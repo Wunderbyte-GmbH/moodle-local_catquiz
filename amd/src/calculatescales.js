@@ -33,6 +33,9 @@ const SELECTORS = {
 export const init = () => {
 
     const calculateButton = document.querySelector(SELECTORS.CALCULATEBUTTON);
+    if (!calculateButton) {
+        return;
+    }
     const contextId = parseInt(calculateButton.dataset.contextid);
     calculateButton.onclick = () => {
         updateParameters(contextId);
