@@ -93,6 +93,12 @@ class response_submitter {
 
         // Make the web service call.
         $curl = new curl();
+        $curl->setopt(
+            [
+                'CURLOPT_SSL_VERIFYPEER' => false,
+                'CURLOPT_SSL_VERIFYHOST' => false,
+            ]
+        );
 
         try {
             $response = $curl->post($serverurl, $params);

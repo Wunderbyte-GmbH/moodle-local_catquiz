@@ -16,6 +16,10 @@
 
 namespace local_catquiz\remote\hash;
 
+use dml_write_exception;
+use Exception;
+use stdClass;
+
 /**
  * Handles question hash generation and verification.
  *
@@ -27,14 +31,7 @@ namespace local_catquiz\remote\hash;
  */
 class question_hasher {
 
-    /**
-     * Generate a hash for a question.
-     *
-     * @param int $questionid The question ID
-     * @return string The generated hash
-     * @throws \moodle_exception
-     */
-    public static function generate_hash($questionid) {
+    public static function get_hash_data($questionid): string {
         global $DB;
 
         // Get question data.
@@ -64,20 +61,49 @@ class question_hasher {
             ];
         }
 
+        return json_encode($hashdata);
+    }
+
+    /**
+     * Generate a hash for a question.
+     *
+     * @param int $questionid The question ID
+     * @param ?array $hashdata Optional hash data. If not given, will be generated.
+     * @return string The generated hash
+     * @throws \moodle_exception
+     */
+    public static function generate_hash(int $questionid, ?array $hashdata = null) {
+        global $DB;
+
+        if (!$hashdata) {
+            $hashdata = self::get_hash_data($questionid);
+        }
+        $hash = hash('sha256', $hashdata);
+
         // Store hash data for verification.
         $record = new \stdClass();
         $record->questionid = $questionid;
-        $record->hashdata = json_encode($hashdata);
-        $record->questionhash = hash('sha256', $record->hashdata);
-        $record->timecreated = time();
-        $record->timemodified = $record->timecreated;
+        $record->hashdata = $hashdata;
+        $record->questionhash = $hash;
+        $record->timemodified = time();
 
-        // Store or update hash mapping.
-        if ($existing = $DB->get_record('local_catquiz_qhashmap', ['questionid' => $questionid])) {
-            $record->id = $existing->id;
-            $DB->update_record('local_catquiz_qhashmap', $record);
-        } else {
-            $DB->insert_record('local_catquiz_qhashmap', $record);
+        try {
+            // Store or update hash mapping.
+            if ($existing = $DB->get_record('local_catquiz_qhashmap', ['questionid' => $questionid])) {
+                $record->id = $existing->id;
+                $DB->update_record('local_catquiz_qhashmap', $record);
+            } else {
+                $record->timecreated = time();
+                $DB->insert_record('local_catquiz_qhashmap', $record);
+            }
+        } catch (dml_write_exception $e) {
+            // If we are here, we could not insert or update the record. The
+            // most likely cause is that we have multiple questions with the
+            // exact same data, so they map to the same hash.
+            if ($existing = $DB->record_exists('local_catquiz_qhashmap', ['questionhash' => $hash])) {
+                return $hash;
+            }
+            throw $e;
         }
 
         return $record->questionhash;
@@ -114,5 +140,41 @@ class question_hasher {
 
         $newhash = self::generate_hash($questionid);
         return $currenthash->questionhash === $newhash;
+    }
+
+    private static function calculate_hash(stdClass $question, array $answers) {
+        global $DB;
+
+        // Get question answers.
+        $answers = $DB->get_records('question_answers', ['question' => $question->id], 'id ASC');
+
+        // Build hash data array.
+        $hashdata = [
+            'questiontext' => $question->questiontext,
+            'questiontextformat' => $question->questiontextformat,
+            'generalfeedback' => $question->generalfeedback,
+            'defaultmark' => $question->defaultmark,
+            'penalty' => $question->penalty,
+            'answers' => [],
+        ];
+
+        foreach ($answers as $answer) {
+            $hashdata['answers'][] = [
+                'answertext' => $answer->answer,
+                'fraction' => $answer->fraction,
+                'feedback' => $answer->feedback,
+            ];
+        }
+
+        $hashdata = json_encode($hashdata);
+        $questionhash = hash('sha256', $hashdata);
+        return [
+            'hashdata' => $hashdata,
+            'hash' => $questionhash,
+        ];
+    }
+
+    public static function find_duplicates(array $questions) {
+
     }
 }
