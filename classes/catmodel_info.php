@@ -34,6 +34,7 @@ use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\task\recalculate_cat_model_params;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_strategy;
 use moodle_exception;
 use moodle_url;
 
@@ -65,10 +66,7 @@ class catmodel_info {
             $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
-        // Return the data that are currently saved in the DB.
-        $context = catcontext::load_from_db($contextid);
-        $strategy = $context->get_strategy($catscaleid);
-        return $strategy->get_params_from_db($contextid, $catscaleid);
+        return model_strategy::get_params_from_db($contextid, $catscaleid);
     }
 
     /**
