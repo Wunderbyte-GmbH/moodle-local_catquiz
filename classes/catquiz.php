@@ -2931,6 +2931,13 @@ SQL;
         return $record->contextid;
     }
 
+    /**
+     * Save the given sync event to the database
+     *
+     * @param stdClass $data
+     *
+     * @return void
+     */
     public function save_sync_event(stdClass $data): void {
         global $DB;
 

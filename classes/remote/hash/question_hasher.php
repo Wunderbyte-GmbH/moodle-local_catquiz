@@ -17,8 +17,6 @@
 namespace local_catquiz\remote\hash;
 
 use dml_write_exception;
-use Exception;
-use stdClass;
 
 /**
  * Handles question hash generation and verification.
@@ -30,8 +28,14 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class question_hasher {
-
-    public static function get_hash_data($questionid): string {
+    /**
+     * Gets the hash data for the given question ID
+     *
+     * @param int $questionid
+     *
+     * @return string
+     */
+    public static function get_hash_data(int $questionid): string {
         global $DB;
 
         // Get question data.
@@ -140,41 +144,5 @@ class question_hasher {
 
         $newhash = self::generate_hash($questionid);
         return $currenthash->questionhash === $newhash;
-    }
-
-    private static function calculate_hash(stdClass $question, array $answers) {
-        global $DB;
-
-        // Get question answers.
-        $answers = $DB->get_records('question_answers', ['question' => $question->id], 'id ASC');
-
-        // Build hash data array.
-        $hashdata = [
-            'questiontext' => $question->questiontext,
-            'questiontextformat' => $question->questiontextformat,
-            'generalfeedback' => $question->generalfeedback,
-            'defaultmark' => $question->defaultmark,
-            'penalty' => $question->penalty,
-            'answers' => [],
-        ];
-
-        foreach ($answers as $answer) {
-            $hashdata['answers'][] = [
-                'answertext' => $answer->answer,
-                'fraction' => $answer->fraction,
-                'feedback' => $answer->feedback,
-            ];
-        }
-
-        $hashdata = json_encode($hashdata);
-        $questionhash = hash('sha256', $hashdata);
-        return [
-            'hashdata' => $hashdata,
-            'hash' => $questionhash,
-        ];
-    }
-
-    public static function find_duplicates(array $questions) {
-
     }
 }

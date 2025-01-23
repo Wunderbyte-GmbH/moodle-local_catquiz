@@ -270,7 +270,6 @@ class fetch_parameters extends external_api {
                 // If there is no entry yet for the given scale and component:
                 // insert with new contextid. Otherwise: update with new
                 // contextid.
-                // Returns NULL even if we have already the new param
                 $localparam = $repo->get_item_with_params(
                     $questionid,
                     $param->model,

@@ -36,17 +36,44 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * This class holds a single sync event
  */
 class sync_event {
-
+    /**
+     * The context ID where this sync event occurs
+     * @var int
+     */
     private int $contextid;
 
+    /**
+     * The ID of the CAT scale being synced
+     * @var int
+     */
     private int $catscaleid;
 
+    /**
+     * Number of parameters fetched during sync
+     * @var int
+     */
     private int $numfetchedparams;
 
+    /**
+     * The ID of the user performing the sync
+     * @var int
+     */
     private int $userid;
 
+    /**
+     * The catquiz repository instance
+     * @var catquiz
+     */
     private catquiz $repo;
 
+    /**
+     * Creates a new sync event
+     *
+     * @param int $contextid The context ID where this sync event occurs
+     * @param int $catscaleid The ID of the CAT scale being synced
+     * @param int $numfetchedparams Number of parameters fetched during sync
+     * @param catquiz|null $repo Optional catquiz repository instance
+     */
     public function __construct(
         int $contextid,
         int $catscaleid,
@@ -64,10 +91,20 @@ class sync_event {
         }
     }
 
+    /**
+     * Saves this sync event to the database
+     *
+     * @return void
+     */
     public function save() {
         $this->repo->save_sync_event($this->as_record());
     }
 
+    /**
+     * Converts this sync event to a database record
+     *
+     * @return stdClass The sync event as a database record
+     */
     private function as_record(): stdClass {
         return (object) [
             'contextid' => $this->contextid,
