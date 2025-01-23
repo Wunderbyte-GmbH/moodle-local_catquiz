@@ -138,6 +138,11 @@ final class model_responses_test extends basic_testcase {
         ];
     }
 
+    /**
+     * Test if setting values works as expected
+     *
+     * @return void
+     */
     public function test_setting_values_works_as_expected(): void {
         $mr = new model_responses();
         $mr->set('P1', 'A1', 1.0);
@@ -150,6 +155,11 @@ final class model_responses_test extends basic_testcase {
         $this->assertEquals(2 / 3, $mr->get_item_fraction('A1'));
     }
 
+    /**
+     * Test if person params can be updated
+     *
+     * @return void
+     */
     public function test_personparam_can_be_updated(): void {
         $mr = new model_responses();
         $mr->set(1, 'A1', 1.0);
@@ -166,8 +176,10 @@ final class model_responses_test extends basic_testcase {
 
     /**
      * Test creating responses from remote responses table
+     *
+     * @return void
      */
-    public function test_create_from_remote_responses() {
+    public function test_create_from_remote_responses(): void {
                 // Create some test data.
                 $testdata = [
                     (object) [
