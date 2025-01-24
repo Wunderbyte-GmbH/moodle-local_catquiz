@@ -51,9 +51,6 @@ abstract class preselect_task {
     /**
      * This is the function in which the $context can be modified.
      *
-     * To return early and skip the rest of the middleware chain, return a result directly.
-     * Otherwise, call $next($context) to let the next middleware do its work.
-     *
      * @param array $context The input that can be modified
      * @return result
      */
