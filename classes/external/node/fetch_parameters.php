@@ -27,7 +27,6 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use external_multiple_structure;
-use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
@@ -49,6 +48,13 @@ class fetch_parameters extends external_api {
      * @var array
      */
     private static array $existingitems = [];
+
+    /**
+     * Stores context IDs between the fetched and older contexts.
+     *
+     * @var ?array
+     */
+    private static ?array $intermediatecontexts = null;
 
     /**
      * Returns description of method parameters.
@@ -101,7 +107,6 @@ class fetch_parameters extends external_api {
         $starttime = microtime(true);
         $warnings = [];
         $errors = 0;
-        $newparams = [];
         $changedparams = [];
 
         $scale = $DB->get_record('local_catquiz_catscales', ['id' => $params['scaleid']], '*', MUST_EXIST);
@@ -114,7 +119,7 @@ class fetch_parameters extends external_api {
         $targetcontext = $repo->get_last_synced_context_id($scale->id);
         $activecontext = catscale::get_context_id($scale->id);
         if (!$targetcontext) {
-            $targetcontext = catscale::get_context_id($scale->id);
+            $targetcontext = $activecontext;
         }
 
         // Create a mapping of catscale labels to IDs.
@@ -136,8 +141,6 @@ class fetch_parameters extends external_api {
 
         $questions = $DB->get_records_sql($sql, $inscaleparams);
         $hashmap = [];
-
-        $duplicates = question_hasher::find_duplicates($questions);
 
         // Generate and store hashes for all questions.
         foreach ($questions as $question) {
@@ -232,7 +235,6 @@ class fetch_parameters extends external_api {
             false
         );
 
-        $haschanged = false;
         $stored = 0;
 
         // Store the received parameters.
@@ -273,8 +275,29 @@ class fetch_parameters extends external_api {
                 $localparam = $repo->get_item_with_params(
                     $questionid,
                     $param->model,
-                    $activecontext
+                    $targetcontext
                 );
+
+                // If not found, check intermediate contexts.
+                if (!$localparam) {
+                    // Traverse from newest to oldest and see if the item exists in an intermediate context.
+                    $intermediatecontexts = self::get_intermediate_context_ids(
+                        min($activecontext, [$targetcontext]),
+                        $newcontext->id
+                    );
+                    foreach ($intermediatecontexts as $context) {
+                        $localparam = $repo->get_itemparams_for(
+                            [
+                                'componentid' => $questionid,
+                                'model' => $param->model,
+                                'contextid' => $context,
+                            ]
+                        );
+                        if ($localparam) {
+                            break;
+                        }
+                    }
+                }
 
                 if (!$localparam) {
                     // Insert only once per questionid.
@@ -291,13 +314,13 @@ class fetch_parameters extends external_api {
                         );
                         self::$existingitems[$questionid] = true;
                     }
-                    $newparams[] = ['item' => $itemrecord, 'param' => $param];
                 }
 
                 // If it did not change, we can skip it.
                 $changed = !$localparam // This is a new model param we do not have locally.
                     || !self::check_float_equal($param->difficulty, $localparam->difficulty)
                     || !self::check_float_equal($param->discrimination, $localparam->discrimination)
+                    || !self::check_float_equal($param->guessing, $localparam->guessing)
                     || $param->json != $localparam->json
                     || $param->status != $localparam->status;
 
@@ -307,13 +330,14 @@ class fetch_parameters extends external_api {
 
                 // Create and save the item parameter.
                 $record = (object)[
-                    'itemid' => $itemid,
+                    'itemid' => $itemid ?? null,
                     'componentid' => $questionid,
                     'componentname' => 'question',
                     'model' => $param->model,
                     'contextid' => $newcontext->id,
                     'difficulty' => $param->difficulty,
                     'discrimination' => $param->discrimination,
+                    'guessing' => $param->guessing ?? 0,
                     'status' => $param->status,
                     'json' => $param->json,
                 ];
@@ -398,5 +422,25 @@ class fetch_parameters extends external_api {
      */
     private static function check_float_equal(float $num1, float $num2, int $precision = 4) {
         return abs($num1 - $num2) < pow(10, -1 * $precision);
+    }
+
+    /**
+     * Just returns a simple range of context IDs between start- and end-context
+     *
+     * @param int $startcontextid
+     * @param int $endcontextid
+     *
+     * @return array
+     */
+    private function get_intermediate_context_ids(int $startcontextid, int $endcontextid) {
+        if (is_null(self::$intermediatecontexts)) {
+            self::$intermediatecontexts = array_reverse(
+                range(
+                    $startcontextid,
+                    $endcontextid
+                )
+            );
+        }
+        return self::$intermediatecontexts;
     }
 }
