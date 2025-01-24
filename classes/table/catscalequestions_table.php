@@ -196,7 +196,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @param \stdClass $values
      * @return string
      */
-    public function col_lastattempttime($values) {
+    public function col_astatlastattempttime($values) {
 
         if (intval($values->astatlastattempttime) === 0) {
             return get_string('notyetcalculated', 'local_catquiz');

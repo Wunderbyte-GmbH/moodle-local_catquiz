@@ -127,7 +127,7 @@ class questionsdisplay {
             'name' => get_string('name', 'core'),
             'model' => get_string('model', 'local_catquiz'),
             'attempts' => get_string('attempts', 'local_catquiz'),
-            'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
+            'astatlastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
             'discrimination' => get_string('discrimination', 'local_catquiz'),
             'guessing' => get_string('guessing', 'local_catquiz'),
