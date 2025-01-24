@@ -432,7 +432,7 @@ class fetch_parameters extends external_api {
      *
      * @return array
      */
-    private function get_intermediate_context_ids(int $startcontextid, int $endcontextid) {
+    private static function get_intermediate_context_ids(int $startcontextid, int $endcontextid) {
         if (is_null(self::$intermediatecontexts)) {
             self::$intermediatecontexts = array_reverse(
                 range(
