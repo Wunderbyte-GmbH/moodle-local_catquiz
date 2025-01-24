@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Shuffles the array of questions so that a random one will be selected
@@ -35,31 +34,17 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class strategyrandom extends preselect_task implements wb_middleware {
-
+final class strategyrandom extends preselect_task {
     /**
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         shuffle($context['questions']);
         return result::ok(reset($context['questions']));
-    }
-
-    /**
-     * Get required context keys
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
     }
 }

@@ -54,11 +54,7 @@ final class strategyfastestscore_test extends basic_testcase {
         array $context,
         $expected
     ): void {
-        $next = fn () => 'nevercalled';
-        $result = (new strategyfastestscore())->run(
-            $context,
-            $next
-        );
+        $result = (new strategyfastestscore())->run($context);
         $this->assertEquals($expected['id'], $result->unwrap()->id);
     }
 

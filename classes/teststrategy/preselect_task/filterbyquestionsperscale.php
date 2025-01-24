@@ -28,7 +28,6 @@ use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Includes or excludes scales based on the number of questions played
@@ -43,8 +42,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filterbyquestionsperscale extends preselect_task implements wb_middleware {
-
+class filterbyquestionsperscale extends preselect_task {
     /**
      * @var progress
      */
@@ -54,16 +52,15 @@ class filterbyquestionsperscale extends preselect_task implements wb_middleware 
      * Run method.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
 
         if (!in_array($context['teststrategy'], [LOCAL_CATQUIZ_STRATEGY_ALLSUBS])) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $minquestionsperscale = $context['min_attempts_per_scale'];
@@ -89,7 +86,7 @@ class filterbyquestionsperscale extends preselect_task implements wb_middleware 
                     PHP_EOL
                 );
             }
-            return $next($context);
+            return result::ok($context);
         }
 
         // If we are here, not all scales have the minimum questions.
@@ -105,20 +102,6 @@ class filterbyquestionsperscale extends preselect_task implements wb_middleware 
                 );
             }
         }
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'progress',
-            'questionsperscale',
-            'teststrategy',
-        ];
+        return result::ok($context);
     }
 }

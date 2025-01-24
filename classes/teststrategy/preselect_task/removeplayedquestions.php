@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Class removeplayedquestions removes questions that were already shown to the user in the current quiz attempt.
@@ -36,8 +35,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class removeplayedquestions extends preselect_task implements wb_middleware {
-
+final class removeplayedquestions extends preselect_task {
     /**
      * @var progress
      */
@@ -47,16 +45,15 @@ final class removeplayedquestions extends preselect_task implements wb_middlewar
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $playedquestions = $this->progress->get_playedquestions();
         if (! $playedquestions) {
-            return $next($context);
+            return result::ok($context);
         }
         foreach (array_keys($playedquestions) as $qid) {
             if (array_key_exists($qid, $context['questions'])) {
@@ -64,18 +61,6 @@ final class removeplayedquestions extends preselect_task implements wb_middlewar
             }
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
+        return result::ok($context);
     }
 }

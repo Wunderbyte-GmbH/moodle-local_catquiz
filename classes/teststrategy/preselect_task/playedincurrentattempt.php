@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Class playedincurrentattempt for test strategy.
@@ -36,8 +35,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class playedincurrentattempt extends preselect_task implements wb_middleware {
-
+final class playedincurrentattempt extends preselect_task {
     /**
      * PENALTY
      *
@@ -54,12 +52,11 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $playedquestions = $this->progress->get_playedquestions();
         foreach ($context['questions'] as $q) {
@@ -70,18 +67,6 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
             }
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
+        return result::ok($context);
     }
 }

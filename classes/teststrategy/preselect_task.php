@@ -25,8 +25,6 @@
 namespace local_catquiz\teststrategy;
 
 use local_catquiz\local\result;
-use local_catquiz\local\status;
-use local_catquiz\wb_middleware;
 
 /**
  * Base class for a pre-select task.
@@ -43,8 +41,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class preselect_task implements wb_middleware {
-
+abstract class preselect_task {
     /**
      *
      * @var array|null $context
@@ -52,51 +49,10 @@ abstract class preselect_task implements wb_middleware {
     protected ?array $context;
 
     /**
-     * The next task
-     *
-     * @var callable
-     */
-    protected $nexttask;
-
-    /**
-     * Process test strategy
-     *
-     * @param array $context
-     * @param callable $nexttask
-     *
-     * @return result
-     *
-     */
-    public function process(array &$context, callable $nexttask): result {
-        foreach ($this->get_required_context_keys() as $key) {
-            if (!array_key_exists($key, $context)) {
-                return result::err(status::ERROR_FETCH_NEXT_QUESTION);
-            }
-        }
-
-        $context['lastmiddleware'] = str_replace(__NAMESPACE__ . '\\preselect_task\\', '', get_class($this));
-        $this->context = $context;
-        $this->nexttask = $nexttask;
-        return $this->run($context, $nexttask);
-    }
-
-    /**
      * This is the function in which the $context can be modified.
      *
-     * To return early and skip the rest of the middleware chain, return a result directly.
-     * Otherwise, call $next($context) to let the next middleware do its work.
-     *
      * @param array $context The input that can be modified
-     * @param callable $next Callable that calls the next middleware
      * @return result
      */
-    abstract public function run(array &$context, callable $next): result;
-
-    /**
-     * If a middleware requires a specific key to be available in the $context
-     * input array, it can be specified here.
-     *
-     * @return array
-     */
-    abstract public function get_required_context_keys(): array;
+    abstract public function run(array &$context): result;
 }

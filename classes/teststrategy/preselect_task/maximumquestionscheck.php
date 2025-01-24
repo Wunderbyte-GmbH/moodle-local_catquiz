@@ -24,12 +24,10 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use local_catquiz\catcontext;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Test strategy maximumquestionscheck.
@@ -38,47 +36,21 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maximumquestionscheck extends preselect_task implements wb_middleware {
-
-    /**
-     * @var progress $progress
-     */
-    private progress $progress;
-
+final class maximumquestionscheck extends preselect_task {
     /**
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
-        $this->progress = $context['progress'];
-
+    public function run(array &$context): result {
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
-            // Update the person ability and then end the quiz.
-            $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
-            $updatepersonability = new updatepersonability();
-            return $updatepersonability->process($context, $next);
+            return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questionsattempted',
-            'maximumquestions',
-            'progress',
-        ];
+        return result::ok($context);
     }
 }

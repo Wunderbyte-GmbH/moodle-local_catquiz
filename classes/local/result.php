@@ -15,27 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Сlass status.
+ * Сlass result.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz\local;
 
+use Exception;
 use local_catquiz\local\status;
 
 /**
  * Provides methods to obtain results.
  *
- *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class result {
-
+abstract class result {
     /**
      * @var string status
      */
@@ -63,11 +62,10 @@ class result {
      * @param string $status
      * @param mixed|null $value
      *
-     * @return result
-     *
+     * @return fail
      */
-    public static function err(string $status = status::ERROR_GENERAL, $value = null) {
-        return new result($value, $status);
+    public static function err(string $status = status::ERROR_GENERAL, $value = null): fail {
+        return new fail($value, $status);
     }
 
     /**
@@ -75,12 +73,38 @@ class result {
      *
      * @param mixed|null $value
      *
+     * @return success
+     */
+    public static function ok($value = null): success {
+        return new success($value, status::OK);
+    }
+
+    /**
+     * Calls the given callable if successful
+     *
+     * @param callable $op
+     *
+     * @return result
+     */
+    abstract public function and_then(callable $op): result;
+
+    /**
+     * Calls the given callable if not successful
+     *
+     * @param callable $op
+     *
+     * @return result
+     */
+    abstract public function or_else(callable $op): result;
+
+    /**
+     * Throws an exception if not successful
+     *
      * @return result
      *
+     * @throws Exception
      */
-    public static function ok($value = null) {
-        return new result($value, status::OK);
-    }
+    abstract public function expect(): result;
 
     /**
      * Returns status.

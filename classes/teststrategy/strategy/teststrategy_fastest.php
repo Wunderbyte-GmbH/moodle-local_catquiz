@@ -24,31 +24,17 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\local\result;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
-use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\checkbreak;
-use local_catquiz\teststrategy\preselect_task\checkitemparams;
-use local_catquiz\teststrategy\preselect_task\checkpagereload;
-use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
-use local_catquiz\teststrategy\preselect_task\fisherinformation;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
-use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
-use local_catquiz\teststrategy\preselect_task\mayberemovescale;
-use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
-use local_catquiz\teststrategy\preselect_task\noremainingquestions;
-use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
-use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
-use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
 /**
@@ -59,7 +45,6 @@ use local_catquiz\teststrategy\strategy;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class teststrategy_fastest extends strategy {
-
     /**
      *
      * @var int $id // strategy id defined in lib.
@@ -72,32 +57,24 @@ class teststrategy_fastest extends strategy {
      */
     public feedbacksettings $feedbacksettings;
 
+    /**
+     * Return the next question
+     *
+     * @return preselect_task
+     */
+    public function get_selector(): preselect_task {
+        return new strategyfastestscore();
+    }
 
     /**
-     * Returns required score modifiers.
+     * If true, the first question selector is called before updating the ability.
      *
-     * @return array
+     * Quickfix, could probabily be removed.
      *
+     * @return bool
      */
-    public function get_preselecttasks(): array {
-        return [
-            checkitemparams::class,
-            checkbreak::class,
-            checkpagereload::class,
-            firstquestionselector::class,
-            updatepersonability::class,
-            fisherinformation::class,
-            addscalestandarderror::class,
-            maximumquestionscheck::class,
-            removeplayedquestions::class,
-            maybe_return_pilot::class,
-            remove_uncalculated::class,
-            noremainingquestions::class,
-            mayberemovescale::class,
-            lasttimeplayedpenalty::class,
-            filterbystandarderror::class,
-            strategyfastestscore::class,
-        ];
+    protected function pre_check_first_question_selector(): bool {
+        return true;
     }
 
     /**
@@ -190,5 +167,14 @@ class teststrategy_fastest extends strategy {
             }
         }
         return $newabilities;
+    }
+
+    /**
+     * In this strategy, we do not need to calculate this.
+     *
+     * @return result
+     */
+    protected function filterbytestinfo(): result {
+        return result::ok($this->context);
     }
 }

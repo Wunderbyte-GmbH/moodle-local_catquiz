@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 use stdClass;
 
 /**
@@ -36,7 +35,7 @@ use stdClass;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lasttimeplayedpenalty extends preselect_task implements wb_middleware {
+final class lasttimeplayedpenalty extends preselect_task {
 
     /**
      * This is used as factor in the exp function
@@ -57,32 +56,18 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $now = time();
-        $context['questions'] = array_map(function($q) use ($now, $context) {
+        $context['questions'] = array_map(function ($q) use ($now, $context) {
             $q->lasttimeplayedpenaltyfactor = $this->get_penalty_factor($q, $now, $context['penalty_threshold']);
             return $q;
         }, $context['questions']);
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'penalty_threshold',
-        ];
+        return result::ok($context);
     }
 
     /**

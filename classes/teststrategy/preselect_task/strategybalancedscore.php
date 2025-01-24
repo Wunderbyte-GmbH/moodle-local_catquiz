@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Add a score to each question and sort questions descending by score
@@ -35,18 +34,16 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class strategybalancedscore extends preselect_task implements wb_middleware {
-
+final class strategybalancedscore extends preselect_task {
     /**
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         foreach ($context['questions'] as $question) {
             // If no question has any attempt yet, they all get the same score of 0.
             if ($context['generalnumberofattempts_max'] === 0) {
@@ -60,7 +57,7 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
 
         // In order to have predictable results, in case the values of two
         // elements are exactly the same, sort by question ID.
-        uasort($context['questions'], function($q1, $q2) {
+        uasort($context['questions'], function ($q1, $q2) {
             if (! ($q2->score === $q1->score)) {
                 return $q2->score <=> $q1->score;
             }
@@ -68,19 +65,5 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
         });
 
         return result::ok(reset($context['questions']));
-    }
-
-    /**
-     * Get required context keys
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'penalty_threshold',
-            'questions',
-            'generalnumberofattempts_max',
-        ];
     }
 }

@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Checks if we have a new response. If not, presents the previous question again.
@@ -36,8 +35,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class checkpagereload extends preselect_task implements wb_middleware {
-
+final class checkpagereload extends preselect_task {
     /**
      * @var progress $progress
      */
@@ -47,29 +45,20 @@ final class checkpagereload extends preselect_task implements wb_middleware {
      * Run.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
-        if (($this->progress->is_first_question() && !$this->progress->get_last_question())
+        if (
+            ($this->progress->is_first_question() && !$this->progress->get_last_question())
             || $this->progress->has_new_response()
             || $this->progress->get_force_new_question()
         ) {
-            return $next($context);
+            return result::ok($context);
         }
 
         return result::ok($this->progress->get_last_question());
-    }
-
-    /**
-     * Returns the context key.
-     *
-     * @return array
-     */
-    public function get_required_context_keys(): array {
-        return ['progress'];
     }
 }

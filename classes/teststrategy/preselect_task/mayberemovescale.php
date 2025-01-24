@@ -24,11 +24,9 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Checks if subscales should be excluded and removes the respective questions
@@ -37,8 +35,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class mayberemovescale extends preselect_task implements wb_middleware {
-
+final class mayberemovescale extends preselect_task {
     /**
      * @var progress
      */
@@ -48,20 +45,19 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $played = $this->progress->get_playedquestions(true);
         if (count($played) === 0) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($context['max_attempts_per_scale'] == -1) {
-            return $next($context);
+            return result::ok($context);
         }
 
         foreach ($played as $catscaleid => $questions) {
@@ -73,20 +69,6 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
             }
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'max_attempts_per_scale',
-            'progress',
-        ];
+        return result::ok($context);
     }
 }

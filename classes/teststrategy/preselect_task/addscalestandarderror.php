@@ -24,14 +24,11 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Calculates the standarderror for each available catscale.
@@ -45,7 +42,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class addscalestandarderror extends preselect_task implements wb_middleware {
+class addscalestandarderror extends preselect_task {
 
     /**
      * @var progress $progress
@@ -56,16 +53,15 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      * Run method.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $responses = $this->progress->get_user_responses();
         if (! $responses) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $userresponses = model_responses::create_from_array([$context['userid'] => ['component' => $responses]]);
@@ -75,22 +71,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             $context['se'][$catscaleid] = $se;
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'contextid',
-            'questions',
-            'initial_standarderror',
-            'person_ability',
-            'progress',
-        ];
+        return result::ok($context);
     }
 }

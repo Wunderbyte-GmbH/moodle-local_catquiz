@@ -31,14 +31,11 @@ use local_catquiz\catcalc;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 use moodle_exception;
 
 /**
@@ -48,8 +45,7 @@ use moodle_exception;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class updatepersonability extends preselect_task implements wb_middleware {
-
+class updatepersonability extends preselect_task {
     /**
      * Threshold for calculating a mean ability
      *
@@ -160,13 +156,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
+        $this->context = $context;
 
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
@@ -178,7 +174,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             )
         ) {
             $context['skip_reason'] = 'lastquestionnull';
-            return $next($context);
+            return result::ok($context);
         }
 
         $this->userresponses = model_responses::create_from_array(
@@ -188,7 +184,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         if (!empty($this->progress->get_last_question()->is_pilot)) {
             $context['skip_reason'] = 'pilotquestion';
-            return $next($context);
+            return result::ok($context);
         }
 
         $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
@@ -217,7 +213,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**
@@ -348,20 +344,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         return $context;
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'contextid',
-            'catscaleid',
-            'progress',
-        ];
     }
 
     /**

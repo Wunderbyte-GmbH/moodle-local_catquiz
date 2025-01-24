@@ -32,7 +32,6 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\context\loader\personability_loader;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 use UnexpectedValueException;
 
 /**
@@ -44,41 +43,34 @@ use UnexpectedValueException;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filterbystandarderror extends preselect_task implements wb_middleware {
-
+class filterbystandarderror extends preselect_task {
     /**
      * @var progress
      */
     private progress $progress;
 
     /**
-     * @var callable $next
-     */
-    private $next;
-
-    /**
      * Run method.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
-        $this->next = $next;
+    public function run(array &$context): result {
+        $this->context = $context;
         $this->progress = $context['progress'];
 
         if ($this->progress->is_first_question()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if (!$this->progress->has_new_response()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($this->progress->get_last_question()->is_pilot) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $lastquestion = $this->progress->get_last_question();
@@ -98,7 +90,8 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "%d: [SE] drop %s%s",
                     count($this->progress->get_playedquestions()),
-                    (catscale::return_catscale_object($scaleid))->name, PHP_EOL
+                    (catscale::return_catscale_object($scaleid))->name,
+                    PHP_EOL
                 );
                 $this->progress->drop_scale($scaleid);
                 $inheritscales = $this->get_scale_heirs($scaleid);
@@ -144,23 +137,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             }
         }
 
-        return $next($context);
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'progress',
-            'se_max',
-            'progress',
-            'pp_min_inc',
-        ];
+        return result::ok($context);
     }
 
     /**
@@ -210,7 +187,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         if ($drop) {
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
-        return ($this->next)($this->context);
+        return result::ok($this->context);
     }
 
     /**

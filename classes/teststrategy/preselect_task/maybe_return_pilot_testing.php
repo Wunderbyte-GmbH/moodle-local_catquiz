@@ -24,8 +24,6 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use local_catquiz\wb_middleware;
-
 /**
  * Randomly returns a pilot question according to the `pilot_ratio` parameter
  *
@@ -33,8 +31,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maybe_return_pilot_testing extends maybe_return_pilot implements wb_middleware {
-
+final class maybe_return_pilot_testing extends maybe_return_pilot {
     /**
      * This value is used to return a pilot question.
      */
