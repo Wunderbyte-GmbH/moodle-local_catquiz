@@ -2784,7 +2784,9 @@ SQL;
         // Create a mapping of questionid -> item.
         // If it exists in both old and new context, the mapping maps to the new context.
         $qid2item = [];
-        $contextids = array_reverse(range($oldcontextid, $newcontextid));
+        $contextids = $oldcontextid
+            ? array_reverse(range($oldcontextid, $newcontextid))
+            : [$newcontextid];
         [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'contextid');
         foreach ($DB->get_records_select('local_catquiz_items', "contextid $insql", $inparams) as $i) {
             if (!isset($qid2item[$i->componentid]) || $i->contextid > $qid2item[$i->componentid]->contextid) {
