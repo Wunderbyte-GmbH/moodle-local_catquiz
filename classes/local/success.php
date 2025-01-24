@@ -35,6 +35,8 @@ class success extends result {
     /**
      * Calls the given callable
      *
+     * @param callable $op
+     *
      * @return result
      */
     public function and_then(callable $op): result {
@@ -44,6 +46,8 @@ class success extends result {
     /**
      * Just returns the current result
      *
+     * @param callable $op
+     *
      * @return result
      */
     public function or_else(callable $op): result {
@@ -52,6 +56,8 @@ class success extends result {
 
     /**
      * Just returns the current result
+     *
+     * @return result
      */
     public function expect(): result {
         return $this;

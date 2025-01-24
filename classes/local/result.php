@@ -82,6 +82,8 @@ abstract class result {
     /**
      * Calls the given callable if successful
      *
+     * @param callable $op
+     *
      * @return result
      */
     abstract public function and_then(callable $op): result;
@@ -89,12 +91,16 @@ abstract class result {
     /**
      * Calls the given callable if not successful
      *
+     * @param callable $op
+     *
      * @return result
      */
     abstract public function or_else(callable $op): result;
 
     /**
      * Throws an exception if not successful
+     *
+     * @return result
      *
      * @throws Exception
      */

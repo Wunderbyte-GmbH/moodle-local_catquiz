@@ -267,9 +267,11 @@ abstract class strategy {
     /**
      * Executes steps that are always performed after an error
      *
+     * @param result $result
+     *
      * @return result
      */
-    private function after_error($result) {
+    private function after_error(result $result) {
         $this->progress->save();
         $this->update_attemptfeedback($this->context);
         $this->cache->set('endtime', time());
