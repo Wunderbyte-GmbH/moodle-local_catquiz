@@ -2590,6 +2590,18 @@ class catquiz {
     }
 
     /**
+     * Returns the itemparam for the given conditions
+     *
+     * @param array $conditions Use field as array key and required value as array value, e.g. ['contextid' => 1]
+     * @return ?stdClass
+     */
+    public static function get_itemparams_for($conditions = []): ?stdClass {
+        global $DB;
+        $record = $DB->get_record('local_catquiz_itemparams', $conditions);
+        return $record ?: null;
+    }
+
+    /**
      * Save an item param
      *
      * @param stdClass $record The record to save
@@ -2735,7 +2747,7 @@ SQL;
          *
          * For each item parameter in the new context:
          * 1. Get the corresponding item from either context
-         * 2. If an item is in active use in the old context, create a new item (copy).
+         * 2. If an item is in active use in the old context (used by a test), create a new item (copy).
          * 3. Otherwise update the existing item with new context and active parameter
          * 4. Update all parameters to point to the correct item
          *
@@ -2746,16 +2758,38 @@ SQL;
     public function create_items_in_new_context(int $newcontextid, ?int $oldcontextid): void {
         global $DB;
 
+        // Copy item parameters that are present in the old context but not in
+        // the new one from old context to the new.
+        // E.g., if we fetched 100 params from the central instance but locally we have 150, copy
+        // the remaining 50 params.
+        if ($oldcontextid) {
+            $remainingparams = $this->get_params_from_old_context($oldcontextid, $newcontextid);
+            $remainingparams = array_map(
+                function ($param) use ($newcontextid) {
+                    $param->contextid = $newcontextid;
+                    $param->id = null;
+                    return $param;
+                },
+                $remainingparams
+            );
+            $DB->insert_records('local_catquiz_itemparams', $remainingparams);
+        }
+
         // Decide if we should just replace existing items with the new contextid or create new items.
         $createnew = false;
         if (!$oldcontextid || $this->is_active_context($oldcontextid)) {
             $createnew = true;
         }
 
+        // Create a mapping of questionid -> item.
+        // If it exists in both old and new context, the mapping maps to the new context.
         $qid2item = [];
-        [$insql, $inparams] = $DB->get_in_or_equal([$oldcontextid, $newcontextid], SQL_PARAMS_NAMED, 'contextid');
+        $contextids = array_reverse(range($oldcontextid, $newcontextid));
+        [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'contextid');
         foreach ($DB->get_records_select('local_catquiz_items', "contextid $insql", $inparams) as $i) {
-            $qid2item[$i->componentid] = $i;
+            if (!isset($qid2item[$i->componentid]) || $i->contextid > $qid2item[$i->componentid]->contextid) {
+                $qid2item[$i->componentid] = $i;
+            }
         }
 
         $activeparam = [];
@@ -2942,5 +2976,65 @@ SQL;
         global $DB;
 
         $DB->insert_record('local_catquiz_sync_event', $data);
+    }
+
+    /**
+     * Returns the context ids of that are in between the given start- and end-context
+     * for the given scale.
+     *
+     * @param int $catscaleid
+     * @param int $oldcontextid
+     * @param int $newcontextid
+     *
+     * @return array
+     */
+    public static function get_intermediate_context_ids(int $catscaleid, int $oldcontextid, int $newcontextid): array {
+        global $DB;
+
+        $sql = <<<SQL
+            SELECT contextid
+            FROM {local_catquiz_sync_event}
+            WHERE catscaleid = :catscaleid
+            AND contextid >= :oldcontextid
+            AND contextid <= :newcontextid
+            ORDER BY contextid
+        SQL;
+        $params = [
+            'oldcontextid' => $oldcontextid,
+            'newcontextid' => $newcontextid,
+            'catscaleid' => $catscaleid,
+        ];
+        $intermediatecontextids = $DB->get_fieldset_sql(
+            $sql,
+            $params
+        );
+        return $intermediatecontextids;
+    }
+
+    /**
+     * Returns itemparams that are present in the oldcontext but not the new one
+     *
+     * @param int $oldcontextid
+     * @param int $newcontextid
+     *
+     * @return array
+     */
+    public function get_params_from_old_context(int $oldcontextid, int $newcontextid): array {
+        global $DB;
+        $sql = <<<SQL
+            SELECT *
+            FROM {local_catquiz_itemparams} itemsouter
+            WHERE contextid = :oldcontextid
+            AND itemsouter.componentid NOT IN (
+                SELECT componentid
+                FROM {local_catquiz_itemparams}
+                WHERE contextid = :newcontextid
+            )
+        SQL;
+        $params = [
+            'oldcontextid' => $oldcontextid,
+            'newcontextid' => $newcontextid,
+        ];
+        return $DB->get_records_sql($sql, $params);
     }
 }
