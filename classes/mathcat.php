@@ -159,8 +159,7 @@ class mathcat {
      * Returns bfgs value.
      *
      * @param callable $fnfunction - Function to be calculated on with parameter $parameter
-     * @param callable $fnderivative1st - 1st derivative (Jacobian) of $fn_function with parameter $parameter
-     * @param callable $fnderivative2nd - 2nd derivative (Hessian) of $fn_function with parameter $parameter
+     * @param callable $fnderivative - 1st derivative (Jacobian) of $fn_function with parameter $parameter
      * @param array $parameterstart - Parameter-set to start with (should be near zero point)
      * @param int $precission - Accuracy to how many decimal places
      * @param int $maxiterations - Maximum number of iterations
@@ -193,7 +192,7 @@ class mathcat {
         $mxinvhessian = (new matrix(count($parameter), count($parameter)))->identity();
 
         $valjacobian = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
-        $mxgradient = new ($valjacobian); // Note: Line vector.
+        $mxgradient = new matrix ($valjacobian); // Note: Line vector.
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
@@ -239,7 +238,7 @@ class mathcat {
             $mxparameterdiff = $mxparameternew->subtract($mxparameter);
             $mxgradientdiff = $mxgradientnew->subtract($mxgradient);
 
-            // Calculate scaling factor
+            // Note: Calculate scaling factor.
             $rho = $mxparameterdiff->multiply($mxgradientdiff->transpose());
 
             if ($rho <> 0) {
@@ -265,11 +264,11 @@ class mathcat {
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            debugging ('Iteration i: '.$i.' 
-            Position: '.print_r($parameter, true).' 
-            Gradient: '.print_r($mxgradient, true).' 
-            Direction: '.print_r($mxdirection, true).' 
-            Length: '.$directionlength.' 
+            debugging ('Iteration i: '.$i.'
+            Position: '.print_r($parameter, true).'
+            Gradient: '.print_r($mxgradient, true).'
+            Direction: '.print_r($mxdirection, true).'
+            Length: '.$directionlength.'
             Step Length: '.$steplength, DEBUG_DEVELOPER);
         }
 
@@ -445,10 +444,10 @@ class mathcat {
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
 
-            debugging ('Iteration i: '.$i.' 
-            Position: '.print_r($parameter, true).' 
-            Gradient: '.print_r($mxgradient, true).' 
-            Length: '.$gradientlength.' 
+            debugging ('Iteration i: '.$i.'
+            Position: '.print_r($parameter, true).'
+            Gradient: '.print_r($mxgradient, true).'
+            Length: '.$gradientlength.'
             Step Length: '.$steplength, DEBUG_DEVELOPER);
             if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
