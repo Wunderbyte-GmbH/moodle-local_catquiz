@@ -63,13 +63,13 @@ class mathcat {
         $parameter = $parameterstart;
         $parameterstructure = self::array_to_vector($parameter);
         $steplength = 1;
-        $mxparameter = new matrix($parameter);
+        $mxparameter = new matrix ($parameter);
 
         // Calculate the function values from the given functions for current $parameter.
         $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
 
         // Note: Takte the identity matrx as first approximation of the inverse Hessian.
-        $mxinvhessian = (new matrix(count($parameter), count($parameter)))->identity();
+        $mxinvhessian = (new matrix (count($parameter), count($parameter)))->identity();
 
         $valjacobian = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
         $mxgradient = new matrix ($valjacobian); // Note: Line vector.
@@ -81,6 +81,8 @@ class mathcat {
                 // Note: There is nothing to be climed on, we are already at a local extrema.
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
+
+            print_r($mxgradient);
 
             $mxdirection = $mxinvhessian->multiply($mxgradient->transpose());
 
@@ -113,7 +115,7 @@ class mathcat {
             } while ($valfunctionnew < $valfunctiontest);
 
             $valjacobian = $fnderivative(self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure));
-            $mxgradientnew = new ($valjacobian);
+            $mxgradientnew = new matrix ($valjacobian);
 
             $mxparameterdiff = $mxparameternew->subtract($mxparameter);
             $mxgradientdiff = $mxgradientnew->subtract($mxgradient);
