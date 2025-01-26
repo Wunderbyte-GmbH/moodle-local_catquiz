@@ -36,226 +36,124 @@ namespace local_catquiz;
 class mathcat {
 
     /**
-     * Returns gaussian density.
+     * Performs BFGS algorithm and returns optimized parameters.
      *
-     * @param mixed $x
-     * @param mixed $mean
-     * @param mixed $stddeviation
-     *
-     * @return mixed
-     *
-     */
-    public static function gaussian_density($x, $mean, $stddeviation) {
-        $factor1 = 1 / sqrt(2 * M_PI * pow($stddeviation, 2));
-        $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stddeviation, 2)));
-        return $factor1 * $factor2;
-    }
-
-    /**
-     * Returns gaussian density derivative1 value.
-     *
-     * @param mixed $x
-     * @param mixed $m
-     * @param mixed $std
-     *
-     * @return mixed
-     *
-     */
-    public static function gaussian_density_derivative1($x, $m, $std) {
-
-        return (exp(-(($m - $x) ** 2 / (2 * $std ** 2))) * ($m - $x)) / (sqrt(2 * M_PI) * $std ** 3);
-    }
-
-    /**
-     * Returns gaussian density derivative2.
-     *
-     * @param mixed $x
-     * @param mixed $m
-     * @param mixed $std
-     *
-     * @return mixed
-     *
-     */
-    public static function gaussian_density_derivative2($x, $m, $std) {
-        return (exp(-(($m - $x) ** 2 / (2 * $std ** 2)))
-            * ($m ** 2 - $std ** 2 - 2 * $m * $x + $x ** 2)) / (sqrt(2 * M_PI) * $std ** 5);
-    }
-
-    /**
-     * Returns numerical derivative.
-     *
-     * @param callable $func
-     * @param float $h
-     *
-     * @return mixed
-     *
-     */
-    public static function get_numerical_derivative(callable $func, float $h = 1e-5) {
-        $returnfn = function ($x) use ($func, $h) {
-            return ($func($x + $h) - $func($x)) / $h;
-        };
-        return $returnfn;
-    }
-
-    /**
-     * Returns numerical derivative2.
-     *
-     * @param callable $func
-     * @param float $h
-     *
-     * @return mixed
-     *
-     */
-    public static function get_numerical_derivative2(callable $func, float $h = 1e-6) {
-        $returnfn = function ($x) use ($func, $h) {
-            return ($func($x + $h) - $func($x - $h)) / (2 * $h);
-        };
-        return $returnfn;
-    }
-
-    /**
-     * Returns numerical gradient.
-     *
-     * @param callable $func
-     * @param mixed $point
-     * @param mixed $delta
+     * @param callable $fnfunction - Function to be calculated on with parameter $parameter
+     * @param callable $fnderivative - 1st derivative (Jacobian) of $fn_function with parameter $parameter
+     * @param array $parameterstart - Parameter-set to start with (should be near zero point)
+     * @param int $precission - Accuracy to how many decimal places
+     * @param int $maxiterations - Maximum number of iterations
+     * @param callable|null $fnparameterrestrictions - Parameter-check for trusted Region
+     * @param callable|null $fneapestimator - EAP-Estimator (bell curve) function
+     * @param callable|null $fneapestimatorderivative1st - Deriavative of $fneapestimator
      *
      * @return array
      *
      */
-    public static function gradient(callable $func, $point, $delta = 1e-5) {
-        $grad = [];
-        for ($i = 0; $i < count($point); $i++) {
-            $pointplusdelta = $point;
-            $pointminusdelta = $point;
-            $pointplusdelta[$i] += $delta;
-            $pointminusdelta[$i] -= $delta;
-            $grad[$i] = ($func($pointplusdelta) - $func($pointminusdelta)) / (2 * $delta);
-        }
-        return $grad;
-    }
+    public static function bfgs(
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
+        int $precission = 2,
+        int $maxiterations = 50,
+        ?callable $fnparameterrestrictions = null,
+        ?callable $fneapestimator = null,
+        ?callable $fneapestimatorderivative1st = null): array {
 
-    /**
-     * Returns matrix vector product.
-     *
-     * @param mixed $matrix
-     * @param mixed $vector
-     *
-     * @return array
-     *
-     */
-    public static function matrix_vector_product($matrix, $vector) {
-        $result = [];
-        for ($i = 0; $i < count($matrix); $i++) {
-            $result[$i] = 0;
-            for ($j = 0; $j < count($matrix[$i]); $j++) {
-                $result[$i] += $matrix[$i][$j] * $vector[$j];
-            }
-        }
-        return $result;
-    }
+        $parameter = $parameterstart;
+        $parameterstructure = self::array_to_vector($parameter);
+        $steplength = 1;
+        $mxparameter = new matrix($parameter);
 
-    /**
-     * Returns bfgs value.
-     *
-     * @param callable $func
-     * @param mixed $startpoint
-     * @param mixed $stepsize
-     * @param mixed $tolerance
-     * @param int $maxiterations
-     *
-     * @return mixed
-     *
-     */
-    public static function bfgs(callable $func, $startpoint, $stepsize = 0.01, $tolerance = 1e-6, $maxiterations = 1000) {
-        $n = count($startpoint);
-        $currentpoint = $startpoint;
-        $iteration = 0;
-        $h = [];
+        // Calculate the function values from the given functions for current $parameter.
+        $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
 
-        // Initialize H with the identity matrix.
-        for ($i = 0; $i < $n; $i++) {
-            $h[$i] = [];
-            for ($j = 0; $j < $n; $j++) {
-                $h[$i][$j] = $i == $j ? 1 : 0;
-            }
-        }
+        // Note: Takte the identity matrx as first approximation of the inverse Hessian.
+        $mxinvhessian = (new matrix(count($parameter), count($parameter)))->identity();
 
-        while ($iteration < $maxiterations) {
-            $grad = self::gradient($func, $currentpoint);
-            $direction = self::matrix_vector_product($h, $grad);
+        $valjacobian = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
+        $mxgradient = new matrix ($valjacobian); // Note: Line vector.
 
-            for ($i = 0; $i < $n; $i++) {
-                $direction[$i] = -$direction[$i];
+        // Begin with numerical iteration.
+        for ($i = 0; $i < $maxiterations; $i++) {
+
+            if ($mxgradient->rooted_summed_squares() == 0) {
+                // Note: There is nothing to be climed on, we are already at a local extrema.
+                return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            // Line search with constant step size.
-            $nextpoint = [];
-            for ($i = 0; $i < $n; $i++) {
-                $nextpoint[$i] = $currentpoint[$i] + $stepsize * $direction[$i];
+            $mxdirection = $mxinvhessian->multiply($mxgradient->transpose());
+
+            // Note: Perform line search sensitive to given limitations.
+            $directionlength = $mxdirection->rooted_summed_squares();
+            if ($directionlength == 0) {
+                // Note: We hit the maximum.
+                return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
+            $mxparametertest = $mxparameter->add($mxdirection->multiply($steplength /
+                $directionlength));
+            $valfunctiontest = $fnfunction(self::vector_to_array(((array) $mxparametertest)[0], $parameterstructure));
 
-            // Update H using BFGS formula.
-            $s = [];
-            $y = [];
-            for ($i = 0; $i < $n; $i++) {
-                $s[$i] = $nextpoint[$i] - $currentpoint[$i];
-                $y[$i] = self::gradient($func, $nextpoint)[$i] - $grad[$i];
-            }
+            $stepdirection = ($valfunctiontest - $valfunction) <=> 0;
 
-            $rho = 1 / array_sum(array_map(function ($yi, $si) {
-                    return $yi * $si;
-            }, $y, $s));
+            do {
+                $mxparameternew = $mxparametertest;
+                $valfunctionnew = $valfunctiontest;
 
-            $i = [];
-            for ($i = 0; $i < $n; $i++) {
-                $i[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $i[$i][$j] = $i == $j ? 1 : 0;
+                $steplength *= 2 ** $stepdirection;
+                $mxparametertest = $mxparameternew->add($mxdirection->multiply($steplength / $directionlength));
+                $valfunctiontest = $fnfunction(self::vector_to_array(((array) $mxparametertest)[0],
+                    $parameterstructure));
+
+                if ($steplength < 10 ** (-$precission)) {
+                    break;
                 }
+                // Do here a check against filterfunction as well!
+
+            } while ($valfunctionnew < $valfunctiontest);
+
+            $valjacobian = $fnderivative(self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure));
+            $mxgradientnew = new ($valjacobian);
+
+            $mxparameterdiff = $mxparameternew->subtract($mxparameter);
+            $mxgradientdiff = $mxgradientnew->subtract($mxgradient);
+
+            // Note: Calculate scaling factor.
+            $rho = $mxparameterdiff->multiply($mxgradientdiff->transpose());
+
+            if ($rho <> 0) {
+                // Note: Update inverse hessian matrix.
+                $mxidentity = (new matrix (count($parameter), count($parameter)))->identity();
+
+                $mxparamxgrad = ($mxparameterdiff->transpose())->multiply($mxgradientdiff);
+                $mxgradxparam = ($mxgradientdiff->transpose())->multiply($mxparameterdiff);
+                $mxparamxparam = ($mxparameterdiff->transpose())->multiply($mxparameterdiff);
+
+                $part1 = $mxidentity->subtract($mxparamxgrad->multiply((1.0 / $rho)));
+                $part2 = $mxidentity->subtract($mxgradxparam->multiply((1.0 / $rho)));
+                $part3 = $mxparamxparam->multiply(1.0 / $rho);
+
+                $mxinvhessian = $part1->multiply($mxinvhessian)->multiply($part2)->add($part3);
+            } else {
+                // Note: There is no progress in parameter, no further gradient or gradient is transverse to progrssion.
+                return self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure);
             }
 
-            $a1 = [];
-            for ($i = 0; $i < $n; $i++) {
-                $a1[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $a1[$i][$j] = $i[$i][$j] - $rho * $s[$i] * $y[$j];
-                }
+            $mxparameter = $mxparameternew;
+            if ((abs($valfunctionnew - $valfunction)) < (10 ** (-$precission))) {
+                return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            $a2 = [];
-            for ($i = 0; $i < $n; $i++) {
-                $a2[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $a2[$i][$j] = $i[$i][$j] - $rho * $y[$i] * $s[$j];
-                }
-            }
-
-            $hnew = [];
-            for ($i = 0; $i < $n; $i++) {
-                $hnew[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $hnew[$i][$j] = $a1[$i][$j] * $h[$j][$i] * $a2[$j][$i] + $rho * $s[$i] * $s[$j];
-                }
-            }
-
-            $h = $hnew;
-
-            // Check for convergence.
-            $diff = 0;
-            for ($i = 0; $i < count($currentpoint); $i++) {
-                $diff += abs($nextpoint[$i] - $currentpoint[$i]);
-            }
-
-            if ($diff < $tolerance) {
-                break;
-            }
-
-            $currentpoint = $nextpoint;
-            $iteration++;
+            debugging ('Iteration i: '.$i.'
+            Position: '.print_r($parameter, true).'
+            Gradient: '.print_r($mxgradient, true).'
+            Direction: '.print_r($mxdirection, true).'
+            Length: '.$directionlength.'
+            Step Length: '.$steplength, DEBUG_DEVELOPER);
         }
 
-        return $currentpoint;
+        // Return the concurrent solution even the precission criteria hasn't been met.
+        return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
     }
 
     /**
@@ -278,7 +176,7 @@ class mathcat {
         callable $fnderivative,
         array $parameterstart,
         int $precission = 6,
-        int $maxiterations = 500,
+        int $maxiterations = 100,
         ?callable $fntrfilter = null,
         ?callable $fntrfunction = null,
         ?callable $fntrderivative = null): array {
@@ -303,7 +201,6 @@ class mathcat {
             $valfunction = $fnfunction($parameter);
             $valderivative = $fnderivative($parameter);
 
-            // Throws error Object of class Closure can not be converted to float.
             $mxfunction = new matrix($valfunction);
             $mxderivative = new matrix($valderivative);
 
@@ -384,92 +281,100 @@ class mathcat {
         return $parameter;
     }
 
-    // Deprecated, falls bfgs nicht genutzt wird.
-
     /**
-     * Returns add gauss der1 callable.
+     * Performs the Gradient Ascent approach for determine the maximum of a function
      *
-     * @param callable $func
-     * @param mixed $mean
-     * @param mixed $std
+     * @param callable $fnfunction - Function to be calculated on with parameter $parameter
+     * @param callable $fnderivative - Derivative of $fn_function with parameter $parameter
+     * @param array $parameterstart - Parameter-set to start with (should be near zero point)
+     * @param int $precission - Accuracy to how many decimal places
+     * @param int $maxiterations - Maximum number of iterations
+     * @param callable|null $fnparameterrestrictions - Parameter-check for trusted Region
+     * @param callable|null $fneapestimator - EAP-Estimator (bell curve) function
+     * @param callable|null $fneapestimatorderivative1st - Deriavative of $fneapestimator
      *
-     * @return callable
+     * @return array
      *
      */
-    private static function add_gauss_der1(callable $func, $mean, $std) {
+    public static function gradient_ascent(
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
+        int $precission = 6,
+        int $maxiterations = 50,
+        ?callable $fnparameterrestrictions = null,
+        ?callable $fneapestimator = null,
+        ?callable $fneapestimatorderivative1st = null): array {
 
-        $gaussian = function($x) use ($mean, $std)  {
-            return 1 * self::gaussian_density_derivative1($x, $mean, $std);
-        };
-        $newfunc = self::compose_plus($func, $gaussian);
-        return $newfunc;
-    }
+        // Set initial values.
+        $parameter = $parameterstart;
+        $parameterstructure = self::array_to_vector($parameter);
+        $steplength = 1;
 
-    /**
-     * Returns add gauss der1 callable.
-     *
-     * @param callable $func
-     * @param mixed $mean
-     * @param mixed $std
-     *
-     * @return callable
-     *
-     */
-    private static function add_gauss_der2(callable $func, $mean, $std) {
+        // Calculate the function values from $fn_function for current $parameter.
+        $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
 
-        $gaussian = function($x) use ($mean, $std)  {
-            return 1 * self::gaussian_density_derivative2($x, $mean, $std);
-        };
-        $newfunc = self::compose_plus($func, $gaussian);
-        return $newfunc;
-    }
+        // Begin with numerical iteration.
+        for ($i = 0; $i < $maxiterations; $i++) {
 
-    /**
-     * REturns compose plus (functions).
-     *
-     * @param mixed $function1
-     * @param mixed $function2
-     *
-     * @return mixed
-     *
-     */
-    public static function compose_plus($function1, $function2) {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($x) + $function2($x);
-        };
-        return $returnfn;
-    }
+            $mxparameter = new matrix($parameter);
 
-    /**
-     * Returns compose multiply (functions).
-     *
-     * @param mixed $function1
-     * @param mixed $function2
-     *
-     * @return mixed
-     *
-     */
-    public static function compose_multiply($function1, $function2) {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($x) * $function2($x);
-        };
-        return $returnfn;
-    }
+            // Calculate the derivative values from $fn_derivative for current $parameter.
+            $valderivative = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
 
-    /**
-     * Returns compose chain (functions).
-     *
-     * @param mixed $function1
-     * @param mixed $function2
-     *
-     * @return mixed
-     *
-     */
-    public static function compose_chain($function1, $function2) {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($function2);
-        };
-        return $returnfn;
+            $mxgradient = new matrix($valderivative);
+            $gradientlength = $mxgradient->rooted_summed_squares();
+
+            debugging ('Iteration i: '.$i.'
+            Position: '.print_r($parameter, true).'
+            Gradient: '.print_r($mxgradient, true).'
+            Length: '.$gradientlength.'
+            Step Length: '.$steplength, DEBUG_DEVELOPER);
+            if ($gradientlength == 0.0) {
+                // There is nothing to climb on anymore. Quit the job.
+                return self::vector_to_array($parameter, $parameterstructure);
+            }
+
+            $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+            $parameternew = ((array) $mxparameternew)[0];
+            $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+
+            // Perform adaptive line search for step length.
+            if ($valfunctionnew > $valfunction) {
+                // Double step length.
+
+                while ($valfunctionnew > $valfunction) {
+                    $valfunction = $valfunctionnew;
+                    $parameter = $parameternew;
+                    $steplength *= 2;
+
+                    $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+                    $parameternew = ((array) $mxparameternew)[0];
+                    $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+                }
+                $steplength /= 2;
+            } else {
+                // Cut step length to half and try again.
+
+                while ($valfunctionnew <= $valfunction && $steplength > 10 ** (-$precission)) {
+                    $parameter = $parameternew;
+                    $steplength /= 2;
+
+                    $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+                    $parameternew = ((array)$mxparameternew)[0];
+                    $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+                }
+                $parameter = $parameternew;
+                $valfunction = $valfunctionnew;
+            }
+
+            // Test if precisiion criteria for stopping iterations has been reached.
+            if ($steplength < 10 ** (-$precission)) {
+                return self::vector_to_array($parameter, $parameterstructure);
+            }
+        }
+        // Return the concurrent solution even the precission criteria hasn't been met.
+        return self::vector_to_array($parameter, $parameterstructure);
     }
 
     /**

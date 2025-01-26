@@ -54,6 +54,32 @@ final class mathcat_test extends basic_testcase {
         $this->assertEquals($expected, $result);
     }
 
+    public function test_gradient_ascent(): void {
+        $result = mathcat::gradient_ascent(
+            fn ($x) => exp(-($x['x'] - 2) ** 2) - (($x['y'] - 1) ** 2),
+            fn ($x) => [2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
+                2 - 2 * $x['y'],
+                0],
+            ['x' => -pi() / 4, 'y' => 1.66, 'z' => -1.5],
+            6
+        );
+        $expected = ['x' => 2.0146573464271933, 'y' => 1.00, 'z' => -1.5];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_bfgs(): void {
+        $result = mathcat::bfgs(
+            fn ($x) => exp(-($x['x'] - 2) ** 2) - (($x['y'] - 1) ** 2),
+            fn ($x) => [2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
+                2 - 2 * $x['y'],
+                0],
+            ['x' => -pi() / 4, 'y' => 1.66, 'z' => -1.5],
+            6
+        );
+        $expected = ['x' => 2.0146573464271933, 'y' => 1.00, 'z' => -1.5];
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * Test if array_to_vector and vector_to_array work as expected
      *
