@@ -36,7 +36,7 @@ namespace local_catquiz;
 class mathcat {
 
     /**
-     * Returns bfgs value.
+     * Performs BFGS algorithm and returns optimized parameters.
      *
      * @param callable $fnfunction - Function to be calculated on with parameter $parameter
      * @param callable $fnderivative - 1st derivative (Jacobian) of $fn_function with parameter $parameter
@@ -47,7 +47,7 @@ class mathcat {
      * @param callable|null $fneapestimator - EAP-Estimator (bell curve) function
      * @param callable|null $fneapestimatorderivative1st - Deriavative of $fneapestimator
      *
-     * @return mixed
+     * @return array
      *
      */
     public static function bfgs(
