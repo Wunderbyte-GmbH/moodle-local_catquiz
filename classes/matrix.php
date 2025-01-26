@@ -206,7 +206,7 @@ class matrix extends ArrayObject {
      *
      * @throws MatrixException If matrices are incompatible
      */
-    public function multiply($value) {
+    public function multiply(mixed $value) {
         if ($value instanceof self) {
             $matrix = $value;
             if ($this->_cols != $matrix->_rows) {
@@ -257,6 +257,30 @@ class matrix extends ArrayObject {
             }
         }
         return new self($subarray);
+    }
+
+    /**
+     * Returns an identity matrix of same dimensions as the origin matrix.
+     *
+     * @return matrix The identity matrix
+     *
+     * @throws MatrixException If matrix is not a square
+     */
+    public function identity() {
+        if (!$this->isSquare()) {
+            throw new MatrixException('Cannot make identity matrix of non square matrix!');
+        }
+        $identityarray = [];
+        for ($i = 0; $i < $this->_rows; $i++) {
+            $identityarray[$i] = [];
+            for ($j = 0; $j < $this->_cols; $j++) {
+                $identityarray[$i][$j] = 0;
+            }
+        }
+        for ($r = 0; $r < $this->_rows; $r++) {
+            $identityarray[$i][$i] = 1;
+        }
+        new self($identityarray);
     }
 
     /**
