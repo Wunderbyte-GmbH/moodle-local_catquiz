@@ -1,0 +1,49 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a quiz attempt feedback.
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+        "userid": 2,
+        "attemptid": 3,
+        "questionsattempted": 3,
+        "timestamp": 123456,
+        "contextid": 1,
+        "catscale": "Deutsch",
+        "teststrategy": "Infer lowest subscale",
+        "personabilities": {"scale1": 0.5, "scale2": 1.2},
+        "questions": [{"id": 1, "score": 0.3}, {"id": 2, "score": 0.01}],
+        "active_scales": ["scale1", "scale2", "scale3"],
+        "lastquestion": {"id": 1, "score": 1.2},
+        "selectedscale": "Deutsch"
+    }
+}}
+<h5>{{description_heading}}</h5>
+<p>{{description}}</p>
+
+<a class="btn btn-info" download="CATQuiz-Export-Attempt{{attemptid}}.csv"
+    id="download-link" href="data:text/csv;charset=utf-8,{{{data}}}"
+    target="_blank">
+        Debug Info CSV
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+</a>
