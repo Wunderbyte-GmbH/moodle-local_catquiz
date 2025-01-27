@@ -26,6 +26,7 @@ use curl;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\event\responses_submitted;
+use Throwable;
 
 /**
  * Handles submission of responses to central instance.
@@ -72,34 +73,42 @@ class response_submitter {
     public function submit_responses() {
         global $CFG, $USER;
 
-        // Get the response data.
+        try {
 
-        $responses = $this->get_response_data();
-        if (empty($responses)) {
-            return (object)[
-                'success' => true,
-                'message' => get_string('nonewresponses', 'local_catquiz'),
+            // Get the response data.
+
+            $responses = $this->get_response_data();
+            if (empty($responses)) {
+                return (object)[
+                    'success' => true,
+                    'message' => get_string('nonewresponses', 'local_catquiz'),
+                ];
+            }
+
+            // Prepare the web service call.
+            $serverurl = $this->centralhost . '/webservice/rest/server.php';
+            $params = [
+                'wstoken' => $this->token,
+                'wsfunction' => 'local_catquiz_hub_collect_responses',
+                'moodlewsrestformat' => 'json',
+                'jsondata' => json_encode($responses),
+                'sourceurl' => $CFG->wwwroot,
+            ];
+
+            // Make the web service call.
+            $curl = new curl();
+            $curl->setopt(
+                [
+                    'CURLOPT_SSL_VERIFYPEER' => false,
+                    'CURLOPT_SSL_VERIFYHOST' => false,
+                ]
+            );
+        } catch (Throwable $t) {
+            return [
+                'success' => false,
+                'error' => sprintf('Could not send data: %s in %s:%d', $t->getMessage(), $t->getFile(), $t->getLine()),
             ];
         }
-
-        // Prepare the web service call.
-        $serverurl = $this->centralhost . '/webservice/rest/server.php';
-        $params = [
-            'wstoken' => $this->token,
-            'wsfunction' => 'local_catquiz_hub_collect_responses',
-            'moodlewsrestformat' => 'json',
-            'jsondata' => json_encode($responses),
-            'sourceurl' => $CFG->wwwroot,
-        ];
-
-        // Make the web service call.
-        $curl = new curl();
-        $curl->setopt(
-            [
-                'CURLOPT_SSL_VERIFYPEER' => false,
-                'CURLOPT_SSL_VERIFYHOST' => false,
-            ]
-        );
 
         try {
             $response = $curl->post($serverurl, $params);
