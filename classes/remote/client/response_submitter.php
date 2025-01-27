@@ -70,7 +70,7 @@ class response_submitter {
      * @return \stdClass Result object with success status and details
      */
     public function submit_responses() {
-        global $USER;
+        global $CFG, $USER;
 
         // Get the response data.
 
@@ -89,6 +89,7 @@ class response_submitter {
             'wsfunction' => 'local_catquiz_hub_collect_responses',
             'moodlewsrestformat' => 'json',
             'jsondata' => json_encode($responses),
+            'sourceurl' => $CFG->wwwroot,
         ];
 
         // Make the web service call.

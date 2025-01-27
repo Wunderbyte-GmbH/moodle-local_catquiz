@@ -42,6 +42,7 @@ use invalid_parameter_exception;
 use local_catquiz\event\responses_added;
 use local_catquiz\remote\response\response_handler;
 use UnexpectedValueException;
+use webservice;
 
 /**
  * External service for collecting responses.
@@ -60,6 +61,7 @@ class collect_responses extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters([
             'jsondata' => new external_value(PARAM_RAW, 'JSON encoded array of response data'),
+            'sourceurl' => new external_value(PARAM_TEXT, 'The source URL as provided by the client'),
         ]);
     }
 
@@ -90,7 +92,7 @@ class collect_responses extends external_api {
      * @param string $jsondata The response data as json-encoded string
      * @return array The status and processed responses
      */
-    public static function execute($jsondata) {
+    public static function execute($jsondata, $sourceurl) {
         global $USER;
 
         // Parameter validation.
@@ -119,7 +121,6 @@ class collect_responses extends external_api {
 
         $errors = [];
         $overallstatus = true;
-        $sourceurl = self::get_remote_source_url();
         $stored = 0;
         $skipped = 0;
 
@@ -194,16 +195,5 @@ class collect_responses extends external_api {
             'skipped' => $skipped,
             'errors' => $errors,
         ];
-    }
-
-    /**
-     * Get the source URL of the remote instance.
-     *
-     * @return string The source URL
-     */
-    private static function get_remote_source_url() {
-        global $CFG;
-        // This should be the URL that uniquely identifies this Moodle instance.
-        return $CFG->wwwroot;
     }
 }
