@@ -18,8 +18,8 @@
  * Class mathcat.
  *
  * @package local_catquiz
- * @author Daniel Pasterk
- * @copyright 2024 Wunderbyte GmbH
+ * @author Ralf Erlebach, Daniel Pasterk
+ * @copyright 2024,2025 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -78,6 +78,8 @@ class mathcat {
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
+            echo "--- Iteration $i ---".'
+            ';
 
             if ($mxgradient->rooted_summed_squares() == 0) {
                 // Note: There is nothing to be climed on, we are already at a local extrema.
@@ -143,10 +145,19 @@ class mathcat {
                 return self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure);
             }
 
-            if ((abs($valfunctionnew - $valfunction)) < (10 ** (-$precission))) {
+            if (($valfunctionnew - $valfunction) < (10 ** (-$precission))) {
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
+            echo 'Summary:
+            Position (old): '; $mxparameter->print_m(); echo'
+            Gradient: '; $mxgradient->print_m(); echo '
+            Direction: '; $mxdirection->print_m(); echo '
+            Length: '.$directionlength.'
+            Step Length: '.$steplength.'
+            Position: '; $mxparameternew->print_m(); echo'
+            Function: '.print_r($valfunction, true).' -> '.print_r($valfunctionnew, true).'
+';
             $mxparameter = $mxparameternew;
             $mxgradient = $mxgradientnew;
             $valfunction = $valfunctionnew;
@@ -316,6 +327,8 @@ class mathcat {
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
+            echo "\n--- Iteration $i ---".'
+            ';
 
             $mxparameter = new matrix($parameter);
 
@@ -324,6 +337,11 @@ class mathcat {
 
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
+
+            echo 'Position: '; $mxparameter->print_m(); echo'
+            Gradient: '; $mxgradient->print_m(); echo '
+            Length: '.$gradientlength.'
+            Step Length: '.$steplength;
 
             if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
