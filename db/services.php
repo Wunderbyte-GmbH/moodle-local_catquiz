@@ -144,16 +144,6 @@ $functions = [
                 'type' => 'read',
                 'ajax' => 1,
         ],
-        // Allows other instances to share their response data.
-        'local_catquiz_submit_catquiz_responses' => [
-            'classname' => 'local_catquiz\\external\\submit_responses',
-            'methodname' => 'execute',
-            'classpath' => 'local/catquiz/classes/external/submit_responses.php',
-            'description' => 'Submit responses for CatQuiz.',
-            'type' => 'write',
-            // Should we require a capability? E.g. 'capabilities' => 'local/catquiz:submit_responses'?
-            'ajax' => true,
-        ],
         'local_catquiz_hub_collect_responses' => [
             'classname' => 'local_catquiz\\external\\hub\\collect_responses',
             'methodname' => 'execute',
