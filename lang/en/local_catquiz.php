@@ -169,7 +169,6 @@ $string['cattags:information'] = 'These tags identify courses that teachers can 
 $string['central_host'] = 'Compute instance';
 $string['central_host_desc'] = 'The host that will perform parameter calculations. E.g. https://www.example.com';
 $string['central_host_help'] = 'The host that will perform parameter calculations. E.g. https://www.example.com';
-$string['syncbutton'] = 'Fetch item parameters';
 $string['central_scale_labels'] = 'Central scale labels';
 $string['central_scale_labels_desc'] = 'Enter one scale label per line. Only these scales will be processed by the remote calculation task.';
 $string['central_token'] = 'Token to access compute instance';
