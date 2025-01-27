@@ -493,6 +493,7 @@ $string['minquestionspersubscale_help'] = 'Eine Skala wird frühestens dann ausg
 $string['minscalevalue'] = 'Minimalwert';
 $string['minscalevalueinformation'] = 'Geben Sie die kleinstmögliche Personenfähigkeit der Skalen als negativen Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das „Skalen“-Tab wechseln.';
 $string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
+$string['missing_scale_label'] = 'Der ausgewählte CAT-Skala ist kein Label zugeordnet';
 $string['missinglabel'] = 'Im importierten File fehlt die verpflichtede Spalte {$a}. Daten können nicht importiert werden.';
 $string['model'] = 'Modell';
 $string['model_override'] = 'Nur dieses Modell verwenden';
