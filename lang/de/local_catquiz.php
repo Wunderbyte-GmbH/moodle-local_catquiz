@@ -174,7 +174,6 @@ $string['central_host_desc'] = 'Z.B. https://www.example.com';
 $string['central_host_help'] = 'Z.B. https://www.example.com';
 $string['central_scale_labels'] = 'Zentrale Skala-Labels';
 $string['central_scale_labels_desc'] = 'Ein Skala-Label pro Zeile eingeben. Nur diese Skalen werden vom Remote-Berechnungstask verarbeitet.';
-$string['syncbutton'] = 'Parameter abrufen';
 $string['central_token'] = 'Token zum Zugriff auf die zentrale Berechnungsinstanz';
 $string['central_token_desc'] = 'Das webtoken, das für sie auf der zentralen Berechnungsinstanz eingerichtet worden ist';
 $string['central_token_help'] = 'Das webtoken, das für sie auf der zentralen Berechnungsinstanz eingerichtet worden ist';
