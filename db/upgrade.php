@@ -1155,5 +1155,18 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2025012100, 'local', 'catquiz');
     }
 
+    // In case there are CAT scales without a label, set the label to the lowercase scale name.
+    if ($oldversion < 2025012702) {
+        $scales = $DB->get_records('local_catquiz_catscales');
+        foreach ($scales as $scale) {
+            if (!$scale->label) {
+                $scale->label = strtolower($scale->name);
+                $DB->update_record('local_catquiz_catscales', $scale);
+            }
+        }
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2025012702, 'local', 'catquiz');
+    }
+
     return true;
 }
