@@ -62,14 +62,16 @@ class mathcat {
 
         $parameter = $parameterstart;
         $parameterstructure = self::array_to_vector($parameter);
-        $steplength = 1;
+        $steplength = 1.0;
         $mxparameter = new matrix ($parameter);
 
         // Calculate the function values from the given functions for current $parameter.
         $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
 
         // Note: Takte the identity matrx as first approximation of the inverse Hessian.
-        $mxinvhessian = (new matrix (count($parameter), count($parameter)))->identity();
+
+        $mxidentity = (new matrix (count($parameter), count($parameter)))->identity();
+        $mxinvhessian = $mxidentity;
 
         $valjacobian = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
         $mxgradient = new matrix ($valjacobian); // Note: Line vector.
@@ -82,9 +84,7 @@ class mathcat {
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            print_r($mxgradient);
-
-            $mxdirection = $mxinvhessian->multiply($mxgradient->transpose());
+            $mxdirection = ($mxinvhessian->multiply($mxgradient->transpose()))->transpose();
 
             // Note: Perform line search sensitive to given limitations.
             $directionlength = $mxdirection->rooted_summed_squares();
@@ -92,8 +92,11 @@ class mathcat {
                 // Note: We hit the maximum.
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
-            $mxparametertest = $mxparameter->add($mxdirection->multiply($steplength /
+
+            $steplengthtest = $steplength;
+            $mxparametertest = $mxparameter->add($mxdirection->multiply($steplengthtest /
                 $directionlength));
+
             $valfunctiontest = $fnfunction(self::vector_to_array(((array) $mxparametertest)[0], $parameterstructure));
 
             $stepdirection = ($valfunctiontest - $valfunction) <=> 0;
@@ -101,13 +104,14 @@ class mathcat {
             do {
                 $mxparameternew = $mxparametertest;
                 $valfunctionnew = $valfunctiontest;
+                $steplength = $steplengthtest;
 
-                $steplength *= 2 ** $stepdirection;
-                $mxparametertest = $mxparameternew->add($mxdirection->multiply($steplength / $directionlength));
+                $steplengthtest = $steplength * (2 ** $stepdirection);
+                $mxparametertest = $mxparameter->add($mxdirection->multiply($steplengthtest / $directionlength));
                 $valfunctiontest = $fnfunction(self::vector_to_array(((array) $mxparametertest)[0],
                     $parameterstructure));
 
-                if ($steplength < 10 ** (-$precission)) {
+                if ($steplengthtest < 10 ** (-$precission)) {
                     break;
                 }
                 // Do here a check against filterfunction as well!
@@ -121,12 +125,10 @@ class mathcat {
             $mxgradientdiff = $mxgradientnew->subtract($mxgradient);
 
             // Note: Calculate scaling factor.
-            $rho = $mxparameterdiff->multiply($mxgradientdiff->transpose());
+            $rho = (float) ($mxparameterdiff->multiply($mxgradientdiff->transpose()))[0][0];
 
-            if ($rho <> 0) {
-                // Note: Update inverse hessian matrix.
-                $mxidentity = (new matrix (count($parameter), count($parameter)))->identity();
-
+            // Note: Update inverse hessian matrix.
+            if ($rho <> 0.0) {
                 $mxparamxgrad = ($mxparameterdiff->transpose())->multiply($mxgradientdiff);
                 $mxgradxparam = ($mxgradientdiff->transpose())->multiply($mxparameterdiff);
                 $mxparamxparam = ($mxparameterdiff->transpose())->multiply($mxparameterdiff);
@@ -135,23 +137,19 @@ class mathcat {
                 $part2 = $mxidentity->subtract($mxgradxparam->multiply((1.0 / $rho)));
                 $part3 = $mxparamxparam->multiply(1.0 / $rho);
 
-                $mxinvhessian = $part1->multiply($mxinvhessian)->multiply($part2)->add($part3);
+                $mxinvhessian = (($part1->multiply($mxinvhessian))->multiply($part2))->subtract($part3); // Note: As we search for maximum, last term becomes negative.
             } else {
                 // Note: There is no progress in parameter, no further gradient or gradient is transverse to progrssion.
                 return self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure);
             }
 
-            $mxparameter = $mxparameternew;
             if ((abs($valfunctionnew - $valfunction)) < (10 ** (-$precission))) {
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            debugging ('Iteration i: '.$i.'
-            Position: '.print_r($parameter, true).'
-            Gradient: '.print_r($mxgradient, true).'
-            Direction: '.print_r($mxdirection, true).'
-            Length: '.$directionlength.'
-            Step Length: '.$steplength, DEBUG_DEVELOPER);
+            $mxparameter = $mxparameternew;
+            $mxgradient = $mxgradientnew;
+            $valfunction = $valfunctionnew;
         }
 
         // Return the concurrent solution even the precission criteria hasn't been met.
@@ -327,11 +325,6 @@ class mathcat {
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
 
-            debugging ('Iteration i: '.$i.'
-            Position: '.print_r($parameter, true).'
-            Gradient: '.print_r($mxgradient, true).'
-            Length: '.$gradientlength.'
-            Step Length: '.$steplength, DEBUG_DEVELOPER);
             if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
                 return self::vector_to_array($parameter, $parameterstructure);
