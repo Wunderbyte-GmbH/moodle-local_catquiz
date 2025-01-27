@@ -587,11 +587,12 @@ class catquiz {
         $selectability = "";
         if ($joinability) {
             $selectability = ", lcp.ability ability";
-            $abilityparams = ['scaleability' => $joinability];
+            $abilityparams = ['scaleability' => $joinability, 'scalecontext' => $contextid];
             $joinabilitysql = <<<SQL
                 JOIN {local_catquiz_personparams} lcp
                     ON lcp.userid = qas.userid
                     AND lcp.catscaleid = :scaleability
+                    AND lcp.contextid = :scalecontext
             SQL;
         }
 
