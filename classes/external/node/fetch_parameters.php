@@ -307,7 +307,7 @@ class fetch_parameters extends external_api {
                         $itemrecord->componentname = 'question';
                         $itemrecord->catscaleid = $scalemapping[$param->scalelabel];
                         $itemrecord->contextid = $newcontext->id;
-                        $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
+                        $itemrecord->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
                         $itemid = $DB->insert_record(
                             'local_catquiz_items',
                             $itemrecord
