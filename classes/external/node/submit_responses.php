@@ -33,6 +33,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use moodle_exception;
+use Throwable;
 
 /**
  * External API class for submitting responses.
@@ -59,49 +60,56 @@ class submit_responses extends external_api {
      * @return array Status message indicating the result of the submission
      */
     public static function execute($scaleid) {
-        $config = get_config('local_catquiz');
-        if (empty($config->central_host) || empty($config->central_token)) {
-            throw new moodle_exception('nocentralconfig', 'local_catquiz');
-        }
+        try {
+            $config = get_config('local_catquiz');
+            if (empty($config->central_host) || empty($config->central_token)) {
+                throw new moodle_exception('nocentralconfig', 'local_catquiz');
+            }
 
-        global $DB;
+            global $DB;
 
-        // Validate parameters passed to the function.
-        $params = self::validate_parameters(self::execute_parameters(), ['scaleid' => $scaleid]);
-        // Fetch scale label from the database.
-        if (!$label = $DB->get_field('local_catquiz_catscales', 'label', ['id' => $scaleid], MUST_EXIST)) {
+            // Validate parameters passed to the function.
+            $params = self::validate_parameters(self::execute_parameters(), ['scaleid' => $scaleid]);
+            // Fetch scale label from the database.
+            if (!$label = $DB->get_field('local_catquiz_catscales', 'label', ['id' => $scaleid], MUST_EXIST)) {
+                return [
+                    'message' => get_string('submission_error', 'local_catquiz', get_string('missing_scale_label', 'local_catquiz')),
+                    'success' => false,
+                ];
+            }
+
+            $submission = new \local_catquiz\remote\client\response_submitter(
+                $config->central_host,
+                $config->central_token,
+                $label
+            );
+            $result = $submission->submit_responses();
+
+            if ($result->success) {
+                return [
+                    'message' => $result->message ?? get_string(
+                        'submission_success',
+                        'local_catquiz',
+                        (object)[
+                            'total' => $result->processed,
+                            'added' => $result->added,
+                            'skipped' => $result->skipped,
+                        ]
+                    ),
+                    'success' => true,
+                ];
+            }
+
             return [
-                'message' => get_string('submission_error', 'local_catquiz', get_string('missing_scale_label', 'local_catquiz')),
+                'message' => get_string('submission_error', 'local_catquiz', $result->error),
+                'success' => false,
+            ];
+        } catch (Throwable $t) {
+            return [
+                'message' => sprintf('Could not submit responses: "%s" in %s:%d', $t->getMessage(), $t->getFile(), $t->getLine()),
                 'success' => false,
             ];
         }
-
-        $submission = new \local_catquiz\remote\client\response_submitter(
-            $config->central_host,
-            $config->central_token,
-            $label
-        );
-        $result = $submission->submit_responses();
-
-        if ($result->success) {
-            return [
-                'message' => $result->message ?? get_string(
-                    'submission_success',
-                    'local_catquiz',
-                    (object)[
-                        'total' => $result->processed,
-                        'added' => $result->added,
-                        'skipped' => $result->skipped,
-                    ]
-                ),
-                'success' => true,
-            ];
-        }
-
-        return [
-            'message' => get_string('submission_error', 'local_catquiz', $result->error),
-            'success' => false,
-        ];
     }
 
     /**
