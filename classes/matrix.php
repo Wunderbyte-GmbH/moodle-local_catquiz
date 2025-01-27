@@ -172,7 +172,7 @@ class matrix extends ArrayObject {
      *
      * @throws MatrixException If matrices do not have the same size
      */
-    public function subtract ($value) {
+    public function subtract($value) {
         if ($value instanceof self) {
             $matrix = $value;
             if ($this->_rows == $matrix->_rows && $this->_cols == $matrix->_cols) {

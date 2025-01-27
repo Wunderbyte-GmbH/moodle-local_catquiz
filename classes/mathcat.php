@@ -139,9 +139,10 @@ class mathcat {
                 $part2 = $mxidentity->subtract($mxgradxparam->multiply((1.0 / $rho)));
                 $part3 = $mxparamxparam->multiply(1.0 / $rho);
 
-                $mxinvhessian = (($part1->multiply($mxinvhessian))->multiply($part2))->subtract($part3); // Note: As we search for maximum, last term becomes negative.
+                $mxinvhessian = (($part1->multiply($mxinvhessian))->multiply($part2))->subtract($part3);
+                // Note: As we search for maximum, last term becomes negative.
             } else {
-                // Note: There is no progress in parameter, no further gradient or gradient is transverse to progrssion.
+                // Note: There is no progress in parameter, null gradient or gradient is transversal to progression.
                 return self::vector_to_array(((array) $mxparameternew)[0], $parameterstructure);
             }
 
@@ -149,15 +150,6 @@ class mathcat {
                 return self::vector_to_array(((array) $mxparameter)[0], $parameterstructure);
             }
 
-            echo 'Summary:
-            Position (old): '; $mxparameter->print_m(); echo'
-            Gradient: '; $mxgradient->print_m(); echo '
-            Direction: '; $mxdirection->print_m(); echo '
-            Length: '.$directionlength.'
-            Step Length: '.$steplength.'
-            Position: '; $mxparameternew->print_m(); echo'
-            Function: '.print_r($valfunction, true).' -> '.print_r($valfunctionnew, true).'
-';
             $mxparameter = $mxparameternew;
             $mxgradient = $mxgradientnew;
             $valfunction = $valfunctionnew;
