@@ -127,6 +127,14 @@ if ($hassiteconfig) {
         24, // Default value.
         PARAM_INT // Expect integer type.
     ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_catquiz/enable_sync_as_node',
+        get_string('enable_sync_as_node', 'local_catquiz'),
+        get_string('enable_sync_as_node_desc', 'local_catquiz'),
+        false, // Default value.
+        PARAM_BOOL
+    ));
     $settings->add(new admin_setting_configtext(
         'local_catquiz/central_host',
         get_string('central_host', 'local_catquiz'),
@@ -134,18 +142,21 @@ if ($hassiteconfig) {
         '',
         PARAM_TEXT
     ));
-
+    $settings->hide_if('local_catquiz/central_host', 'local_catquiz/enable_sync_as_node', 'notchecked', '0');
     $settings->add(new admin_setting_configtext(
         'local_catquiz/central_token',
         get_string('central_token', 'local_catquiz'),
         get_string('central_token_desc', 'local_catquiz'),
+        '',
         PARAM_ALPHANUM
     ));
-    $settings->add(new admin_setting_configtext(
-        'local_catquiz/sync_scale',
-        get_string('sync_scale', 'local_catquiz'),
-        get_string('sync_scale_desc', 'local_catquiz'),
-        PARAM_INT
+    $settings->hide_if('local_catquiz/central_token', 'local_catquiz/enable_sync_as_node', 'notchecked', '0');
+    $settings->add(new admin_setting_configcheckbox(
+        'local_catquiz/enable_sync_as_hub',
+        get_string('enable_sync_as_hub', 'local_catquiz'),
+        get_string('enable_sync_as_hub_desc', 'local_catquiz'),
+        false, // Default value.
+        PARAM_BOOL
     ));
     $settings->add(new admin_setting_configtextarea(
         'local_catquiz/central_scale_labels',
@@ -154,4 +165,5 @@ if ($hassiteconfig) {
         '', // Default value.
         PARAM_TEXT
     ));
+    $settings->hide_if('local_catquiz/central_scale_labels', 'local_catquiz/enable_sync_as_hub', 'notchecked', '0');
 }
