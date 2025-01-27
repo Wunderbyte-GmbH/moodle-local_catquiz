@@ -69,7 +69,12 @@ class submit_responses extends external_api {
         // Validate parameters passed to the function.
         $params = self::validate_parameters(self::execute_parameters(), ['scaleid' => $scaleid]);
         // Fetch scale label from the database.
-        $label = $DB->get_field('local_catquiz_catscales', 'label', ['id' => $scaleid], MUST_EXIST);
+        if (!$label = $DB->get_field('local_catquiz_catscales', 'label', ['id' => $scaleid], MUST_EXIST)) {
+            return [
+                'message' => get_string('submission_error', 'local_catquiz', get_string('missing_scale_label', 'local_catquiz')),
+                'success' => false,
+            ];
+        }
 
         $submission = new \local_catquiz\remote\client\response_submitter(
             $config->central_host,

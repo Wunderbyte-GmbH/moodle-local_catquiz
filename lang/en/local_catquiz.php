@@ -475,6 +475,7 @@ $string['minquestionspersubscale_help'] = 'Questions of a subscale will be exclu
 $string['minscalevalue'] = 'Min value';
 $string['minscalevalueinformation'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the “Scales” tab.';
 $string['mintimeperitem'] = 'Min time per question in seconds';
+$string['missing_scale_label'] = 'The selected scale does not have a label associated with it';
 $string['missinglabel'] = 'Imported CSV does not contain mandatory column {$a}. Data can not be imported.';
 $string['model'] = 'Model';
 $string['model_override'] = 'Only use this model';
