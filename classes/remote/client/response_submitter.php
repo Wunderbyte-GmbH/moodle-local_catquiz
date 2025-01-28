@@ -160,7 +160,6 @@ class response_submitter {
 
     /**
      * Get response data to submit.
-     * This method should be replaced with your implementation.
      *
      * @return array Array of response objects
      */
