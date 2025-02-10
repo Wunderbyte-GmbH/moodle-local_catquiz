@@ -90,6 +90,7 @@ class collect_responses extends external_api {
      * Submit responses for CatQuiz.
      *
      * @param string $jsondata The response data as json-encoded string
+     * @param string $sourceurl The source url
      * @return array The status and processed responses
      */
     public static function execute($jsondata, $sourceurl) {
