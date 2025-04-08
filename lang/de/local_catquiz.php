@@ -707,6 +707,7 @@ $string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
 $string['submission_error'] = 'Fehler beim versenden von Antwort-Daten: {$a}';
 $string['submission_success'] = '{$a->total} Antworten wurden erfolgreich übermittelt. {$a->added} Antworten wurden neu hingzugefügt, {$a->skipped} waren bereits vorhanden';
 $string['submit_responses'] = 'Antwort-Daten mit zentraler Berechnungsinstanz teilen';
+$string['submitresponsescheduled'] = 'Antwort-Daten geplant';
 $string['subplugintype_catmodel'] = 'CAT Modell';
 $string['subplugintype_catmodel_plural'] = 'CAT Modelle';
 $string['subscribe'] = 'Abonniere';

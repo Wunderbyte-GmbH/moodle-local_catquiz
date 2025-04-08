@@ -689,6 +689,7 @@ $string['subfeedbackrange'] = '({$a->lowerlimit} to {$a->upperlimit})';
 $string['submission_error'] = 'Error submitting responses: {$a}';
 $string['submission_success'] = '{$a->total} responses successfully submitted. {$a->added} new responses were added and {$a->skipped} were skipped.';
 $string['submit_responses'] = 'Submit responses to central instance';
+$string['submitresponsescheduled'] = 'Submit responses scheduled';
 $string['subplugintype_catmodel'] = 'CAT model';
 $string['subplugintype_catmodel_plural'] = 'CAT models';
 $string['subscribe'] = 'Subscribe';
