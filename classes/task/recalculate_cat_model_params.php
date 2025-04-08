@@ -28,6 +28,7 @@ namespace local_catquiz\task;
 use local_catquiz\catcontext;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\data\dataapi;
 
 /**
  * Runs through all contexts and recalculates values for all CAT models.
@@ -55,7 +56,9 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
         $mainscales = catquiz::get_all_scales_for_active_contexts();
         $cmi = new catmodel_info();
         foreach ($mainscales as $scale) {
-            $context = catcontext::get_instance($scale->id);
+            if (!$context = catcontext::get_instance($scale->id)) {
+                $context = dataapi::create_new_context_for_scale($scale->id, $scale->name);
+            }
             if (!$cmi->needs_update($context, $scale->id)) {
                 continue;
             }

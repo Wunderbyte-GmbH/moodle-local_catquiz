@@ -401,7 +401,8 @@ class info {
         $elements[] = $mform->addGroup(
             $timelimitgroup,
             'catquiz_timelimitgroup',
-            get_string('maxtimeperquestion', 'local_catquiz'));
+            get_string('maxtimeperquestion', 'local_catquiz')
+        );
         $mform->setType('catquiz_maxtimeperattempt', PARAM_INT);
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_timelimitgroup', 'catquiz_includetimelimit', 'neq', 1);

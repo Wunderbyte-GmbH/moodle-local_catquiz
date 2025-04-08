@@ -166,7 +166,7 @@ class catcontext {
     }
     /**
      * Get a context via scaleid.
-     * We create scale-based contexts for uploaded items without context assigned.+
+     * We create scale-based contexts for uploaded items without context assigned.
      * This is to check if a context was already created for this scale.
      *
      * @param int $scaleid
