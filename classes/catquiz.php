@@ -2714,11 +2714,12 @@ SQL;
         // Get all contexts.
         $contexts = $DB->get_records_sql(
             <<<SQL
-                SELECT * FROM {local_catquiz_catscales} s
+                SELECT DISTINCT s.*
+                FROM {local_catquiz_catscales} s
                 JOIN {local_catquiz_catcontext} cc ON s.contextid = cc.id
                 WHERE s.contextid IS NOT NULL
-                  AND cc.starttimestamp <= :now1 AND cc.endtimestamp >= :now2
-                ;
+                AND cc.starttimestamp <= :now1 AND cc.endtimestamp >= :now2
+            ;
             SQL,
             [
                 'now1' => $now,
