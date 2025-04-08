@@ -141,7 +141,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
      */
     private function initialize() {
         $this->currenttime = time();
-        $this->defaultmaxtime = 60 * 60 * intval(get_config('local_catquiz', 'maximum_attempt_duration_hours'));
+        $this->defaultmaxtime = 60 * 60 * intval(get_config('local_catquiz', 'maximum_attempt_duration_hours') ?? 24);
         $this->load_max_times_per_test();
     }
 
@@ -164,7 +164,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
                 continue;
             }
 
-            $maxtimeperattempt = $settings->catquiz_timelimitgroup->catquiz_maxtimeperattempt * 60;
+            $maxtimeperattempt = floatval($settings->catquiz_timelimitgroup->catquiz_maxtimeperattempt ?: 60) * 60;
             if ($settings->catquiz_timelimitgroup->catquiz_timeselect_attempt == 'h') {
                 $maxtimeperattempt *= 60;
             }
