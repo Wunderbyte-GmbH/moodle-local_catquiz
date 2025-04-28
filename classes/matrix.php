@@ -115,7 +115,7 @@ class matrix extends ArrayObject {
             $this->_rows = count($value);
             $this->_cols = count($value[0]);
         } else if (is_numeric($value) && is_numeric($cols)
-                && $value > 0 && $cols > 0) {
+            && $value > 0 && $cols > 0) {
             // Create a void matrix with dimensions $value x $cols.
             $this->_rows = $value;
             $this->_cols = $cols;
@@ -129,7 +129,6 @@ class matrix extends ArrayObject {
             throw new MatrixException('Cannot create matrix');
         }
     }
-
 
     /**
      * Add another matrix or a scalar to this matrix, return a new matrix instance.
@@ -200,7 +199,7 @@ class matrix extends ArrayObject {
     /**
      * Multiply another matrix or a scalar to this matrix, return a new matrix instance.
      *
-     * @param mixed $value matrix or scalar to multiply to this matrix
+     * @param float|matrix $value matrix or scalar to multiply to this matrix
      *
      * @return Matrix New result matrix
      *
@@ -257,6 +256,30 @@ class matrix extends ArrayObject {
             }
         }
         return new self($subarray);
+    }
+
+    /**
+     * Returns an identity matrix of same dimensions as the origin matrix.
+     *
+     * @return matrix The identity matrix
+     *
+     * @throws MatrixException If matrix is not a square
+     */
+    public function identity() {
+        if (!$this->isSquare()) {
+            throw new MatrixException('Cannot make identity matrix of non square matrix!');
+        }
+        $identityarray = [];
+        for ($i = 0; $i < $this->_rows; $i++) {
+            $identityarray[$i] = [];
+            for ($j = 0; $j < $this->_cols; $j++) {
+                $identityarray[$i][$j] = 0;
+            }
+        }
+        for ($i = 0; $i < $this->_rows; $i++) {
+            $identityarray[$i][$i] = 1;
+        }
+        return new self($identityarray);
     }
 
     /**
@@ -389,7 +412,7 @@ class matrix extends ArrayObject {
      *
      * return float
      */
-    public function rooted_summed_squares(): float {
+    public function rooted_summed_squares() {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -405,7 +428,7 @@ class matrix extends ArrayObject {
      *
      * return float
      */
-    public function max_absolute_element(): float {
+    public function max_absolute_element() {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -437,7 +460,7 @@ class matrix extends ArrayObject {
      * @param Matrix $matrix The second matrix
      * @return boolean
      */
-    public function equals(Matrix $matrix) {
+    public function equals($matrix) {
         if ($this->_rows != $matrix->_rows || $this->_cols != $matrix->_cols) {
             return false;
         }
