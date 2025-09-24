@@ -28,7 +28,6 @@ namespace local_catquiz;
 use cache;
 use cache_exception;
 use cache_helper;
-use cm_info;
 use coding_exception;
 use context_module;
 use context_system;
@@ -71,15 +70,58 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
-        global $DB, $PAGE;
+        global $DB;
 
 
         $elements = [];
+        self::set_advanced($mform, $elements);
 
-        $advendesettingheading = $mform->getElement('advancedheading');
-        $advendesettingheading->setText(
-            get_string('catmodelsettings', 'local_catquiz')
+        // Add a special header for catquiz.
+        // Create your CAT-Model header.
+        // $catmodelheader = $mform->createElement('header', 'catmodel_header', 'catmoSetting Schmetting');
+        // $mform->insertElementBefore($catmodelheader, 'modstandardgrade');
+        // $mform->addElement('header', 'catquiz_headerr',
+        //     get_string('catquizsettings', 'local_catquiz'));
+        // $catquiheaderr = $mform->getElement('advancedheading');
+        // $mform->setExpanded('catquiz_headerr');
+        // $mform->insertElementBefore($catquiheaderr, 'modstandardgrade');
+
+        self::set_catquizsettings($mform, $elements);
+
+        // We want to adjust our form depending on the nosubmit action which might just have taken place.
+        // But we don't get the correct data, because these elements are added to the mform only...
+        // ... after this function has finished execution. submitted form.
+        // But the submitted via post, so we can access the variable via the superglobal $POST.
+        return $elements;
+    }
+
+    /**
+     * Returns the ID of the next question
+     *
+     * This is called by adaptive quiz
+     * @param MoodleQuickForm $mform
+     * @param array $elements
+     * @return void
+     */
+    public static function set_advanced(MoodleQuickForm &$mform, &$elements): void {
+        global $PAGE;
+
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'header',
+                'catmodel_header',
+                'CAT-Model'
+            ),
+            'modstandardgrade'
         );
+
+        if ($mform->elementExists('catmodel')) {
+            $catmodel = $mform->removeElement('catmodel', false);
+            $mform->insertElementBefore($catmodel, 'modstandardgrade');
+        }
+
+        $submitcatmodeloption = $mform->getElement('submitcatmodeloption');
+        $mform->insertElementBefore($submitcatmodeloption, 'modstandardgrade');
 
         $testtemplates = testenvironment::get_environments_as_array(
             'mod_adaptivequiz',
@@ -92,30 +134,36 @@ class catquiz_handler {
 
         ksort($testtemplates);
 
-        $elements[] = $mform->addElement(
-            'select',
-            'choosetemplate',
-            get_string('choosetemplate', 'local_catquiz'),
-            $testtemplates,
-            ['data-on-change-action' => 'reloadTestForm']
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'select',
+                'choosetemplate',
+                get_string('choosetemplate', 'local_catquiz'),
+                $testtemplates,
+                ['data-on-change-action' => 'reloadTestForm']
+            ),
+            'modstandardgrade'
         );
 
         $mform->setType('choosetemplate', PARAM_INT);
 
         // Add a hidden element to store which button was clicked.
-        $elements[] = $mform->addElement('hidden', 'triggered_button', '');
+        $hiddentrigger = $mform->addElement('hidden', 'triggered_button', '');
+        $mform->insertElementBefore($hiddentrigger, 'modstandardgrade');
         $mform->setType('triggered_button', PARAM_ALPHANUMEXT);
 
         $context = context_system::instance();
 
         if (has_capability('local/catquiz:manage_testenvironments', $context)) {
             // If you have the right, you can define this setting as template.
-            $elements[] = $mform->addElement(
+            $testenvironmentaddoredittemplate = $mform->addElement(
                 'advcheckbox',
                 'testenvironment_addoredittemplate',
-                get_string('addoredittemplate', 'local_catquiz'));
-
-            $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+                get_string('addoredittemplate', 'local_catquiz')
+            );
+            $mform->insertElementBefore($testenvironmentaddoredittemplate, 'modstandardgrade');
+            $testenvironmentname = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+            $mform->insertElementBefore($testenvironmentname, 'modstandardgrade');
             $mform->setType('testenvironment_name', PARAM_TEXT);
             $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
         }
@@ -125,15 +173,37 @@ class catquiz_handler {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcattestoption');
-        $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
-            [
-            'class' => 'd-none',
-            'data-action' => 'submitCatTest',
-        ]);
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'submit',
+                'submitcattestoption',
+                'cattestsubmit',
+                [
+                    'class' => 'd-none',
+                    'data-action' => 'submitCatTest',
+                ]
+            ),
+            'modstandardgrade'
+        );
+    }
 
-        // Add a special header for catquiz.
-        $elements[] = $mform->addElement('header', 'catquiz_header',
-                get_string('catquizsettings', 'local_catquiz'));
+    /**
+     * Returns the ID of the next question
+     *
+     * This is called by adaptive quiz
+     * @param MoodleQuickForm $mform
+     * @param array $elements
+     * @return void
+     */
+    public static function set_catquizsettings(MoodleQuickForm &$mform, &$elements): void {
+        global $DB;
+
+        $elements[] = $mform->addElement(
+            'header',
+            'catquiz_header',
+            get_string('catquizsettings', 'local_catquiz')
+        );
+
         $mform->setExpanded('catquiz_header');
 
         $selectedcontext = optional_param('contextid', 0, PARAM_INT);
@@ -146,9 +216,6 @@ class catquiz_handler {
                 $name
             );
         }
-
-        // Question categories or tags to use for this quiz.
-
         // Parent Catscales have parentscaleid 0.
         $parentcatscales = \local_catquiz\data\dataapi::get_catscales_by_parent(0);
         $options = [
@@ -164,14 +231,11 @@ class catquiz_handler {
         $elements[] = $mform->addElement(
             'select',
             'catquiz_catscales',
-            get_string('selectparentscale', 'local_catquiz'), $select, $options);
+            get_string('selectparentscale', 'local_catquiz'),
+            $select,
+            $options
+        );
         $mform->addHelpButton('catquiz_catscales', 'catcatscales', 'local_catquiz');
-
-        // We want to adjust our form depending on the nosubmit action which might just have taken place.
-        // But we don't get the correct data, because these elements are added to the mform only...
-        // ... after this function has finished execution. submitted form.
-        // But the submitted via post, so we can access the variable via the superglobal $POST.
-
         $reloadtemplate = ($mform->getSubmitValues()['triggered_button'] ?? null) === "reloadTestForm";
         $template = null;
         if ($reloadtemplate && $chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
@@ -200,16 +264,20 @@ class catquiz_handler {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
-        $elements[] = $mform->addElement('submit', 'submitcatscaleoption', get_string('applychanges', 'local_catquiz'),
+        $elements[] = $mform->addElement(
+            'submit',
+            'submitcatscaleoption',
+            get_string('applychanges', 'local_catquiz'),
             [
-            'class' => 'hidden',
-            'data-action' => 'submitCatScale',
-        ]);
-
+                'class' => 'hidden',
+                'data-action' => 'submitCatScale',
+            ]
+        );
         info::instance_form_definition($mform, $elements, $template);
-
-        return $elements;
+        return;
     }
+
+
     /**
      *  Generate recursive checkboxes for sub(-sub)scales.
      * @param array $subscales
@@ -681,13 +749,14 @@ class catquiz_handler {
                 $scaleidofcopyvalue = substr($key, strlen('copysettingsforallsubscales_'));
                 $subscaleids = catscale::get_subscale_ids(intval($scaleidofcopyvalue));
             }
-
         };
 
         // If we just changed the number of the feedbackoptions.
         // We add the right values.
-        if (isset($values["submitnumberoffeedbackoptions"])
-            && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
+        if (
+            isset($values["submitnumberoffeedbackoptions"])
+            && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit"
+        ) {
             $parentscale = catscale::return_catscale_object($values['catquiz_catscales']);
             // First, get the setting.
             $numberofoptions = $values['numberoffeedbackoptionsselect'];
@@ -799,8 +868,10 @@ class catquiz_handler {
             }
             // In this case, we keep the selected template.
             $keepselectedtemplate = true;
-        } else if (!isset($values["submitcattestoption"])
-        || $values["submitcattestoption"] != "cattestsubmit") {
+        } else if (
+            !isset($values["submitcattestoption"])
+            || $values["submitcattestoption"] != "cattestsubmit"
+        ) {
             return;
         }
 
@@ -825,7 +896,6 @@ class catquiz_handler {
         }
 
         foreach ($values as $k => $v) {
-
             if (isset($overridevalues[$k])) {
                 $v = $overridevalues[$k];
             }

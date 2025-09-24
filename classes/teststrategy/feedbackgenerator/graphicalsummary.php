@@ -30,7 +30,6 @@ use html_writer;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 
 /**
@@ -41,7 +40,6 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class graphicalsummary extends feedbackgenerator {
-
     /**
      * Get student feedback.
      *
@@ -196,8 +194,9 @@ class graphicalsummary extends feedbackgenerator {
             return $existingdata;
         }
 
+        $lastresponse = $progress->get_last_response();
         if (
-            !$lastresponse = $progress->get_last_response() ||
+            !$lastresponse ||
             !isset($lastresponse['qid'])
         ) {
             return null;

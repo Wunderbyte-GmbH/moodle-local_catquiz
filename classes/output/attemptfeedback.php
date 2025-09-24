@@ -17,7 +17,6 @@
 namespace local_catquiz\output;
 
 use cache;
-use cache_helper;
 use coding_exception;
 use context_system;
 use Exception;
