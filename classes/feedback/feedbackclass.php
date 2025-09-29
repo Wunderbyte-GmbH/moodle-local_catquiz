@@ -63,8 +63,14 @@ class feedbackclass {
 
         // phpcs:ignore
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
-        $elements[] = $mform->addElement('header', 'catquiz_feedback',
-                get_string('catquiz_feedbackheader', 'local_catquiz'));
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'header',
+                'catquiz_feedback',
+                get_string('catquiz_feedbackheader', 'local_catquiz')
+            ),
+            'modstandardgrade'
+        );
         $mform->setExpanded('catquiz_feedback');
 
         $options = [
@@ -95,22 +101,28 @@ class feedbackclass {
         $nfeedbpersubscale = empty($nfeedbpersubscale)
             ? LOCAL_CATQUIZ_DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($nfeedbpersubscale);
 
-        $element = $mform->addElement(
-            'static',
-            'disclaimer:numberoffeedbackchange',
-            "",
-            get_string('disclaimer:numberoffeedbackchange', 'local_catquiz'),
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'static',
+                'disclaimer:numberoffeedbackchange',
+                "",
+                get_string('disclaimer:numberoffeedbackchange', 'local_catquiz'),
+            ),
+            'modstandardgrade'
         );
-        $elements[] = $element;
 
-        $element = $mform->addElement(
+        $element = $mform->createElement(
             'select',
             'numberoffeedbackoptionsselect',
             get_string('numberoffeedbackoptionpersubscale', 'local_catquiz'),
             $options,
-            ['data-on-change-action' => 'numberOfFeedbacksSubmit'],
+            ['data-on-change-action' => 'numberOfFeedbacksSubmit']
         );
-        $element->setValue($nfeedbpersubscale);
+
+        // Insert it before another known element (e.g. 'modstandardgrade').
+        $mform->insertElementBefore($element, 'modstandardgrade');
+        $mform->setDefault('numberoffeedbackoptionsselect', $nfeedbpersubscale);
+
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
         $elements[] = $element;
 
@@ -119,20 +131,25 @@ class feedbackclass {
             $picturewarning = get_string('picturesavewarning', 'local_catquiz');
             $element = $mform->createElement(
                 'html',
-                '<div class="alert alert-warning" role="alert">'.$picturewarning.'</div>'
+                '<div class="alert alert-warning" role="alert">' . $picturewarning . '</div>'
             );
             $element->setName('picturesavewarning');
-            $mform->addElement($element);
-            $elements[] = $element;
+            $mform->insertElementBefore($element, 'modstandardgrade');
         }
 
         // Button to attach JavaScript to reload the form.
-        $mform->registerNoSubmitButton('submitnumberoffeedbackoptions');
-        $elements[] = $mform->addElement('submit', 'submitnumberoffeedbackoptions', 'numberoffeedbackoptionssubmit',
-            [
-            'class' => 'd-none',
-            'data-action' => 'submitNumberOfFeedbackOptions',
-        ]);
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'submit',
+                'submitnumberoffeedbackoptions',
+                'numberoffeedbackoptionssubmit',
+                [
+                    'class' => 'd-none',
+                    'data-action' => 'submitNumberOfFeedbackOptions',
+                ]
+            ),
+            'modstandardgrade'
+        );
 
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($nfeedbpersubscale);
@@ -156,17 +173,21 @@ class feedbackclass {
             if ($scale->depth !== 0 && $checkboxchecked !== 1) {
                 continue;
             }
-            $subelements[] = $mform->addElement(
-                'advcheckbox',
-                'catquiz_scalereportcheckbox_' . $scale->id,
-                get_string('reportscale', 'local_catquiz'),
-                );
+            $mform->insertElementBefore(
+                $mform->createElement(
+                    'advcheckbox',
+                    'catquiz_scalereportcheckbox_' . $scale->id,
+                    get_string('reportscale', 'local_catquiz')
+                ),
+                'modstandardgrade'
+            );
 
             $scalereportcheckbox = isset($defaultvalues['catquiz_scalereportcheckbox_' . $scale->id])
                 ? $defaultvalues['catquiz_scalereportcheckbox_' . $scale->id] : optional_param(
                 'catquiz_scalereportcheckbox_' . $scale->id,
                 LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                PARAM_INT);
+                PARAM_INT
+            );
             if ($scalereportcheckbox == LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                 $mform->setDefault('catquiz_scalereportcheckbox_' . $scale->id, 1);
             }
@@ -174,10 +195,12 @@ class feedbackclass {
             for ($j = 1; $j <= $nfeedbpersubscale; $j++) {
                 // We need to create a div tag to "wrap" feedback range.
                 // Element is only used for testing purpose and can therefore contain scale name.
-                $element = $mform->createElement('html',
-                '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
+                $element = $mform->createElement(
+                    'html',
+                    '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >'
+                );
                 $element->setName('feedback_scale_' . $scale->id . '_rangestart_' . $j);
-                $subelements[] = $mform->addElement($element);
+                $mform->insertElementBefore($element, 'modstandardgrade');
 
                 // Check for each feedback editor field, if there is content.
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
@@ -207,46 +230,61 @@ class feedbackclass {
                 }
 
                 // Header for Subfeedback.
-                $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . '_'. $j,
-                get_string('feedbacknumber', 'local_catquiz', $j));
+                $mform->insertElementBefore(
+                    $mform->createElement(
+                        'static',
+                        'headingforfeedback' . $scale->id . '_'. $j,
+                        get_string('feedbacknumber', 'local_catquiz', $j)
+                    ),
+                    'modstandardgrade'
+                );
 
                 // Define range.
                 // For the lowest range (first range, min) value should be set statically to min of scale ability.
                 // Max (last range, max) is set to max of scale.
                 if ($j === 1) {
-                    $static = $mform->addElement(
-                        'static',
-                        'lowest_limit',
-                        get_string('lowerlimit', 'local_catquiz'),
-                        $lowestability
+                    $mform->insertElementBefore(
+                        $mform->createElement(
+                            'static',
+                            'lowest_limit',
+                            get_string('lowerlimit', 'local_catquiz'),
+                            $lowestability
+                        ),
+                        'modstandardgrade'
                     );
-                    $subelements[] = $static;
-                    $element = $mform->addElement(
-                        'hidden',
-                        'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j,
-                        $lowestability
+                    $label = 'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j;
+                    $mform->insertElementBefore(
+                        $mform->createElement(
+                            'hidden',
+                            $label,
+                            $lowestability
+                        ),
+                        'modstandardgrade'
                     );
-                    $element->setValue($lowestability);
+                    $mform->setDefault($label, $lowestability);
                 } else {
+                    $label = 'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j;
                     $element = $mform->addElement(
                         'float',
-                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        $label,
                         get_string('lowerlimit', 'local_catquiz')
-                        );
-                    $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
+                    );
+                    $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]
                         ?? optional_param(
-                            'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                            'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j,
                             LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                            PARAM_FLOAT);
+                            PARAM_FLOAT
+                        );
                     if ($lowerlimit === LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                         $lowerlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
                             true,
                             $lowestability,
-                            $highestability);
+                            $highestability
+                        );
                     }
-                    $element->setValue($lowerlimit);
+                    $mform->setDefault($label, $lowerlimit);
                 }
 
                 // If the Element is new, we set the default.

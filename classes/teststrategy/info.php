@@ -40,7 +40,6 @@ use MoodleQuickForm;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class info {
-
     /**
      *
      * @var int $id // strategy id defined in lib.
@@ -52,7 +51,6 @@ class info {
      * Instantioate parameters.
      */
     public function __construct() {
-
     }
 
     /**
@@ -70,7 +68,6 @@ class info {
         $strategies = self::return_available_strategies();
 
         foreach ($strategies as $strategy) {
-
             if (isset($strategy->id) && $strategy->id === $id) {
                 return $strategy;
             }
@@ -134,8 +131,8 @@ class info {
         }
 
         $strategy = array_filter(
-                self::return_available_strategies($onlyactive),
-                fn ($strategy) => $strategy->id == $id
+            self::return_available_strategies($onlyactive),
+            fn ($strategy) => $strategy->id == $id
         );
         return reset($strategy);
     }
@@ -153,8 +150,14 @@ class info {
         $data = $mform->getSubmitValues();
         $defaultvalues = $mform->_defaultValues;
         // Add a special header for catquiz.
-        $elements[] = $mform->addElement('header', 'catquiz_teststrategy',
-                get_string('catquiz_teststrategyheader', 'local_catquiz'));
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'header',
+                'catquiz_teststrategy',
+                get_string('catquiz_teststrategyheader', 'local_catquiz')
+            ),
+            'modstandardgrade'
+        );
         $mform->setExpanded('catquiz_teststrategy');
 
         $teststrategies = self::return_available_strategies();
@@ -170,27 +173,38 @@ class info {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
 
             // Only for those strategies in the array, we want to show the standard error setting.
-            if (!in_array($ts->id, [
-                    LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
-                    LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
-                    LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
-                    LOCAL_CATQUIZ_STRATEGY_FASTEST,
-                    LOCAL_CATQUIZ_STRATEGY_RELSUBS,
-                    ])) {
+            $validstrategies = [
+                LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
+                LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                LOCAL_CATQUIZ_STRATEGY_RELSUBS,
+            ];
+            if (!in_array($ts->id, $validstrategies)) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
             }
         }
 
         // Choose a test strategy for this instance.
-        $elements[] = $mform->addElement('select', 'catquiz_selectteststrategy',
-            get_string('catquiz_selectteststrategy', 'local_catquiz'),
-            $teststrategiesoptions
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'select',
+                'catquiz_selectteststrategy',
+                get_string('catquiz_selectteststrategy', 'local_catquiz'),
+                $teststrategiesoptions
+            ),
+            'modstandardgrade'
         );
 
-        $elements[] = $mform->addElement(
-            'advcheckbox',
-            'catquiz_includepilotquestions',
-            get_string('includepilotquestions', 'local_catquiz'));
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_includepilotquestions',
+                get_string('includepilotquestions', 'local_catquiz')
+            ),
+            'modstandardgrade'
+        );
+
         $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'in', $strategieswithoutpilotquestions);
         // Add ratio of pilot questions.
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
@@ -199,22 +213,32 @@ class info {
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
-        $elements[] = $mform->addElement(
-            'advcheckbox',
-            'catquiz_firstquestionreuseexistingdata',
-            get_string('firstquestion_startnewtest', 'local_catquiz'),
-            get_string('firstquestionreuseexistingdata', 'local_catquiz')
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_firstquestionreuseexistingdata',
+                get_string('firstquestion_startnewtest', 'local_catquiz'),
+                get_string('firstquestionreuseexistingdata', 'local_catquiz')
+            ),
+            'modstandardgrade'
         );
+
         $mform->setDefault('catquiz_firstquestionreuseexistingdata', 1);
-        $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
-            get_string('catquiz_selectfirstquestion', 'local_catquiz'),
-            [
-                firstquestionselector::LEVEL_VERYEASY => get_string('startwithveryeasyquestion', 'local_catquiz'),
-                firstquestionselector::LEVEL_EASY => get_string('startwitheasyquestion', 'local_catquiz'),
-                firstquestionselector::LEVEL_NORMAL => get_string('startwithmediumquestion', 'local_catquiz'),
-                firstquestionselector::LEVEL_DIFFICULT => get_string('startwithdifficultquestion', 'local_catquiz'),
-                firstquestionselector::LEVEL_VERYDIFFICULT => get_string('startwithverydifficultquestion', 'local_catquiz'),
-            ]
+        $questiondifficuty = [
+            firstquestionselector::LEVEL_VERYEASY => get_string('startwithveryeasyquestion', 'local_catquiz'),
+            firstquestionselector::LEVEL_EASY => get_string('startwitheasyquestion', 'local_catquiz'),
+            firstquestionselector::LEVEL_NORMAL => get_string('startwithmediumquestion', 'local_catquiz'),
+            firstquestionselector::LEVEL_DIFFICULT => get_string('startwithdifficultquestion', 'local_catquiz'),
+            firstquestionselector::LEVEL_VERYDIFFICULT => get_string('startwithverydifficultquestion', 'local_catquiz'),
+        ];
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'select',
+                'catquiz_selectfirstquestion',
+                get_string('catquiz_selectfirstquestion', 'local_catquiz'),
+                $questiondifficuty
+            ),
+            'modstandardgrade'
         );
         // When a classical CAT is performed, we ignore the first-question
         // option and display all questions ordered by their ID.
@@ -258,16 +282,21 @@ class info {
             ),
             ];
 
-        if (!optional_param('catquiz_minquestions', 0, PARAM_FLOAT) &&
-            !isset($defaultvalues['maxquestionsgroup']['catquiz_minquestions'])) {
+        if (
+            !optional_param('catquiz_minquestions', 0, PARAM_FLOAT) &&
+            !isset($defaultvalues['maxquestionsgroup']['catquiz_minquestions'])
+        ) {
             $mform->_defaultValues['maxquestionsgroup']['catquiz_minquestions'] =
                 get_config('local_catquiz', 'minquestions_default');
         }
 
-        $elements[] = $mform->addGroup(
-            $maxquestionspertest,
+        $group = $mform->createElement(
+            'group',
             'maxquestionsgroup',
-            get_string('numberofquestionspertest', 'local_catquiz'));
+            get_string('numberofquestionspertest', 'local_catquiz'),
+            $maxquestionspertest
+        );
+        $mform->insertElementBefore($group, 'modstandardgrade');
         $mform->addHelpButton('maxquestionsgroup', 'numberofquestionspertest', 'local_catquiz');
 
         $maxquestionsperscale = [
@@ -296,10 +325,14 @@ class info {
                 ['size' => '3']
             ),
             ];
-        $elements[] = $mform->addGroup(
-            $maxquestionsperscale,
+        $group = $mform->createElement(
+            'group',
             'maxquestionsscalegroup',
-            get_string('numberofquestionsperscale', 'local_catquiz'));
+            get_string('numberofquestionsperscale', 'local_catquiz'),
+            $maxquestionsperscale
+        );
+        $mform->insertElementBefore($group, 'modstandardgrade');
+
         $mform->addHelpButton('maxquestionsscalegroup', 'numberofquestionsperscale', 'local_catquiz');
         $mform->hideIf(
             'maxquestionsscalegroup',
@@ -335,21 +368,29 @@ class info {
             ),
         ];
 
-        if (!optional_param('catquiz_standarderror_min', 0, PARAM_FLOAT) &&
-            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+        if (
+            !optional_param('catquiz_standarderror_min', 0, PARAM_FLOAT) &&
+            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
+        ) {
                 $mform->_defaultValues['catquiz_standarderrorgroup']['catquiz_standarderror_min'] =
                 LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN;
         }
-        if (!optional_param('catquiz_standarderror_max', 0, PARAM_FLOAT) &&
-            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+        if (
+            !optional_param('catquiz_standarderror_max', 0, PARAM_FLOAT) &&
+            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+        ) {
                 $mform->_defaultValues['catquiz_standarderrorgroup']['catquiz_standarderror_max'] =
                 LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX;
         }
-
-        $elements[] = $mform->addGroup(
-            $standarderrorgroup,
+        $group = $mform->createElement(
+            'group',
             'catquiz_standarderrorgroup',
-            get_string('acceptedstandarderror', 'local_catquiz'));
+            get_string('acceptedstandarderror', 'local_catquiz'),
+            $standarderrorgroup
+        );
+        $mform->insertElementBefore($group, 'modstandardgrade');
+
+
         $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
         $mform->hideIf(
             'catquiz_standarderrorgroup',
@@ -358,10 +399,15 @@ class info {
             $strategyhasstandarderrorperscale
         );
 
-        $elements[] = $mform->addElement(
-            'advcheckbox',
-            'catquiz_includetimelimit',
-            get_string('includetimelimit', 'local_catquiz'));
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_includetimelimit',
+                get_string('includetimelimit', 'local_catquiz')
+            ),
+            'modstandardgrade'
+        );
+
         $mform->addHelpButton('catquiz_includetimelimit', 'includetimelimit', 'local_catquiz');
 
         $timelimitgroup = [
@@ -377,10 +423,12 @@ class info {
                 'catquiz_maxtimeperattempt',
                 ['size' => '3']
             ),
-            $mform->createElement('select',
+            $mform->createElement(
+                'select',
                 'catquiz_timeselect_attempt',
                 "string",
-                ['h' => "h", 'min' => 'min']),
+                ['h' => "h", 'min' => 'min']
+            ),
             $mform->createElement(
                 'static',
                 'catquiz_timelabel_item',
@@ -393,16 +441,22 @@ class info {
                 'catquiz_maxtimeperitem',
                 ['size' => '3']
             ),
-            $mform->createElement('select',
+            $mform->createElement(
+                'select',
                 'catquiz_timeselect_item',
                 "string",
-                ['min' => "min", 'sec' => 'sec']),
+                ['min' => "min", 'sec' => 'sec']
+            ),
         ];
-        $elements[] = $mform->addGroup(
-            $timelimitgroup,
+
+        $group = $mform->createElement(
+            'group',
             'catquiz_timelimitgroup',
-            get_string('maxtimeperquestion', 'local_catquiz')
+            get_string('maxtimeperquestion', 'local_catquiz'),
+            $timelimitgroup
         );
+        $mform->insertElementBefore($group, 'modstandardgrade');
+
         $mform->setType('catquiz_maxtimeperattempt', PARAM_INT);
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_timelimitgroup', 'catquiz_includetimelimit', 'neq', 1);
@@ -429,11 +483,14 @@ class info {
                 get_string('questionfeedbackshowfeedback', 'local_catquiz')
             ),
         ];
-        $elements[] = $mform->addGroup(
-            $feedbackgroup,
+
+        $group = $mform->createElement(
+            'group',
             'catquiz_questionfeedbacksettings',
-            get_string('questionfeedbacksettings', 'local_catquiz')
+            get_string('questionfeedbacksettings', 'local_catquiz'),
+            $feedbackgroup
         );
+        $mform->insertElementBefore($group, 'modstandardgrade');
         $mform->hideIf('catquiz_questionfeedbacksettings', 'catquiz_showquestion', 'neq', 1);
 
         feedbackclass::instance_form_definition($mform, $elements, $template);

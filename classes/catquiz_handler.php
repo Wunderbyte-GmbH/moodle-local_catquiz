@@ -198,22 +198,27 @@ class catquiz_handler {
     public static function set_catquizsettings(MoodleQuickForm &$mform, &$elements): void {
         global $DB;
 
-        $elements[] = $mform->addElement(
-            'header',
-            'catquiz_header',
-            get_string('catquizsettings', 'local_catquiz')
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'header',
+                'catquiz_header',
+                get_string('catquizsettings', 'local_catquiz')
+            ),
+            'modstandardgrade'
         );
 
         $mform->setExpanded('catquiz_header');
-
         $selectedcontext = optional_param('contextid', 0, PARAM_INT);
         $name = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => $selectedcontext]);
         if ($name) {
-            $elements[] = $mform->addElement(
-                'static',
-                'selectedcontext',
-                get_string('testcontext', 'local_catquiz'),
-                $name
+            $mform->insertElementBefore(
+                $mform->createElement(
+                    'static',
+                    'selectedcontext',
+                    get_string('testcontext', 'local_catquiz'),
+                    $name
+                ),
+                'modstandardgrade'
             );
         }
         // Parent Catscales have parentscaleid 0.
@@ -228,12 +233,15 @@ class catquiz_handler {
         foreach ($parentcatscales as $catscale) {
             $select[$catscale->id] = $catscale->name;
         }
-        $elements[] = $mform->addElement(
-            'select',
-            'catquiz_catscales',
-            get_string('selectparentscale', 'local_catquiz'),
-            $select,
-            $options
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'select',
+                'catquiz_catscales',
+                get_string('selectparentscale', 'local_catquiz'),
+                $select,
+                $options
+            ),
+            'modstandardgrade'
         );
         $mform->addHelpButton('catquiz_catscales', 'catcatscales', 'local_catquiz');
         $reloadtemplate = ($mform->getSubmitValues()['triggered_button'] ?? null) === "reloadTestForm";
@@ -264,14 +272,17 @@ class catquiz_handler {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
-        $elements[] = $mform->addElement(
-            'submit',
-            'submitcatscaleoption',
-            get_string('applychanges', 'local_catquiz'),
-            [
-                'class' => 'hidden',
-                'data-action' => 'submitCatScale',
-            ]
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'submit',
+                'submitcatscaleoption',
+                get_string('applychanges', 'local_catquiz'),
+                [
+                    'class' => 'hidden',
+                    'data-action' => 'submitCatScale',
+                ]
+            ),
+            'modstandardgrade'
         );
         info::instance_form_definition($mform, $elements, $template);
         return;
