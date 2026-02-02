@@ -117,7 +117,9 @@ if ($hassiteconfig) {
             'local_catquiz/store_debug_info',
             get_string('store_debug_info_name', 'local_catquiz'),
             get_string('store_debug_info_desc', 'local_catquiz'),
-            0));
+            0
+        )
+    );
 
     // Add a setting for the default maximum attempt duration.
     $settings->add(new admin_setting_configtext(
@@ -127,4 +129,12 @@ if ($hassiteconfig) {
         24, // Default value.
         PARAM_INT // Expect integer type.
     ));
+
+    $subplugindir = __DIR__ . '/connectivity';
+
+    if (is_dir($subplugindir)) {
+        foreach (glob($subplugindir . '/*/settings.php') as $settingsfile) {
+            require_once($settingsfile);
+        }
+    }
 }
