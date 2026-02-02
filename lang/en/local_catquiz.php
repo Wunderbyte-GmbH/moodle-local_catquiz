@@ -606,12 +606,6 @@ $string['removetestitemtitle'] = 'Remove test item from CAT scale';
 $string['reportscale'] = 'Include scale for report';
 $string['requesttimeout'] = 'The connection request timed out before it could complete';
 $string['response'] = 'Response';
-$string['responses_added'] = 'New responses were submitted';
-$string['responses_added_desc'] = '{$a->sourceurl} submitted new responses. {$a->added} new responses were added, {$a->skipped} '
-    . 'were skipped and {$a->errors} errors occured';
-$string['responses_submitted'] = 'New responses were shared';
-$string['responses_submitted_desc'] = 'New responses were shared with central compute instance {$a->centralhost}. {$a->added} new '
-    . 'responses were added, {$a->skipped} were skipped and {$a->errors} errors occured';
 $string['responsesbyusercharttitle'] = 'Total number of responses per person';
 $string['rootscale:tooltiptitle'] = 'root scale {$a}';
 $string['saveconfig'] = 'Save configuration';
@@ -690,10 +684,11 @@ $string['studentstats'] = 'Students';
 $string['subfeedbackrange'] = '({$a->lowerlimit} to {$a->upperlimit})';
 $string['submission_error'] = 'Error submitting responses: {$a}';
 $string['submission_success'] = '{$a->total} responses successfully submitted. {$a->added} new responses were added and {$a->skipped} were skipped.';
-$string['submit_responses'] = 'Submit responses to central instance';
 $string['submitresponsescheduled'] = 'Submit responses scheduled';
 $string['subplugintype_catmodel'] = 'CAT model';
 $string['subplugintype_catmodel_plural'] = 'CAT models';
+$string['subplugintype_connectivity'] = 'Connectivity plugin';
+$string['subplugintype_connectivity_plural'] = 'Connectivity plugins';
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
 $string['subscribedcatscalesheading'] = 'Subscribed CAT scales';

@@ -16,7 +16,6 @@
 
 namespace local_catquiz\output\catscalemanager\calculations;
 
-use core_form\dynamic_form;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\form\remote_settings_form;
@@ -34,13 +33,11 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class calculationsdisplay {
-
     /**
      * Constructor.
      *
      */
     public function __construct() {
-
     }
 
     /**
