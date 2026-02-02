@@ -624,12 +624,6 @@ $string['removetestitemtitle'] = 'Testitems von Skalen entfernen';
 $string['reportscale'] = 'Skala für den Report der Ergebnisse berücksichtigen';
 $string['requesttimeout'] = 'Zeitüberschreitung beim Verbindungsaufbau';
 $string['response'] = 'Antwort';
-$string['responses_added'] = 'Es wurden neue Antworten hinzugefügt';
-$string['responses_added_desc'] = '{$a->sourceurl} hat neue Antworten hinzugefügt. {$a->added} neue Antworten wurden hinzugefügt, '
-    . '{$a->skipped} waren bereits vorhanden und es sind {$a->errors} Fehler aufgetreten';
-$string['responses_submitted'] = 'Neue Antworten geteilt';
-$string['responses_submitted_desc'] = 'Es wurden neue Antworten mit der zentralen Berechnungsinstanz {$a->centralhost} geteilt. {$a->added} neue Antworten wurden hinzugefügt, '
-    . '{$a->skipped} waren bereits vorhanden und es sind {$a->errors} Fehler aufgetreten';
 $string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
 $string['rootscale:tooltiptitle'] = 'Globalskala „{$a}“';
 $string['saveconfig'] = 'Konfiguration speicher';
@@ -707,7 +701,6 @@ $string['studentstats'] = 'Nutzende';
 $string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
 $string['submission_error'] = 'Fehler beim versenden von Antwort-Daten: {$a}';
 $string['submission_success'] = '{$a->total} Antworten wurden erfolgreich übermittelt. {$a->added} Antworten wurden neu hingzugefügt, {$a->skipped} waren bereits vorhanden';
-$string['submit_responses'] = 'Antwort-Daten mit zentraler Berechnungsinstanz teilen';
 $string['submitresponsescheduled'] = 'Antwort-Daten geplant';
 $string['subplugintype_catmodel'] = 'CAT Modell';
 $string['subplugintype_catmodel_plural'] = 'CAT Modelle';
