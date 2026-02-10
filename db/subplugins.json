@@ -1,6 +1,6 @@
 {
-    "plugintypes": {
-        "catmodel": "local\/catquiz\/catmodel",
-        "connectivity": "local\/catquiz\/connectivity"
-    }
+  "plugintypes": {
+    "catmodel": "local\/catquiz\/catmodel",
+    "connectivity": "local\/catquiz\/connectivity"
+  }
 }

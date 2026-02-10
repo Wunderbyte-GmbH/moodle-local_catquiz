@@ -31,7 +31,6 @@ use admin_settingpage;
  * models subplugin define classes.
  */
 class catmodel extends base {
-
     /**
      * Returns the information about plugin availability
      *
