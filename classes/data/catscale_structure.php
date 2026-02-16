@@ -34,7 +34,6 @@ use moodle_url;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale_structure {
-
     /** @var ?int $id null means object is not yet initialised */
     public ?int $id = null;
 

@@ -44,7 +44,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item_model_override_selector extends dynamic_form {
-
     /**
      * DEFAULT_COMPONENT_NAME
      *
@@ -102,8 +101,8 @@ class item_model_override_selector extends dynamic_form {
             if ($param->get_id() === intval($item->activeparamid)) {
                 $class .= " activeparam";
             }
-            $form->addElement('html', '<div class="'.$class.'">');
-            $form->addElement('html', '<h3>'.get_string('pluginname', sprintf('catmodel_%s', $param->get_model_name())).'</h3>');
+            $form->addElement('html', '<div class="' . $class . '">');
+            $form->addElement('html', '<h3>' . get_string('pluginname', sprintf('catmodel_%s', $param->get_model_name())) . '</h3>');
             $statusstring = get_string(sprintf('itemstatus_%d', $param->get_status()), 'local_catquiz');
             $form->addElement(
                 'html',
@@ -121,8 +120,12 @@ class item_model_override_selector extends dynamic_form {
         }
 
         $this->_form->registerNoSubmitButton('edititemparams');
-        $this->_form->addElement('submit', 'edititemparams', get_string('edit'),
-            ['data-action' => 'edititemparams']);
+        $this->_form->addElement(
+            'submit',
+            'edititemparams',
+            get_string('edit'),
+            ['data-action' => 'edititemparams']
+        );
         $this->_form->disable_form_change_checker();
     }
 
@@ -150,7 +153,8 @@ class item_model_override_selector extends dynamic_form {
             'active_model',
             get_string('activemodel', 'local_catquiz'),
             array_combine(
-                array_keys($models), array_map(fn($m) => get_string('pluginname', sprintf('catmodel_%s', $m)), array_keys($models))
+                array_keys($models),
+                array_map(fn($m) => get_string('pluginname', sprintf('catmodel_%s', $m)), array_keys($models))
             ),
             ['multiple' => false]
         );
@@ -178,8 +182,12 @@ class item_model_override_selector extends dynamic_form {
         }
 
         $mform->registerNoSubmitButton('noedititemparams');
-        $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
-            ['data-action' => 'edititemparams']);
+        $mform->addElement(
+            'submit',
+            'noedititemparams',
+            get_string('noedit', 'local_catquiz'),
+            ['data-action' => 'edititemparams']
+        );
         $this->add_action_buttons(false);
         $mform->disable_form_change_checker();
     }
@@ -271,7 +279,8 @@ class item_model_override_selector extends dynamic_form {
         foreach ($formitemparams as $model => $param) {
             // If the parameter was not changed, skip it.
             $defaultparam = $this->_form->_defaultValues['itemparams']->offsetGet($model);
-            if ($param->get_params_array() == $defaultparam->get_params_array()
+            if (
+                $param->get_params_array() == $defaultparam->get_params_array()
                 && $param->get_status() == $defaultparam->get_status()
             ) {
                 if ($model == $selectedmodel) {
@@ -343,9 +352,11 @@ class item_model_override_selector extends dynamic_form {
             $dataarray = [];
             // In editing mode we want to display a string for status.
             if (empty($data->editing)) {
-                if (isset($modelparams->model)
+                if (
+                    isset($modelparams->model)
                     && $modelparams->model == $model
-                    && isset($modelparams->status)) {
+                    && isset($modelparams->status)
+                ) {
                     $status = $modelparams->status;
                 } else {
                     $status = $statusint;

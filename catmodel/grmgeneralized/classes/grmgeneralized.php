@@ -41,7 +41,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grmgeneralized extends model_multiparam {
-
     /**
      * {@inheritDoc}
      *

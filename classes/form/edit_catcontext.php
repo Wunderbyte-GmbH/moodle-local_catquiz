@@ -39,7 +39,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_catcontext extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -65,12 +64,18 @@ class edit_catcontext extends dynamic_form {
         $mform->addElement('editor', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
         $mform->setType('description', PARAM_CLEANHTML);
 
-        $mform->addElement('date_time_selector', 'starttimestamp',
-                get_string("starttimestamp", "local_catquiz"));
+        $mform->addElement(
+            'date_time_selector',
+            'starttimestamp',
+            get_string("starttimestamp", "local_catquiz")
+        );
         $mform->setType('starttimestamp', PARAM_INT);
 
-        $mform->addElement('date_time_selector', 'endtimestamp',
-                get_string("endtimestamp", "local_catquiz"));
+        $mform->addElement(
+            'date_time_selector',
+            'endtimestamp',
+            get_string("endtimestamp", "local_catquiz")
+        );
         $mform->setType('endtimestamp', PARAM_INT);
 
         model_strategy::handle_mform($mform);
@@ -98,7 +103,6 @@ class edit_catcontext extends dynamic_form {
         $data = $this->get_data();
 
         if (isset($data->id)) {
-
             $data->descriptionformat = $data->description['format'];
             $data->description = $data->description['text'];
             $data->json = json_encode(
@@ -106,12 +110,12 @@ class edit_catcontext extends dynamic_form {
                     'max_iterations' => $data->max_iterations,
                     'default' => $data->default ? true : false,
                     'strategy' => ['model_override' => $data->model_override],
-                ]);
+                ]
+            );
 
             $catcontext = new catcontext($data);
 
             $catcontext->save_or_update();
-
         }
 
         cache_helper::purge_by_event('changesincatcontexts');
@@ -131,7 +135,6 @@ class edit_catcontext extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
         if (!empty($data->id)) {
-
             $record = (object)[
                 'id' => $data->id,
             ];
@@ -151,7 +154,6 @@ class edit_catcontext extends dynamic_form {
             foreach ($storeddata as $key => $value) {
                 $data->$key = $value;
             }
-
         }
 
         $this->set_data($data);

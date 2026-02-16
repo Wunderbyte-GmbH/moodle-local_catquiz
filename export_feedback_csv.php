@@ -41,9 +41,10 @@ require_login();
 
 $PAGE->set_context(context_course::instance($cid));
 
-if (!has_capability('local/catquiz:view_users_feedback', context_course::instance($cid)) &&
-    !has_capability('local/catquiz:canmanage', context_system::instance())) {
-
+if (
+    !has_capability('local/catquiz:view_users_feedback', context_course::instance($cid)) &&
+    !has_capability('local/catquiz:canmanage', context_system::instance())
+) {
     die(get_string('error:permissionforcsvdownload', 'local_catquiz', 'local/catquiz:view_users_feedback'));
 }
 
@@ -60,17 +61,17 @@ if ($testid != 0) {
     $filename .= "_test_$testid";
 }
 if ($starttime != 0) {
-    $filename .= "_from_".userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
+    $filename .= "_from_" . userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
 }
 if ($endtime != 0) {
-    $filename .= "_till_".userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
+    $filename .= "_till_" . userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
 }
 
-$filename .= "_".userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
+$filename .= "_" . userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
 
-$downloadfilename = clean_filename ( $filename );
-$csvexport = new csv_export_writer ( 'semicolon' );
-$csvexport->set_filename ( $downloadfilename );
+$downloadfilename = clean_filename($filename);
+$csvexport = new csv_export_writer('semicolon');
+$csvexport->set_filename($downloadfilename);
 
 $exporttitle = [
 // phpcs:disable
@@ -120,7 +121,6 @@ $exporttitle = [
 $csvexport->add_data($exporttitle);
 
 foreach ($catquizstatistics->get_export_data() as $row) {
-
     // phpcs:disable
     $csvexport->add_data(
         [
@@ -155,4 +155,4 @@ foreach ($catquizstatistics->get_export_data() as $row) {
     // phpcs:enable
 }
 
-$csvexport->download_file ();
+$csvexport->download_file();

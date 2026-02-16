@@ -32,30 +32,29 @@ $attemptid = required_param('attemptid', PARAM_INT);
 require_login();
 
 if (!has_capability('local/catquiz:canmanage', context_system::instance())) {
-
     die(get_string('error:permissionforcsvdownload', 'local_catquiz', 'local/catquiz:canmanage'));
 }
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
-$filename = date("Ymd Hi-")."export_debuginfo_attempt_$attemptid.pdf";
+$filename = date("Ymd Hi-") . "export_debuginfo_attempt_$attemptid.pdf";
 
-$downloadfilename = clean_filename( $filename );
+$downloadfilename = clean_filename($filename);
 $pdfexport = new pdf();
 
 $debuginfo = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'json,debug_info', IGNORE_MISSING);
 $pdfexport->AddPage('P', "A4");
-$pdfexport->writeHTML("<h1>Debug Info, Attempt $attemptid</h1>".nl2br(var_export(json_decode($debuginfo->debug_info), true)));
+$pdfexport->writeHTML("<h1>Debug Info, Attempt $attemptid</h1>" . nl2br(var_export(json_decode($debuginfo->debug_info), true)));
 
 $progressinfo = $DB->get_record('local_catquiz_progress', ['attemptid' => $attemptid], 'json', IGNORE_MISSING);
 
 $pdfexport->AddPage('P', "A4");
-$pdfexport->writeHTML("<h1>Progress Info, Attempt $attemptid</h1>".nl2br(var_export(json_decode($progressinfo->json), true)));
+$pdfexport->writeHTML("<h1>Progress Info, Attempt $attemptid</h1>" . nl2br(var_export(json_decode($progressinfo->json), true)));
 
 $attemptinfo = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'json', IGNORE_MISSING);
 
 $pdfexport->AddPage('P', "A4");
-$pdfexport->writeHTML("<h1>Attempt Info, Attempt $attemptid</h1>".nl2br(var_export(json_decode($attemptinfo->json), true)));
+$pdfexport->writeHTML("<h1>Attempt Info, Attempt $attemptid</h1>" . nl2br(var_export(json_decode($attemptinfo->json), true)));
 
 $pdfexport->Output($downloadfilename, 'D');

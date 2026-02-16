@@ -41,7 +41,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_testenvironment extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -74,7 +73,6 @@ class edit_testenvironment extends dynamic_form {
 
         $mform->addElement('select', 'status', get_string('status', 'core'), $statusarray);
         $mform->setType('status', PARAM_TEXT);
-
     }
 
     /**
@@ -99,7 +97,6 @@ class edit_testenvironment extends dynamic_form {
         $data = $this->get_data();
 
         if (isset($data->id)) {
-
             $data->descriptionformat = $data->description['format'];
             $data->description = $data->description['text'];
 
@@ -125,7 +122,6 @@ class edit_testenvironment extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
         if (!empty($data->id)) {
-
             $record = (object)[
                 'id' => $data->id,
             ];
@@ -140,7 +136,6 @@ class edit_testenvironment extends dynamic_form {
             foreach ($storeddata as $key => $value) {
                 $data->$key = $value;
             }
-
         }
 
         $this->set_data($data);

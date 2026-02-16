@@ -40,7 +40,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grm extends model_multiparam {
-
     /**
      * {@inheritDoc}
      *
@@ -110,7 +109,6 @@ class grm extends model_multiparam {
      */
     public static function get_parameter_names(): array {
         return ['difficulty', 'difficulties'];
-
     }
 
     /**

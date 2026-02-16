@@ -37,7 +37,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class modal_manage_catscale extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -71,10 +70,12 @@ class modal_manage_catscale extends dynamic_form {
         $buttonargs = ['style' => 'visibility:hidden;'];
         $categoryselect = [
             $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $parents),
-            $mform->createElement('submit',
+            $mform->createElement(
+                'submit',
                 'btn_changeparentid',
                 get_string('chooseparent', 'local_catquiz'),
-                $buttonargs),
+                $buttonargs
+            ),
         ];
 
         $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), '', false);
@@ -103,7 +104,6 @@ class modal_manage_catscale extends dynamic_form {
         $mform->setType('catquiz_minscalevalue', PARAM_FLOAT);
         $mform->setDefault('catquiz_minscalevalue', LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT);
         $mform->addHelpButton('catquiz_minscalevalue', 'minabilityscalevalue', 'local_catquiz');
-
     }
 
     /**
@@ -210,15 +210,17 @@ class modal_manage_catscale extends dynamic_form {
             $errors["catquiz_minscalevalue"] = get_string(
                 'formelementnegativefloatwithdefault',
                 'local_catquiz',
-                LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT);
+                LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT
+            );
         }
         if (isset($data["catquiz_maxscalevalue"]) && (float) $data["catquiz_maxscalevalue"] <= 0) {
             $errors["catquiz_maxscalevalue"] = get_string(
                 'formelementpositivefloatwithdefault',
                 'local_catquiz',
-                LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
+                LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT
+            );
         }
-        if ( (float)$data["catquiz_minscalevalue"] > (float) $data["catquiz_maxscalevalue"]) {
+        if ((float)$data["catquiz_minscalevalue"] > (float) $data["catquiz_maxscalevalue"]) {
             $errors['catquiz_minscalevalue'] = get_string('errorminscalevalue', 'local_catquiz');
         }
 

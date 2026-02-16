@@ -39,7 +39,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class contextselector extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -62,10 +61,11 @@ class contextselector extends dynamic_form {
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
             $jsonobj = json_decode($context->json);
-            if ($jsonobj
+            if (
+                $jsonobj
                 && $jsonobj->default === true
                 && !isset($default)
-                ) {
+            ) {
                 $default = $contextid;
             }
         }
@@ -140,7 +140,6 @@ class contextselector extends dynamic_form {
             } else if (!empty(catscale::get_context_id($catscaleid))) {
                 $data->contextid = catscale::get_context_id($catscaleid);
             }
-
         }
 
         $this->set_data($data);

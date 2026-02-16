@@ -40,7 +40,6 @@ use moodle_url;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class add_testitem_to_scale extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -68,11 +67,12 @@ class add_testitem_to_scale extends dynamic_form {
             $mform->addElement('static', 'questiontext_' . $question->id, $question->id, $questiontext);
 
             // Check if question has an assigned scale and compare to newscale.
-            if (catscale::is_assigned_to_parent_scale($catscaleid, $question->id)
-            || catscale::is_assigned_to_subscale($catscaleid, $question->id)) {
+            if (
+                catscale::is_assigned_to_parent_scale($catscaleid, $question->id)
+                || catscale::is_assigned_to_subscale($catscaleid, $question->id)
+            ) {
                 $mform->addElement('hidden', 'itemalreadyinotherscale_' . $question->id, $question->id);
             }
-
         }
         $mform->addElement('advcheckbox', 'validateitemsscaleid', "", 0, ['class' => 'hidden']);
     }
@@ -83,7 +83,6 @@ class add_testitem_to_scale extends dynamic_form {
      * @return void
      */
     protected function check_access_for_dynamic_submission(): void {
-
     }
 
     /**
