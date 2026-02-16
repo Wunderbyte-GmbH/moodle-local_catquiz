@@ -29,7 +29,7 @@ $componentname = 'local_catquiz';
 
 // Default for users that have site config.
 if ($hassiteconfig) {
-    $settings = new admin_settingpage($componentname . '_settings',  get_string('pluginname', 'local_catquiz'));
+    $settings = new admin_settingpage($componentname . '_settings', get_string('pluginname', 'local_catquiz'));
     $ADMIN->add('localplugins', $settings);
 
     foreach (core_plugin_manager::instance()->get_plugins_of_type('catmodel') as $plugin) {
@@ -49,11 +49,11 @@ if ($hassiteconfig) {
 
     $settings->add(
         new admin_setting_heading(
-                'local_catquiz/cattags',
-                get_string('cattags', 'local_catquiz'),
-                get_string('cattags:information', 'local_catquiz'),
+            'local_catquiz/cattags',
+            get_string('cattags', 'local_catquiz'),
+            get_string('cattags:information', 'local_catquiz'),
         )
-        );
+    );
 
     $sql = "SELECT DISTINCT t.id, t.name
             FROM {tag} t
@@ -85,23 +85,24 @@ if ($hassiteconfig) {
         get_string('tr_sd_ratio_name', 'local_catquiz'),
         get_string('tr_sd_ratio_desc', 'local_catquiz'),
         3.0,
-        PARAM_FLOAT)
-    );
+        PARAM_FLOAT
+    ));
     $settings->add(new admin_setting_configtext(
         'local_catquiz/minquestions_default',
         get_string('minquestions_default_name', 'local_catquiz'),
         get_string('minquestions_default_desc', 'local_catquiz'),
         3,
         '/^\d+$/'
-        )
-    );
+    ));
 
     $settings->add(
         new admin_setting_configcheckbox(
             'local_catquiz/automatic_reload_on_scale_selection',
             get_string('automatic_reload_on_scale_selection', 'local_catquiz'),
             get_string('automatic_reload_on_scale_selection_description', 'local_catquiz'),
-            1));
+            1
+        )
+    );
 
     $settings->add(new admin_setting_configtext(
         'local_catquiz/time_penalty_threshold',
@@ -109,8 +110,7 @@ if ($hassiteconfig) {
         get_string('time_penalty_threshold_desc', 'local_catquiz'),
         10,
         '/^[1-9]\d*$/'
-        )
-    );
+    ));
 
     $settings->add(
         new admin_setting_configcheckbox(

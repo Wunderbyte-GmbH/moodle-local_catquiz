@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__.'/../../../db/upgradelib.php');
+require_once(__DIR__ . '/../../../db/upgradelib.php');
 
 /**
  * Execute mixedraschbirnbaum upgrade from the given old version.
@@ -44,7 +44,6 @@ function xmldb_catmodel_mixedraschbirnbaum_upgrade($oldversion) {
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
 
     if ($oldversion < 2023061500) {
-
         // Define field guessing to be added to local_catquiz_itemparams.
         $table = new xmldb_table('local_catquiz_itemparams');
         $field = new xmldb_field('guessing', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0', 'discrimination');

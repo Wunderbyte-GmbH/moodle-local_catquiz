@@ -51,7 +51,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pcmgeneralized extends model_multiparam {
-
     /**
      * {@inheritDoc}
      *

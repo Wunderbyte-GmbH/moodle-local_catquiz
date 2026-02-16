@@ -34,7 +34,6 @@ namespace local_catquiz;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mathcat {
-
     /**
      * Returns gaussian density.
      *
@@ -281,7 +280,8 @@ class mathcat {
         int $maxiterations = 500,
         ?callable $fntrfilter = null,
         ?callable $fntrfunction = null,
-        ?callable $fntrderivative = null): array {
+        ?callable $fntrderivative = null
+    ): array {
 
         // Set initial values.
         $parameter = $parameterstart;
@@ -294,7 +294,6 @@ class mathcat {
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
-
             // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
             $mxparameter = new matrix($parameter);
             $mxparameter = $mxparameter->transpose();
@@ -398,7 +397,7 @@ class mathcat {
      */
     private static function add_gauss_der1(callable $func, $mean, $std) {
 
-        $gaussian = function($x) use ($mean, $std)  {
+        $gaussian = function ($x) use ($mean, $std) {
             return 1 * self::gaussian_density_derivative1($x, $mean, $std);
         };
         $newfunc = self::compose_plus($func, $gaussian);
@@ -417,7 +416,7 @@ class mathcat {
      */
     private static function add_gauss_der2(callable $func, $mean, $std) {
 
-        $gaussian = function($x) use ($mean, $std)  {
+        $gaussian = function ($x) use ($mean, $std) {
             return 1 * self::gaussian_density_derivative2($x, $mean, $std);
         };
         $newfunc = self::compose_plus($func, $gaussian);
@@ -484,14 +483,11 @@ class mathcat {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
         if (is_array($data) && count($data) > 0) {
-
             // Handle all arrays given.
             $datatmp = [];
             $structure = [];
             foreach ($data as $key => $val) {
-
                 if (is_array($val) && count($val) > 0) {
-
                     // Analyse further recursively.
                     $structuretmp = self::array_to_vector($val, $n);
 
@@ -505,13 +501,11 @@ class mathcat {
                     $structure[$key] = $structuretmp;
                     $datatmp = array_merge($datatmp, $val);
                 } else if (is_numeric($val)) {
-
                     // Give back part of the array and structure, also increment $n.
                     $datatmp[$n] = floatval($val);
                     $structure[$key] = $n;
                     $n += 1;
                 } else {
-
                     // Handle any other cases, like strings or objects.
                     // TODO: Throw error warning and exit with null.
                     return [];
@@ -522,7 +516,6 @@ class mathcat {
             $data = $datatmp;
             return $structure;
         } else if (is_numeric($data)) {
-
             // Handle the case that something like a float is given instead.
             $structure = $n;
             $data = [$n => $data];
@@ -545,29 +538,22 @@ class mathcat {
     public static function vector_to_array(array $data, $structure): array {
 
         if (is_array($structure)) {
-
             // Handle arrays.
             $datatmp = [];
             foreach ($structure as $key => $val) {
-
                 if (is_array($val)) {
-
                     $datatmp[$key] = self::vector_to_array($data, $val);
                 } else if (is_int($val)) {
-
                     $datatmp[$key] = $data[$val];
                 }
             }
             return $datatmp;
         } else if (is_int($structure)) {
-
             // Handle floats or anything like it.
             if (array_key_exists($structure, $data)) {
-
                 // Give back just the value.
                 return $data[$structure];
             } else {
-
                 debugging('given structure array does not match vector in vector_to_array', DEBUG_DEVELOPER);
                 return [];
             }

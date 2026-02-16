@@ -40,7 +40,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \catmodel_raschbirnbaum\raschbirnbaum
  */
 final class raschbirnbaum_test extends TestCase {
-
     /**
      * Tests that the model calculates the item parameters correctly.
      *
@@ -200,7 +199,6 @@ final class raschbirnbaum_test extends TestCase {
         $expected = array_map(fn ($a) => (float)sprintf("%.6f", $a), $expected);
 
         $this->assertEquals($expected, $result);
-
     }
 
     /**
@@ -236,7 +234,6 @@ final class raschbirnbaum_test extends TestCase {
         }
 
         $this->assertEquals($expectedmatrix, $resultmatrix);
-
     }
 
     /**

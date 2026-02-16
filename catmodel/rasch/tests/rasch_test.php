@@ -41,7 +41,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \catmodel_rasch\rasch
  */
 final class rasch_test extends TestCase {
-
     /**
      * Tests that the model calculates the item parameters correctly.
      *
@@ -189,7 +188,6 @@ final class rasch_test extends TestCase {
         $result = (float)sprintf("%.6f", $result[0]);
 
         $this->assertEqualsWithDelta($expected, $result, '0.0001');
-
     }
 
     /**
@@ -214,7 +212,6 @@ final class rasch_test extends TestCase {
         $result = (float)sprintf("%.6f", $result[0][0]);
 
         $this->assertEquals($expected, $result);
-
     }
 
     /**
