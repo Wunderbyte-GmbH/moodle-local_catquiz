@@ -96,12 +96,12 @@ class matrix extends ArrayObject {
             // Check, if $value is array.
             if (is_array($value)) {
                 // Strip of any associated indices.
-                $value = array_values ($value);
+                $value = array_values($value);
                 // Check if $value is not an array of array.
                 if (is_array($value[0])) {
                     // Note: Also strip of any further associated indices.
                     foreach ($value as $key => $val) {
-                        $value[$key] = array_values ($val);
+                        $value[$key] = array_values($val);
                     }
                 } else {
                     // Note: Vector is given, convert to proper matrix.
@@ -114,8 +114,10 @@ class matrix extends ArrayObject {
             parent::__construct($value);
             $this->_rows = count($value);
             $this->_cols = count($value[0]);
-        } else if (is_numeric($value) && is_numeric($cols)
-                && $value > 0 && $cols > 0) {
+        } else if (
+            is_numeric($value) && is_numeric($cols)
+                && $value > 0 && $cols > 0
+        ) {
             // Create a void matrix with dimensions $value x $cols.
             $this->_rows = $value;
             $this->_cols = $cols;
@@ -420,13 +422,13 @@ class matrix extends ArrayObject {
      *
      */
     public function print_m() {
-        echo '('.$this->_rows. " x " . $this->_cols. ")-matrix : [";
+        echo '(' . $this->_rows . " x " . $this->_cols . ")-matrix : [";
         for ($r = 0; $r < $this->_rows; $r++) {
             echo "[";
             for ($c = 0; $c < $this->_cols; $c++) {
-                echo ' '. round(floatval($this[$r][$c]), 7). (($c < (($this->_cols) - 1)) ? ', ' : ' ');
+                echo ' ' . round(floatval($this[$r][$c]), 7) . (($c < (($this->_cols) - 1)) ? ', ' : ' ');
             }
-            echo ']'. (($r < ($this->_rows) - 1) ? ", " : "");
+            echo ']' . (($r < ($this->_rows) - 1) ? ", " : "");
         }
         echo ']';
     }
@@ -459,7 +461,6 @@ class matrix extends ArrayObject {
     public function issquare() {
         return $this->_rows == $this->_cols;
     }
-
 }
 
 use RuntimeException;

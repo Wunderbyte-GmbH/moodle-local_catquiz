@@ -43,7 +43,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addscalestandarderror extends preselect_task {
-
     /**
      * @var progress $progress
      */

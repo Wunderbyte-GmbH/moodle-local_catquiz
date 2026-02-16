@@ -32,14 +32,11 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eventlogtableinstance {
-
-
     /**
      * Constructor.
      *
      */
     public function __construct() {
-
     }
 
     /**
@@ -50,7 +47,7 @@ class eventlogtableinstance {
 
         $table = new event_log_table('eventlogtable');
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_event_logs();
+        [$select, $from, $where, $filter, $params] = catquiz::return_sql_for_event_logs();
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 

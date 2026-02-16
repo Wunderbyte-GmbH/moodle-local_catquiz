@@ -34,7 +34,6 @@ use local_catquiz\catscale;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale_updated extends \core\event\base {
-
     /**
      * Init parameters.
      *

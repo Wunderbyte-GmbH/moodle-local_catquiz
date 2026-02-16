@@ -35,7 +35,6 @@ use moodle_url;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testiteminscale_added extends catquiz_event_base {
-
     /**
      * Init parameters.
      *
@@ -70,15 +69,17 @@ class testiteminscale_added extends catquiz_event_base {
 
         $catscaleid = $other->catscaleid ?? 0;
         $testitemid = $data['objectid'];
-        if (!empty($catscaleid) &&
+        if (
+            !empty($catscaleid) &&
             !empty($other->context) &&
             !empty($other->component)
-            ) {
+        ) {
             $linktotidetailview = catscale::get_link_to_testitem(
                 $testitemid,
                 $other->catscaleid,
                 $other->context,
-                $other->component);
+                $other->component
+            );
         } else {
             $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }

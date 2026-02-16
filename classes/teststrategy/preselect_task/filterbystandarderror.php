@@ -207,7 +207,8 @@ class filterbystandarderror extends preselect_task {
         // Special treatment for the main scale: exclude it only, if the minimum number of questions
         // per attempt AND questions per scale have been played.
         $ismainscale = $scaleid === intval($this->context['catscaleid']);
-        if ($ismainscale
+        if (
+            $ismainscale
             && (
                 count($this->progress->get_playedquestions()) < $this->context['minimumquestions']
                 || count($playeditems) < $this->context['min_attempts_per_scale']

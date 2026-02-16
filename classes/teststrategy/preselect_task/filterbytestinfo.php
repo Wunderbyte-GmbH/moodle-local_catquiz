@@ -57,7 +57,8 @@ class filterbytestinfo extends preselect_task {
         $this->context = $context;
         $this->progress = $context['progress'];
 
-        if (!in_array($context['teststrategy'], [
+        if (
+            !in_array($context['teststrategy'], [
             LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
             LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
             LOCAL_CATQUIZ_STRATEGY_RELSUBS,

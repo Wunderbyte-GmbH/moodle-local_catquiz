@@ -125,7 +125,7 @@ class teststrategy_fastest extends strategy {
         array $feedbackdata,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
-        ): array {
+    ): array {
 
         $newabilities = [];
         $rootscaleid = (int) $feedbackdata['catscaleid'];

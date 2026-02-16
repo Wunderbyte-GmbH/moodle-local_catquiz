@@ -36,7 +36,6 @@ use local_catquiz\feedback\feedbackclass;
  * Event observer for local_catquiz.
  */
 class local_catquiz_observer {
-
     /**
      * Observer for the update_catscale event
      *
@@ -96,6 +95,4 @@ class local_catquiz_observer {
         cache_helper::purge_by_event('changesintestitems');
         cache_helper::purge_by_event('changesineventlog');
     }
-
-
 }

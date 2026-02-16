@@ -44,7 +44,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personabilities extends feedbackgenerator {
-
     /**
      *
      * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.

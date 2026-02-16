@@ -43,7 +43,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedback_helper {
-
     /**
      * The precision to use when rounding numbers.
      *
@@ -168,9 +167,11 @@ class feedback_helper {
     public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = LOCAL_CATQUIZ_DEFAULT_GREY;
         $abilityrange = $this->get_ability_range($catscaleid);
-        if (!$quizsettings ||
+        if (
+            !$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
-            $personability > (float) $abilityrange['maxscalevalue']) {
+            $personability > (float) $abilityrange['maxscalevalue']
+        ) {
             return $default;
         }
         $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
@@ -188,7 +189,6 @@ class feedback_helper {
                 $colorname = $quizsettings[$colorkey];
                 return $colorarray[$colorname];
             }
-
         }
         return $default;
     }
@@ -255,7 +255,6 @@ class feedback_helper {
                     $fisherinfos[$stringkey] += $fisherinformation;
                 }
             }
-
         }
         return $fisherinfos;
     }
@@ -464,7 +463,8 @@ class feedback_helper {
         // If the value is outside the defined range, return null.
         $lowest = sprintf('feedback_scaleid_limit_lower_%d_1', $scaleid);
         $highest = sprintf('feedback_scaleid_limit_upper_%d_%d', $scaleid, $quizsettings->numberoffeedbackoptionsselect);
-        if (!isset($quizsettings->$lowest)
+        if (
+            !isset($quizsettings->$lowest)
             || !isset($quizsettings->$highest)
         ) {
             return null;
@@ -478,7 +478,6 @@ class feedback_helper {
             $i++;
             $ranglow = sprintf('feedback_scaleid_limit_lower_%d_%d', $scaleid, $i);
             $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $scaleid, $i);
-
         } while (
             !($quizsettings->$ranglow <= $value && $quizsettings->$rangup >= $value)
             && $i <= $quizsettings->numberoffeedbackoptionsselect
@@ -560,7 +559,8 @@ class feedback_helper {
                 [
                     'upperlimit' => self::localize_float($quizsettings->$upperlimitkey),
                     'lowerlimit' => self::localize_float($quizsettings->$lowerlimitkey),
-                ]);
+                ]
+            );
 
             $text = get_string('feedbackrange', 'local_catquiz', $j);
             if ($customlabels && property_exists($quizsettings, $feedbacktextkey)) {
@@ -600,6 +600,7 @@ class feedback_helper {
             $number,
             self::PRECISION,
             $locale['decimal_point'],
-            $locale['thousands_sep']);
+            $locale['thousands_sep']
+        );
     }
 }

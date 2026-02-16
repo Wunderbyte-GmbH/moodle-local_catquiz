@@ -20,8 +20,8 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/local/catquiz/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
  * Class feedbacksettings teststrategy and feedbackgenerator.
@@ -32,7 +32,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedbacksettings {
-
     /**
      * Used to mark a field as hidden.
      *
@@ -118,7 +117,6 @@ class feedbacksettings {
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
 
         $this->areashiddenbydefault = ['questionssummary'];
-
     }
 
     /**
@@ -399,14 +397,13 @@ class feedbacksettings {
         foreach ($responses as $responsearray) {
             $fraction = (float) $responsearray['fraction'];
             $f += $fraction;
-            $i ++;
+            $i++;
         }
         if (!empty($i)) {
             $this->fraction = $f / $i;
         } else {
             $this->fraction = $f;
         }
-
     }
 
     /**
@@ -430,7 +427,6 @@ class feedbacksettings {
             return $max;
         }
         return $value;
-
     }
 
     /**
@@ -480,4 +476,3 @@ class feedbacksettings {
         return $this;
     }
 }
-

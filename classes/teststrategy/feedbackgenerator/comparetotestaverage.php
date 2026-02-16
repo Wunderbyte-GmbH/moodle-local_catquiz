@@ -39,7 +39,7 @@ use local_catquiz\teststrategy\feedbacksettings;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/local/catquiz/lib.php');
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
@@ -49,7 +49,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comparetotestaverage extends feedbackgenerator {
-
     /**
      *
      * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
@@ -195,7 +194,6 @@ class comparetotestaverage extends feedbackgenerator {
         }
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
 
@@ -282,12 +280,14 @@ class comparetotestaverage extends feedbackgenerator {
         $testaverageinrange = feedbacksettings::sanitize_range_min_max(
             $testaverage,
             $abilityrange['minscalevalue'],
-            $abilityrange['maxscalevalue']);
+            $abilityrange['maxscalevalue']
+        );
 
         $abilityinrange = feedbacksettings::sanitize_range_min_max(
             $ability,
             $abilityrange['minscalevalue'],
-            $abilityrange['maxscalevalue']);
+            $abilityrange['maxscalevalue']
+        );
 
         if (!($abilityrange['minscalevalue'] < $abilityrange['maxscalevalue'])) {
             throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
@@ -311,7 +311,8 @@ class comparetotestaverage extends feedbackgenerator {
                 'average_ability' => feedback_helper::localize_float($testaverageinrange),
                 'scale_min' => feedback_helper::localize_float($abilityrange['minscalevalue']),
                 'scale_max' => feedback_helper::localize_float($abilityrange['maxscalevalue']),
-            ]);
+            ]
+        );
 
         return [
             'contextid' => $existingdata['contextid'],
@@ -390,7 +391,6 @@ class comparetotestaverage extends feedbackgenerator {
                     $fisherinfos[$stringkey] += $fisherinformation;
                 }
             }
-
         }
 
         $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
@@ -405,14 +405,14 @@ class comparetotestaverage extends feedbackgenerator {
                 if ($ability != $as) {
                     continue;
                 } else {
-                    $counter ++;
+                    $counter++;
                 }
             }
             $colorvalue = $this->feedbackhelper->get_color_for_personability(
                 (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
-                );
+            );
             $abilitystring = strval($as);
             $abilityseries['counter'][$abilitystring] = $counter;
             $abilityseries['colors'][$abilitystring] = $colorvalue;
@@ -446,5 +446,4 @@ class comparetotestaverage extends feedbackgenerator {
             'charttitle' => get_string('abilityprofile_title', 'local_catquiz'),
         ];
     }
-
 }

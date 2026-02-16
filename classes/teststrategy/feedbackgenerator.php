@@ -40,7 +40,6 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class feedbackgenerator {
-
     /**
      * The precision used to store float values.
      */
@@ -248,7 +247,7 @@ abstract class feedbackgenerator {
         int $strategyid,
         int $forcedscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
-        ): array {
+    ): array {
             $quizsettings = $newdata['progress']->get_quiz_settings();
 
         $transformedpersonabilities = $newdata['updated_personabilities'];
@@ -327,7 +326,8 @@ abstract class feedbackgenerator {
      */
     protected function has_teacherfeedbackpermission(): bool {
         return has_capability(
-            'local/catquiz:view_teacher_feedback', context_system::instance()
+            'local/catquiz:view_teacher_feedback',
+            context_system::instance()
         );
     }
 
@@ -482,5 +482,4 @@ abstract class feedbackgenerator {
             ->catquiz_catscales;
         return catscale::return_catscale_object($globalscaleid);
     }
-
 }

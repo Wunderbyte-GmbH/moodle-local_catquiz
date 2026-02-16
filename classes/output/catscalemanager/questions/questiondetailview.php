@@ -36,7 +36,6 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questiondetailview {
-
     /** @var int of testitemid */
     public int $testitemid = 0;
 
@@ -68,7 +67,8 @@ class questiondetailview {
         int $testitemid,
         int $contextid,
         int $catscaleid,
-        string $component = 'question') {
+        string $component = 'question'
+    ) {
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
         $this->catscaleid = $catscaleid;
@@ -88,10 +88,11 @@ class questiondetailview {
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
-                                                                                                    $catcontext,
-                                                                                                    []
-                                                                                                    );
+        [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
+            [$this->catscaleid],
+            $catcontext,
+            []
+        );
         $sql = "SELECT $select FROM $from WHERE $where";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
@@ -125,7 +126,8 @@ class questiondetailview {
             $this->contextid,
             $this->catscaleid,
             $this->component,
-            $record);
+            $record
+        );
         return $datacard->export_for_template();
     }
 

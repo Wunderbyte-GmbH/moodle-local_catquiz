@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once(__DIR__ . '/../../lib.php');
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
 use cache_helper;
@@ -51,7 +51,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testenvironments_table extends wunderbyte_table {
-
     /**
      * Return value for type column.
      *
@@ -162,7 +161,8 @@ class testenvironments_table extends wunderbyte_table {
             ];
         }
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+        ;
     }
 
     /**

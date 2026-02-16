@@ -34,7 +34,6 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class contextcreator {
-
     /**
      * @var mixed loaders
      */
@@ -100,7 +99,9 @@ class contextcreator {
             if (! array_key_exists($require, $context)) {
                 throw new moodle_exception(
                     sprintf(
-                        'Loader for "%s" requires Context item "%s"', $paramname, $require
+                        'Loader for "%s" requires Context item "%s"',
+                        $paramname,
+                        $require
                     )
                 );
             }

@@ -35,7 +35,6 @@ use local_catquiz\local\model\model_item_param_list;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_ability_estimator_demo extends model_person_ability_estimator {
-
     /**
      * Get person abilities.
      *

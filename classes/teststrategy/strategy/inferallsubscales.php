@@ -52,7 +52,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class inferallsubscales extends strategy {
-
     /**
      *
      * @var int $id
@@ -124,7 +123,7 @@ class inferallsubscales extends strategy {
         array $feedbackdata,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
-        ): array {
+    ): array {
         // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
         $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
         $rootscaleid = $feedbackdata['catscaleid'];

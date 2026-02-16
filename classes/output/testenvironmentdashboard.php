@@ -61,7 +61,7 @@ class testenvironmentdashboard implements renderable, templatable {
 
         $table = new testenvironments_table('testenvironmentstable' . $tablesuffix);
 
-        list($select, $from, $where, $filter, $params) =
+        [$select, $from, $where, $filter, $params] =
             catquiz::return_sql_for_testenvironments($catscaleid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
@@ -146,7 +146,7 @@ class testenvironmentdashboard implements renderable, templatable {
         $table->showreloadbutton = true;
         $table->addcheckboxes = true;
 
-        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        [$idstring, $encodedtable, $html] = $table->lazyouthtml(10, true);
         return $html;
     }
 

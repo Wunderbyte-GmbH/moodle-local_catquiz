@@ -32,7 +32,6 @@ namespace local_catquiz\local\model;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_item_response {
-
     /**
      * @var string
      */

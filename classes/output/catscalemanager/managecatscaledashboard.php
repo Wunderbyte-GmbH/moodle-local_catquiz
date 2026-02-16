@@ -38,7 +38,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class managecatscaledashboard implements renderable, templatable {
-
     /** @var int of testitemid */
     public int $testitemid = 0;
 
@@ -144,7 +143,8 @@ class managecatscaledashboard implements renderable, templatable {
         int $catscaleid,
         int $scaledetailview,
         int $usesubs,
-        string $componentname) {
+        string $componentname
+    ) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
@@ -164,7 +164,8 @@ class managecatscaledashboard implements renderable, templatable {
             $this->contextid,
             $this->catscaleid,
             $this->usesubs,
-            $this->componentname);
+            $this->componentname
+        );
         $this->questionsdisplayarray = $questionsdisplay->export_data_array();
 
         $testenvironmentdashboard = new testsandtemplatesdisplay($this->catscaleid, $this->usesubs, $this->componentname);
@@ -176,14 +177,17 @@ class managecatscaledashboard implements renderable, templatable {
         $catscalestats = new catscalestats();
         $this->catscalestatsarray = $catscalestats->export_data_array();
 
-        if (!empty($this->catscaleid)
+        if (
+            !empty($this->catscaleid)
             && !empty($this->testitemid)
-            && !empty($this->contextid)) {
+            && !empty($this->contextid)
+        ) {
                 $testitemdashboard = new testitemdashboard(
                     $this->testitemid,
                     $this->contextid,
                     $this->catscaleid,
-                    $this->componentname);
+                    $this->componentname
+                );
                 $this->testitemdashboardarray = $testitemdashboard->return_as_array();
         }
 

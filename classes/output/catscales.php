@@ -33,7 +33,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscales implements renderable, templatable {
-
     /** @var array of objects including all items */
     public array $items;
 
@@ -115,7 +114,6 @@ class catscales implements renderable, templatable {
                 $element['children'] = [];
             }
             $branch[] = $element;
-
         }
         $this->branchitems[$parentid] = $branch;
         return $branch;
@@ -135,7 +133,7 @@ class catscales implements renderable, templatable {
         foreach ($out as &$item) {
             $item['image'] = $output->get_generated_image_for_id($item['id']);
             $item['numberofchildren'] = count($item['children']);
-            list($sql, $params) = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
+            [$sql, $params] = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
             $item['numberofquestions'] = $DB->count_records_sql($sql, $params);
         }
         return $out;
@@ -150,7 +148,7 @@ class catscales implements renderable, templatable {
         $out = $this->itemtree;
         foreach ($out as &$item) {
             $item['numberofchildren'] = count($item['children']);
-            list($sql, $params) = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
+            [$sql, $params] = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
             $item['numberofquestions'] = $DB->count_records_sql($sql, $params);
         }
 
@@ -173,5 +171,4 @@ class catscales implements renderable, templatable {
         }
         return $out;
     }
-
 }

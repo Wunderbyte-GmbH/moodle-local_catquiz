@@ -1121,8 +1121,10 @@ class progress implements JsonSerializable {
         // Get selected subscales from quizdata.
         $selectedsubscales = [];
         foreach ($this->quizsettings as $key => $value) {
-            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
-                && $value == "1") {
+            if (
+                strpos($key, 'catquiz_subscalecheckbox_') !== false
+                && $value == "1"
+            ) {
                     $catscaleid = substr_replace($key, '', 0, 25);
                     $selectedsubscales[] = $catscaleid;
             }
@@ -1140,5 +1142,4 @@ class progress implements JsonSerializable {
         global $USER;
         return sprintf('progress_user_%d_id_%d', $USER->id, $attemptid);
     }
-
 }

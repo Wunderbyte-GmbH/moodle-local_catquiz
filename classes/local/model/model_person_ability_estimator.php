@@ -31,7 +31,6 @@ namespace local_catquiz\local\model;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_person_ability_estimator {
-
     /**
      * @var model_responses Contains necessary data for estimation
      */

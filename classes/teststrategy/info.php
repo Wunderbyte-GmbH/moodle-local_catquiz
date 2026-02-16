@@ -390,7 +390,6 @@ class info {
         );
         $mform->insertElementBefore($group, 'modstandardgrade');
 
-
         $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
         $mform->hideIf(
             'catquiz_standarderrorgroup',
