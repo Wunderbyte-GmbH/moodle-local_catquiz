@@ -27,8 +27,6 @@ namespace local_catquiz;
 
 use RuntimeException;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Simple matrix exception.
  *

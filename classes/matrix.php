@@ -27,8 +27,6 @@ namespace local_catquiz;
 
 use ArrayObject;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Matrix basic implementation.
  *
