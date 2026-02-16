@@ -32,7 +32,7 @@ use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_strategy;
-use mod_adaptivequiz\local\attempt\attempt;
+use mod_adaptivequiz\local\attempt;
 use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
 use question_engine;
