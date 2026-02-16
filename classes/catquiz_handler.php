@@ -72,17 +72,6 @@ class catquiz_handler {
 
         $elements = [];
         self::set_advanced($mform, $elements);
-
-        // Add a special header for catquiz.
-        // Create your CAT-Model header.
-        // $catmodelheader = $mform->createElement('header', 'catmodel_header', 'catmoSetting Schmetting');
-        // $mform->insertElementBefore($catmodelheader, 'modstandardgrade');
-        // $mform->addElement('header', 'catquiz_headerr',
-        // get_string('catquizsettings', 'local_catquiz'));
-        // $catquiheaderr = $mform->getElement('advancedheading');
-        // $mform->setExpanded('catquiz_headerr');
-        // $mform->insertElementBefore($catquiheaderr, 'modstandardgrade');
-
         self::set_catquizsettings($mform, $elements);
 
         // We want to adjust our form depending on the nosubmit action which might just have taken place.

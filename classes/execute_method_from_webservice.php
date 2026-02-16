@@ -71,4 +71,4 @@ class execute_method_from_webservice {
                 return false;
         }
     }
-};
+}
