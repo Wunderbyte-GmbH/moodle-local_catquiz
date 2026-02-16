@@ -36,7 +36,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_multiparam extends model_raschmodel {
-
     /**
      * Get static param array
      *

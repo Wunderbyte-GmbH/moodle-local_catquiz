@@ -33,7 +33,6 @@ namespace local_catquiz;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface catcalc_ability_estimator {
-
     /**
      * Likelihood.
      *
@@ -81,5 +80,4 @@ interface catcalc_ability_estimator {
      *
      */
     public static function log_likelihood_p_p(array $pp, array $itemparams, float $itemresponse);
-
 }

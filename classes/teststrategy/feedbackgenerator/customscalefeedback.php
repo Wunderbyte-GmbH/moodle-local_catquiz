@@ -40,7 +40,6 @@ use local_catquiz\teststrategy\feedbacksettings;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
-
     /**
      * @var callable $sortfun
      */
@@ -198,7 +197,7 @@ class customscalefeedback extends feedbackgenerator {
         array $personabilities,
         array $quizsettings,
         array $catscales
-        ): string {
+    ): string {
         $scalefeedback = [];
         $relevantscalesfound = false;
 

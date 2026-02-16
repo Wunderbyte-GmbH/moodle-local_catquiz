@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitemactivitystatus_updated extends catquiz_event_base {
-
     /**
      * Init parameters.
      *
@@ -73,7 +72,8 @@ class testitemactivitystatus_updated extends catquiz_event_base {
         $data = $this->data;
         $other = $this->get_other_data();
 
-        if (!empty($other->catscaleid) &&
+        if (
+            !empty($other->catscaleid) &&
             !empty($data['objectid']) &&
             !empty($other->context) &&
             !empty($other->component)
@@ -82,7 +82,8 @@ class testitemactivitystatus_updated extends catquiz_event_base {
                 $data['objectid'],
                 $other->catscaleid,
                 $other->context,
-                $other->component);
+                $other->component
+            );
         } else {
             $linktotidetailview = get_string('testitem', 'local_catquiz', $data['objectid']);
         }

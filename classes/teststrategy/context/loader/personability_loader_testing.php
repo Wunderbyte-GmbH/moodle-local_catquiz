@@ -32,7 +32,6 @@ namespace local_catquiz\teststrategy\context\loader;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personability_loader_testing extends personability_loader {
-
     /**
      * Load saved personparams.
      *

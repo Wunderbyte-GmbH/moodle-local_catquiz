@@ -359,7 +359,7 @@ class matrixcat {
      * @return callable<array>
      */
     public static function build_callable_array($fnfunction) {
-        return function($x) use($fnfunction) {
+        return function ($x) use ($fnfunction) {
             foreach ($fnfunction as $key => $f) {
                 $fnfunction[$key] = $f($x);
             }

@@ -36,10 +36,10 @@ final class cat_model_params extends persistent {
     public const TABLE = 'adaptivequiz_cat_params';
 
      /**
-     * Return the definition of the properties of this model.
-     *
-     * @return array
-     */
+      * Return the definition of the properties of this model.
+      *
+      * @return array
+      */
     protected static function define_properties(): array {
         return [
             'attempt' => [

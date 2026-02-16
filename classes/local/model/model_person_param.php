@@ -34,7 +34,6 @@ namespace local_catquiz\local\model;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_param implements \ArrayAccess {
-
     // For some items, the model returns -INF or INF as difficulty.
     // However, we expect it to be numeric, so we encode those values as -1000 and 1000.
     /**

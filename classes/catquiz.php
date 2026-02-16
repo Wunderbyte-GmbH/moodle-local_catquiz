@@ -43,12 +43,10 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz {
-
     /**
      * Entities constructor.
      */
     public function __construct() {
-
     }
     /**
      * Give back the global (parent) scale id of a given catscale id or an array of catscale ids.
@@ -212,7 +210,6 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
-
             $globalscaleids = self::get_global_scale($catscaleids);
 
             [$parentscales1, $inparams1] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales1');
@@ -356,7 +353,7 @@ class catquiz {
             ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
 
-        list(, $contextfrom, , $params) = self::get_sql_for_stat_base_request();
+        [, $contextfrom, , $params] = self::get_sql_for_stat_base_request();
         $select = "id,
                 idnumber,
                 name,
@@ -367,7 +364,7 @@ class catquiz {
                 contextattempts as questioncontextattempts,
                 catscaleids";
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
-             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
+             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) . " as catscaleids
             FROM {question} q
                 JOIN (
                     SELECT *
@@ -417,8 +414,8 @@ class catquiz {
         array $testitemids = [],
         array $contextids = [],
         array $studentids = []
-        ) {
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+    ) {
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -437,7 +434,7 @@ class catquiz {
      *
      */
     public static function get_sql_for_questions_average(array $testitemids = [], array $contextids = []) {
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT AVG(qas.fraction)
         FROM $from
@@ -461,7 +458,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ) {
-        list(, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -486,7 +483,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ) {
-        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        [$select, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -506,7 +503,7 @@ class catquiz {
      *
      */
     public static function get_sql_for_questions_answered_partlycorrect(array $testitemids = [], array $contextids = []) {
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -528,7 +525,7 @@ class catquiz {
      */
     public static function get_sql_for_questions_answered_by_distinct_persons(array $testitemids = [], array $contextids = []) {
 
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -571,7 +568,7 @@ class catquiz {
             SQL_PARAMS_NAMED,
             'incatscales'
         );
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
         $joinitemssql = "";
         if ($joinitems) {
@@ -716,7 +713,7 @@ class catquiz {
             SQL_PARAMS_NAMED,
             'incatscales'
         );
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request([], [$contextid]);
 
         $sql = "
         SELECT COUNT(*)
@@ -755,7 +752,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ) {
-        list(, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        [, $from, $where, $params] = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -848,7 +845,8 @@ class catquiz {
      */
     public static function return_sql_for_testenvironments(
         int $catscaleid = 0,
-        array $filterarray = []) {
+        array $filterarray = []
+    ) {
         global $DB;
         $params = [];
         $filter = '';
@@ -1001,7 +999,8 @@ class catquiz {
         int $instanceid = 0,
         int $courseid = 0,
         int $attemptid = 0,
-        int $userid = -1) {
+        int $userid = -1
+    ) {
 
         global $DB;
 
@@ -1032,7 +1031,8 @@ class catquiz {
         int $instanceid = 0,
         int $courseid = 0,
         int $attemptid = 0,
-        int $userid = -1): array {
+        int $userid = -1
+    ): array {
 
         $sql = "SELECT
         attemptid, contextid, userid, endtime, timemodified, json, debug_info
@@ -1087,7 +1087,8 @@ class catquiz {
      *
      */
     public static function return_sql_for_catcontexts(
-        array $filterarray = []) {
+        array $filterarray = []
+    ) {
 
         $params = [];
         $where = [];
@@ -1276,14 +1277,14 @@ class catquiz {
     public static function get_default_context_id() {
         global $DB;
         $contextid = $DB->get_field_sql(
-           "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
-               'json',
-               ":default"
-           ),
-           [
+            "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+                'json',
+                ":default"
+            ),
+            [
                'default' => '%"default":true%',
-           ],
-           MUST_EXIST
+            ],
+            MUST_EXIST
         );
 
         return intval($contextid);
@@ -1298,14 +1299,14 @@ class catquiz {
         global $DB;
 
         $context = $DB->get_record_sql(
-           "SELECT * FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
-               'json',
-               ":default"
-           ),
-           [
+            "SELECT * FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+                'json',
+                ":default"
+            ),
+            [
                'default' => '%"default":true%',
-           ],
-           MUST_EXIST
+            ],
+            MUST_EXIST
         );
 
         return $context;
@@ -1421,7 +1422,7 @@ class catquiz {
         return $DB->get_records_sql(
             $sql,
             $params
-          );
+        );
     }
 
     /**
@@ -1471,7 +1472,7 @@ class catquiz {
                 'component' => 'mod_adaptivequiz',
                 'id' => $attemptid,
             ]
-            );
+        );
     }
 
     /**
@@ -1505,7 +1506,7 @@ class catquiz {
             'local_catquiz_catscales',
             ['parentid' => 0],
             '',
-          'id, name'
+            'id, name'
         );
     }
 
@@ -1623,7 +1624,7 @@ class catquiz {
                 ON lci.id = lcip.itemid
             WHERE $where
             ",
-           $params
+            $params
         );
     }
 
@@ -1717,7 +1718,7 @@ class catquiz {
             $attemptdata['attemptid']
         );
 
-        $data = new stdClass;
+        $data = new stdClass();
         $data->userid = $attemptdata['userid'];
         $data->scaleid = $attemptdata['catscaleid'];
         $data->contextid = $catcontext;
@@ -1883,14 +1884,15 @@ class catquiz {
      * @return array
      */
     public static function get_attempts(
-            ?int $userid = null,
-            ?int $catscaleid = null,
-            ?int $courseid = null,
-            ?int $testid = null,
-            ?int $contextid = null,
-            ?int $starttime = null,
-            ?int $endtime = null,
-            bool $enrolled = true) {
+        ?int $userid = null,
+        ?int $catscaleid = null,
+        ?int $courseid = null,
+        ?int $testid = null,
+        ?int $contextid = null,
+        ?int $starttime = null,
+        ?int $endtime = null,
+        bool $enrolled = true
+    ) {
         global $DB;
 
         // Select only attempts of courses, where the user of the attempt is
@@ -1960,7 +1962,8 @@ class catquiz {
     public static function enrol_user(
         array $quizsettings,
         array $coursestoenrol,
-        array $groupstoenrol): string {
+        array $groupstoenrol
+    ): string {
         global $USER;
 
         // Filter for scales that are selected for enrolement.
@@ -2010,7 +2013,7 @@ class catquiz {
         string $testname,
         int $catscaleid,
         int $userid
-        ): array {
+    ): array {
         global $DB, $COURSE;
 
         try {
@@ -2105,7 +2108,6 @@ class catquiz {
             ],
         ]);
         $event->trigger();
-
     }
 
     /**
@@ -2187,7 +2189,7 @@ class catquiz {
                     </div>";
                 };
                 if ($type === "group") {
-                    $groupstring .= "<div> - "  . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) ."</div>";
+                    $groupstring .= "<div> - "  . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) . "</div>";
                 }
             }
         }
@@ -2286,7 +2288,7 @@ class catquiz {
                     continue;
                 }
                 if ($data['fraction'] == 1) {
-                    $correct ++;
+                    $correct++;
                 }
             }
             $percentage = round(($correct / $nquestions) * 100);
@@ -2371,7 +2373,7 @@ class catquiz {
         $catscaleids = [$scaleid, ...catscale::get_subscale_ids($scaleid)];
 
         // Get questions answered for the given context.
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+         [, $from, $where, $params] = self::get_sql_for_stat_base_request([], [$contextid]);
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
         $params = array_merge($params, $inparams, ['catscaleid' => $scaleid]);
         $where2 = '1=1';

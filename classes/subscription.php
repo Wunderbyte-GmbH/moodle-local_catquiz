@@ -37,7 +37,6 @@ require_once(__DIR__ . '/../lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class subscription {
-
     /**
      * Toggles the subscription and returns the state.
      *
@@ -54,12 +53,13 @@ class subscription {
 
         $now = time();
 
-        if (!$record = $DB->get_record('local_catquiz_subscriptions', [
+        if (
+            !$record = $DB->get_record('local_catquiz_subscriptions', [
             'userid' => $userid,
             'area' => $area,
             'itemid' => $itemid,
-            ])) {
-
+            ])
+        ) {
             $record = (object)[
                 'userid' => $userid,
                 'itemid' => $itemid,
@@ -105,12 +105,14 @@ class subscription {
         $status = 0;
         $booked = LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED;
 
-        if ($DB->record_exists('local_catquiz_subscriptions', [
+        if (
+            $DB->record_exists('local_catquiz_subscriptions', [
             'userid' => $userid,
             'itemid' => $itemid,
             'area' => $area,
             'status' => LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED,
-            ])) {
+            ])
+        ) {
             $status = 1;
         }
 

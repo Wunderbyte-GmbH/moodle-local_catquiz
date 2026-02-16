@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datacard implements renderable {
-
     /**
      * @var object
      */
@@ -73,7 +72,8 @@ class datacard implements renderable {
         int $contextid,
         int $catscaleid,
         string $component,
-        ?object $record = null) {
+        ?object $record = null
+    ) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
@@ -99,10 +99,12 @@ class datacard implements renderable {
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
-                                                                                                    $catcontext,
-                                                                                                    [],
-                                                                                                    $this->testitemid);
+        [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
+            [$this->catscaleid],
+            $catcontext,
+            [],
+            $this->testitemid
+        );
         $idcheck = "id=:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
@@ -184,6 +186,4 @@ class datacard implements renderable {
             'scaleid' => $this->catscaleid,
         ];
     }
-
-
 }

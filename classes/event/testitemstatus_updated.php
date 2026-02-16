@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitemstatus_updated extends catquiz_event_base {
-
     /**
      * Init parameters.
      *
@@ -73,7 +72,8 @@ class testitemstatus_updated extends catquiz_event_base {
         $other = $this->get_other_data();
 
         $testitemid = $data['objectid'];
-        if (!empty($other->catscaleid) &&
+        if (
+            !empty($other->catscaleid) &&
             !empty($other->context) &&
             !empty($other->component)
         ) {
@@ -81,7 +81,8 @@ class testitemstatus_updated extends catquiz_event_base {
                 $testitemid,
                 $other->catscaleid,
                 $other->context,
-                $other->component);
+                $other->component
+            );
         } else {
             $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }
@@ -90,7 +91,7 @@ class testitemstatus_updated extends catquiz_event_base {
         // If we have information about the testitem and it's status, we display it.
         if (!empty($other->status)) {
             $statusint = $other->status;
-            $string = 'itemstatus_'.$statusint;
+            $string = 'itemstatus_' . $statusint;
 
             $statusstring = get_string($string, 'local_catquiz');
             $data['statusstring'] = $statusstring;

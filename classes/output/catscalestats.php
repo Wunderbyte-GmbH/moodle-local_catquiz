@@ -32,7 +32,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscalestats {
-
     /**
      * @var int
      */
@@ -69,13 +68,13 @@ class catscalestats {
     private function get_data_from_db() {
         global $USER, $DB;
 
-        list($sql, $params) = catquiz::get_sql_for_number_of_assigned_catscales($USER->id);
+        [$sql, $params] = catquiz::get_sql_for_number_of_assigned_catscales($USER->id);
         $this->numassignedcatscales = $DB->count_records_sql($sql, $params);
-        list($sql, $params) = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
+        [$sql, $params] = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
         $this->numassignedtests = $DB->count_records_sql($sql, $params);
-        list($sql, $params) = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
+        [$sql, $params] = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
         $this->numassignedquestions = $DB->count_records_sql($sql, $params);
-        list($sql, $params) = catquiz::get_sql_for_last_calculation_time();
+        [$sql, $params] = catquiz::get_sql_for_last_calculation_time();
         $number = $DB->get_field_sql($sql, $params);
         $this->lastcalculated = userdate($number, get_string('strftimedatetime', 'core_langconfig'));
     }

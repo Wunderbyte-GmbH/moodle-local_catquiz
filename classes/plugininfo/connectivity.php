@@ -101,5 +101,4 @@ class connectivity extends base {
         global $CFG;
         parent::uninstall_cleanup();
     }
-
 }

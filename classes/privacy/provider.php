@@ -44,10 +44,7 @@ use Exception;
  * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements     \core_privacy\local\metadata\provider,
-                            \core_privacy\local\request\subsystem\provider,
-                            \core_privacy\local\request\core_userlist_provider {
-
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\subsystem\provider {
     /**
      * Get the metadata associated with this plugin.
      *
@@ -200,7 +197,6 @@ class provider implements     \core_privacy\local\metadata\provider,
                 $data = (object) $data;
                 // There might be more than one attempts in the same module (adaptivequizinstance).
                 $modulecontextslist[$attempt->instanceid][] = $data;
-
             }
         }
               // Might move this out of context loop!
@@ -216,7 +212,8 @@ class provider implements     \core_privacy\local\metadata\provider,
             'local_catquiz_personparams',
             [
                 'userid' => $userid,
-            ]);
+            ]
+        );
         // Personparams we apply to context system.
         $data = (object) $personparams;
         $systemcontext = context_system::instance();
@@ -267,7 +264,7 @@ class provider implements     \core_privacy\local\metadata\provider,
         global $DB;
 
         // Only delete data of subscriptions table.
-        switch($context->contextlevel) {
+        switch ($context->contextlevel) {
             case CONTEXT_SYSTEM:
                 // System context, delete all data.
                 $DB->delete_records('local_catquiz_subscriptions');
@@ -276,7 +273,6 @@ class provider implements     \core_privacy\local\metadata\provider,
                 // Other contexts, don't delete data related to that context.
                 break;
         }
-
     }
 
     /**
@@ -291,9 +287,10 @@ class provider implements     \core_privacy\local\metadata\provider,
         $context = $userlist->get_context();
 
         // Ensure we only process course contexts for this example.
-        if ($context instanceof \context_course ||
-            $context instanceof context_module) {
-
+        if (
+            $context instanceof \context_course ||
+            $context instanceof context_module
+        ) {
             $users = get_enrolled_users($context);
             $params = ['courseid' => $context->instanceid];
 

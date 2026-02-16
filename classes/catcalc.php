@@ -44,7 +44,6 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcalc {
-
     /**
      * Estimate initial item difficulties.
      *
@@ -59,7 +58,6 @@ class catcalc {
         $itemids = array_keys($itemlist);
 
         foreach ($itemids as $id) {
-
             $itemfractions = $itemlist[$id];
             $numpassed = 0;
             $numfailed = 0;
@@ -77,7 +75,6 @@ class catcalc {
             // $item_difficulty = -log($num_passed / $num_failed);
             $itemdifficulty = -log($p / (1 - $p + 0.00001)); // TODO: numerical stability check.
             $itemdifficulties[$id] = $itemdifficulty;
-
         }
         return $itemdifficulties;
     }
@@ -257,7 +254,7 @@ class catcalc {
      * @return Closure(mixed $x): array
      */
     public static function build_callable_array($functions) {
-        return function($x) use ($functions) {
+        return function ($x) use ($functions) {
             $new = [];
             foreach ($functions as $key => $f) {
                 $new[$key] = $f($x);

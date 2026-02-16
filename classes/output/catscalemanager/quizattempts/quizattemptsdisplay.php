@@ -32,7 +32,6 @@ use local_wunderbyte_table\filters\types\standardfilter;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quizattemptsdisplay {
-
     /**
      * Renders table.
      *
@@ -42,7 +41,7 @@ class quizattemptsdisplay {
     public function render_table() {
         $table = new quizattempts_table('quizattemptstable');
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_quizattempts();
+        [$select, $from, $where, $filter, $params] = catquiz::return_sql_for_quizattempts();
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columns = [
@@ -141,7 +140,7 @@ class quizattemptsdisplay {
         $table->showreloadbutton = true;
         $table->addcheckboxes = true;
 
-        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        [$idstring, $encodedtable, $html] = $table->lazyouthtml(10, true);
         return $html;
     }
 

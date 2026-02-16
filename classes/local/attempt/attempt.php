@@ -43,9 +43,7 @@ class attempt {
 
     /**
      * The constructor.
-     *
      * @param int $userid
-     * @param string[] $tags An array of acceptable tags.
      */
     private function __construct(int $userid) {
         $this->userid = $userid;

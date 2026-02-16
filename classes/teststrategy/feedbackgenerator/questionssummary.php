@@ -35,7 +35,6 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionssummary extends feedbackgenerator {
-
     /**
      * Get student feedback.
      *
@@ -56,7 +55,6 @@ class questionssummary extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
-
     }
 
     /**

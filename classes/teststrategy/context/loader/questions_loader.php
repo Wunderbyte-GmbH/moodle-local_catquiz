@@ -37,7 +37,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questions_loader implements contextloaderinterface {
-
     /**
      * @var progress $progress
      */
@@ -116,5 +115,4 @@ class questions_loader implements contextloaderinterface {
 
         return $context;
     }
-
 }

@@ -37,7 +37,6 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debuginfo extends feedbackgenerator {
-
     /**
      * Default string for missing data
      *
@@ -120,7 +119,7 @@ class debuginfo extends feedbackgenerator {
                 ->add_column_value('questionattemptid')
                 ->as_csv_string();
         }
-        $heading = implode(';', $this->columns).PHP_EOL;
+        $heading = implode(';', $this->columns) . PHP_EOL;
         $csvstring = $heading . $csvstring;
 
         $attemptid = $data['attemptid'];
@@ -144,8 +143,10 @@ class debuginfo extends feedbackgenerator {
                 'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", var_export($data, true)))),
                 'cfg->root' => $CFG->wwwroot,
                 'isteacher' => true, // Hier auf has_capability mit 'local/catquiz:view_users_feedback' und $contextid testen!
-                'iscatmanager' => has_capability('local/catquiz:canmanage',
-                    context_system::instance()),
+                'iscatmanager' => has_capability(
+                    'local/catquiz:canmanage',
+                    context_system::instance()
+                ),
             ]
         );
 
@@ -207,7 +208,7 @@ class debuginfo extends feedbackgenerator {
      * @return string
      */
     private function as_csv_string(): string {
-        return implode(';', $this->row).PHP_EOL;
+        return implode(';', $this->row) . PHP_EOL;
     }
 
     /**
@@ -274,7 +275,8 @@ class debuginfo extends feedbackgenerator {
         $teststrategies = info::return_available_strategies();
         $teststrategy = array_filter(
             $teststrategies,
-            fn ($t) => $t->id == $teststrategy);
+            fn ($t) => $t->id == $teststrategy
+        );
         $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
 
         $debuginfo = $existingdata['debuginfo'] ?? [];
@@ -311,7 +313,7 @@ class debuginfo extends feedbackgenerator {
             'lastmiddleware' => $newdata['lastmiddleware'],
             'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
             'numquestionsperscale' => '"'
-                . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
+                . implode(", ", array_map(fn ($entry) => $entry['name'] . ": " . $entry['num'], $questionsperscale)) . '"',
             'state' => isset($lastresponse['state']) ? $lastresponse['state'] : self::NA,
             'rightanswer' => isset($lastresponse['rightanswer']) ? trim($lastresponse['rightanswer']) : self::NA,
             'responsesummary' => isset($lastresponse['responsesummary']) ? trim($lastresponse['responsesummary']) : self::NA,
@@ -330,10 +332,11 @@ class debuginfo extends feedbackgenerator {
      */
     protected function has_teacherfeedbackpermission(): bool {
         return has_capability(
-            'local/catquiz:canmanage', context_system::instance()
+            'local/catquiz:canmanage',
+            context_system::instance()
         );
 
-        GLOBAL $DB;
+        global $DB;
 
         $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $this->attemptid], 'courseid');
         return has_capability('local/catquiz:view_users_feedback', context_course::instance($cid->courseid));
@@ -346,7 +349,8 @@ class debuginfo extends feedbackgenerator {
      */
     protected function has_catmanagerpermission(): bool {
         return has_capability(
-            'local/catquiz:canmanage', context_system::instance()
+            'local/catquiz:canmanage',
+            context_system::instance()
         );
     }
 }

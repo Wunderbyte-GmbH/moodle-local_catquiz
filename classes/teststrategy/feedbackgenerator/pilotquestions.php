@@ -121,6 +121,5 @@ class pilotquestions extends feedbackgenerator {
         return [
             'num_pilot_questions' => $numpilotquestions,
         ];
-
     }
 }

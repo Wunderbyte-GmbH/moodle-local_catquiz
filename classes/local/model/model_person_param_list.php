@@ -43,8 +43,7 @@ use Traversable;
  * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class model_person_param_list implements ArrayAccess, IteratorAggregate, Countable {
-
+class model_person_param_list implements ArrayAccess, Countable, IteratorAggregate {
     /**
      * @var array<model_person_param>
      */

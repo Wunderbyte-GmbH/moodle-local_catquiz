@@ -37,7 +37,6 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionpreview {
-
     /**
      * @var object
      */
@@ -70,7 +69,9 @@ class questionpreview {
         $question = question_bank::load_question($id);
 
         $quba = question_engine::make_questions_usage_by_activity(
-            'local_catquiz', context_system::instance());
+            'local_catquiz',
+            context_system::instance()
+        );
 
         $options = new question_preview_options((object)$question);
         $options->feedback = question_display_options::HIDDEN;
@@ -97,5 +98,4 @@ class questionpreview {
             'body' => $previewdata,
         ];
     }
-
 }
