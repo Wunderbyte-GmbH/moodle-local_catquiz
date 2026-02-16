@@ -26,8 +26,6 @@
 namespace local_catquiz;
 use local_catquiz\local\model\model_item_response;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class for synthcat
  *
