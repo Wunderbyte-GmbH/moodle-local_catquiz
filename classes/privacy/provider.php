@@ -30,11 +30,9 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
-use core_privacy\local\request\user_preference_provider;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\writer;
-use Exception;
 
 /**
  * Privacy subsystem implementation for local_shopping_cart
@@ -44,7 +42,11 @@ use Exception;
  * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\subsystem\provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\subsystem\provider
+{
     /**
      * Get the metadata associated with this plugin.
      *
