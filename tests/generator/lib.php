@@ -48,7 +48,12 @@ class local_catquiz_generator extends testing_module_generator {
         }
 
         $course = get_course($data['courseid']);
-        $context = context_course::instance($course->id);
+        // Create a qbank module in the course and use its module context so
+        // question API functions that require a module context work correctly.
+        // Use the testing data generator to create the module so this works
+        // both in PHPUnit and Behat generator contexts.
+        $qbank = $this->datagenerator->create_module('qbank', ['course' => $course->id]);
+        $context = context_module::instance($qbank->cmid);
         $category = question_get_top_category($context->id, true);
 
         // Load data into class.
