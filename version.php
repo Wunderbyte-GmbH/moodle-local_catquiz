@@ -33,5 +33,4 @@ $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_wunderbyte_table' => 2024040200,
     'mod_adaptivequiz' => 2024031502,
-    'adaptivequizcatmodel_catquiz' => 2024062800,
 ];
