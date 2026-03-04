@@ -113,8 +113,10 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
     global $CFG;
 
     // Early bail out conditions.
-    if (!isloggedin() || isguestuser()
-        || !has_capability('local/catquiz:canmanage', context_system::instance())) {
+    if (
+        !isloggedin() || isguestuser()
+        || !has_capability('local/catquiz:canmanage', context_system::instance())
+    ) {
         return;
     }
 
@@ -123,7 +125,7 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
         id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
             . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"
         role="button">
-        '. get_string('catquiz', 'local_catquiz') .'
+        ' . get_string('catquiz', 'local_catquiz') . '
         </a>
     </div>';
 
@@ -138,7 +140,6 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
  * @return void
  */
 function local_catquiz_coursemodule_standard_elements($fromform, $fields) {
-
 }
 
 /**
@@ -162,7 +163,8 @@ function local_catquiz_pluginfile($course, $birecordorcm, $context, $filearea, $
     $filename = array_pop($args);
     $filepath = '/';
     $itemid = intval($args[0]);
-    if ((!$file = $fs->get_file($context->id, 'local_catquiz', $filearea, $itemid, $filepath, $filename))
+    if (
+        (!$file = $fs->get_file($context->id, 'local_catquiz', $filearea, $itemid, $filepath, $filename))
         || $file->is_directory()
     ) {
         send_file_not_found();

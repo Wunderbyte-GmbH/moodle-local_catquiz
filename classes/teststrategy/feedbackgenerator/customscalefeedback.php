@@ -40,7 +40,6 @@ use local_catquiz\teststrategy\feedbacksettings;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
-
     /**
      * @var callable $sortfun
      */
@@ -198,7 +197,7 @@ class customscalefeedback extends feedbackgenerator {
         array $personabilities,
         array $quizsettings,
         array $catscales
-        ): string {
+    ): string {
         $scalefeedback = [];
         $relevantscalesfound = false;
 
@@ -287,6 +286,7 @@ class customscalefeedback extends feedbackgenerator {
                     } else if (isset($errorarray['semaxdefined'])) {
                         return get_string('error:semax', 'local_catquiz', $errorarray);
                     }
+                    return get_string('noscalesfound', 'local_catquiz', $errorarray);
                 case "nminscale":
                     return get_string('error:nminscale', 'local_catquiz', $errorarray);
                 case "fraction":
@@ -295,6 +295,7 @@ class customscalefeedback extends feedbackgenerator {
                     } else if ($errorarray['fraction'] == 0) {
                         return get_string('error:fraction0', 'local_catquiz');
                     }
+                    return get_string('noscalesfound', 'local_catquiz', $errorarray);
                 default:
                     return get_string('noscalesfound', 'local_catquiz');
             }

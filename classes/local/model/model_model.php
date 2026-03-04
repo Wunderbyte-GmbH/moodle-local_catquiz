@@ -34,7 +34,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_model {
-
     /**
      * Holds model instances.
      *
@@ -117,7 +116,8 @@ abstract class model_model {
     abstract public function estimate_item_params(
         model_responses $responses,
         model_person_param_list $personparams,
-        ?model_item_param_list $olditemparams = null): model_item_param_list;
+        ?model_item_param_list $olditemparams = null
+    ): model_item_param_list;
 
     /**
      * Returns the paramter names of the model as strings.
@@ -160,7 +160,8 @@ abstract class model_model {
         string $criterion,
         model_person_param_list $personabilities,
         model_item_param $itemparams,
-        model_responses $k): float;
+        model_responses $k
+    ): float;
 
     /**
      * Return the difficulty as a single float.

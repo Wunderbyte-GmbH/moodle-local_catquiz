@@ -41,7 +41,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pcm extends model_multiparam {
-
     /**
      * {@inheritDoc}
      *
@@ -132,7 +131,6 @@ class pcm extends model_multiparam {
      */
     public static function get_parameter_names(): array {
         return ['intercepts', 'difficulty'];
-
     }
 
     /**
@@ -539,5 +537,4 @@ class pcm extends model_multiparam {
         $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
         return $newparams;
     }
-
 }

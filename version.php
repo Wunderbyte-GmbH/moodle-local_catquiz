@@ -25,12 +25,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_catquiz';
+$plugin->supported = [405, 405];
 $plugin->release = '1.1.3';
-$plugin->version = 2025040900;
-$plugin->requires = 2022041900;
+$plugin->version = 2026020200;
+$plugin->requires = 2024100709;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_wunderbyte_table' => 2024040200,
     'mod_adaptivequiz' => 2024031502,
-    'adaptivequizcatmodel_catquiz' => 2024062800,
 ];

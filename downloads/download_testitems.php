@@ -61,7 +61,6 @@ $columnstoinclude = [
 ];
 
 foreach ($table->columns as $key => $value) {
-
     if (!in_array($key, $columnstoexclude, true)) {
         $newcolumns[$key] = $table->headers[$value];
     }

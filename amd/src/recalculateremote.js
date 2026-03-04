@@ -44,7 +44,7 @@ const recalculateParameters = async() => {
 
     try {
         const result = await Ajax.call([{
-            methodname: 'local_catquiz_hub_enqueue_parameter_recalculation',
+            methodname: 'connectivity_hub_hub_enqueue_parameter_recalculation',
             args: {
                 scaleid: scaleid
             }

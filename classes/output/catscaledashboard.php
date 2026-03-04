@@ -37,7 +37,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscaledashboard {
-
     /**
      * Sets the maximum number of values used for the chart.
      * @var int
@@ -191,8 +190,11 @@ class catscaledashboard {
      */
     private function render_modelbutton($contextid) {
         $buttontitle = get_string('calculate', 'local_catquiz');
-        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">%s</button>',
-                        $contextid, $buttontitle);
+        return sprintf(
+            '<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">%s</button>',
+            $contextid,
+            $buttontitle
+        );
     }
 
     /**
@@ -259,7 +261,7 @@ class catscaledashboard {
      */
     public function export_scaledetails(\renderer_base $output): array {
 
-        $cm = new catmodel_info;
+        $cm = new catmodel_info();
         [$itemdifficulties, $personabilities] = $cm->get_context_parameters(
             $this->catcontextid,
             $this->catscaleid,
@@ -284,8 +286,8 @@ class catscaledashboard {
             'submitresponsesbutton' => $this->render_submitresponses_button(),
             'is_root' => $this->is_root_scale(),
             'centralhost' => get_config('local_catquiz', 'central_host'),
-            'sync_as_node_enabled' => get_config('local_catquiz', 'enable_sync_as_node'),
-            'sync_as_hub_enabled' => get_config('local_catquiz', 'enable_sync_as_hub'),
+            'sync_as_node_enabled' => get_config('connectivity_hub', 'enable_sync_as_node') ?? false,
+            'sync_as_hub_enabled' => get_config('connectivity_hub', 'enable_sync_as_hub') ?? false,
         ];
     }
 

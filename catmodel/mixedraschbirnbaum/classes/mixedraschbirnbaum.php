@@ -39,7 +39,6 @@ use stdClass;
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mixedraschbirnbaum extends model_raschmodel {
-
     /**
      * {@inheritDoc}
      *
@@ -95,7 +94,7 @@ class mixedraschbirnbaum extends model_raschmodel {
      */
     public static function get_model_dim(): int {
         // Adds +1 for the person ability.
-        return count (self::get_parameter_names()) + 1;
+        return count(self::get_parameter_names()) + 1;
     }
 
     /**
@@ -187,7 +186,7 @@ class mixedraschbirnbaum extends model_raschmodel {
         if ($k < 1.0) {
             return -(($b ** 2 * exp($b * ($a + $pp))) / (exp($a * $b) + exp($b * $pp)) ** 2);
         } else {
-            return ($b ** 2 * ($c - 1) * exp( $b * ($pp - $a)) * (exp(2 * $b * ($pp - $a)) - $c)) /
+            return ($b ** 2 * ($c - 1) * exp($b * ($pp - $a)) * (exp(2 * $b * ($pp - $a)) - $c)) /
                 ((1 + exp($b * ( $pp - $a))) ** 2 * ($c + exp($b * ($pp - $a))) ** 2);
         }
     }

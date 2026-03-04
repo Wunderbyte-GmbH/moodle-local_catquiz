@@ -30,7 +30,7 @@ use context_module;
 use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\local\status;
-use mod_adaptivequiz\local\attempt\attempt;
+use local_catquiz\local\attempt\attempt;
 use mod_adaptivequiz\local\attempt\attempt_state;
 use stdClass;
 
@@ -48,7 +48,6 @@ require_once("$CFG->dirroot/mod/adaptivequiz/locallib.php");
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cancel_expired_attempts extends \core\task\scheduled_task {
-
     /**
      * Allow some extra time before closing an expired attempt.
      * @var float

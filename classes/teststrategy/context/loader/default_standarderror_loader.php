@@ -34,7 +34,6 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class default_standarderror_loader implements contextloaderinterface {
-
     /**
      * Returns array of items.
      *

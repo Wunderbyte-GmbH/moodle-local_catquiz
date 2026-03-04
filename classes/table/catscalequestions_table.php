@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -53,7 +53,6 @@ use moodle_url;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscalequestions_table extends wunderbyte_table {
-
     /** @var int $catscaleid */
     private $catscaleid = 0;
 
@@ -278,7 +277,8 @@ class catscalequestions_table extends wunderbyte_table {
             'question',
             'questiontext',
             [],
-            $values->id);
+            $values->id
+        );
 
         $fulltext = format_text($questiontext);
         $questiontext = strip_tags($fulltext);
@@ -308,7 +308,6 @@ class catscalequestions_table extends wunderbyte_table {
         $catscaleid = $jsonobject->catscaleid;
 
         if ($testitemid == -1) {
-
             if (gettype($jsonobject->checkedids) == 'string') {
                 $idarray = explode(',', $jsonobject->checkedids);
             } else if (gettype($jsonobject->checkedids) == 'array') {
@@ -316,7 +315,6 @@ class catscalequestions_table extends wunderbyte_table {
             } else {
                 $idarray = [$jsonobject->checkedids[0]];
             }
-
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
@@ -409,7 +407,8 @@ class catscalequestions_table extends wunderbyte_table {
             'question',
             'questiontext',
             [],
-            $values->id);
+            $values->id
+        );
 
         $fulltext = format_text($questiontext);
         $questiontext = strip_tags($fulltext);
@@ -524,5 +523,4 @@ class catscalequestions_table extends wunderbyte_table {
             ),
         ];
     }
-
 }

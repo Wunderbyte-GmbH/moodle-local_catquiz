@@ -611,7 +611,7 @@ class model_responses {
     ): array {
         global $DB;
 
-        list($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleids, $testitemid, $userid);
+        [$sql, $params] = catquiz::get_sql_for_model_input($contextid, $catscaleids, $testitemid, $userid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
         return $inputdata;

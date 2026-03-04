@@ -1,5 +1,10 @@
 {
-    "plugintypes": {
-        "catmodel": "local\/catquiz\/catmodel"
-    }
+  "subplugintypes": {
+    "catmodel": "catmodel",
+    "connectivity": "connectivity"
+  },
+  "plugintypes": {
+    "catmodel": "local\/catquiz\/catmodel",
+    "connectivity": "local\/catquiz\/connectivity"
+  }
 }

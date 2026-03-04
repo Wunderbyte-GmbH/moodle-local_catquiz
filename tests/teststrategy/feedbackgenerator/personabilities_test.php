@@ -1620,7 +1620,6 @@ final class personabilities_test extends advanced_testcase {
             "competency_rule" => "0",
             "override_grade" => 0,
             "submitbutton" => "Speichern und anzeigen",
-            "mform_isexpanded_id_catmodelheading" => 1,
             "mform_isexpanded_id_catquiz_header" => 1,
             "mform_isexpanded_id_catquiz_teststrategy" => 1,
             "mform_isexpanded_id_catquiz_feedback" => 1,

@@ -38,7 +38,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class execute_method_from_webservice {
-
     /**
      * Execute method using params: methodname, data.
      *
@@ -54,9 +53,7 @@ class execute_method_from_webservice {
         }
 
         switch ($methodname) {
-
             case 'local_catquiz_toggle_testitemstatus':
-
                 if ($params[2] == "-slash") {
                     $status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
                 } else {
@@ -73,7 +70,5 @@ class execute_method_from_webservice {
             default:
                 return false;
         }
-
     }
-
-};
+}

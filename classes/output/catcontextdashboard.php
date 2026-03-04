@@ -31,14 +31,12 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcontextdashboard implements renderable, templatable {
-
     /**
      * Constructor
      *
      * @return void
      */
     public function __construct() {
-
     }
 
     /**
@@ -51,7 +49,7 @@ class catcontextdashboard implements renderable, templatable {
 
         $table = new catcontext_table('catcontexttable');
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catcontexts();
+        [$select, $from, $where, $filter, $params] = catquiz::return_sql_for_catcontexts();
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 

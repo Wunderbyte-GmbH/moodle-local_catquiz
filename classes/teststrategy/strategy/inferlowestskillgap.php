@@ -50,7 +50,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class inferlowestskillgap extends strategy {
-
     /**
      *
      * @var int $id // strategy id defined in lib.

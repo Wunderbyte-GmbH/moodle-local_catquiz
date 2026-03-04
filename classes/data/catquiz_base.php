@@ -32,7 +32,6 @@ namespace local_catquiz\data;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_base {
-
     /**
      * Returns all or parts of answered questions in the Moodle instance.
      *
@@ -102,7 +101,6 @@ class catquiz_base {
 
         $returnarray = [];
         foreach ($records as $record) {
-
             if (!isset($returnarray[$record->userid])) {
                 $returnarray[$record->userid] = [];
             }

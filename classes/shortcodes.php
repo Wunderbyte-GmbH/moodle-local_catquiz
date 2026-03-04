@@ -44,7 +44,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * Deals with local_shortcodes regarding catquiz.
  */
 class shortcodes {
-
     /**
      * Prints out list of catquiz attempts.
      *
@@ -231,7 +230,7 @@ class shortcodes {
             return ['course' => $courseid, 'globalscale' => $globalscale, 'testid' => null];
         }
         if (!$courseid || ($courseid && $args['scope'] == "all")) {
-            return ['course' => null,  'globalscale' => $globalscale, 'testid' => null];
+            return ['course' => null, 'globalscale' => $globalscale, 'testid' => null];
         }
     }
 
@@ -293,7 +292,7 @@ class shortcodes {
         if (!$cmid) {
             return null;
         }
-        list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'adaptivequiz');
+        [$course, $cm] = get_course_and_cm_from_cmid($cmid, 'adaptivequiz');
         return $cm->instance;
     }
 
@@ -315,7 +314,8 @@ class shortcodes {
             $timerangeaddition = get_string(
                 'catquizstatistics_timerange_both',
                 'local_catquiz',
-                (object) ['starttime' => $start, 'endtime' => $end]);
+                (object) ['starttime' => $start, 'endtime' => $end]
+            );
         } else if ($starttime) {
             $start = userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
             $timerangeaddition = get_string('catquizstatistics_timerange_start', 'local_catquiz', (object) ['starttime' => $start]);
@@ -330,7 +330,7 @@ class shortcodes {
         }
         if ($test) {
             $testname = json_decode($test->json)->name;
-            list($course, $cm) = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
+            [$course, $cm] = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
             $testurl = new moodle_url(
                 '/mod/adaptivequiz/view.php',
                 ['id' => $cm->id]
@@ -359,7 +359,7 @@ class shortcodes {
             $course = get_course($courseid);
             $linkedcourses = array_map(function ($test) {
                 $testname = json_decode($test->json)->name;
-                list($course, $cm) = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
+                [$course, $cm] = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
                 $testurl = new moodle_url(
                     '/mod/adaptivequiz/view.php',
                     ['id' => $cm->id]

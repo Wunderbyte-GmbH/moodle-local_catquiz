@@ -40,7 +40,6 @@ use local_catquiz\local\model\model_responses;
  * @covers \catmodel_pcmgeneralized\pcmgeneralized
  */
 final class pcmgeneralized_test extends TestCase {
-
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
      *
@@ -146,7 +145,6 @@ final class pcmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $frac, array $ip, array $expected): void {
-
     }
 
     /**
@@ -216,7 +214,7 @@ final class pcmgeneralized_test extends TestCase {
 
         foreach ($labels as $key => $label) {
             foreach ($expected[$key] as $case => $expectedvalue) {
-                $providedarray[$label."-".$case] = ['pp' => ['ability' => $ability[$key]],
+                $providedarray[$label . "-" . $case] = ['pp' => ['ability' => $ability[$key]],
                     'frac' => $frac[$case],
                     'ip' => $parameter[$key],
                     'expected' => $expectedvalue,
@@ -265,7 +263,7 @@ final class pcmgeneralized_test extends TestCase {
 
         foreach ($labels as $key => $label) {
             foreach ($expected[$key] as $case => $expectedvalue) {
-                $providedarray[$label."-".$case] = ['pp' => ['ability' => $ability[$key]],
+                $providedarray[$label . "-" . $case] = ['pp' => ['ability' => $ability[$key]],
                     'frac' => $frac[$case],
                     'ip' => $parameter[$key],
                     'expected' => $expectedvalue,
@@ -314,7 +312,7 @@ final class pcmgeneralized_test extends TestCase {
 
         foreach ($labels as $key => $label) {
             foreach ($expected[$key] as $case => $expectedvalue) {
-                $providedarray[$label."-".$case] = ['pp' => ['ability' => $ability[$key]],
+                $providedarray[$label . "-" . $case] = ['pp' => ['ability' => $ability[$key]],
                     'frac' => $frac[$case],
                     'ip' => $parameter[$key],
                     'expected' => $expectedvalue,

@@ -373,7 +373,6 @@ class model_item_param_list implements ArrayAccess, Countable, IteratorAggregate
 
         if (!empty($newrecords)) {
             $DB->insert_records('local_catquiz_itemparams', $newrecords);
-
         }
 
         foreach ($updatedrecords as $r) {
@@ -519,7 +518,6 @@ class model_item_param_list implements ArrayAccess, Countable, IteratorAggregate
                 'message' => get_string('success', 'core'),
                 'recordid' => $itemparam->get_id(),
              ];
-
         }
     }
 
@@ -814,7 +812,8 @@ class model_item_param_list implements ArrayAccess, Countable, IteratorAggregate
                     throw new \Exception("Multiple matching parent scales found.");
                 }
                 $record = end($record);
-                if ($record
+                if (
+                    $record
                     && $matching
                     && !in_array($record, $records)
                 ) {
@@ -828,9 +827,11 @@ class model_item_param_list implements ArrayAccess, Countable, IteratorAggregate
             }
 
             // For new rootscales, add min & max scalevalue.
-            if ($catscaleid == 0
+            if (
+                $catscaleid == 0
                 && (isset($newrecord['minability'])
-                    || isset($newrecord['maxability']))) {
+                    || isset($newrecord['maxability']))
+            ) {
                 if (isset($newrecord['minability']) && (float) $newrecord['minability'] <= 0) {
                     $minscalevalue = $newrecord['minability'];
                 }
@@ -861,7 +862,6 @@ class model_item_param_list implements ArrayAccess, Countable, IteratorAggregate
             if ($parent == $newrecord['catscalename'] || !$parentsgiven) {
                 $newrecord['catscaleid'] = $catscaleid;
             }
-
         }
     }
     /**

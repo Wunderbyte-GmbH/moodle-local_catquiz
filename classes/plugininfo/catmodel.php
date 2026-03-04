@@ -31,7 +31,6 @@ use admin_settingpage;
  * models subplugin define classes.
  */
 class catmodel extends base {
-
     /**
      * Returns the information about plugin availability
      *
@@ -63,7 +62,7 @@ class catmodel extends base {
      * @return null|string node name or null if plugin does not create settings node (default)
      */
     public function get_settings_section_name() {
-        return 'catmodel'.$this->name.'settings';
+        return 'catmodel' . $this->name . 'settings';
     }
     /**
      * Loads plugin settings to the settings tree
@@ -103,5 +102,4 @@ class catmodel extends base {
 
         parent::uninstall_cleanup();
     }
-
 }

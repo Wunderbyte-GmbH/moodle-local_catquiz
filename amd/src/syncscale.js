@@ -104,7 +104,7 @@ const fetchParameters = async(centralHost) => {
 
         // Call webservice.
         const result = await Ajax.call([{
-            methodname: 'local_catquiz_node_fetch_parameters',
+            methodname: 'connectivity_hub_node_fetch_parameters',
             args: {
                 scaleid: scaleid
             }
@@ -117,7 +117,7 @@ const fetchParameters = async(centralHost) => {
 
         // Handle empty or invalid responses.
         if (!result || typeof result.status === 'undefined') {
-            throw new Error(await getString('invalidresponse', 'local_catquiz'));
+            throw new Error(await getString('invalidresponse', 'connectivity_hub'));
         }
 
         // Aggregate warnings before rendering.
@@ -135,7 +135,7 @@ const fetchParameters = async(centralHost) => {
         });
 
         // Update modal.
-        modal.setTitle(await getString('fetchparamheading', 'local_catquiz', centralHost));
+        modal.setTitle(await getString('fetchparamheading', 'connectivity_hub', centralHost));
         modal.setBody(content);
 
         // Add close button.
@@ -159,7 +159,7 @@ const fetchParameters = async(centralHost) => {
     } catch (error) {
         // If we have a modal, show error there.
         if (modal) {
-            const errorMessage = error.message || await getString('unknownerror', 'local_catquiz');
+            const errorMessage = error.message || await getString('unknownerror', 'connectivity_hub');
             try {
                 const errorContent = await Templates.render('local_catquiz/fetch_parameters_result', {
                     status: false,

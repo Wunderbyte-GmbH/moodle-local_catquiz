@@ -39,7 +39,6 @@ use local_catquiz\data\dataapi;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class recalculate_cat_model_params extends \core\task\scheduled_task {
-
     /**
      * Returns task name.
      * @return string

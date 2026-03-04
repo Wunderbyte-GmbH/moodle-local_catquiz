@@ -31,7 +31,7 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 /**
  * Class catquiz
@@ -41,7 +41,6 @@ require_once($CFG->dirroot.'/user/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class messages {
-
     /**
      * Generic send message function for catquiz.
      *
@@ -128,8 +127,10 @@ class messages {
 
         $userids = subscription::get_subscribed_user_ids($catscale->id, 'catscale');
 
-        $urltoscale = new moodle_url('/local/catquiz/edit_catscale.php',
-            ['id' => $catscale->id]);
+        $urltoscale = new moodle_url(
+            '/local/catquiz/edit_catscale.php',
+            ['id' => $catscale->id]
+        );
         $urltoscale = $urltoscale->out();
 
         $usermodified = $DB->get_record('user', ['id' => $usermodified]);
@@ -137,7 +138,6 @@ class messages {
         $users = user_get_users_by_id($userids);
 
         foreach ($users as $user) {
-
             $data = (object)[
                 'firstname' => $user->firstname,
                 'lastname' => $user->lastname,
@@ -152,8 +152,8 @@ class messages {
                 $user->id,
                 get_string('catscaleupdatedtitle', 'local_catquiz'),
                 get_string('notificationcatscalechange', 'local_catquiz', $data),
-                'updatecatscale');
+                'updatecatscale'
+            );
         }
     }
-
 }

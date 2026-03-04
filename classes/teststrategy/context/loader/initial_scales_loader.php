@@ -35,7 +35,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class initial_scales_loader implements contextloaderinterface {
-
     /**
      * Returns the new context elements provided by this class.
      *

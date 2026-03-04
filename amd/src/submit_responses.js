@@ -44,7 +44,7 @@ const submitResponses = async() => {
 
     try {
         const result = await Ajax.call([{
-            methodname: 'local_catquiz_node_submit_responses',
+            methodname: 'connectivity_hub_node_submit_responses',
             args: {
                 scaleid: scaleid
             }

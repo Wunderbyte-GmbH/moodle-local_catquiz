@@ -43,7 +43,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcontext_table extends wunderbyte_table {
-
     /**
      * Return value for timecreated column.
      *
@@ -181,7 +180,6 @@ class catcontext_table extends wunderbyte_table {
         ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
-
     }
 
     /**

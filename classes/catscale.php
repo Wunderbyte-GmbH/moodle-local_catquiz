@@ -58,7 +58,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale {
-
     /**
      *
      * @var stdClass $catscale.
@@ -81,7 +80,6 @@ class catscale {
         $catscale = self::return_catscale_object($catscaleid);
         $this->catscale = $catscale;
         $this->catscaleid = $catscaleid;
-
     }
 
     /**
@@ -125,9 +123,10 @@ class catscale {
      * @return array
      */
     public static function return_catscaleids_and_links_for_testitemitem(
-            int $componentid,
-            string $componentname = "question",
-            bool $returnlink = false) {
+        int $componentid,
+        string $componentname = "question",
+        bool $returnlink = false
+    ) {
         global $DB;
 
         $sql = "SELECT catscaleid
@@ -147,7 +146,6 @@ class catscale {
         } else {
             return $catscaleids;
         }
-
     }
 
     /**
@@ -187,7 +185,7 @@ class catscale {
             $catscaleid = $this->catscaleid;
         }
         $catscale = self::return_catscale_object($catscaleid);
-        if ($catscale->minscalevalue && $catscale->maxscalevalue && $catscale->parentid == 0 ) {
+        if ($catscale->minscalevalue && $catscale->maxscalevalue && $catscale->parentid == 0) {
             return [
                 'minscalevalue' => $catscale->minscalevalue,
                 'maxscalevalue' => $catscale->maxscalevalue,
@@ -215,11 +213,12 @@ class catscale {
      *
      */
     public static function add_or_update_testitem_to_scale(
-            int $catscaleid,
-            int $testitemid,
-            int $status = LOCAL_CATQUIZ_TESTITEM_STATUS_UNDEFINED,
-            string $component = 'question',
-            bool $overridecatscale = false) {
+        int $catscaleid,
+        int $testitemid,
+        int $status = LOCAL_CATQUIZ_TESTITEM_STATUS_UNDEFINED,
+        string $component = 'question',
+        bool $overridecatscale = false
+    ) {
 
         global $DB;
         $context = context_system::instance();
@@ -284,11 +283,12 @@ class catscale {
                 ],
                 ]);
             $event->trigger();
-
         } else {
             // We won't allow an item to be assigned to both a scale and its sub- or parent-scale.
-            if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
-                || self::is_assigned_to_subscale($catscaleid, $testitemid)) {
+            if (
+                self::is_assigned_to_parent_scale($catscaleid, $testitemid)
+                || self::is_assigned_to_subscale($catscaleid, $testitemid)
+            ) {
                     return result::err(status::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE, $testitemid);
             }
 
@@ -337,7 +337,8 @@ class catscale {
                 FROM {local_catquiz_items}
                 WHERE componentid = :testitemid AND catscaleid $insql
             SQL,
-            array_merge($inparams, ['testitemid' => $testitemid]));
+            array_merge($inparams, ['testitemid' => $testitemid])
+        );
         return !empty($records);
     }
 
@@ -364,7 +365,8 @@ class catscale {
                 FROM {local_catquiz_items}
                 WHERE componentid = :testitemid AND catscaleid $insql
             SQL,
-            array_merge($inparams, ['testitemid' => $testitemid]));
+            array_merge($inparams, ['testitemid' => $testitemid])
+        );
         return !empty($records);
     }
 
@@ -422,7 +424,8 @@ class catscale {
         int $contextid,
         bool $includesubscales = false,
         ?string $orderby = null,
-        array $selectedsubscales = []): array {
+        array $selectedsubscales = []
+    ): array {
 
         if (empty($this->catscale)) {
             return [];
@@ -443,7 +446,7 @@ class catscale {
             $scaleids = array_merge($scaleids, $subscaleids);
         }
 
-        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions(
+        [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
             $scaleids,
             $contextid,
             [],
@@ -544,13 +547,12 @@ class catscale {
 
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
 
-        $where = ' parentid '. $insql;
+        $where = ' parentid ' . $insql;
         $params = array_merge($params, $inparams);
         $sql = "SELECT $select FROM $from WHERE $where";
         $subscaleids = $DB->get_records_sql($sql, $params);
 
         return $subscaleids;
-
     }
 
     /**
@@ -646,7 +648,8 @@ class catscale {
         int $context,
         string $component,
         string $linktext = "",
-        $url = '/local/catquiz/manage_catscales.php') {
+        $url = '/local/catquiz/manage_catscales.php'
+    ) {
 
         if (empty($linktext)) {
             $linktext = get_string('testitem', 'local_catquiz', $testitemid);
@@ -690,7 +693,7 @@ class catscale {
 
         $scaleids = self::get_subscale_ids($scaleid);
         $scaleids[] = $scaleid;
-        list($inorequal, $params) = $DB->get_in_or_equal($scaleids, SQL_PARAMS_NAMED);
+        [$inorequal, $params] = $DB->get_in_or_equal($scaleids, SQL_PARAMS_NAMED);
 
         $sql = "SELECT lcip.*
                 FROM {local_catquiz_items} lci

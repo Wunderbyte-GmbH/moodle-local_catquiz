@@ -50,7 +50,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitemdashboard implements renderable, templatable {
-
     /** @var int of testitemid */
     public int $testitemid = 0;
 
@@ -103,7 +102,7 @@ class testitemdashboard implements renderable, templatable {
 
         $returnarray = [];
 
-        list($modelitemparams) = $this
+        [$modelitemparams] = $this
             ->catmodelinfo
             ->get_context_parameters($this->contextid, $this->catscaleid);
 
@@ -111,7 +110,6 @@ class testitemdashboard implements renderable, templatable {
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
         foreach ($modelitemparams as $modelname => $itemparamlist) {
-
             $item = $itemparamlist[$this->testitemid];
             if (! $item) {
                 continue;
@@ -170,19 +168,19 @@ class testitemdashboard implements renderable, templatable {
 
         global $DB;
 
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered([$this->testitemid], [$this->contextid]);
         $numberofanswers = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_usages_in_tests([$this->testitemid], [$this->contextid]);
         $numberofusagesintests = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_by_distinct_persons([$this->testitemid], [$this->contextid]);
         $numberofpersonsanswered = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_correct([$this->testitemid], [$this->contextid]);
         $numberofanswerscorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_incorrect([$this->testitemid], [$this->contextid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_partlycorrect([$this->testitemid], [$this->contextid]);
         $numberofanswerspartlycorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_average([$this->testitemid], [$this->contextid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_average([$this->testitemid], [$this->contextid]);
         $averageofallanswers = $DB->get_field_sql($sql, $params) ?: get_string('notavailable', 'core');
 
         return [
@@ -238,7 +236,7 @@ class testitemdashboard implements renderable, templatable {
      */
     private function get_itemstatus(): array {
         global $DB;
-        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid, true);
+         [$sql, $params] = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid, true);
         $result = $DB->get_record_sql($sql, $params);
         // If we do not have any item parameters for this item, return a status that says that.
         if (!$result) {

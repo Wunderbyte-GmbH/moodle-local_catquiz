@@ -77,7 +77,8 @@ $managecatscaledashboard = new managecatscaledashboard(
     $catscale,
     $scaledetailview,
     $usesubs,
-    $componentname);
+    $componentname
+);
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
 echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 

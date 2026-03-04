@@ -30,7 +30,6 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class studentdetails implements renderable, templatable {
-
     /**
      * @var int
      */
@@ -55,7 +54,7 @@ class studentdetails implements renderable, templatable {
         // Get the ability. At the moment there can be different abilities for each model.
         // This might change later. For now, just take the ability of the first model.
         $catmodelinfo = new catmodel_info();
-        list(, $personparams) = $catmodelinfo->get_context_parameters(1); // TODO dynamic context?
+        [, $personparams] = $catmodelinfo->get_context_parameters(1); // TODO dynamic context?
         $selectedmodel = reset($personparams);
         $ability = get_string('personabilitiesnodata', 'local_catquiz');
         if (isset($selectedmodel[$this->studentid])) {
@@ -74,11 +73,11 @@ class studentdetails implements renderable, templatable {
             $displaycourses = (array)$course;
         }
 
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered([], [], [$this->studentid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered([], [], [$this->studentid]);
         $numberofanswers = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct([], [], [$this->studentid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_correct([], [], [$this->studentid]);
         $numberofanswerscorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([], [], [$this->studentid]);
+         [$sql, $params] = catquiz::get_sql_for_questions_answered_incorrect([], [], [$this->studentid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
 
         // Getting the values for the last access and comparing to now.
@@ -90,7 +89,7 @@ class studentdetails implements renderable, templatable {
                 $differencestring
                     = get_string('hoursago', 'local_catquiz', floor((usertime(time()) - $user->lastaccess) / 60 / 60));
             }
-            $datestring = date('D, j F Y, g:i a', $user->lastaccess) . ' ('. $differencestring . ')';
+            $datestring = date('D, j F Y, g:i a', $user->lastaccess) . ' (' . $differencestring . ')';
         } else {
             $datestring = get_string('noaccessyet', 'local_catquiz');
         }

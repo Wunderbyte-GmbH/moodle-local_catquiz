@@ -51,7 +51,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcontext {
-
     /**
      * $id
      *
@@ -252,7 +251,6 @@ class catcontext {
                 ],
                 ]);
             $event->trigger();
-
         } else {
             $this->id = $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
 

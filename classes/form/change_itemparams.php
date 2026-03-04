@@ -36,7 +36,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class change_itemparams extends dynamic_form {
-
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -58,7 +57,6 @@ class change_itemparams extends dynamic_form {
 
         $mform->addElement('text', 'discrimination', get_string('discrimination', 'local_catquiz'));
         $mform->setType('discrimination', PARAM_FLOAT);
-
     }
 
     /**

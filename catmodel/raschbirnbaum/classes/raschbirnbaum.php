@@ -39,7 +39,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class raschbirnbaum extends model_raschmodel {
-
     /**
      * {@inheritDoc}
      *
@@ -191,7 +190,7 @@ class raschbirnbaum extends model_raschmodel {
             $jacobian[0] = ($b * $expbp) / ($expab + $expbp); // Calculates d/da.
             $jacobian[1] = ($expbp * ( $a - $pp)) / ($expab + $expbp); // Calculates d/db.
         } else {
-            $jacobian[0] = -$b * $expab / (exp( $a * $b) + $expbp); // Calculates d/da.
+            $jacobian[0] = -$b * $expab / (exp($a * $b) + $expbp); // Calculates d/da.
             $jacobian[1] = $expab * ($pp - $a) / ($expab + $expbp); // Calculates d/db.
         }
         return $jacobian;

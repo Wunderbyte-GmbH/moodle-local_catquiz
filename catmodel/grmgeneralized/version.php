@@ -27,4 +27,3 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2024051000;
 $plugin->requires  = 2022041900;
 $plugin->component = 'catmodel_grmgeneralized';
-

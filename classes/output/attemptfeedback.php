@@ -17,7 +17,6 @@
 namespace local_catquiz\output;
 
 use cache;
-use cache_helper;
 use coding_exception;
 use context_system;
 use Exception;
@@ -42,7 +41,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attemptfeedback implements renderable, templatable {
-
     /**
      * @var ?int
      */
@@ -96,7 +94,8 @@ class attemptfeedback implements renderable, templatable {
         int $attemptid,
         int $contextid = 0,
         ?feedbacksettings $feedbacksettings = null,
-        $courseid = null) {
+        $courseid = null
+    ) {
         global $USER;
         if ($attemptid === 0) {
             // This can still return nothing. In that case, we show a message that the user has no attempts yet.
@@ -232,7 +231,8 @@ class attemptfeedback implements renderable, templatable {
                 ),
                 true
             );
-            if ($feedbackdata
+            if (
+                $feedbackdata
                 && array_key_exists('primaryscale', $feedbackdata)
                 && is_array($feedbackdata['primaryscale'])
             ) {
@@ -260,16 +260,18 @@ class attemptfeedback implements renderable, templatable {
 
         // In newer versions, the debuginfo data are stored in a separate column that can be emptied in case it takes up too much
         // space.
-        if (!$debugdata && !$debugdata = $DB->get_field(
+        if (
+            !$debugdata && !$debugdata = $DB->get_field(
                 'local_catquiz_attempts',
                 'debug_info',
                 ['attemptid' => $this->attemptid]
-        )) {
+            )
+        ) {
             $this->save_to_cache($feedbackdata);
             return $feedbackdata;
         }
 
-        $debuginfo = json_decode( $debugdata, true) ?? [];
+        $debuginfo = json_decode($debugdata, true) ?? [];
         $feedbackdata['debuginfo'] = $debuginfo;
 
         $this->save_to_cache($feedbackdata);
@@ -481,12 +483,12 @@ class attemptfeedback implements renderable, templatable {
      *
      * @return array
      */
-    public function get_courses_to_enrol(
-    ): array {
+    public function get_courses_to_enrol(): array {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        if (!array_key_exists('personabilities_abilities', $feedbackdata)
+        if (
+            !array_key_exists('personabilities_abilities', $feedbackdata)
             || !$feedbackdata['personabilities_abilities']
         ) {
             return [];
@@ -504,9 +506,9 @@ class attemptfeedback implements renderable, templatable {
                 'course_ids' => [],
             ];
             $i = 0;
-            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. ++$i])) {
-                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. $i];
-                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid. '_'. $i];
+            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . ++$i])) {
+                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . $i];
+                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid . '_' . $i];
                 if ($data['value'] < (float) $lowerlimit || $data['value'] > (float) $upperlimit) {
                     continue;
                 }
@@ -542,7 +544,8 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        if (!array_key_exists('personabilities_abilities', $feedbackdata)
+        if (
+            !array_key_exists('personabilities_abilities', $feedbackdata)
             || !$feedbackdata['personabilities_abilities']
         ) {
             return [];
@@ -591,7 +594,7 @@ class attemptfeedback implements renderable, templatable {
         $primaryfeedbackname = 'customscalefeedback';
 
         // Set primary generator element (customscalefeedback) first.
-        usort($generators, function($a, $b) use ($primaryfeedbackname) {
+        usort($generators, function ($a, $b) use ($primaryfeedbackname) {
             if ($a->get_generatorname() == $primaryfeedbackname) {
                 return -1;
             } else if ($b->get_generatorname() == $primaryfeedbackname) {

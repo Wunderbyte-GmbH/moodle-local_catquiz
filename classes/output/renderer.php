@@ -32,7 +32,6 @@ use templatable;
  * @package local_catquiz
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Render the catscaledashboard
      *
