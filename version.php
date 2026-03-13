@@ -27,8 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_catquiz';
 $plugin->supported = [405, 405];
 $plugin->release = '1.1.3';
-$plugin->version = 2026020200;
-$plugin->requires = 2024100709;
+$plugin->version = 2026020201;
+$plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_wunderbyte_table' => 2024040200,
