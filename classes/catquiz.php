@@ -3178,18 +3178,44 @@ class catquiz {
                     SQL_PARAMS_NAMED,
                     'alloweduser'
                 );
-                $where .= " AND s2.userid $useridsql ";
+                // Alias ue.userid, not s2.userid: $where is placed inside the subquery
+                // that produces s2, so the alias does not exist yet at that point.
+                // The error stayed hidden because the course filter below used to
+                // overwrite $where whenever a course was given - which is the normal
+                // case. Fixing the overwrite made the broken alias visible.
+                $where .= " AND ue.userid $useridsql ";
             }
         }
         $params = array_merge($useridparams ?? [], [
+            // The attempts were counted without any scale restriction: the number of
+            // attempts came from every scale in the context while the colour of the
+            // bar came from the person ability of the selected one. Two populations
+            // in one chart, and independent of any context change.
+            //
+            // A separate name from 'catscaleid' because the two are used in different
+            // places and a later change to one must not silently move the other.
+            'attemptscaleid' => $scaleid,
             'catscaleid' => $scaleid,
             'contextid' => $contextid,
         ]);
         if ($courseid) {
-            $where = "e.courseid = :courseid";
+            // Appended, not assigned. An assignment here discarded everything built
+            // above - including the group restriction from the review finding on
+            // issue #18 and the "nothing is visible" guard that has to yield no rows
+            // rather than all of them.
+            //
+            // A course id is the normal case for the shortcode, so the restriction
+            // was dropped almost always, and silently: the chart rendered, it just
+            // counted people the caller was not allowed to see.
+            $where .= " AND e.courseid = :courseid ";
             $params = array_merge($params, ['courseid' => $courseid]);
         }
 
+        // DISTINCT on the enrolment row: a person can hold several user_enrolments in
+        // one course - a manual one and a cohort one, for instance - and each of them
+        // brought the same s1.attemptcount into s2, where SUM() then added it up.
+        // Two real attempts could show as four.
+        //
         // Subquery s3  summarizes the attempts for multiple courses. This is
         // used, if the shortcode is used outside a course and we want to know
         // all attempt across all courses.
@@ -3200,7 +3226,8 @@ class catquiz {
                 FROM (
                     SELECT s2.userid, s2.ability, SUM(attemptcount) attemptcount
                     FROM (
-                        SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
+                        SELECT DISTINCT ue.userid, lcp.ability, s1.courseid,
+                               COALESCE(attemptcount, 0) attemptcount
                         FROM {enrol} e
                         JOIN {user_enrolments} ue ON e.id = ue.enrolid
                         JOIN {role} r ON e.roleid = r.id
@@ -3208,6 +3235,7 @@ class catquiz {
                             SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
                             FROM {local_catquiz_attempts} a
                             WHERE a.contextid = :contextid
+                              AND a.scaleid = :attemptscaleid
                             GROUP BY a.userid, a.contextid, a.courseid
                         ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
                         LEFT JOIN {local_catquiz_personparams} lcp ON

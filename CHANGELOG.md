@@ -1,5 +1,31 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090514)
+
+> Vier Defekte in `get_sql_for_attempts_per_person()` - alle unabhaengig vom
+> Kontextwechsel, jeder erzeugt fuer sich falsche Zahlen.
+
+- **Zugriffsdefekt: Der Kursfilter ueberschrieb die Gruppenbeschraenkung.**
+  `$where = "e.courseid = :courseid"` verwarf alles davor - die Beschraenkung auf
+  sichtbare Nutzer aus dem Review zu #18 und den `1=0`-Schutz, der "nichts sichtbar"
+  bedeutet. Eine Kurs-ID ist beim Shortcode der Normalfall, die Beschraenkung fiel
+  also fast immer weg. Still: Das Diagramm rendert, es zaehlt nur Personen mit, die
+  der Aufrufende nicht sehen darf.
+- **Falscher Alias im selben Filter.** `$where` referenzierte `s2.userid`, wird aber
+  *innerhalb* der Unterabfrage eingesetzt, die s2 erzeugt. Das war verdeckt, weil der
+  Filter ohnehin ueberschrieben wurde - erst der obige Fix machte es sichtbar.
+- **Die Versuche wurden ohne Skalenfilter gezaehlt.** Die Balkenhoehe kam aus allen
+  Skalen des Kontexts, die Farbe aus der Personenfaehigkeit der gewaehlten - zwei
+  Populationen in einem Bild.
+- **Mehrfacheinschreibungen vervielfachten die Zahl.** Manuelle und Kohorten-
+  Einschreibung im selben Kurs ergeben mehrere `user_enrolments`-Zeilen; jede brachte
+  denselben Zaehlwert in die Summe. Zwei reale Versuche konnten als vier erscheinen.
+  Behoben durch `DISTINCT` auf der Einschreibungszeile.
+- Vier Tests decken die Faelle ab, jeder mit konsistent aufgebauter Fixture.
+
+> Diese Defekte standen hinter dem zuvor gemeldeten Kontextwechsel. Meine erste
+> Analyse hat den Kontext fuer *die* Ursache gehalten - er ist einer von mehreren.
+
 ## 1.2.0 (interne Version 2026090513)
 
 > Das Faehigkeitsprofil-Diagramm blieb leer.
