@@ -1,5 +1,28 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090518)
+
+> „Testversuche pro Person" zaehlt jetzt Versuche, nicht Einschreibungen.
+
+- **Die Abfrage ist auf `local_catquiz_attempts` als Primaerquelle umgebaut.** Bisher
+  begann sie bei `{enrol}`, verband `{user_enrolments}` und `{role}` und hing die
+  Versuche per LEFT JOIN an. **Jeder** bisher gefundene Defekt dieses Diagramms kam
+  aus dieser Richtung: der Role-Join, der LTI-Nutzer entfernte; Mehrfach-
+  einschreibungen, die Zaehlwerte vervielfachten; der Kontextfilter, der die Historie
+  verschwinden liess. Keiner davon hat mit dem Zaehlen von Versuchen zu tun.
+- **Der Kontext ist kein Filter mehr.** Er haelt fest, unter welcher Kalibrierung ein
+  Versuch bewertet wurde - nicht, ob er stattgefunden hat.
+- **Die Farbe kommt aus dem letzten Versuch der Person**
+  (`personability_after_attempt`) statt aus `local_catquiz_personparams`. Damit
+  stammen Balkenhoehe und Farbe aus derselben historischen Datenbasis; die
+  Personenparameter tragen den aktuellen Stand und werden bei jeder Rekalibrierung
+  ueberschrieben.
+- Die Einschreibungen werden nur noch fuer **einen** Zweck herangezogen: den Balken
+  „Ohne Versuch". Das ist das Einzige, was die Versuchstabelle nicht liefern kann.
+- **Neuer Kohortentest** mit 20 Personen, LTI-Einschreibung ohne Rolle und gemischten
+  Versuchszahlen. Er prueft die Summen, nicht einen einzelnen Nutzer: Anzahl Personen
+  und Summe der Versuche muessen stimmen. Beides tat es vorher nicht.
+
 ## 1.2.0 (interne Version 2026090517)
 
 > Die Diagramme einer Seite zeigten unterschiedliche Grundgesamtheiten.

@@ -264,4 +264,77 @@ final class attempts_per_person_query_test extends advanced_testcase {
                 . 'vanish from the chart.'
         );
     }
+    /**
+     * A realistic cohort arrives complete.
+     *
+     * The reported course had 87 enrolled people, 81 of them with attempts, and the
+     * chart showed five. Every defect found so far lived in the enrolment side of the
+     * query - the role join, the duplicate enrolments, the context filter - so this
+     * test builds the same shape and asserts the totals rather than a single user.
+     *
+     * The sum over all buckets has to be the number of people, and the sum of the
+     * attempts has to be the number of attempts. Neither held before.
+     *
+     * @return void
+     */
+    public function test_a_whole_cohort_is_counted(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->courseid = (int) $course->id;
+
+        $expectedattempts = 0;
+        $withattempts = 0;
+
+        // 20 people: 12 with one attempt, 6 with two, 2 with none.
+        for ($i = 0; $i < 20; $i++) {
+            $user = $this->getDataGenerator()->create_user();
+            $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+            $count = 0;
+            if ($i < 12) {
+                $count = 1;
+            } else if ($i < 18) {
+                $count = 2;
+            }
+
+            for ($n = 0; $n < $count; $n++) {
+                $this->add_attempt((int) $user->id, 501);
+            }
+
+            $expectedattempts += $count;
+            if ($count > 0) {
+                $withattempts++;
+            }
+        }
+
+        // Enrolled through LTI, which leaves the instance without a role.
+        $DB->set_field('enrol', 'roleid', 0, ['courseid' => $course->id]);
+
+        $counts = $this->attempts_per_user(null);
+
+        $this->assertCount(
+            20,
+            $counts,
+            'Every enrolled person belongs in the chart, those without an attempt in '
+                . 'the "no attempt" bucket.'
+        );
+        $this->assertSame(
+            $expectedattempts,
+            array_sum($counts),
+            'The attempts add up to what was recorded.'
+        );
+        $this->assertSame(
+            18,
+            count(array_filter($counts)),
+            'Twelve people with one attempt and six with two.'
+        );
+        $this->assertSame(
+            2,
+            count($counts) - $withattempts,
+            'Two people without any attempt.'
+        );
+    }
 }

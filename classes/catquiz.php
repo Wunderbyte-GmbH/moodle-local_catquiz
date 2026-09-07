@@ -3165,106 +3165,102 @@ class catquiz {
         int $scaleid,
         ?int $courseid,
         ?array $alloweduserids = null
-    ) {
+    ): array {
         global $DB;
 
-        $where = "1 = 1";
+        // The attempts are the primary source, not the enrolments.
+        //
+        // The previous construction started from {enrol}, joined {user_enrolments}
+        // and {role}, and attached the attempts with a LEFT JOIN. Every defect this
+        // chart has had came from that direction: an inner join on {role} removed
+        // everyone enrolled through LTI, because enrol.roleid is a property of the
+        // enrolment instance and those plugins leave it at 0; a second enrolment in
+        // the same course multiplied the count; people unenrolled since their test
+        // disappeared, and people enrolled afterwards appeared retroactively as
+        // "no attempt". None of it has anything to do with counting attempts.
+        //
+        // Counting from {local_catquiz_attempts} is immune to all of it: an attempt
+        // that exists is counted once, whatever the person's enrolment looks like
+        // today.
+        //
+        // The context is deliberately not a filter here. It records which calibration
+        // an attempt was scored under, not whether it happened - and after a
+        // recalibration the older attempts carry the previous context. Restricting on
+        // it made the whole history vanish from the chart.
+        $params = ['attemptscaleid' => $scaleid];
+        $where = 'a.scaleid = :attemptscaleid';
 
-        // Review finding on issue #18: the same restriction as in the answers query -
-        // null means no restriction, an empty array means nothing is visible and must
-        // yield no rows rather than all of them.
+        if ($courseid) {
+            $where .= ' AND a.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
+
+        // Null means no restriction; an empty array means nothing is visible and has
+        // to yield no rows rather than all of them.
+        $enrolwhere = $courseid ? 'e.courseid = :enrolcourseid' : '1 = 1';
+        $enrolparams = $courseid ? ['enrolcourseid' => $courseid] : [];
+
         if ($alloweduserids !== null) {
             if (empty($alloweduserids)) {
-                $where .= ' AND 1=0 ';
+                $where .= ' AND 1 = 0';
+                $enrolwhere .= ' AND 1 = 0';
             } else {
-                [$useridsql, $useridparams] = $DB->get_in_or_equal(
+                [$insql, $inparams] = $DB->get_in_or_equal(
                     $alloweduserids,
                     SQL_PARAMS_NAMED,
                     'alloweduser'
                 );
-                // Alias ue.userid, not s2.userid: $where is placed inside the subquery
-                // that produces s2, so the alias does not exist yet at that point.
-                // The error stayed hidden because the course filter below used to
-                // overwrite $where whenever a course was given - which is the normal
-                // case. Fixing the overwrite made the broken alias visible.
-                $where .= " AND ue.userid $useridsql ";
+                $where .= " AND a.userid $insql";
+                $params = array_merge($params, $inparams);
+
+                [$insql2, $inparams2] = $DB->get_in_or_equal(
+                    $alloweduserids,
+                    SQL_PARAMS_NAMED,
+                    'allowedenrol'
+                );
+                $enrolwhere .= " AND ue.userid $insql2";
+                $enrolparams = array_merge($enrolparams, $inparams2);
             }
         }
-        $params = array_merge($useridparams ?? [], [
-            // The attempts were counted without any scale restriction: the number of
-            // attempts came from every scale in the context while the colour of the
-            // bar came from the person ability of the selected one. Two populations
-            // in one chart, and independent of any context change.
-            //
-            // A separate name from 'catscaleid' because the two are used in different
-            // places and a later change to one must not silently move the other.
-            'attemptscaleid' => $scaleid,
-            'catscaleid' => $scaleid,
-            'contextid' => $contextid,
-        ]);
-        if ($courseid) {
-            // Appended, not assigned. An assignment here discarded everything built
-            // above - including the group restriction from the review finding on
-            // issue #18 and the "nothing is visible" guard that has to yield no rows
-            // rather than all of them.
-            //
-            // A course id is the normal case for the shortcode, so the restriction
-            // was dropped almost always, and silently: the chart rendered, it just
-            // counted people the caller was not allowed to see.
-            $where .= " AND e.courseid = :courseid ";
-            $params = array_merge($params, ['courseid' => $courseid]);
-        }
 
-        // No join on {role}: enrol.roleid is a property of the enrolment *instance*,
-        // not proof of a user's role, and several plugins leave it at 0 - the LTI
-        // enrolment does. An inner join on {role} then finds no matching row and
-        // removes those people entirely, because there is no {role} with id 0.
-        //
-        // On a course filled through LTI that eliminates almost the whole population.
-        // The single grey bar of height 1 was not "one participant without an
-        // attempt" but the only user who survived the join.
-        //
-        // The alias was never read - no column of r was selected and no condition
-        // used it - so the join only ever acted as an unintended filter. The same
-        // join is already commented out on the get_attempts() path.
-        //
-        // DISTINCT on the enrolment row: a person can hold several user_enrolments in
-        // one course - a manual one and a cohort one, for instance - and each of them
-        // brought the same s1.attemptcount into s2, where SUM() then added it up.
-        // Two real attempts could show as four.
-        //
-        // Subquery s3  summarizes the attempts for multiple courses. This is
-        // used, if the shortcode is used outside a course and we want to know
-        // all attempt across all courses.
-        // Subquery s2 gets the number of attempts per course/context combination for all users
-        // The outermost query takes the highest (MAX) ability in case we have
-        // multiple abilities for the given user.
-        $sql = "SELECT s3.userid, MAX(s3.ability) ability, SUM(attemptcount) attempts
-                FROM (
-                    SELECT s2.userid, s2.ability, SUM(attemptcount) attemptcount
-                    FROM (
-                        SELECT DISTINCT ue.userid, lcp.ability, s1.courseid,
-                               COALESCE(attemptcount, 0) attemptcount
-                        FROM {enrol} e
-                        JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                        LEFT JOIN (
-                            SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
-                            FROM {local_catquiz_attempts} a
-                            WHERE a.contextid = :contextid
-                              AND a.scaleid = :attemptscaleid
-                            GROUP BY a.userid, a.contextid, a.courseid
-                        ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
-                        LEFT JOIN {local_catquiz_personparams} lcp ON
-                            ue.userid = lcp.userid
-                            AND lcp.catscaleid = :catscaleid
-                            AND lcp.contextid = s1.contextid
-                        WHERE $where
-                    ) s2
-                    GROUP BY s2.userid, s2.ability
-                    ORDER BY attemptcount
-                ) s3
-                GROUP BY s3.userid
-                ORDER BY attempts";
+        // The ability that colours the bar comes from the person's last attempt in
+        // the same selection - the value they were actually shown - rather than from
+        // {local_catquiz_personparams}, which holds the current estimate and is
+        // overwritten by every recalibration.
+        $abilitysql = "SELECT a2.personability_after_attempt
+                         FROM {local_catquiz_attempts} a2
+                        WHERE a2.userid = a.userid
+                          AND a2.scaleid = a.scaleid
+                        ORDER BY a2.endtime DESC, a2.id DESC
+                        LIMIT 1";
+
+        // People enrolled today who have no attempt at all form the "no attempt"
+        // bucket. They are the one thing the attempts table cannot supply, so the
+        // enrolments are consulted for that alone - without any join on {role}.
+        $sql = "SELECT userid, MAX(ability) ability, SUM(attempts) attempts
+                  FROM (
+                        SELECT a.userid, ($abilitysql) ability, COUNT(*) attempts
+                          FROM {local_catquiz_attempts} a
+                         WHERE $where
+                      GROUP BY a.userid, a.scaleid
+
+                         UNION ALL
+
+                        SELECT DISTINCT ue.userid, CAST(NULL AS DECIMAL(10,5)) ability, 0 attempts
+                          FROM {enrol} e
+                          JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                         WHERE $enrolwhere
+                           AND NOT EXISTS (
+                               SELECT 1
+                                 FROM {local_catquiz_attempts} inner_a
+                                WHERE inner_a.userid = ue.userid
+                                  AND inner_a.scaleid = :nonparticipantscale
+                           )
+                  ) counted
+              GROUP BY userid
+              ORDER BY attempts";
+
+        $params = array_merge($params, $enrolparams, ['nonparticipantscale' => $scaleid]);
 
         return [$sql, $params];
     }
