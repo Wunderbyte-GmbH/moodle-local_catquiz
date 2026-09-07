@@ -197,11 +197,23 @@ final class question_list_payload_test extends advanced_testcase {
         $student = $this->getDataGenerator()->create_user();
         $this->setUser($student);
 
-        // Proves the capability is the actual gate, not an accident of setup.
+        // Proves the guard is the actual gate, not an accident of setup.
         $this->assertFalse(has_capability('local/catquiz:manage_catscales', context_system::instance()));
 
-        $this->expectException(\required_capability_exception::class);
-        get_question_preview::execute($question->id);
+        // The endpoint has two doors since participants may review the questions of
+        // their own attempt: managers pass on the capability, everyone else on an
+        // ownership check. This student has neither, so the refusal now arrives as
+        // norighttoaccess rather than as required_capability_exception.
+        //
+        // What is asserted has not been weakened - the point was never the class of
+        // the exception but that the question text does not leave the server.
+        try {
+            get_question_preview::execute($question->id);
+            $this->fail('A user with neither the capability nor an own attempt must be refused.');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('norighttoaccess', $e->errorcode);
+            $this->assertStringNotContainsString('SECRETQUESTIONBODY', $e->getMessage());
+        }
     }
     /**
      * The preview rewrites file URLs against the question's own context.

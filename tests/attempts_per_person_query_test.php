@@ -218,4 +218,50 @@ final class attempts_per_person_query_test extends advanced_testcase {
                 . 'into "everything is visible".'
         );
     }
+    /**
+     * An enrolment without a usable role still counts.
+     *
+     * enrol.roleid describes the enrolment *instance*, not a user's role, and several
+     * plugins leave it at 0 - the LTI enrolment does. The query used to inner-join
+     * {role} on it, and since no role has id 0, every one of those people was removed
+     * from the statistic.
+     *
+     * On a course filled through LTI that is not an edge case but the whole
+     * population: the observed chart showed a single grey bar of height 1, which was
+     * not a participant without an attempt but the only user who survived the join.
+     *
+     * @return void
+     */
+    public function test_enrolment_without_role_still_counts(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->courseid = (int) $course->id;
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        // What an LTI enrolment looks like: the instance carries no role.
+        $DB->set_field('enrol', 'roleid', 0, ['courseid' => $course->id]);
+
+        $this->assertFalse(
+            $DB->record_exists('role', ['id' => 0]),
+            'The premise of the defect: there is no role with id 0, so an inner join '
+                . 'on it drops the row.'
+        );
+
+        $this->add_attempt((int) $user->id, 501);
+        $this->add_attempt((int) $user->id, 501);
+
+        $counts = $this->attempts_per_user(null);
+
+        $this->assertSame(
+            2,
+            $counts[(int) $user->id] ?? -1,
+            'A person enrolled through LTI has to appear with their attempts, not '
+                . 'vanish from the chart.'
+        );
+    }
 }

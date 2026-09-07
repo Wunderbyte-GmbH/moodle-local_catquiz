@@ -1,5 +1,41 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090516)
+
+> Die eigentliche Ursache des grauen Einzelbalkens: ein Join, der LTI-Nutzer
+> vollstaendig aus der Statistik entfernt.
+
+- **`JOIN {role} r ON e.roleid = r.id` entfernt.** `enrol.roleid` beschreibt die
+  Einschreibe-*Instanz*, nicht die Rolle einer Person, und mehrere Plugins lassen den
+  Wert auf `0` - die LTI-Einschreibung tut das. Da es keine Rolle mit `id = 0` gibt,
+  entfernte der INNER JOIN jede so eingeschriebene Person.
+- **Auf einem ueber LTI befuellten Kurs ist das nahezu die gesamte Population.** Der
+  graue Balken der Hoehe 1 war nicht "eine Person ohne Versuch", sondern der einzige
+  Nutzer, der den Join ueberlebt hat.
+- Der Alias wurde nie gelesen - keine Spalte, keine Bedingung. Der Join wirkte
+  ausschliesslich als unbeabsichtigter Filter. Auf dem `get_attempts()`-Pfad war
+  derselbe Join bereits auskommentiert; hier stand er noch.
+- **Derselbe Defekt in `get_sql_for_questions_answered_per_person()`** mitbehoben,
+  dort sogar mit `r.shortname = student`.
+- Regressionstest mit `roleid = 0`; der Zahn-Test faellt, sobald der Join wieder
+  eingesetzt wird.
+
+> Korrektur meiner frueheren Analyse: Der Kontextwechsel existiert als
+> Architekturproblem, verursacht diesen Screenshot aber nicht.
+
+## 1.2.0 (interne Version 2026090515)
+
+- **CI-Fehlschlag `Preview endpoint requires the capability` behoben.** Der Test
+  erwartete `required_capability_exception`; seit der Endpunkt zwei Tueren hat -
+  Verwaltende ueber die Capability, Teilnehmende ueber die Eigentumspruefung -
+  kommt fuer einen Nutzer ohne beides `norighttoaccess`.
+- Der Test ist dabei **nicht** aufgeweicht worden: Er prueft weiterhin, dass ein
+  Studierender ohne eigenen Versuch abgewiesen wird, jetzt zusaetzlich, dass der
+  Fragetext nicht in der Fehlermeldung landet. Der Punkt war nie die Klasse der
+  Ausnahme, sondern dass der Text den Server nicht verlaesst.
+- `render_question_with_response_test` ist nicht betroffen - der Endpunkt nutzt
+  weiterhin `require_capability`, geprueft statt angenommen.
+
 ## 1.2.0 (interne Version 2026090514)
 
 > Vier Defekte in `get_sql_for_attempts_per_person()` - alle unabhaengig vom

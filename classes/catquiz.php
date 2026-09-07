@@ -3126,7 +3126,11 @@ class catquiz {
         $sql = "SELECT DISTINCT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                -- No join on {role}: enrol.roleid belongs to the enrolment instance,
+                -- not to the person, and plugins such as the LTI enrolment leave it
+                -- at 0. Requiring a matching role - let alone the shortname
+                -- 'student' - silently removes everyone enrolled that way, which on
+                -- an LTI course is nearly the entire population.
                 LEFT JOIN (
                     SELECT s1.userid, COUNT(*) as answercount
                     FROM (
@@ -3211,6 +3215,19 @@ class catquiz {
             $params = array_merge($params, ['courseid' => $courseid]);
         }
 
+        // No join on {role}: enrol.roleid is a property of the enrolment *instance*,
+        // not proof of a user's role, and several plugins leave it at 0 - the LTI
+        // enrolment does. An inner join on {role} then finds no matching row and
+        // removes those people entirely, because there is no {role} with id 0.
+        //
+        // On a course filled through LTI that eliminates almost the whole population.
+        // The single grey bar of height 1 was not "one participant without an
+        // attempt" but the only user who survived the join.
+        //
+        // The alias was never read - no column of r was selected and no condition
+        // used it - so the join only ever acted as an unintended filter. The same
+        // join is already commented out on the get_attempts() path.
+        //
         // DISTINCT on the enrolment row: a person can hold several user_enrolments in
         // one course - a manual one and a cohort one, for instance - and each of them
         // brought the same s1.attemptcount into s2, where SUM() then added it up.
@@ -3230,7 +3247,6 @@ class catquiz {
                                COALESCE(attemptcount, 0) attemptcount
                         FROM {enrol} e
                         JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                        JOIN {role} r ON e.roleid = r.id
                         LEFT JOIN (
                             SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
                             FROM {local_catquiz_attempts} a
