@@ -45,17 +45,26 @@ $context = context_resolver::for_attempt($attemptid);
 // page. Moodle's navigation builds the course tree from them; setting only the
 // context leaves it without a course and it fails while rendering the header.
 // require_login() with the course also enforces enrolment for the resolved course.
-$cm = null;
 $course = null;
 if ($context->contextlevel == CONTEXT_MODULE) {
-    [$course, $cm] = get_course_and_cm_from_cmid($context->instanceid);
+    // Only the course is taken from the resolution: the course module is not passed
+    // to require_login() below, so keeping it would be dead weight that reads like
+    // an oversight.
+    [$course] = get_course_and_cm_from_cmid($context->instanceid);
 } else if ($context->contextlevel == CONTEXT_COURSE) {
     $course = get_course($context->instanceid);
 }
 
-if ($cm) {
-    require_login($course, false, $cm);
-} else if ($course) {
+// Deliberately without the course module, even when one was resolved: passing $cm
+// makes require_login() enforce $cm->uservisible, and that is false as soon as the
+// activity - or the section holding it - becomes unavailable. A common setup hides
+// the activity once the test is completed, and reviewing a finished attempt would
+// then fail with "course or activity not available" precisely for the attempts that
+// are worth reviewing.
+//
+// The course is still required, so enrolment is still enforced, and the permission
+// check below is what actually guards this page.
+if ($course) {
     require_login($course, false);
 } else {
     require_login();

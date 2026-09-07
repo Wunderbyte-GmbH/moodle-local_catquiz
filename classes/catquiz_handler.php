@@ -719,6 +719,46 @@ class catquiz_handler {
         $test->save_or_update();
 
         cache_helper::purge_by_event('changesintestenvironments');
+
+        // The progress bar on the attempt page is drawn by mod_adaptivequiz
+        // against its own maximumquestions field. Keeping it in step here is what
+        // makes that bar show the CAT limit instead of a placeholder.
+        self::sync_activity_question_limit($quizdata);
+    }
+
+    /**
+     * Writes the CAT question limit into the activity's own maximumquestions field.
+     *
+     * The attempt page draws its progress bar from $adaptivequiz->maximumquestions -
+     * the activity's field, not ours. On a test run through catquiz that field is
+     * usually left at a large placeholder so the activity's hard stop never fires
+     * before the CAT logic does. The bar then counts against the wrong reference:
+     * "5 / 1000" on a test that ends after twenty questions, and a bar that never
+     * visibly moves.
+     *
+     * Syncing here keeps one field but only one source. Reading the CAT setting from
+     * mod_adaptivequiz instead would make the activity depend on this plugin, which
+     * is the wrong direction.
+     *
+     * @param stdClass $quizdata
+     * @return void
+     */
+    private static function sync_activity_question_limit(stdClass $quizdata): void {
+        global $DB;
+
+        $catmax = (int) ($quizdata->maxquestionsgroup->catquiz_maxquestions ?? 0);
+
+        // No CAT limit configured: the activity's own value is all there is, and
+        // overwriting it with zero would remove the stop altogether.
+        if ($catmax <= 0) {
+            return;
+        }
+
+        if (empty($quizdata->id)) {
+            return;
+        }
+
+        $DB->set_field('adaptivequiz', 'maximumquestions', $catmax, ['id' => $quizdata->id]);
     }
 
     /**

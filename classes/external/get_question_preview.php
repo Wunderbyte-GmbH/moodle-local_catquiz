@@ -77,7 +77,20 @@ class get_question_preview extends external_api {
         // on. Without it there is no reason to hand out question content.
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('local/catquiz:manage_catscales', $context);
+
+        // Two ways to be allowed here, and they answer different questions.
+        //
+        // Managers may look at any question - that is what manage_catscales is for.
+        //
+        // Participants may look at the questions they were actually asked. Whether
+        // the link is offered at all is decided by the feedback configuration of the
+        // test: if the question list is not part of a learner's feedback, no preview
+        // link is rendered. What this endpoint has to add is the object check - the
+        // question id arrives from the client, and without it any authenticated user
+        // could read the text of any question in the installation by guessing ids.
+        if (!has_capability('local/catquiz:manage_catscales', $context)) {
+            self::require_own_question($questionid);
+        }
 
         $question = $DB->get_record(
             'question',
@@ -162,5 +175,37 @@ class get_question_preview extends external_api {
             'name' => new external_value(PARAM_RAW, 'Question name'),
             'questiontext' => new external_value(PARAM_RAW, 'Formatted question text'),
         ]);
+    }
+    /**
+     * Throws unless the current user was asked this question in one of their attempts.
+     *
+     * The check is against the recorded question attempts of this person, not against
+     * the item pool: being in a scale the user may see is not the same as having been
+     * asked, and only the latter is the user's own data.
+     *
+     * @param int $questionid
+     * @throws moodle_exception
+     * @return void
+     */
+    private static function require_own_question(int $questionid): void {
+        global $DB, $USER;
+
+        // The join runs through adaptivequiz_attempt on purpose:
+        // local_catquiz_attempts.attemptid is the activity's attempt id, not the
+        // question usage id. Joining it straight to question_attempts.questionusageid
+        // matches nothing - verified against the data rather than assumed - and the
+        // check would then refuse every participant.
+        $sql = "SELECT 1
+                  FROM {local_catquiz_attempts} lca
+                  JOIN {adaptivequiz_attempt} aqa ON aqa.id = lca.attemptid
+                  JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
+                 WHERE lca.userid = :userid
+                   AND qa.questionid = :questionid";
+
+        $params = ['userid' => $USER->id, 'questionid' => $questionid];
+
+        if (!$DB->record_exists_sql($sql, $params)) {
+            throw new moodle_exception('norighttoaccess', 'local_catquiz');
+        }
     }
 }

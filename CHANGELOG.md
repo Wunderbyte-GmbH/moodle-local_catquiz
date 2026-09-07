@@ -1,5 +1,46 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090512)
+
+> Geschlossenes Quiz sperrte Review-Seite und Fragen-Vorschau.
+
+- **`show_attemptfeedback.php` uebergab das Kursmodul an `require_login()`** und war
+  damit gesperrt, sobald die Aktivitaet nach Abschluss unsichtbar wird - genau fuer
+  die Versuche, die man ansehen moechte. Dieselbe Entkopplung wie zuvor bei
+  `attemptfinished.php`; die Absicherung leistet weiterhin
+  `feedback_access::can_view_other_users()`. Das ungenutzte `$cm` ist entfernt.
+- **Die Fragen-Vorschau war Teilnehmenden ganz verwehrt**: Der Endpunkt verlangte
+  `manage_catscales`, eine Verwaltungsberechtigung. Jetzt zwei Wege - Verwaltende
+  sehen jede Frage, Teilnehmende die Fragen **ihres eigenen Versuchs**. Ob die Lupe
+  ueberhaupt erscheint, entscheidet weiterhin die Feedback-Konfiguration des Tests;
+  der Endpunkt prueft das Objekt, denn die Frage-ID kommt vom Client.
+- **Die Verknuepfung wurde an echten Daten geprueft, nicht angenommen.** Ein erster
+  Versuch verband `local_catquiz_attempts.attemptid` direkt mit
+  `question_attempts.questionusageid` - das trifft nichts: Das Feld ist die
+  Attempt-ID der Aktivitaet, nicht die Question-Usage-ID. Der Weg fuehrt ueber
+  `adaptivequiz_attempt.uniqueid`.
+- Drei Tests: eigene Frage erlaubt, fremde abgelehnt, nie gestellte abgelehnt.
+
+## 1.2.0 (interne Version 2026090511)
+
+> Fragenfortschritt zeigte "5 / 1000".
+
+- **Die Fortschrittsanzeige zaehlte gegen die falsche Groesse.** `mod_adaptivequiz`
+  zeichnet den Balken aus seinem *eigenen* Feld `maximumquestions`. Bei einem ueber
+  catquiz gesteuerten Test bleibt dieses Feld ueblicherweise auf einem grossen
+  Platzhalter stehen, damit die harte Grenze der Aktivitaet nicht vor der CAT-Logik
+  greift - der Balken zeigte dann 5 von 1000 bei einem Test, der nach zwanzig Fragen
+  endet, und bewegte sich sichtbar nie.
+- **`catquiz_handler` schreibt die CAT-Grenze jetzt beim Speichern mit.** Es bleibt
+  ein Feld, aber nur eine Quelle. Der umgekehrte Weg - die CAT-Einstellung aus
+  `mod_adaptivequiz` lesen - haette die Aktivitaet von diesem Plugin abhaengig
+  gemacht, also in die falsche Richtung.
+- Ohne konfigurierte CAT-Grenze bleibt der Wert der Aktivitaet unberuehrt: Eine Null
+  hineinzuschreiben wuerde die Notbremse ganz entfernen.
+- Vier Tests, darunter einer, der die **Verdrahtung** prueft. Die ersten drei rufen
+  die Methode direkt auf und wuerden auch bestehen, wenn der Aufruf im
+  Speicher-Callback fehlte - genau der Fehler, um den es geht.
+
 ## 1.2.0 (interne Version 2026090510)
 
 > Die Ursache des CI-Abbruchs gefunden: eine Endlosrekursion in einer Test-Fixture.
