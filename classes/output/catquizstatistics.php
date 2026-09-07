@@ -787,7 +787,20 @@ class catquizstatistics {
                     . 'a.personability_after_attempt'
         );
 
+        // The group restriction belongs here, not in each chart: three of the five
+        // charts are built on this loader and applied none of it, while the two that
+        // call get_sql_for_attempts_per_person() did. The same page therefore showed
+        // one chart over the whole course and another over the viewer's group, and
+        // the totals did not match.
+        //
+        // Null means no restriction, so the common case costs a single comparison.
+        $alloweduserids = feedback_access::get_allowed_userids($this->get_statistics_context());
+
         foreach ($recordset as $record) {
+            if ($alloweduserids !== null && !in_array((int) $record->userid, $alloweduserids, true)) {
+                continue;
+            }
+
             $json = json_decode($record->json);
             $prunedrecord = $record;
             $prunedrecord->json = json_encode((object) [

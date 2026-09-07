@@ -287,4 +287,66 @@ final class light_count_test extends advanced_testcase {
                 . 'they arrive as null and the charts silently lose their data.'
         );
     }
+    /**
+     * Every chart applies the same group restriction.
+     *
+     * Three of the five charts are built on get_attempts() and applied none of it,
+     * while the two calling get_sql_for_attempts_per_person() did. The same page
+     * therefore showed one chart over the whole course and another over the viewer's
+     * group, and the totals did not match - which is how it was noticed.
+     *
+     * Checked as a rule on the loader rather than per chart, because a chart added
+     * later inherits it without anyone remembering this test.
+     *
+     * @return void
+     */
+    public function test_attempt_loader_applies_the_group_restriction(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $source = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/output/catquizstatistics.php'
+        );
+
+        $start = strpos($source, 'private function get_attempts');
+        $this->assertNotFalse($start, 'The charts load their rows here.');
+
+        $end = strpos($source, "\n    }", $start);
+        $loader = substr($source, $start, $end - $start);
+
+        $this->assertStringContainsString(
+            'get_allowed_userids',
+            $loader,
+            'Without the restriction here the charts built on this loader aggregate '
+                . 'over members of groups the viewer may not see.'
+        );
+    }
+
+    /**
+     * Scaling survives a range without any attempts.
+     *
+     * max() on an empty array raises "must contain at least one element" in PHP 8,
+     * and that reaches the user as a fatal error page instead of an empty chart. A
+     * test range with no attempts is the ordinary case right after publication.
+     *
+     * @return void
+     */
+    public function test_scaling_tolerates_an_empty_range(): void {
+        $this->resetAfterTest();
+
+        $helper = new \local_catquiz\teststrategy\feedback_helper();
+
+        $this->assertSame(
+            [],
+            $helper->scalevalues([], []),
+            'No attempts must yield an empty chart, not a fatal.'
+        );
+
+        $this->assertSame(
+            [1.0, 2.0],
+            $helper->scalevalues([1.0, 2.0], []),
+            'An empty attempt counter leaves the values untouched.'
+        );
+    }
 }

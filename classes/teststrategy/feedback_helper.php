@@ -582,6 +582,16 @@ class feedback_helper {
      * @return array
      */
     public function scalevalues($fisherinfos, $attemptscounter) {
+        // Nothing to scale when either side is empty, and max() must not be asked:
+        // on an empty array PHP 8 raises "must contain at least one element", which
+        // reaches the user as a fatal instead of an empty chart.
+        //
+        // A test range with no attempts at all is the ordinary case right after a
+        // test is published, not an edge case.
+        if (empty($attemptscounter) || empty($fisherinfos)) {
+            return $fisherinfos;
+        }
+
         // Find the maximum values in arrays.
         $maxattempts = max($attemptscounter);
         $maxfisherinfo = max($fisherinfos);

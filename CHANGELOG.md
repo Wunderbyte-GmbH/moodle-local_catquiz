@@ -1,5 +1,23 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090517)
+
+> Die Diagramme einer Seite zeigten unterschiedliche Grundgesamtheiten.
+
+- **Nur zwei von fuenf Diagrammen wandten die Gruppenbeschraenkung an.** Die drei
+  Diagramme auf `get_attempts()` filterten gar nicht, die beiden auf
+  `get_sql_for_attempts_per_person()` schon. Dieselbe Seite zeigte damit ein Diagramm
+  ueber den ganzen Kurs und ein anderes ueber die Gruppe der betrachtenden Person -
+  die Gesamtzahlen oben und unten passten nicht zusammen.
+- Der Filter sitzt jetzt im **zentralen Ladepfad**, nicht in jedem Diagramm. Ein
+  spaeter ergaenztes Diagramm erbt ihn, ohne dass sich jemand daran erinnern muss.
+  Das war die Absicht des Reviews zu #18; umgesetzt war sie nur an zwei Stellen.
+- **Fataler Fehler bei einem Zeitraum ohne Versuche behoben.** `max()` auf einem
+  leeren Array wirft in PHP 8 "must contain at least one element"; das erreichte die
+  Nutzenden als Fehlerseite statt als leeres Diagramm. Ein Zeitraum ohne Versuche ist
+  direkt nach der Veroeffentlichung eines Tests der Normalfall.
+- Zwei Tests, beide zahn-geprueft.
+
 ## 1.2.0 (interne Version 2026090516)
 
 > Die eigentliche Ursache des grauen Einzelbalkens: ein Join, der LTI-Nutzer
