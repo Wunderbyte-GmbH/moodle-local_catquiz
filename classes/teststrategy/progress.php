@@ -614,6 +614,50 @@ class progress implements JsonSerializable {
     }
 
     /**
+     * Returns the share of points reached on a scale, or null when nothing counts.
+     *
+     * Same population as get_num_answered_productive_questions(): answered items,
+     * pilots excluded. The value is the mean of the per-item fractions, so a scale
+     * answered fully correctly gives 1.0 and one answered fully wrongly gives 0.0.
+     *
+     * Null rather than 0.0 when no item counts - "no productive answer on this scale"
+     * and "every answer was wrong" are different statements, and a column that cannot
+     * tell them apart is worse than an empty one.
+     *
+     * @param int|null $scaleid Null counts across all scales.
+     * @return float|null
+     */
+    public function get_fraction_for_scale(?int $scaleid = null): ?float {
+        $sum = 0.0;
+        $count = 0;
+
+        foreach ($this->responses as $questionid => $response) {
+            $question = $this->playedquestions[$questionid] ?? null;
+            if ($question !== null && !empty($question->is_pilot)) {
+                continue;
+            }
+            if ($scaleid !== null && !$this->question_belongs_to_scale($questionid, $scaleid)) {
+                continue;
+            }
+
+            $fraction = is_array($response)
+                ? ($response['fraction'] ?? null)
+                : ($response->fraction ?? null);
+
+            if ($fraction === null) {
+                continue;
+            }
+
+            // Clamped: a question may award more than its maximum through overrides,
+            // and a share above 1 would misrepresent the scale.
+            $sum += min(1.0, max(0.0, (float) $fraction));
+            $count++;
+        }
+
+        return $count > 0 ? $sum / $count : null;
+    }
+
+    /**
      * Shows whether an answered question was counted towards the given scale.
      *
      * @param int $questionid

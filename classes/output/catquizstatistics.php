@@ -363,7 +363,19 @@ class catquizstatistics {
      * @return array|null
      */
     private function get_allowed_userids_for_charts(): ?array {
-        return feedback_access::get_allowed_userids($this->get_statistics_context());
+        // Deliberately no restriction. get_allowed_userids() answers "which people
+        // may this viewer see as individuals" - the right question for the CSV
+        // export, for a participant list, for personal feedback. It is the wrong
+        // question for a histogram: "60 people had one attempt" names nobody.
+        //
+        // Applying it here made the aggregate depend on who is looking. A teacher in
+        // one small group saw a course statistic of seven people instead of 87, and
+        // the same page contradicted itself because other charts were not filtered.
+        //
+        // Access to the aggregate is governed by the capability instead, checked
+        // before anything is rendered. The person-level paths keep their filter -
+        // export and individual feedback below still call get_allowed_userids().
+        return null;
     }
 
     /**
@@ -787,20 +799,12 @@ class catquizstatistics {
                     . 'a.personability_after_attempt'
         );
 
-        // The group restriction belongs here, not in each chart: three of the five
-        // charts are built on this loader and applied none of it, while the two that
-        // call get_sql_for_attempts_per_person() did. The same page therefore showed
-        // one chart over the whole course and another over the viewer's group, and
-        // the totals did not match.
-        //
-        // Null means no restriction, so the common case costs a single comparison.
-        $alloweduserids = feedback_access::get_allowed_userids($this->get_statistics_context());
-
+        // No per-user restriction here either. This loader feeds the aggregate charts,
+        // and adding the personal group list to it produced exactly the defect it was
+        // meant to remove: the totals started depending on the viewer's own group
+        // membership. Consistency between the charts is achieved by none of them
+        // filtering, not by all of them filtering.
         foreach ($recordset as $record) {
-            if ($alloweduserids !== null && !in_array((int) $record->userid, $alloweduserids, true)) {
-                continue;
-            }
-
             $json = json_decode($record->json);
             $prunedrecord = $record;
             $prunedrecord->json = json_encode((object) [
@@ -1119,11 +1123,16 @@ class catquizstatistics {
         }
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
 
+        // The same scope as the rest of the page: test and period included. Without
+        // them this chart answered a different question than the heading above it.
         $maxattempts = catquiz::get_max_attempts_per_person(
             $this->contextid,
             $this->scaleid,
             $this->courseid,
-            $this->get_allowed_userids_for_charts()
+            $this->get_allowed_userids_for_charts(),
+            $this->testid,
+            $this->starttime,
+            $this->endtime
         );
         if ($maxattempts == 0) {
             $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
@@ -1139,7 +1148,10 @@ class catquizstatistics {
             $this->courseid,
             $classwidth,
             $qs ? feedback_helper::get_feedback_range_bounds($qs, $this->scaleid) : [],
-            $this->get_allowed_userids_for_charts()
+            $this->get_allowed_userids_for_charts(),
+            $this->testid,
+            $this->starttime,
+            $this->endtime
         );
 
         if (empty($counts)) {

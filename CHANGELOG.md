@@ -1,5 +1,76 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090522)
+
+> P1 abgeschlossen: Das Diagramm verwendet denselben Scope wie die uebrige Statistik.
+
+- **`testid` und Zeitraum wirken jetzt.** Bisher uebergab der Renderer nur Kontext,
+  Skala und Kurs. Ein Shortcode, der einen konkreten Test und einen Zeitraum nannte,
+  bekam trotzdem die Versuche aller Tests und ausserhalb des Zeitraums - das Diagramm
+  beantwortete eine andere Frage als seine eigene Ueberschrift.
+- Der Zeitraum wird ueber `endtime` begrenzt, wie im Rest der Statistik: Ein Versuch
+  gehoert in den Zeitraum, in dem er **beendet** wurde, nicht in den, in dem er
+  begonnen hat.
+- Zwei Tests, beide zahn-geprueft: Versuche eines anderen Tests und Versuche
+  ausserhalb des Zeitraums duerfen nicht mitzaehlen.
+
+### Damit ist die Liste der Expertise abgearbeitet
+
+| Punkt | Stand |
+|---|---|
+| ACL aus den Aggregaten | `2026090521` |
+| Attempt-basierte Abfrage | `2026090518` |
+| Einschreibungen nur fuer "Ohne Versuch" | `2026090518` |
+| Kontext nicht mehr Primaerfilter | `2026090518` |
+| Farbe aus `personability_after_attempt` | `2026090518` |
+| Role-JOIN entfernt | `2026090516` |
+| `testid`, `starttime`, `endtime` | **diese Version** |
+
+## 1.2.0 (interne Version 2026090521)
+
+> Die aggregierten Diagramme wurden auf die Gruppen der betrachtenden Person
+> zugeschnitten. Damit hing eine Kursstatistik davon ab, wer sie oeffnet.
+
+- **`get_allowed_userids()` ist die falsche Frage fuer ein Histogramm.** Sie
+  beantwortet "welche Personen darf diese Person als Individuen sehen" - richtig fuer
+  den CSV-Export, fuer Teilnehmerlisten, fuer persoenliches Feedback. Ein Balken
+  "60 Personen hatten einen Versuch" nennt niemanden.
+- Angewendet auf die Aggregate machte sie aus 87 Personen sieben - je nachdem, in
+  welcher Gruppe die betrachtende Person selbst ist.
+- **Zurueckgenommen wird auch mein eigener Filter aus `2026090517`.** Ich hatte die
+  Beschraenkung in den zentralen Ladepfad gesetzt, um die Diagramme konsistent zu
+  machen. Konsistent waren sie danach - aber gemeinsam falsch. Die Konsistenz
+  entsteht dadurch, dass **keines** filtert, nicht dass alle filtern.
+- **Personenbezogene Pfade behalten ihren Filter**: `get_export_data()` ruft
+  `get_allowed_userids()` weiterhin auf. Der Zugriff auf die Statistik selbst wird
+  ueber die Capability entschieden (`can_view_other_users`), nicht ueber eine
+  Nutzerliste.
+- Zwei Tests: einer auf die **Trennung** (Aggregat ohne Filter, Export mit), einer
+  mit einem Betrachter in einer Zweiergruppe unter `SEPARATEGROUPS` und ohne
+  `accessallgroups` - das Aggregat muss trotzdem alle enthalten.
+
+## 1.2.0 (interne Version 2026090520)
+
+> Die Spalte `fraction` in `local_catquiz_attemptscale` blieb auf jeder Zeile NULL.
+
+- **`validate()` uebergab fuer die Fraction-Karte ein leeres Array.** Die Spalte
+  wurde also geschrieben - nur nie mit einem Wert. Verfuegbar war er die ganze Zeit:
+  Die einzelnen Antworten tragen ihre `fraction` im Fortschritt.
+- **Neu `progress::get_fraction_for_scale()`**: Mittel der Einzel-Fractions ueber
+  dieselbe Population wie N - beantwortete Items, Piloten ausgenommen. Werte werden
+  auf 0..1 begrenzt, weil eine Frage durch Overrides mehr als ihr Maximum vergeben
+  kann.
+- **`null` statt `0.0`, wenn nichts zaehlt.** "Keine produktive Antwort auf dieser
+  Skala" und "jede Antwort war falsch" sind verschiedene Aussagen; eine Spalte, die
+  das nicht unterscheidet, ist schlechter als eine leere.
+- Vier Tests, darunter einer auf die **Verdrahtung**: Die drei anderen rufen den
+  Zugriff direkt auf und wuerden auch bestehen, wenn `validate()` weiterhin `[]`
+  uebergaebe - genau der Defekt, um den es geht.
+
+> Beim Einfuegen der Methode ist mir der Docblock von
+> `get_num_answered_productive_questions()` verwaist - die Falle aus dem
+> Engineering-Guide. Von phpcs gefangen, Methode verschoben.
+
 ## 1.2.0 (interne Version 2026090519)
 
 > Der CSV-Export lieferte nur einen Teil der Versuche.

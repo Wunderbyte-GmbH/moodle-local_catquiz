@@ -196,11 +196,21 @@ final class attempt_result_validator {
            here claimed the value was pilot-filtered while the code was not; the
            authoritative counter on progress now enforces both filters (Issue #7). */
         $nbyscale = [];
+        $fractionbyscale = [];
         if (!empty($catattempt->contextid)) {
             try {
                 $progress = progress::load($adaptiveattemptid, 'mod_adaptivequiz', (int) $catattempt->contextid);
                 foreach (array_keys($personabilities) as $scaleid) {
                     $nbyscale[(int) $scaleid] = $progress->get_num_answered_productive_questions((int) $scaleid);
+
+                    // The share of points on the same population as N. It was never
+                    // filled - validate() passed an empty array - so the fraction
+                    // column of local_catquiz_attemptscale stayed null on every row
+                    // while the value was available all along.
+                    $fraction = $progress->get_fraction_for_scale((int) $scaleid);
+                    if ($fraction !== null) {
+                        $fractionbyscale[(int) $scaleid] = $fraction;
+                    }
                 }
             } catch (\Throwable $e) {
                 $nbyscale = [];
@@ -216,6 +226,12 @@ final class attempt_result_validator {
             ? (int) $data['primaryscale']['id']
             : null;
 
-        return self::from_personabilities($personabilities, $sebyscale, $nbyscale, [], $primaryscaleid);
+        return self::from_personabilities(
+            $personabilities,
+            $sebyscale,
+            $nbyscale,
+            $fractionbyscale,
+            $primaryscaleid
+        );
     }
 }

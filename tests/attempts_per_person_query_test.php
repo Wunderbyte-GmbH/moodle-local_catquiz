@@ -50,6 +50,12 @@ final class attempts_per_person_query_test extends advanced_testcase {
     /** @var int Context the attempts live in. */
     private int $contextid = 7001;
 
+    /** @var int Test instance the attempts belong to. */
+    private int $instanceid = 1;
+
+    /** @var int|null End time written on the attempts, null for "now". */
+    private ?int $endtime = null;
+
     /**
      * Records an attempt of a user on a scale.
      *
@@ -70,14 +76,14 @@ final class attempts_per_person_query_test extends advanced_testcase {
             'courseid' => $this->courseid,
             'attemptid' => ++$attemptid,
             'component' => 'mod_adaptivequiz',
-            'instanceid' => 1,
+            'instanceid' => $this->instanceid,
             'teststrategy' => 4,
             'status' => 1,
             'json' => '{}',
             'debug_info' => '',
             'timecreated' => $now,
             'timemodified' => $now,
-            'endtime' => $now,
+            'endtime' => $this->endtime ?? $now,
         ]);
     }
 
@@ -387,6 +393,183 @@ final class attempts_per_person_query_test extends advanced_testcase {
             $rows,
             'The raw export has to carry every attempt on the scale, including those '
                 . 'scored under an earlier calibration.'
+        );
+    }
+    /**
+     * The aggregate is the same for every entitled viewer.
+     *
+     * The reported distribution was 6 people without an attempt, 60 with one, 19 with
+     * two and 2 with three - 87 in total. The chart showed seven, because the query
+     * was cut down to the groups the viewer happened to belong to.
+     *
+     * This builds the same shape at a smaller scale, puts the viewer in a two-person
+     * group under SEPARATEGROUPS, and asserts that the aggregate still covers
+     * everybody. A histogram names nobody; restricting it makes a course statistic
+     * depend on who opens the page.
+     *
+     * @return void
+     */
+    public function test_aggregate_is_independent_of_the_viewers_group(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course(['groupmode' => SEPARATEGROUPS]);
+        $this->courseid = (int) $course->id;
+
+        $smallgroup = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $biggroup = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        $expected = ['none' => 0, 'one' => 0, 'two' => 0];
+
+        for ($i = 0; $i < 15; $i++) {
+            $user = $this->getDataGenerator()->create_user();
+            $this->getDataGenerator()->enrol_user($user->id, $course->id);
+            $this->getDataGenerator()->create_group_member([
+                'groupid' => $biggroup->id,
+                'userid' => $user->id,
+            ]);
+
+            if ($i < 9) {
+                $this->add_attempt((int) $user->id, 501);
+                $expected['one']++;
+            } else if ($i < 13) {
+                $this->add_attempt((int) $user->id, 501);
+                $this->add_attempt((int) $user->id, 501);
+                $expected['two']++;
+            } else {
+                $expected['none']++;
+            }
+        }
+
+        // The viewer: a teacher in the small group only, without accessallgroups.
+        $teacher = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->create_group_member([
+            'groupid' => $smallgroup->id,
+            'userid' => $teacher->id,
+        ]);
+        // An editing teacher holds accessallgroups by default; taken away so the
+        // premise of the test actually holds.
+        $coursecontext = \context_course::instance($course->id);
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        role_change_permission(
+            (int) $teacherrole->id,
+            $coursecontext,
+            'moodle/site:accessallgroups',
+            CAP_PREVENT
+        );
+
+        $this->setUser($teacher);
+
+        $this->assertFalse(
+            has_capability('moodle/site:accessallgroups', \context_course::instance($course->id)),
+            'The premise: this viewer does not see all groups, so a personal filter '
+                . 'would cut the statistic down.'
+        );
+
+        // The aggregate query is called without a user restriction, which is what the
+        // charts now do.
+        $counts = $this->attempts_per_user(null);
+
+        $this->assertCount(
+            16,
+            $counts,
+            'Fifteen participants and the teacher belong to the course aggregate, '
+                . 'whatever group the viewer is in.'
+        );
+        $this->assertSame(
+            $expected['one'] + ($expected['two'] * 2),
+            array_sum($counts),
+            'Every attempt is counted.'
+        );
+    }
+    /**
+     * Attempts of another test are not counted.
+     *
+     * A shortcode naming one test still counted every attempt of the course, so the
+     * chart answered a different question than its own heading.
+     *
+     * @return void
+     */
+    public function test_scope_is_limited_to_the_named_test(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->courseid = (int) $course->id;
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $this->instanceid = 11;
+        $this->add_attempt((int) $user->id, 501);
+        $this->add_attempt((int) $user->id, 501);
+
+        $this->instanceid = 22;
+        $this->add_attempt((int) $user->id, 501);
+
+        [$sql, $params] = catquiz::get_sql_for_attempts_per_person(
+            $this->contextid,
+            501,
+            $this->courseid,
+            null,
+            11
+        );
+
+        $rows = $DB->get_records_sql($sql, $params);
+
+        $this->assertSame(
+            2,
+            (int) $rows[(int) $user->id]->attempts,
+            'The third attempt belongs to another test instance.'
+        );
+    }
+
+    /**
+     * Attempts outside the period are not counted.
+     *
+     * Bounded by endtime, like the rest of the statistics: an attempt belongs to the
+     * period in which it was finished.
+     *
+     * @return void
+     */
+    public function test_scope_is_limited_to_the_period(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->courseid = (int) $course->id;
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $now = time();
+
+        $this->endtime = $now - 100;
+        $this->add_attempt((int) $user->id, 501);
+
+        $this->endtime = $now - 100000;
+        $this->add_attempt((int) $user->id, 501);
+
+        [$sql, $params] = catquiz::get_sql_for_attempts_per_person(
+            $this->contextid,
+            501,
+            $this->courseid,
+            null,
+            null,
+            $now - 1000,
+            $now
+        );
+
+        $rows = $DB->get_records_sql($sql, $params);
+
+        $this->assertSame(
+            1,
+            (int) $rows[(int) $user->id]->attempts,
+            'The older attempt lies outside the requested period.'
         );
     }
 }

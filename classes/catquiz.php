@@ -1558,7 +1558,10 @@ class catquiz {
         int $contextid,
         int $scaleid,
         ?int $courseid = null,
-        ?array $alloweduserids = null
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
     ): int {
         global $DB;
 
@@ -1603,7 +1606,10 @@ class catquiz {
         ?int $courseid,
         int $classwidth,
         array $ranges,
-        ?array $alloweduserids = null
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
     ): array {
         [$inner, $params] = self::get_sql_for_questions_answered_per_person(
             $contextid,
@@ -1643,7 +1649,10 @@ class catquiz {
             $contextid,
             $scaleid,
             $courseid,
-            $alloweduserids
+            $alloweduserids,
+            $testid,
+            $starttime,
+            $endtime
         );
 
         // Unlike the answers chart, this one puts an unmatched ability into range 0
@@ -1670,7 +1679,10 @@ class catquiz {
             $contextid,
             $scaleid,
             $courseid,
-            $alloweduserids
+            $alloweduserids,
+            $testid,
+            $starttime,
+            $endtime
         );
 
         return self::get_max_from_subquery($inner, $params, 'attempts');
@@ -3164,7 +3176,10 @@ class catquiz {
         int $contextid,
         int $scaleid,
         ?int $courseid,
-        ?array $alloweduserids = null
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
     ): array {
         global $DB;
 
@@ -3193,6 +3208,27 @@ class catquiz {
         if ($courseid) {
             $where .= ' AND a.courseid = :courseid';
             $params['courseid'] = $courseid;
+        }
+
+        // The same scope the rest of the statistics uses. Without these the chart
+        // answered a different question than the page around it: a shortcode naming
+        // one test and one date range still counted attempts of other tests and from
+        // outside the range.
+        if ($testid) {
+            $where .= ' AND a.instanceid = :testinstance';
+            $params['testinstance'] = $testid;
+        }
+
+        // Bounded by endtime, like get_attempts(): an attempt belongs to the period
+        // in which it was finished, not the one in which it was begun.
+        if ($starttime) {
+            $where .= ' AND a.endtime >= :starttime';
+            $params['starttime'] = $starttime;
+        }
+
+        if ($endtime) {
+            $where .= ' AND a.endtime <= :endtime';
+            $params['endtime'] = $endtime;
         }
 
         // Null means no restriction; an empty array means nothing is visible and has

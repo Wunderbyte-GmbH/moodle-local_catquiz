@@ -300,7 +300,7 @@ final class light_count_test extends advanced_testcase {
      *
      * @return void
      */
-    public function test_attempt_loader_applies_the_group_restriction(): void {
+    public function test_aggregates_and_person_data_use_different_gates(): void {
         global $CFG;
 
         $this->resetAfterTest();
@@ -309,17 +309,41 @@ final class light_count_test extends advanced_testcase {
             $CFG->dirroot . '/local/catquiz/classes/output/catquizstatistics.php'
         );
 
+        // The aggregate charts must not be cut down to the viewer's own group.
+        // get_allowed_userids() answers "which people may this viewer see as
+        // individuals"; a histogram names nobody, and filtering it made the course
+        // statistic depend on who was looking - 7 people instead of 87.
         $start = strpos($source, 'private function get_attempts');
         $this->assertNotFalse($start, 'The charts load their rows here.');
 
         $end = strpos($source, "\n    }", $start);
         $loader = substr($source, $start, $end - $start);
 
-        $this->assertStringContainsString(
+        $this->assertStringNotContainsString(
             'get_allowed_userids',
             $loader,
-            'Without the restriction here the charts built on this loader aggregate '
-                . 'over members of groups the viewer may not see.'
+            'The aggregate loader must not apply the personal group list.'
+        );
+
+        // Person-level output keeps it. Removing it there would be the opposite
+        // mistake, and the export carries names and individual results.
+        $exportstart = strpos($source, 'public function get_export_data');
+        $this->assertNotFalse($exportstart);
+
+        $exportend = strpos($source, "\n    }", $exportstart);
+        $export = substr($source, $exportstart, $exportend - $exportstart);
+
+        $this->assertStringContainsString(
+            'get_allowed_userids',
+            $export,
+            'The CSV export lists people by name and must stay restricted.'
+        );
+
+        // And the aggregate is still gated - by the capability, not by a user list.
+        $this->assertStringContainsString(
+            'can_view_other_users',
+            $source,
+            'Access to the statistics is decided by the capability.'
         );
     }
 
