@@ -337,4 +337,56 @@ final class attempts_per_person_query_test extends advanced_testcase {
             'Two people without any attempt.'
         );
     }
+    /**
+     * The raw export contains every attempt, across calibration contexts.
+     *
+     * The export used to filter on a.contextid, so it returned the attempts of the
+     * currently active calibration alone. Everything from before a recalibration was
+     * missing - and silently, because the file looked complete: it had rows, headers
+     * and plausible values, just not all of them.
+     *
+     * A recalibration is not an exception in this plugin. Every recomputation of the
+     * item parameters opens a new context, so on a course that has run for a while
+     * the export loses most of its history.
+     *
+     * @return void
+     */
+    public function test_raw_export_spans_all_contexts(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->courseid = (int) $course->id;
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        // Two attempts in the current context, one from before a recalibration.
+        $this->add_attempt((int) $user->id, 501);
+        $this->add_attempt((int) $user->id, 501);
+
+        $this->contextid = 7002;
+        $this->add_attempt((int) $user->id, 501);
+
+        [$sql, $params] = catquiz::get_sql_for_csv_export(
+            7001,
+            501,
+            $this->courseid,
+            null,
+            null,
+            null,
+            false
+        );
+
+        $rows = $DB->get_records_sql($sql, $params);
+
+        $this->assertCount(
+            3,
+            $rows,
+            'The raw export has to carry every attempt on the scale, including those '
+                . 'scored under an earlier calibration.'
+        );
+    }
 }

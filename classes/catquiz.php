@@ -3288,14 +3288,23 @@ class catquiz {
         bool $enrolled = true
     ): array {
         $params = [
-            'contextid' => $contextid,
             'scaleid' => $scaleid,
             'courseid' => $courseid,
             'testid' => $testid,
             'starttime' => $starttime,
             'endtime' => $endtime,
         ];
-        $where = "a.contextid = :contextid AND a.scaleid = :scaleid";
+        // No restriction on the context. This is the raw data export: it has to
+        // contain every attempt on the scale, and the context only records which
+        // calibration an attempt was scored under, not whether it happened.
+        //
+        // Filtering on it returned the attempts of the currently active context
+        // alone, so everything from before a recalibration was missing - silently,
+        // because the file looked complete.
+        //
+        // The parameter is kept in the signature and written into the exported rows;
+        // callers that want a single calibration can still filter on that column.
+        $where = "a.scaleid = :scaleid";
         $join = "";
         if ($courseid) {
             $where .= " AND a.courseid = :courseid";

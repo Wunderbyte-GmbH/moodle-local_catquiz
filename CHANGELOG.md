@@ -1,5 +1,22 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090519)
+
+> Der CSV-Export lieferte nur einen Teil der Versuche.
+
+- **Der Rohdaten-Export filterte auf `a.contextid`** und enthielt damit nur die
+  Versuche der aktuell aktiven Kalibrierung. Alles von vor einer Rekalibrierung
+  fehlte - und zwar still, weil die Datei vollstaendig aussah: Zeilen, Kopfzeile und
+  plausible Werte, nur eben nicht alle.
+- Der Filter ist entfernt. Der Export enthaelt jetzt **jeden** Versuch auf der Skala;
+  Kurs, Test und Zeitraum schraenken weiterhin ein, ebenso die Gruppenberechtigung.
+- Die `contextid` bleibt in der Signatur und in den exportierten Spalten - wer eine
+  einzelne Kalibrierung braucht, kann in der Datei danach filtern.
+- **Gegengeprueft**: Der Export reduziert nicht auf einen Versuch je Person. Kein
+  `GROUP BY`, kein `DISTINCT ON` - jede Zeile ist ein Versuch. Der Kontextfilter war
+  die einzige Ursache der fehlenden Zeilen.
+- Test mit Versuchen aus zwei Kontexten, zahn-geprueft.
+
 ## 1.2.0 (interne Version 2026090518)
 
 > „Testversuche pro Person" zaehlt jetzt Versuche, nicht Einschreibungen.
