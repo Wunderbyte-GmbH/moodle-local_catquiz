@@ -1,5 +1,20 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090513)
+
+> Das Faehigkeitsprofil-Diagramm blieb leer.
+
+- **Der Spaltensatz der Statistikabfrage liess `personability_after_attempt` aus** -
+  genau die Spalte, aus der `get_snapshot_ability_per_person()` die Werte zieht. Eine
+  fehlende Momentaufnahme gilt dort als Altdatensatz und wird verworfen; damit war
+  jeder Wert null. Das Diagramm rendert dann mit korrekten Achsen und ohne Daten -
+  es sieht gebaut aus, nicht kaputt.
+- Ergaenzt. Ein Abgleich aller gelesenen Attribute gegen den Spaltensatz zeigt keine
+  weitere Luecke.
+- **Der erste Test dazu war wertlos.** Er durchsuchte nur `catquizstatistics.php` und
+  bestand auch mit entfernter Spalte - gelesen wird sie in `catquiz.php`. Jetzt
+  werden die Verbraucher mitgescannt; der Zahn-Test benennt die Spalte namentlich.
+
 ## 1.2.0 (interne Version 2026090512)
 
 > Geschlossenes Quiz sperrte Review-Seite und Fragen-Vorschau.

@@ -229,4 +229,62 @@ final class light_count_test extends advanced_testcase {
             'A count set by the caller has to take precedence over the light one.'
         );
     }
+    /**
+     * The statistics query loads every column the charts read.
+     *
+     * get_attempts() selects an explicit column list; the charts then read attributes
+     * off those rows. A column left out does not fail - the attribute is simply null,
+     * get_snapshot_ability_per_person() treats it as a legacy attempt and drops the
+     * value, and the ability profile renders with correct axes and no data. A chart
+     * that looks built rather than broken.
+     *
+     * That is exactly what happened to personability_after_attempt. Compared as a rule
+     * rather than as a list, so a column added to the charts later is caught too.
+     *
+     * @return void
+     */
+    public function test_statistics_query_loads_what_the_charts_read(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $source = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/output/catquizstatistics.php'
+        );
+
+        $start = strpos($source, 'private function get_attempts');
+        $this->assertNotFalse($start, 'The statistics rows are loaded here.');
+
+        $end = strpos($source, "\n    }", $start);
+        $loader = substr($source, $start, $end - $start);
+
+        preg_match_all('/a\.([a-z_]+)/', $loader, $columns);
+        $loaded = array_unique($columns[1]);
+
+        $this->assertNotEmpty($loaded, 'No column list found - the test cannot judge.');
+
+        // The consumers are scanned, not only this file. get_snapshot_ability_per_person()
+        // lives in catquiz.php and reads personability_after_attempt off these rows -
+        // scanning only catquizstatistics.php made an earlier version of this test pass
+        // with the column removed, which is the failure it was written to catch.
+        $consumers = $source . file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/catquiz.php'
+        );
+
+        preg_match_all('/\$attempt->([a-z_]+)/', $consumers, $reads);
+
+        // The key 'value' is built in the reducer, not selected; 'component'
+        // and 'instanceid' are read on rows from other queries in catquiz.php.
+        $needed = array_diff(
+            array_unique($reads[1]),
+            ['value', 'component', 'instanceid', 'attemptid', 'uniqueid']
+        );
+
+        $this->assertSame(
+            [],
+            array_values(array_diff($needed, $loaded)),
+            'These attributes are read off the attempt rows but never selected, so '
+                . 'they arrive as null and the charts silently lose their data.'
+        );
+    }
 }

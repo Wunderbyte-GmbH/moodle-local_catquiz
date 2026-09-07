@@ -776,8 +776,15 @@ class catquizstatistics {
                 false,
             // Only the columns the charts actually read. The debug
                 // trace field in particular is never used here and can be large.
+                // personability_after_attempt is what the charts plot:
+                // get_snapshot_ability_per_person() reads it off every attempt, and a
+                // missing snapshot is treated as a legacy attempt and dropped. Left
+                // out of this list, every value became null and the ability profile
+                // rendered with correct axes and no data at all - a chart that looks
+                // built rather than broken.
                 'a.id, a.userid, a.scaleid, a.contextid, a.courseid, a.attemptid, '
-                    . 'a.starttime, a.endtime, a.json, a.timecreated'
+                    . 'a.starttime, a.endtime, a.json, a.timecreated, '
+                    . 'a.personability_after_attempt'
         );
 
         foreach ($recordset as $record) {
