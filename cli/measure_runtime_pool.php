@@ -158,6 +158,18 @@ function measure_add_questions(int $scaleid, int $contextid, int $pagesize = 10)
     );
 
     $start = microtime(true);
+    // The table rewrites this statement before running it: on an unsorted, unfiltered
+    // page catscalequestions_table::push_limit_into_subquery() moves the LIMIT into
+    // the derived table, because MariaDB otherwise materialises all rows to show ten.
+    //
+    // Measuring the raw statement reported the old path and said nothing about the
+    // change - the same mistake as measuring the pool without the lean column set.
+    // The rewrite is reproduced here because query_db() needs a page context this
+    // script does not have.
+    if (preg_match('/^\s*\(\s*SELECT\b(.*)\)\s*as\s+(\w+)\s*$/is', $from, $matches)) {
+        $from = sprintf('( SELECT %s LIMIT %d OFFSET 0 ) as %s', $matches[1], $pagesize, $matches[2]);
+    }
+
     $rows = $DB->get_records_sql("SELECT $select FROM $from WHERE $where", $params, 0, $pagesize);
     $sqltime = (microtime(true) - $start) * 1000;
 
