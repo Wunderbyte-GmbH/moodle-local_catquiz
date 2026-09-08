@@ -1,5 +1,29 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090548)
+
+> Messung ueber den echten Codeweg statt ueber einzelne SQL-Aufrufe.
+
+- `cli/measure_screens.php` misst Bildschirme durch die **Tabellenklasse**, nicht am
+  Query-Builder vorbei. Damit sind das innere Seitenlimit und das Nachladen der
+  Statistik je sichtbarer Zeile Teil der Zahl - beides fehlte im bisherigen
+  Vergleich, dessen Werte deshalb Abfragezeiten waren und keine Ladezeiten.
+- **Neu vermessen: eine Antwort im laufenden Test.** Diese Zahl gab es bisher gar
+  nicht, obwohl sie die ist, die Teilnehmende erleben. Auf 250.000 Items:
+  **kalt 725 ms, warm 206 ms**.
+- Auswahldialog ueber den echten Weg: **kalt 30 ms, warm 4 ms** - die 2 ms des alten
+  Werkzeugs waren die Abfrage allein.
+- Verglichen wird durch **zweimaliges Ausfuehren** gegen dieselbe Datenbank, mit
+  getauschtem Plugin-Verzeichnis. Der frueher versuchte Weg - beide Versionen per
+  Namensraum gleichzeitig laden - traegt nicht: Die Klassen eines Moodle-Plugins
+  verweisen namentlich aufeinander, und eine umbenannte Datei laesst den Rest auf die
+  installierte Version zeigen.
+
+**Offen:** Der Bildschirm "Fragenliste, sortiert" scheitert ueber die Tabellenklasse
+mit einem Datenbankfehler. Die Abfrage allein laeuft; die Tabelle sortiert nach
+`questionname`, das im Ergebnis nicht unter diesem Namen steht. Die beiden anderen
+Bildschirme sind davon nicht betroffen.
+
 ## 1.2.0 (interne Version 2026090547)
 
 > Der Vergleich hat einen Bildschirm gemessen, den er nicht gemessen hat.
