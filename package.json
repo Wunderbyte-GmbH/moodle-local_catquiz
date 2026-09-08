@@ -1,0 +1,33 @@
+{
+    "name": "local_catquiz",
+    "private": true,
+    "description": "JS unit tests (Jest) for local_catquiz AMD modules.",
+    "scripts": {
+        "test": "jest"
+    },
+    "jest": {
+        "testEnvironment": "jsdom",
+        "roots": [
+            "<rootDir>/tests/jest"
+        ],
+        "testMatch": [
+            "**/*.test.js"
+        ],
+        "moduleNameMapper": {
+            "^core/ajax$": "<rootDir>/tests/jest/mocks/ajax.js",
+            "^core/modal_factory$": "<rootDir>/tests/jest/mocks/modal_factory.js",
+            "^core/loadingicon$": "<rootDir>/tests/jest/mocks/loadingicon.js",
+            "^core/templates$": "<rootDir>/tests/jest/mocks/templates.js",
+            "^core/notification$": "<rootDir>/tests/jest/mocks/notification.js",
+            "^core/modal$": "<rootDir>/tests/jest/mocks/modal.js",
+            "^core/str$": "<rootDir>/tests/jest/mocks/str.js"
+        }
+    },
+    "devDependencies": {
+        "@babel/core": "^7.29.7",
+        "@babel/preset-env": "^7.29.7",
+        "babel-jest": "^29.7.0",
+        "jest": "^29.7.0",
+        "jest-environment-jsdom": "^29.7.0"
+    }
+}

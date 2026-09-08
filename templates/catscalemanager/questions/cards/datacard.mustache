@@ -62,9 +62,15 @@
             title='{{#str}}togglestatus, local_catquiz{{/str}}'
             data-id="testitem-toggle-status"
             data-templatelocation="local_catquiz/catscalemanager/questions/cards/datacard"
-            data-classlocation="local_catquiz\output\catscalemanager\questions\cards\datacard"
+            {{! Issue #66: a symbolic renderer name instead of a PHP class name, and
+                named fields instead of a comma-separated list whose order only the
+                server knew. }}
+            data-renderer="questiondatacard"
             data-tdmethod="testitem-toggle-status"
-            data-tdparams="{{testitemid}},{{contextid}},{{scaleid}},{{component}}"
+            data-testitemid="{{testitemid}}"
+            data-contextid="{{contextid}}"
+            data-catscaleid="{{scaleid}}"
+            data-component="{{component}}"
             data-adparams="{{scaleid}},{{testitemid}},{{closedeye}},{{component}}"
             data-admethodname="local_catquiz_toggle_testitemstatus">
             </i></a>

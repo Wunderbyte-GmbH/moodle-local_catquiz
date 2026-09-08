@@ -177,6 +177,44 @@ div[contenteditable="false"] {
     text-align: center;
 }
 
+/* Result table: readable and responsive without breaking words mid-character. */
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table {
+    /* Never exceed the container. A min-width here (previously 55rem) forced the
+       table wider than its parent and pushed the whole feedback tab into a
+       horizontal scroll. */
+    width: 100%;
+    max-width: 100%;
+    table-layout: auto;
+}
+
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table th,
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table td {
+    vertical-align: top;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-number,
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-correctness,
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-ability,
+#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-action {
+    width: 1%;
+    white-space: nowrap;
+}
+
+#feedbackcontent-graphicalsummary .catquiz-response-icon {
+    font-size: 1.1em;
+}
+
+#feedbackcontent-graphicalsummary .catquiz-question-label {
+    font-size: 0.85em;
+}
+
 #lcq_model_override_form .param-group .felement > .w-100 > .d-flex {
     display: grid;
     grid-template-columns: auto 1fr auto;

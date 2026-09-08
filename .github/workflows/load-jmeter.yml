@@ -1,0 +1,262 @@
+##############################################################################
+# JMeter read-endpoint load test – local_catquiz
+#
+# Runs after merges/pushes to main (and on demand). Pull requests are covered
+# by Moodle Plugin CI Main, avoiding duplicate load-test executions. Builds a
+# self-contained Moodle 4.5 site with the plugin and its dependencies, seeds a
+# large CAT-manager/statistics profile and load-tests the read pages with
+# Apache JMeter.
+#
+# NOTE: exercises a live site (login + heavy pages) outside the static
+# moodle-plugin-ci pipeline. The plan tests/load/catquiz-read-endpoints.jmx and
+# its assertions are an initial baseline; tune after the first real run.
+##############################################################################
+
+name: Load test (JMeter)
+
+on:
+  workflow_dispatch:
+    inputs:
+      threads:
+        description: Concurrent virtual users (plateau)
+        default: '25'
+      rampup:
+        description: Ramp-up seconds
+        default: '10'
+      duration:
+        description: Plateau duration seconds
+        default: '90'
+      users:
+        description: Seeded persons
+        default: '2000'
+      items:
+        description: 'Questions with item parameters to seed (0 disables)'
+        required: false
+        default: '20000'
+  # No push trigger. These runs seed hundreds of thousands of items and take the
+  # better part of an hour; on every merge to main they occupied the runners without
+  # anyone reading the result. Start them from the Actions tab when a measurement is
+  # actually wanted - the workflow takes its parameters as inputs.
+
+concurrency:
+  group: load-jmeter-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jmeter:
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+
+    env:
+      DB: pgsql
+      MOODLE_BRANCH: MOODLE_405_STABLE
+      MOODLE_DIR: ${{ github.workspace }}/moodle
+      LOAD_ADMIN_PASS: 'Admin!23'
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: plugin
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, gd, intl, zip, soap, mbstring, curl, xml, exif
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Build Moodle, dependencies and plugin
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The two hub plugins are attached to this repository as submodules, so the
+          # checkout leaves catquizcentralhub/host and catquizcentralhub/client behind
+          # as empty directories. moodle-plugin-ci refuses to install into a directory
+          # that already exists - it checks is_dir(), not whether a plugin is in it -
+          # and aborts with "Plugin is already installed in standard Moodle".
+          #
+          # The placeholders are removed from the checkout before install, so the real
+          # plugins fetched by add-plugin can be written to their proper paths.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            echo "leerer Submodul-Platzhalter entfernt: $placeholder"
+            rmdir "$placeholder"
+          done
+          # Load tests need a normal live Moodle site, not PHPUnit/Behat databases.
+          moodle-plugin-ci install --plugin ./plugin --moodle="$MOODLE_DIR" --db-host=127.0.0.1 --no-init
+
+      - name: Install clean live Moodle site
+        run: |
+          set -euo pipefail
+
+          # moodle-plugin-ci is used above to assemble the exact Moodle checkout
+          # plus CATquiz and all required plugins. Its generated config.php is
+          # intentionally a CI/test configuration (PHPUnit/Behat). Do not turn
+          # that configuration into the site used by the load test.
+          rm -f "$MOODLE_DIR/config.php"
+          rm -rf "${{ github.workspace }}/moodledata-live"
+
+          # Recreate the normal Moodle database from scratch.
+          dropdb --if-exists --host=127.0.0.1 --username=postgres moodle
+          createdb --host=127.0.0.1 --username=postgres moodle
+
+          # Let Moodle create its own production-style config.php and install
+          # core plus every plugin already assembled in the Moodle tree.
+          php "$MOODLE_DIR/admin/cli/install.php" \
+            --non-interactive \
+            --agree-license \
+            --wwwroot='http://127.0.0.1:8000' \
+            --dataroot='${{ github.workspace }}/moodledata-live' \
+            --dbtype=pgsql \
+            --dbhost=127.0.0.1 \
+            --dbport=5432 \
+            --dbname=moodle \
+            --dbuser=postgres \
+            --prefix=mdl_ \
+            --fullname='CATquiz load test' \
+            --shortname='CATquiz load' \
+            --adminuser=admin \
+            --adminpass="$LOAD_ADMIN_PASS" \
+            --adminemail='admin@example.com'
+
+          # Ensure there is no pending plugin upgrade and no stale install cache.
+          php "$MOODLE_DIR/admin/cli/upgrade.php" --non-interactive
+          php "$MOODLE_DIR/admin/cli/purge_caches.php"
+
+          # Verify the actual live schema, not just that config.php exists.
+          php -r 'define("CLI_SCRIPT", true); require getenv("MOODLE_DIR") . "/config.php"; $manager = $DB->get_manager(); if (!$manager->table_exists("config") || !$manager->table_exists("context") || !$manager->table_exists("local_catquiz_catcontext")) { fwrite(STDERR, "Live Moodle/CATquiz schema missing\n"); exit(1); } echo "Live Moodle schema OK\n";'
+
+      - name: Serve the site
+        run: |
+          set -euo pipefail
+          rm -f /tmp/moodle-server.log /tmp/moodle-login.html
+
+          # A single PHP CLI server is single-threaded and would invalidate a
+          # concurrency load test. Use several built-in workers for this CI
+          # smoke/load baseline.
+          PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$MOODLE_DIR" \
+            >/tmp/moodle-server.log 2>&1 &
+          serverpid=$!
+          echo "MOODLE_SERVER_PID=$serverpid" >> "$GITHUB_ENV"
+
+          ready=0
+          lastcode=000
+          for i in $(seq 1 40); do
+            if ! kill -0 "$serverpid" 2>/dev/null; then
+              echo "Moodle PHP server exited before becoming ready." >&2
+              break
+            fi
+
+            # Do not use curl -f here: on an HTTP 500 we explicitly want to
+            # retain Moodle's response body for diagnosis.
+            lastcode=$(curl -sS --max-time 20 \
+              -o /tmp/moodle-login.html \
+              -w '%{http_code}' \
+              http://127.0.0.1:8000/login/index.php || true)
+
+            if [ "$lastcode" = "200" ] \
+              && grep -q 'name="logintoken"' /tmp/moodle-login.html; then
+              ready=1
+              break
+            fi
+            sleep 3
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo "Moodle did not become ready; last HTTP status: $lastcode" >&2
+            echo "--- PHP server log ---" >&2
+            cat /tmp/moodle-server.log >&2 || true
+            echo "--- HTTP response ---" >&2
+            cat /tmp/moodle-login.html >&2 || true
+            exit 1
+          fi
+
+          echo "Moodle live site is ready (HTTP 200 with login token)."
+
+      - name: Seed a large profile
+        run: |
+          # --items is what makes this measure the plugin rather than Moodle's
+          # rendering: without an item pool the manager and the statistics pages run
+          # their pool queries against nothing, and the result says little about how
+          # they behave in an installation that is actually in use.
+          php "$MOODLE_DIR/local/catquiz/tests/load/seed_large.php" \
+            --users='${{ github.event.inputs.users || 2000 }}' \
+            --items='${{ github.event.inputs.items || 20000 }}' > /tmp/seed.env
+          cat /tmp/seed.env
+          sed -n "s/^export \([A-Z_]*\)='\(.*\)'$/\1=\2/p" /tmp/seed.env >> "$GITHUB_ENV"
+
+      - name: Set up JMeter
+        run: |
+          curl -sSL https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz -o jmeter.tgz
+          tar xzf jmeter.tgz
+
+      - name: Run JMeter plan
+        run: |
+          apache-jmeter-5.6.3/bin/jmeter -n \
+            -t plugin/tests/load/catquiz-read-endpoints.jmx \
+            -Jbase_url="$BASE_URL" \
+            -Jusername="$ADMIN_USER" \
+            -Jpassword="$ADMIN_PASS" \
+            -Jscaleid="$SCALEID" \
+            -Jcontextid="$CONTEXTID" \
+            -Jthreads='${{ github.event.inputs.threads || 25 }}' \
+            -Jrampup='${{ github.event.inputs.rampup || 10 }}' \
+            -Jduration='${{ github.event.inputs.duration || 90 }}' \
+            -l results.jtl -e -o jmeter-report
+
+      - name: Show Moodle diagnostics on failure
+        if: failure()
+        run: |
+          echo "--- PHP server log ---"
+          cat /tmp/moodle-server.log || true
+          echo "--- Last HTTP response ---"
+          cat /tmp/moodle-login.html || true
+
+      - name: Upload Moodle diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jmeter-moodle-diagnostics
+          path: |
+            /tmp/moodle-server.log
+            /tmp/moodle-login.html
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload JMeter results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jmeter-results
+          path: |
+            results.jtl
+            jmeter-report
+          retention-days: 7
+          if-no-files-found: ignore

@@ -31,7 +31,7 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
       | adaptivequiz | My Adaptive Quiz | C1     | 1       | adaptivecatquiz1 | Adaptive Quiz Intro |
     And the following "local_catquiz > testsettings" exist:
       | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy         | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
-      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | startwitheasiestquestion    | 4                    | 0.4                       | 0.6                       | 2                       |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | -2                          | 4                    | 0.4                       | 0.6                       | 2                       |
     ## Below steps are required to save a correct JSON settings
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -40,7 +40,7 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
     And I log out
     ## Pass 1 attempt as a student
     And I am on the "adaptivecatquiz1" Activity page logged in as student1
-    And I click on "Start attempt" "button"
+    And I click on "Start attempt" "link"
     And I wait until the page is ready
     And I should see "Question 1"
     And I click on "richtige Antwort" "text" in the "Question 1" "question"
@@ -70,7 +70,11 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
     ## And I should see "CAT scale created" in the ".eventlogtable" "css_element"
     ## And I should see "CAT context created" in the ".eventlogtable" "css_element"
     ## And I should see "CAT scale updated" in the ".eventlogtable" "css_element"
-    And I should see "Testitem added to CAT scale" in the ".eventlogtable" "css_element"
+    ## The "Testitem added to CAT scale" import events are a Background
+    ## precondition, not functionality under test here. With timecreated DESC and
+    ## a 10-row page, the ~28 same-second import events land on later pages
+    ## non-deterministically, so asserting them on page 1 is flaky. Emission is
+    ## covered deterministically by tests/eventlog_testitemadded_test.php instead.
     ## Verify Questions tab
     And I click on "Questions" "link" in the "#region-main" "css_element"
     And I set the field "Scale" to "Simulation"

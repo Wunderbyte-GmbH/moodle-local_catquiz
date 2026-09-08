@@ -470,10 +470,30 @@ class testenvironment {
     /**
      * Returns settings saved as JSON.
      *
+     * The declared return type is stdClass, but json_decode() returns null for an
+     * empty or malformed json column - which used to surface as a bare TypeError
+     * deep inside the call stack ("Return value must be of type stdClass, null
+     * returned"), pointing at this method rather than at the real problem: there is
+     * no configured test environment for that component/instance. Fail with a
+     * message that names the cause instead.
+     *
      * @return stdClass
      */
     public function return_settings(): stdClass {
-        return json_decode($this->json);
+        $settings = json_decode($this->json ?? '');
+        if (!$settings instanceof stdClass) {
+            throw new moodle_exception(
+                'error:notestenvironmentsettings',
+                'local_catquiz',
+                '',
+                (object) [
+                    'component' => $this->component ?? '',
+                    'componentid' => $this->componentid ?? 0,
+                ]
+            );
+        }
+
+        return $settings;
     }
 
     /**

@@ -27,16 +27,13 @@ declare(strict_types=1);
 namespace local_catquiz\external;
 
 use context_system;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
 use local_catquiz\subscription;
 use moodle_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * External Service for local catquiz.
@@ -47,7 +44,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class subscribe extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -58,8 +54,7 @@ class subscribe extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'area'  => new external_value(PARAM_TEXT, 'area', VALUE_REQUIRED),
             'itemid'  => new external_value(PARAM_INT, 'itemid', VALUE_REQUIRED),
-            ]
-        );
+        ]);
     }
 
     /**
@@ -83,16 +78,22 @@ class subscribe extends external_api {
         require_login();
 
         $context = context_system::instance();
-        if (!has_capability('local/catquiz:canmanage', $context)) {
-            throw new moodle_exception('norighttoaccess', 'local_catquiz');
-        }
+        self::validate_context($context);
 
         if (empty($params['userid'])) {
-            $params['userid'] = (int)$USER->id;
+            $params['userid'] = (int) $USER->id;
+        }
+
+        // Review finding: the endpoint accepted any user id behind a single manage
+        // check, so one capability covered two very different actions. Subscribing
+        // yourself is the ordinary case and needs no management right; subscribing
+        // somebody else is an administrative act and does.
+        if ((int) $params['userid'] !== (int) $USER->id) {
+            require_capability('local/catquiz:canmanage', $context);
         }
 
         // The transformation of the userid will be done in the start_new_attempt function.
-        return subscription::toggle_subscription($params['userid'], $params['area'], $params['itemid'], );
+        return subscription::toggle_subscription($params['userid'], $params['area'], $params['itemid']);
     }
 
     /**
@@ -103,7 +104,6 @@ class subscribe extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'subscribed' => new external_value(PARAM_INT, '1 is subscribed, 0 is not.', VALUE_REQUIRED),
-            ]
-        );
+        ]);
     }
 }

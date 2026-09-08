@@ -113,8 +113,29 @@ class filterbytestinfo extends preselect_task {
             );
 
             $enable = $testpotential + $testinformation > 1 / $this->context['se_max'] ** 2;
+            // A scale must never be deactivated before at least one question has
+            // actually been administered from it. On the very first question the
+            // ability is only the configured starting guess (e.g. "very easy" =>
+            // -2). At such an extreme guess the test potential can fall below the
+            // se_max threshold, which — when min_attempts_per_scale is 0 — used to
+            // deactivate the one and only active scale with zero played questions,
+            // leaving no active scale and aborting the whole attempt with
+            // 'attemptnofirstquestion'. Require at least one played question (and
+            // the configured minimum) before a scale may be excluded.
+            $playedinscale = $this->progress->get_num_answered_productive_questions($scaleid);
+            $playedintest = $this->progress->get_num_answered_productive_questions();
+            $minimumperscale = max(1, (int) $this->context['min_attempts_per_scale']);
+            $ismainscale = $scaleid === (int) $this->context['catscaleid'];
+            // The main scale may only be excluded once the globally configured
+            // minimum number of questions has actually been administered. This
+            // mirrors filterbystandarderror so that catquiz_minquestions is
+            // respected here too; otherwise a low test potential at the starting
+            // guess would deactivate the main scale after question 1 and end the
+            // whole attempt before the minimum is reached.
+            $minimumreached = $playedinscale >= $minimumperscale
+                && (!$ismainscale || $playedintest >= (int) ($this->context['minimumquestions'] ?? 0));
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2
-                && count($this->progress->get_playedquestions(true, $scaleid)) >= $this->context['min_attempts_per_scale'];
+                && $minimumreached;
             if ($exclude && $this->progress->is_active_scale($scaleid)) {
                 $this->progress->deactivate_scale($scaleid, true);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(

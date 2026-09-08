@@ -71,13 +71,18 @@ if (empty($catcontextid)) {
     }
 }
 
+// Issue #29: the active tab travels in the URL, so reload and the browser's back
+// button keep it - and only that tab is built on the server.
+$activetab = optional_param('tab', '', PARAM_ALPHA);
+
 $managecatscaledashboard = new managecatscaledashboard(
     $testitemid,
     $catcontextid,
     $catscale,
     $scaledetailview,
     $usesubs,
-    $componentname
+    $componentname,
+    $activetab
 );
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
 echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);

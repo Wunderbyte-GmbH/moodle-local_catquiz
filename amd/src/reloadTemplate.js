@@ -32,30 +32,39 @@ export const init = (selector) => {
         element.addEventListener('click', e => {
             e.stopPropagation();
 
-            let jsondata = JSON.stringify(data);
-
-            transmitAction(jsondata);
+            // Issue #66: named, typed fields instead of the whole dataset as JSON.
+            // Sending everything meant the server received whatever happened to be on
+            // the element - it could not declare its parameters, and so could not
+            // validate them either.
+            transmitAction({
+                renderer: data.renderer,
+                action: data.admethodname || '',
+                actionparams: data.adparams || '',
+                testitemid: parseInt(data.testitemid || 0, 10),
+                contextid: parseInt(data.contextid || 0, 10),
+                catscaleid: parseInt(data.catscaleid || 0, 10),
+                component: data.component || 'question',
+            }, data.templatelocation);
         });
     });
 };
 
 /**
  * Ajax function to handle action buttons.
- * @param {string} data
+ * @param {object} args Server parameters, exactly the ones the endpoint declares.
+ * @param {string} templatelocation Template to redraw; never sent to the server.
  */
-export function transmitAction(data) {
+export function transmitAction(args, templatelocation) {
 Ajax.call([{
   methodname: "local_catquiz_reload_template",
-  args: {
-    'data': data,
-  },
+  args: args,
   done: function(response) {
 
     if (response.success == 1) {
       showNotification(response.message, "success");
-      reloadTemplate(data, response);
+      reloadTemplate(templatelocation, response);
     } else {
-      showNotification(data.message, "danger");
+      showNotification(response.message, "danger");
     }
   },
   fail: function(ex) {
@@ -67,16 +76,17 @@ Ajax.call([{
 }]);
 
 /**
- * Reloads template defined in the data of the object that was clicked on.
- * @param {object} data
- * @param {string} response
+ * Reloads the template that belongs to the clicked element.
+ * @param {string} templatelocation
+ * @param {object} response
  */
-function reloadTemplate(data, response) {
+function reloadTemplate(templatelocation, response) {
 
-// Parse the data of object that triggered the change.
-const dataobject = JSON.parse(data);
-const template = dataobject.templatelocation;
-const templateid = "[data-templateid='" + dataobject.templatelocation + "']";
+// Issue #66: the template to redraw is passed directly. It used to be parsed back
+// out of the JSON payload that also carried the server parameters - two unrelated
+// concerns travelling in one string.
+const template = templatelocation;
+const templateid = "[data-templateid='" + templatelocation + "']";
 
 // The data of the response gives us the context for the template.
 const responseobject = JSON.parse(response.data);

@@ -114,17 +114,43 @@ class questionssummary extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        if (! $attempt = catquiz::get_attempt_statistics($attemptid)) {
+        if (! $rows = catquiz::get_attempt_statistics($attemptid)) {
             return null;
         }
 
+        // Exclude pilot items from the performance counters. The pilot
+        // flag is context-computed, so we get the played pilot question ids from
+        // the progress and drop those questions here.
+        $pilotids = array_map('intval', array_keys($this->get_progress()->get_played_pilot_questions()));
+
+        $right = 0;
+        $wrong = 0;
+        $partial = 0;
+        $unanswered = 0;
+        foreach ($rows as $row) {
+            if (in_array((int) $row->questionid, $pilotids, true)) {
+                continue;
+            }
+            // No graded step at all: skipped/unanswered, kept separate from wrong.
+            if ($row->fraction === null) {
+                $unanswered++;
+                continue;
+            }
+            $fraction = (float) $row->fraction;
+            if ($fraction >= 1.0) {
+                $right++;
+            } else if ($fraction > 0.0) {
+                $partial++;
+            } else {
+                $wrong++;
+            }
+        }
+
         return ['questionssummary' => [
-                'gradedright' => $attempt['gradedright']->count ?? 0,
-                // We want to count skipped questions as wrong. The skipped answers
-                // are stored under array key null.
-                'gradedwrong' => ($attempt['gradedwrong']->count ?? 0)
-                    + ($attempt[null]->count ?? 0),
-                'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+                'gradedright' => $right,
+                'gradedwrong' => $wrong,
+                'gradedpartial' => $partial,
+                'gradedunanswered' => $unanswered,
             ],
         ];
     }

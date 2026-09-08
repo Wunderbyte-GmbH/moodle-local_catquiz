@@ -45,6 +45,37 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @param stdClass $record
      * @return array
      */
+    /**
+     * Validates the item parameters for the 3PL model.
+     *
+     * A 3PL item needs a strictly positive discrimination (see 2PL) and a guessing
+     * parameter in [0, 1). A guessing value of 1 or above would make the item
+     * answerable with certainty regardless of ability; a negative one is meaningless.
+     *
+     * @param stdClass $record The raw item parameter record.
+     * @return string[] Reasons the parameters are invalid; empty array if valid.
+     */
+    public static function validate_parameters(stdClass $record): array {
+        $reasons = parent::validate_parameters($record);
+
+        if (!self::is_valid_positive_float($record->discrimination ?? null)) {
+            $reasons[] = 'discrimination must be a number greater than 0';
+        }
+
+        $guessing = $record->guessing ?? null;
+        if (!self::is_valid_float($guessing) || (float) $guessing < 0.0 || (float) $guessing >= 1.0) {
+            $reasons[] = 'guessing must be a number in the range [0, 1)';
+        }
+
+        return $reasons;
+    }
+
+    /**
+     * Returns the parameters as associative array, where the key is the parameter name.
+     *
+     * @param stdClass $record
+     * @return array
+     */
     public static function get_parameters_from_record(stdClass $record): array {
         return [
             'difficulty' => $record->difficulty,
@@ -92,6 +123,37 @@ class mixedraschbirnbaum extends model_raschmodel {
      *
      * @return int
      */
+    /**
+     * Serialises the item parameters into a flat numeric vector (parameter codec).
+     *
+     * @param array $ip item parameters
+     *
+     * @return array
+     *
+     */
+    public static function convert_ip_to_vector(array $ip): array {
+        return [$ip['difficulty'], $ip['discrimination'], $ip['guessing']];
+    }
+
+    /**
+     * Reconstructs the item parameters from a flat numeric vector (parameter codec).
+     *
+     * @param array $vector flat parameter vector
+     * @param mixed $fractions response fractions (unused for dichotomous models)
+     *
+     * @return array
+     *
+     */
+    public static function convert_vector_to_ip(array $vector, $fractions = null): array {
+        return ['difficulty' => $vector[0], 'discrimination' => $vector[1], 'guessing' => $vector[2]];
+    }
+
+    /**
+     * The fixed model dimension (person ability plus item parameters).
+     *
+     * @return int
+     *
+     */
     public static function get_model_dim(): int {
         // Adds +1 for the person ability.
         return count(self::get_parameter_names()) + 1;
@@ -129,7 +191,7 @@ class mixedraschbirnbaum extends model_raschmodel {
         if ($k < 1.0) {
             return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
-            return $c + (1 - $c) / (1 + exp($b * ($a - $ability)));
+            return $c + (1 - $c) * self::logistic($b * ($ability - $a));
         }
     }
 
@@ -156,17 +218,25 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p(array $pp, array $ip, float $k): float {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        if ($k < 1.0) {
-            return -(($b * exp($b * $pp)) / (exp($a * $b) + exp($b * $pp)));
-        } else {
-            return -(($b * (-1 + $c) * exp($b * ($a + $pp))) /
-                ((exp($a * $b) + exp($b * $pp)) * ($c * exp($a * $b) + exp($b * $pp))));
+        // P/W form. L logistic core, P = c + (1 - c) L; dP/dtheta = (1 - c) b W_L.
+        $l = self::logistic($b * ($ability - $a));
+        $p = $c + (1.0 - $c) * $l;
+
+        // The naive score (k - P) / (P (1 - P)) * dP/dtheta divides by P (1 - P),
+        // which underflows to exactly 0 at saturation (L -> 0 or 1). Using
+        // 1 - P = (1 - c)(1 - L) and W_L = L (1 - L), the factor (1 - c) W_L / (1 - P)
+        // cancels to L, so the score simplifies to b L (k - P) / P — dividing only by
+        // P, and P >= c. The remaining P = 0 case (c = 0 with an underflowed L) is the
+        // 2PL limit b (k - L).
+        if ($p <= 0.0) {
+            return $b * ($k - $l);
         }
+        return $b * $l * ($k - $p) / $p;
     }
 
     /**
@@ -178,17 +248,69 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        if ($k < 1.0) {
-            return -(($b ** 2 * exp($b * ($a + $pp))) / (exp($a * $b) + exp($b * $pp)) ** 2);
-        } else {
-            return ($b ** 2 * ($c - 1) * exp($b * ($pp - $a)) * (exp(2 * $b * ($pp - $a)) - $c)) /
-                ((1 + exp($b * ( $pp - $a))) ** 2 * ($c + exp($b * ($pp - $a))) ** 2);
+        // P/W form via the chain rule on P = c + (1 - c) L. The naive expression
+        // divides by P (1 - P), P^2 and (1 - P)^2, all of which underflow to 0 at
+        // saturation. We express the surviving terms through the ratio L/P, which is
+        // well defined even when both L and P are denormal (it tends to 1 for c = 0
+        // and to 0 for c > 0). This avoids forming P^2, which underflows to 0.0 for a
+        // denormal P and would otherwise break the L^2/P^2 -> 1 cancellation, leaving
+        // a spurious +b^2 instead of the correct 2PL limit at saturation.
+        // The P = 0 case (c = 0 with an exactly-underflowed L) is the 2PL limit -b^2 W_L.
+        $l = self::logistic($b * ($ability - $a));
+        $wl = self::logistic_w($l);
+        $p = $c + (1.0 - $c) * $l;
+
+        if ($p <= 0.0) {
+            return -($b ** 2) * $wl;
         }
+
+        $b2 = $b ** 2;
+        $onemp = 1.0 - $p;
+        $ratio = $l / $p;
+        $terma = $b2 * $ratio * (1.0 - 2.0 * $l) * ($k - $p);
+        $termmid = -$k * $b2 * $ratio ** 2 * $onemp ** 2;
+        $termlast = -(1.0 - $k) * $b2 * $l ** 2;
+
+        return $terma + $termmid + $termlast;
+    }
+
+    /**
+     * Combined person-ability score and hessian sharing one L/P computation.
+     *
+     * @param array $pp person ability parameter ('ability')
+     * @param array $ip item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $frac answer category (0 or 1.0)
+     * @return array ['jacobian' => 1st derivative, 'hessian' => 2nd derivative]
+     */
+    public static function get_ability_derivatives(array $pp, array $ip, float $frac): array {
+        $ability = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        $c = $ip['guessing'];
+
+        $l = self::logistic($b * ($ability - $a));
+        $wl = self::logistic_w($l);
+        $p = $c + (1.0 - $c) * $l;
+
+        if ($p <= 0.0) {
+            // Degenerate saturation (c = 0, L underflowed): 2PL limits.
+            return ['jacobian' => $b * ($frac - $l), 'hessian' => -($b ** 2) * $wl];
+        }
+
+        $b2 = $b ** 2;
+        $onemp = 1.0 - $p;
+        $ratio = $l / $p;
+        return [
+            'jacobian' => $b * $ratio * ($frac - $p),
+            'hessian' => $b2 * $ratio * (1.0 - 2.0 * $l) * ($frac - $p)
+                - $frac * $b2 * $ratio ** 2 * $onemp ** 2
+                - (1.0 - $frac) * $b2 * $l ** 2,
+        ];
     }
 
     /**
@@ -200,29 +322,30 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - jacobian vector
      */
     public static function get_log_jacobian($pp, $ip, float $k): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        $jacobian = [];
+        // P/W form. L is the logistic core, P the actual 3PL success probability.
+        $x = $ability - $a;               // Theta - a.
+        $l = self::logistic($b * $x);     // L = sigma(b (theta - a)).
+        $wl = self::logistic_w($l);       // Wl = L (1 - L).
+        $omc = 1.0 - $c;
+        $p = $c + $omc * $l;              // P = c + (1 - c) L.
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expab = exp($a * $b);
-        $expbp = exp($b * $pp);
-        $expbap1 = exp($b * ($a + $pp));
-        $expbap0 = exp($b * ($a - $pp));
+        // First derivatives of P.
+        $pa = -$b * $omc * $wl;           // DP/da.
+        $pb = $omc * $wl * $x;            // DP/db.
+        $pc = 1.0 - $l;                   // DP/dc.
 
-        if ($k >= 1.0) {
-            $jacobian[0] = ($b * ($c - 1) * $expbap1) / (($expab + $expbp) * ($c * $expab + $expbp)); // Calculate d/da.
-            $jacobian[1] = (($c - 1) * $expbap1 * ($a - $pp)) / (($expab + $expbp) * ($c * $expab + $expbp)); // Calculate d/db.
-            $jacobian[2] = $expab / ($c * $expab + $expbp); // Calculate d/dc.
-        } else {
-            $jacobian[0] = $b / (1 + $expbap0); // Calculate d/da.
-            $jacobian[1] = ($a - $pp) / (1 + $expbap0); // Calculate d/db.
-            $jacobian[2] = 1 / ($c - 1); // Calculate d/dc.
-        }
-        return $jacobian;
+        $dlp = ($k - $p) / self::stabilize_denominator($p * (1.0 - $p)); // D log L / dP.
+
+        return [
+            $dlp * $pa, // D/da.
+            $dlp * $pb, // D/db.
+            $dlp * $pc, // D/dc.
+        ];
     }
 
     /**
@@ -234,51 +357,49 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - hessian matrx
      */
     public static function get_log_hessian($pp, $ip, float $k): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        $hessian = [[]];
+        // P/W form via the chain rule on P = c + (1 - c) L, with
+        // H_ij = (d^2 log L / dP^2) P_i P_j + (d log L / dP) P_ij.
+        $x = $ability - $a;               // Theta - a.
+        $l = self::logistic($b * $x);     // L = sigma(b (theta - a)).
+        $wl = self::logistic_w($l);       // Wl = L (1 - L) = L'(z).
+        $vl = $wl * (1.0 - 2.0 * $l);     // Vl = Wl (1 - 2L) = L''(z).
+        $omc = 1.0 - $c;
+        $p = $c + $omc * $l;             // P.
 
-        if ($k >= 1.0) {
-            // Calculate d²/ da².
-            $hessian[0][0] = -($b ** 2 * ($c - 1) * exp($b * ($a + $pp)) * ($c * exp(2 * $a * $b) - exp(2 * $b * $pp))) /
-                ((exp($a * $b) + exp($b * $pp)) ** 2 * ($c * exp($a * $b) + exp($b * $pp)) ** 2);
-            // Calculate d/da d/db.
-            $hessian[0][1] = (($c - 1) * exp($b * ($a + $pp)) * (exp($b * ($a + $pp)) + exp(2 * $b * $pp) *
-                (1 + $a * $b - $b * $pp) + $c * (exp($b * ($a + $pp)) + exp(2 * $a * $b) * (1 - $a * $b + $b * $pp)))) /
-                ((exp($a * $b) + exp($b * $pp)) ** 2 * ($c * exp($a * $b) + exp($b * $pp)) ** 2);
-            // Calculate d/da d/dc.
-            $hessian[0][2] = ($b * exp($b * ($a + $pp))) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;
-            $hessian[1][0] = $hessian[0][1];
-            // Calculate d²/db².
-            $hessian[1][1] = -(($c - 1) * exp($b * ($a - $pp)) * ($c * exp(2 * $b * ($a - $pp)) - 1) * ($a - $pp) ** 2) /
-                (((1 + exp($b * ($a - $pp))) * (1 + $c * exp($b * ($a - $pp)))) ** 2);
-            // Calculate d/db d/dc.
-            $hessian[1][2] = (exp($b * ($a + $pp)) * ($a - $pp)) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;
-            $hessian[2][0] = $hessian[0][2];
-            $hessian[2][1] = $hessian[1][2];
-            // Calculate d²/dc².
-            $hessian[2][2] = -exp(2 * $a * $b) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;
-        } else {
-            // Calculate d²/da².
-            $hessian[0][0] = -($b ** 2 * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp))) ** 2;
-            // Calculate d/da d/db.
-            $hessian[0][1] = (exp($b * ($a - $pp)) * ($b * ($pp - $a) + 1) + 1) / (exp($b * ($a - $pp)) + 1) ** 2;
-            // Calculate d/da d/dc.
-            $hessian[0][2] = 0;
-            $hessian[1][0] = $hessian[0][1];
-            // Calculate .d²/db².
-            $hessian[1][1] = -(exp($b * ($a - $pp)) * ($a - $pp) ** 2) / (1 + exp($b * ($a - $pp))) ** 2;
-            // Calculate d/db d/dc.
-            $hessian[1][2] = 0;
-            $hessian[2][0] = $hessian[0][2];
-            $hessian[2][1] = $hessian[1][2];
-            // Calculate d²/dc².
-            $hessian[2][2] = -1 / ($c - 1) ** 2;
-        }
-        return $hessian;
+        // First and second derivatives of P.
+        $pa = -$b * $omc * $wl;
+        $pb = $omc * $wl * $x;
+        $pc = 1.0 - $l;
+        $paa = $omc * $vl * $b ** 2;
+        $pbb = $omc * $vl * $x ** 2;
+        $pab = $omc * (-$b * $x * $vl - $wl);
+        $pac = $b * $wl;
+        $pbc = -$x * $wl;
+        // Second derivative d^2P/dc^2 vanishes.
+
+        // Derivatives of the Bernoulli log likelihood with respect to P.
+        $dlp = ($k - $p) / self::stabilize_denominator($p * (1.0 - $p));                       // D log L / dP.
+        // D^2 log L / dP^2.
+        $d2lp = -$k / self::stabilize_denominator($p ** 2)
+            - (1.0 - $k) / self::stabilize_denominator((1.0 - $p) ** 2);
+
+        $haa = $d2lp * $pa * $pa + $dlp * $paa;
+        $hbb = $d2lp * $pb * $pb + $dlp * $pbb;
+        $hcc = $d2lp * $pc * $pc;                                   // Plus dlp * (d^2P/dc^2 = 0).
+        $hab = $d2lp * $pa * $pb + $dlp * $pab;
+        $hac = $d2lp * $pa * $pc + $dlp * $pac;
+        $hbc = $d2lp * $pb * $pc + $dlp * $pbc;
+
+        return [
+            [$haa, $hab, $hac],
+            [$hab, $hbb, $hbc],
+            [$hac, $hbc, $hcc],
+        ];
     }
 
     // Calculate the Least-Mean-Squres (LMS) approach.
@@ -306,25 +427,30 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - 1st derivative of lms with respect to $ip
      */
     public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        $derivative = [];
+        // LMS objective S = n (frac - P)^2 with P = c + (1 - c) L, L = sigma(b (theta - a)).
+        // Gradient: dS/dtheta_i = 2 n (P - frac) * dP/dtheta_i.
+        $x = $ability - $a;
+        $l = self::logistic($b * $x);
+        $wl = self::logistic_w($l);
+        $omc = 1.0 - $c;
+        $p = $c + $omc * $l;
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expbap = exp($b * ($a - $pp));
+        $pa = -$b * $omc * $wl;   // DP/da.
+        $pb = $omc * $wl * $x;    // DP/db.
+        $pc = 1.0 - $l;           // DP/dc.
 
-        // Calculate d/da.
-        $derivative[0] = $n * (-(2 * $b * (1 - $c) * $expbap) / (1 + $expbap - $frac) ** 3);
-        // Calculate d/db.
-        $derivative[1] = $n * (-(2 * (1 - $c) * $expbap * ($c + (1 - $c) / (1 + $expbap) - $frac) * ($a - $pp)) /
-            (1 + $expbap) ** 2);
-        // Calculate d/dc.
-        $derivative[2] = $n * 2 * (1 - 1 / (1 + $expbap)) * ($c + (1 - $c) / (1 + $expbap) - $frac);
+        $factor = 2.0 * $n * ($p - $frac);
 
-        return $derivative;
+        return [
+            $factor * $pa, // D/da.
+            $factor * $pb, // D/db.
+            $factor * $pc, // D/dc.
+        ];
     }
 
     /**
@@ -337,43 +463,46 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - 2nd derivative of lms with respect to $ip
      */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
 
-        $derivative = [[]];
+        // LMS objective S = n (frac - P)^2. Hessian:
+        // D^2S/dtheta_i dtheta_j = 2 n [ P_i P_j + (P - frac) P_ij ].
+        $x = $ability - $a;
+        $l = self::logistic($b * $x);
+        $wl = self::logistic_w($l);
+        $vl = $wl * (1.0 - 2.0 * $l);
+        $omc = 1.0 - $c;
+        $p = $c + $omc * $l;
+        $r = $p - $frac;
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expbap = exp($b * ($a - $pp));
-        $expab = exp($a * $b);
-        $expbp = exp($b * $pp);
+        // First derivatives of P.
+        $pa = -$b * $omc * $wl;
+        $pb = $omc * $wl * $x;
+        $pc = 1.0 - $l;
+        // Second derivatives of P.
+        $paa = $omc * $vl * $b ** 2;
+        $pbb = $omc * $vl * $x ** 2;
+        $pab = $omc * (-$b * $x * $vl - $wl);
+        $pac = $b * $wl;
+        $pbc = -$x * $wl;
+        // Second derivative d^2P/dc^2 vanishes.
 
-        // Calculate d²/da².
-        $derivative[0][0]  = $n * (-(2 * $b ** 2 * (1 - $c) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * $expbap ** 2 * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * $expbap ** 2) / ($expbap + 1) ** 4);
-        // Calculate d/da d/db.
-        $derivative[0][1]  = $n * (-(2 * (1 - $c) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $pp) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 2 + (4 * $b * (1 - $c) * ($a - $pp) * $expbap ** 2 * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $pp) * $expbap ** 2) / ($expbap + 1) ** 4);
-        // Calculate d/da d/dc.
-        $derivative[0][2]  = $n * (2 * $b * $expbap * ((2 * $c - $frac - 1) * $expbap - $frac + 1)) / ($expbap + 1) ** 3;
-        // Calculate d²/db².
-        $derivative[1][1]  = $n * (2 * ($a - $pp) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) /
-            ($expbap + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * $expbap * (1 - 1 / ($expbap + 1))) / ($expbap + 1) ** 2;
-        // Calculate d/db d/dc.
-        $derivative[1][2]  = $n * (2 * ($a - $pp) * $expbap * ((2 * $c - $frac - 1) * $expbap - $frac + 1)) / ($expbap + 1) ** 3;
-        // Calculate d²/dc².
-        $derivative[2][2]  = $n * (2 * $expab ** 2) / ($expab + $expbp) ** 2;
+        $k = 2.0 * $n;
+        $haa = $k * ($pa * $pa + $r * $paa);
+        $hbb = $k * ($pb * $pb + $r * $pbb);
+        $hcc = $k * ($pc * $pc);
+        $hab = $k * ($pa * $pb + $r * $pab);
+        $hac = $k * ($pa * $pc + $r * $pac);
+        $hbc = $k * ($pb * $pc + $r * $pbc);
 
-        // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
-        $derivative[1][0] = $derivative[0][1];
-        $derivative[2][0] = $derivative[0][2];
-        $derivative[2][1] = $derivative[1][2];
-
-        return $derivative;
+        return [
+            [$haa, $hab, $hac],
+            [$hab, $hbb, $hbc],
+            [$hac, $hbc, $hcc],
+        ];
     }
 
 
@@ -407,18 +536,21 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - 1st derivative
      */
     public static function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
 
-        $derivative = [];
+        // LORS residual R = b (a - theta) + log(OR); the objective is n * R^2.
+        // R does not depend on the guessing parameter c, so d/dc is identically
+        // zero and the gradient is [d/da, d/db, d/dc] = [2n b R, 2n (a-theta) R, 0].
+        $x = $a - $ability;
+        $r = $b * $x + log($or);
 
-        // TODO: @RALF: Implement formulas for 3PL.
-
-        $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.
-        $derivative[1] = $n * 2 * ($a - $pp) * ($b * ($a - $pp) + log($or)); // Calculate d/db.
-
-        return $derivative;
+        return [
+            $n * 2 * $b * $r, // Calculate d/da.
+            $n * 2 * $x * $r, // Calculate d/db.
+            0.0, // Calculate d/dc (LORS is independent of guessing).
+        ];
     }
 
     /**
@@ -431,26 +563,37 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return array - 1st derivative
      */
     public static function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
 
-        $derivative = [[]];
+        // LORS residual R = b (a - theta) + log(OR); the objective is n * R^2.
+        // With dR/da = b, dR/db = (a - theta), d^2R/da db = 1 and no dependence
+        // on the guessing parameter c, all second derivatives involving c vanish.
+        $x = $a - $ability;
 
-        // TODO: @RALF: Implement formulas for 3PL.
+        $haa = $n * 2 * $b ** 2;                   // D^2/da^2.
+        $hbb = $n * 2 * $x ** 2;                   // D^2/db^2.
+        $hab = $n * 2 * (2 * $b * $x + log($or));  // D^2/da db = 2n (2 b (a-theta) + log(OR)).
 
-        $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².
-        $derivative[0][1]  = 0; // TODO: $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.
-        $derivative[1][1]  = $n * 2 * ($a - $pp) ** 2; // Calculate d²/db².
-
-        // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
-        $derivative[1][0] = $derivative[0][1];
-
-        return $derivative;
+        // Partial derivatives are exchangeable (Schwarz), and the guessing row and
+        // column are zero because the residual is independent of c.
+        return [
+            [$haa, $hab, 0.0],
+            [$hab, $hbb, 0.0],
+            [0.0, 0.0, 0.0],
+        ];
     }
 
     /**
      * Calculate Fisher-Information.
+     *
+     * For the 3PL model with P = P(Y = 1) = c + (1 - c) * sigma(b * (theta - a))
+     * the item information is
+     *   I(theta) = b^2 * (1 - P) / P * ((P - c) / (1 - c))^2 .
+     * For c = 0 this correctly reduces to the 2PL form b^2 * P * (1 - P).
+     * The information depends quadratically on the discrimination b, not on the
+     * difficulty a (the previous implementation used a^2 and was incorrect).
      *
      * @param array $pp
      * @param array $ip
@@ -459,7 +602,11 @@ class mixedraschbirnbaum extends model_raschmodel {
      *
      */
     public function fisher_info(array $pp, array $ip): float {
-        return $ip['difficulty'] ** 2 * (1 - $ip['guessing']) * self::likelihood($pp, $ip, 1.0) * (self::likelihood($pp, $ip, 0.0));
+        $b = $ip['discrimination'];
+        $c = $ip['guessing'];
+        $p = self::likelihood($pp, $ip, 1.0); // P(Y = 1).
+        $q = self::likelihood($pp, $ip, 0.0); // P(Y = 0) = 1 - P.
+        return $b ** 2 * ($q / $p) * (($p - $c) / (1 - $c)) ** 2;
     }
 
     /**
@@ -527,68 +674,6 @@ class mixedraschbirnbaum extends model_raschmodel {
         $ip['guessing'] = $c;
 
         return $ip;
-    }
-
-    /**
-     * Calculates the 1st derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination', 'guessing')
-     * @return array - 1st derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_jacobian(array $ip): array {
-        // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
-
-        return [
-            // Calculate d/da.
-            ($am - $ip['difficulty']) / ($as ** 2),
-            // Calculate d/db.
-            -($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])),
-            // Calculate d/dc.
-            0,
-        ];
-    }
-
-    /**
-     * Calculates the 2nd derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination', 'guessing')
-     *
-     * @return array - 2nd derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_hessian(array $ip): array {
-        // Set values for difficulty parameter.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
-
-        return [
-            [
-                -1 / ($as ** 2), // Calculate d²/da².
-                0, // Calculate d/da d/db.
-                0, // Calculate d/da d/dc.
-            ],
-            [
-                0, // The d/da d/db.
-                -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
-                    (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculate d²/db².
-                0, // Calculate d/db d/dc.
-            ],
-            [
-                0, // Calculate d/da d/dc.
-                0, // Calculate d/db d/dc.
-                0, // Calculate d²/dc².
-            ],
-        ];
     }
 
     /**

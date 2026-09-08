@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Class rasch.
@@ -68,6 +68,37 @@ class rasch extends model_raschmodel {
      *
      * @return int
      */
+    /**
+     * Serialises the item parameters into a flat numeric vector (parameter codec).
+     *
+     * @param array $ip item parameters
+     *
+     * @return array
+     *
+     */
+    public static function convert_ip_to_vector(array $ip): array {
+        return [$ip['difficulty']];
+    }
+
+    /**
+     * Reconstructs the item parameters from a flat numeric vector (parameter codec).
+     *
+     * @param array $vector flat parameter vector
+     * @param mixed $fractions response fractions (unused for dichotomous models)
+     *
+     * @return array
+     *
+     */
+    public static function convert_vector_to_ip(array $vector, $fractions = null): array {
+        return ['difficulty' => $vector[0]];
+    }
+
+    /**
+     * The fixed model dimension (person ability plus item parameters).
+     *
+     * @return int
+     *
+     */
     public static function get_model_dim(): int {
         return 2;  // 2 parameters: person ability, difficulty
     }
@@ -112,7 +143,7 @@ class rasch extends model_raschmodel {
         if ($k < 1.0) {
             return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
-            return 1 / (1 + exp($a - $ability));
+            return self::logistic($ability - $a);
         }
     }
 
@@ -132,6 +163,19 @@ class rasch extends model_raschmodel {
     }
 
     /**
+     * Combined person-ability score and hessian sharing one P computation.
+     *
+     * @param array $pp person ability parameter ('ability')
+     * @param array $ip item parameters ('difficulty')
+     * @param float $frac response fraction
+     * @return array ['jacobian' => k - P, 'hessian' => -W]
+     */
+    public static function get_ability_derivatives(array $pp, array $ip, float $frac): array {
+        $p = self::logistic($pp['ability'] - $ip['difficulty']);
+        return ['jacobian' => $frac - $p, 'hessian' => -self::logistic_w($p)];
+    }
+
+    /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
      *
      * @param array $pp - person ability parameter ('ability')
@@ -141,18 +185,11 @@ class rasch extends model_raschmodel {
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p(array $pp, array $ip, float $k): float {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expa = exp($a);
-        $expp = exp($pp);
-
-        if ($k < 1.0) {
-            return -$expp / ($expa + $expp);
-        } else {
-            return $expa / ($expa + $expp);
-        }
+        // P/W form: d/dtheta log L = k - P, with P = sigma(theta - a).
+        return $k - self::logistic($ability - $a);
     }
 
     /**
@@ -165,14 +202,12 @@ class rasch extends model_raschmodel {
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expa = exp($a);
-        $expp = exp($pp);
-
-        return - ($expa * $expp) / (($expa + $expp) ** 2);
+        // P/W form: d^2/dtheta^2 log L = -W = -P(1 - P), independent of k.
+        $p = self::logistic($ability - $a);
+        return -self::logistic_w($p);
     }
 
     /**
@@ -185,21 +220,13 @@ class rasch extends model_raschmodel {
      * @return array - jacobian vector
      */
     public static function get_log_jacobian(array $pp, array $ip, float $k): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
 
-        $jacobian = [];
+        // P/W form: P = sigma(theta - a); d/da log L = P - k.
+        $p = self::logistic($ability - $a);
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expa = exp($a);
-        $expp = exp($pp);
-
-        if ($k >= 1.0) {
-            $jacobian[0] = -($expa * $expp) / (($expa + $expp) * $expp); // The d/da .
-        } else {
-            $jacobian[0] = $expp / ($expa + $expp); // The d/da .
-        }
-        return $jacobian;
+        return [$p - $k];
     }
 
     /**
@@ -212,18 +239,14 @@ class rasch extends model_raschmodel {
      * @return array - hessian matrx
      */
     public static function get_log_hessian(array $pp, $ip, float $k): array {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
 
-        $hessian = [[]];
+        // P/W form: d^2/da^2 log L = -W = -P(1 - P), identical for k = 0 and k = 1.
+        $p = self::logistic($ability - $a);
+        $w = self::logistic_w($p);
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expa = exp($a);
-        $expp = exp($pp);
-
-        // 2nd derivative is equal for both k = 0 and k = 1
-        $hessian[0][0] = -($expa * $expp) / ($expa + $expp) ** 2; // The d²/ da² .
-        return $hessian;
+        return [[-$w]];
     }
 
     // Calculate the Least-Mean-Squres (LMS) approach.
@@ -364,7 +387,9 @@ class rasch extends model_raschmodel {
      *
      */
     public function fisher_info(array $pp, array $ip) {
-        return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
+        // I(theta) = W = P(1 - P) with P = sigma(theta - a).
+        $p = self::likelihood($pp, $ip, 1.0);
+        return self::logistic_w($p);
     }
 
     // Implements handling of the Trusted Regions (TR) approach.
@@ -399,38 +424,6 @@ class rasch extends model_raschmodel {
         $ip['difficulty'] = $a;
 
         return $ip;
-    }
-
-    /**
-     * Calculates the 1st derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty')
-     *
-     * @return array - 1st derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_jacobian(array $ip): array {
-        // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        return [
-            ($am - $ip['difficulty']) / ($as ** 2), // The d/da .
-        ];
-    }
-
-    /**
-     * Calculates the 2nd derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty')
-     *
-     * @return array - 2nd derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_hessian(array $ip): array {
-        // Set values for difficulty parameter.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Calculate d/da d/da.
-        return [[ -1 / ($as ** 2) ]];
     }
 
     /**

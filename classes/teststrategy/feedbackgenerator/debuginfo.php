@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use context_system;
 use local_catquiz\catquiz;
+use local_catquiz\local\access\context_resolver;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
 
@@ -95,13 +96,14 @@ class debuginfo extends feedbackgenerator {
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT, $DB, $CFG;
 
-        // Note: Has to be redone as well.
-        if (!get_config('local_catquiz', 'store_debug_info')) {
-            return [];
-        }
+        // The export tab is always available to users with the feedback
+        // permission. The raw debug exports below are added only when debug
+        // storage is enabled for the plugin.
+        $debugenabled = (bool) get_config('local_catquiz', 'store_debug_info');
+
         $csvstring = "";
 
-        foreach ($data['debuginfo'] as $row) {
+        foreach (($data['debuginfo'] ?? []) as $row) {
             $newrow = $this->convert($row);
             $csvstring .= $this
                 ->set_row_data($newrow)
@@ -117,19 +119,19 @@ class debuginfo extends feedbackgenerator {
                 ->add_column_value('originalfraction')
                 ->add_column_value('fraction')
                 ->add_column_value('questionattemptid')
+                ->add_column_value('invaliditemparams')
                 ->as_csv_string();
         }
         $heading = implode(';', $this->columns) . PHP_EOL;
         $csvstring = $heading . $csvstring;
 
         $attemptid = $data['attemptid'];
-        $cid = 0;
-        $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'courseid');
-        $courseid = $cid->courseid;
 
-        // Geht irgendwie nicht: $context = context_course::instance($courseid) .
-        $cid = $DB->get_record('context', ['contextlevel' => 50, 'instanceid' => $courseid], 'id');
-        $contextid = $cid->id;
+        // Resolve the context of this attempt through the central
+        // resolver instead of querying the context table by hand with a hardcoded
+        // context level, which silently produced no context when the attempt had
+        // no course or the course context row was not found.
+        $contextid = context_resolver::for_attempt($attemptid, $this->get_component())->id;
 
         $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
         $description = get_string('debuginfo_desc', 'local_catquiz');
@@ -142,8 +144,9 @@ class debuginfo extends feedbackgenerator {
                 'description' => $description,
                 'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", var_export($data, true)))),
                 'cfg->root' => $CFG->wwwroot,
-                'isteacher' => true, // Hier auf has_capability mit 'local/catquiz:view_users_feedback' und $contextid testen!
-                'iscatmanager' => has_capability(
+                'isteacher' => true,
+                'debugenabled' => $debugenabled,
+                'iscatmanager' => $debugenabled && has_capability(
                     'local/catquiz:canmanage',
                     context_system::instance()
                 ),
@@ -172,6 +175,38 @@ class debuginfo extends feedbackgenerator {
             $updated['lastresponse'] = $row['lastresponse']['fraction'];
         }
         return $updated;
+    }
+
+    /**
+     * Formats the collected "unusable item parameters" warnings for the debug output.
+     *
+     * pilotquestions_loader collects a warning whenever an item had to be demoted to
+     * a pilot item because its stored parameters violate its model contract (for
+     * example a 2PL item with discrimination 0, which is mathematically mute and
+     * would freeze the ability estimate). Surfacing item id, model and the concrete
+     * reason here makes such an item traceable from the attempt debug export/PDF.
+     *
+     * @param array $warnings
+     *
+     * @return string
+     */
+    private static function format_invalid_itemparams(array $warnings): string {
+        if ($warnings === []) {
+            return self::NA;
+        }
+
+        $lines = [];
+        foreach ($warnings as $warning) {
+            $lines[] = sprintf(
+                '%s (%s / model "%s"): %s',
+                (string) ($warning['itemid'] ?? '?'),
+                (string) ($warning['label'] ?? ''),
+                (string) ($warning['model'] ?? ''),
+                (string) ($warning['reason'] ?? '')
+            );
+        }
+
+        return '"' . implode('; ', $lines) . '"';
     }
 
     /**
@@ -309,8 +344,16 @@ class debuginfo extends feedbackgenerator {
             'personabilities' => $personabilities,
             'questions' => $questions,
             'activescales' => '"' . implode(", ", $activescales) . '"',
-            'lastquestion' => (array) $newdata['lastquestion'],
-            'lastmiddleware' => $newdata['lastmiddleware'],
+            // On the first question of an attempt these keys do not exist,
+            // and catquiz.php removes lastquestion from the attempt data outright. On
+            // a normal instance (array) null is simply [], but with DEBUG_DEVELOPER
+            // Moodle turns the notice into an exception. It is caught in
+            // return_next_testitem() and reported as "couldn't define the first
+            // question", pointing at the configuration instead of at this diagnostic
+            // helper - so debug information was unobtainable exactly where it is
+            // wanted. The neighbouring fields have always been guarded.
+            'lastquestion' => (array) ($newdata['lastquestion'] ?? []),
+            'lastmiddleware' => $newdata['lastmiddleware'] ?? self::NA,
             'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
             'numquestionsperscale' => '"'
                 . implode(", ", array_map(fn ($entry) => $entry['name'] . ": " . $entry['num'], $questionsperscale)) . '"',
@@ -320,6 +363,7 @@ class debuginfo extends feedbackgenerator {
             'originalfraction' => isset($lastresponse['originalfraction']) ? $lastresponse['originalfraction'] : self::NA,
             'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
             'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
+            'invaliditemparams' => self::format_invalid_itemparams($newdata['invaliditemparams'] ?? []),
         ];
 
         return ['debuginfo' => $debuginfo];
@@ -331,15 +375,19 @@ class debuginfo extends feedbackgenerator {
      * @return bool
      */
     protected function has_teacherfeedbackpermission(): bool {
-        return has_capability(
-            'local/catquiz:canmanage',
-            context_system::instance()
-        );
+        // The debug output exposes internals of the estimation, so a CAT
+        // manager always sees it. In addition a teacher of the course the attempt
+        // belongs to may see it - checked in the attempt's own context, never in
+        // the system context.
+        //
+        // This method previously contained the course based check behind an
+        // unconditional return, so it was dead code that never ran (and would have
+        // fatalled on the private $attemptid property if it had).
+        if (has_capability('local/catquiz:canmanage', context_system::instance())) {
+            return true;
+        }
 
-        global $DB;
-
-        $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $this->attemptid], 'courseid');
-        return has_capability('local/catquiz:view_users_feedback', context_course::instance($cid->courseid));
+        return has_capability('local/catquiz:view_users_feedback', $this->get_attempt_context());
     }
 
     /**

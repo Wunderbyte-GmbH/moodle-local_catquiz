@@ -45,6 +45,7 @@ use local_catquiz\output\catscales;
 use moodle_exception;
 use moodle_url;
 use stdClass;
+use local_catquiz\local\itemparam_validity;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -446,12 +447,19 @@ class catscale {
             $scaleids = array_merge($scaleids, $subscaleids);
         }
 
+        // Issue #26: the runtime pool is cached per scale and context, and the cache
+        // holds the hydrated rows. The manager interface needs the question, category
+        // and scale names; the selection does not - it works on ids, scale ids and
+        // item parameters. Leaving them out of this path takes 36 % off a payload
+        // that measured 206 MB at 250.000 items.
         [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
             $scaleids,
             $contextid,
             [],
             $USER->id,
-            $orderby
+            $orderby,
+            null,
+            true
         );
 
         $sql = "SELECT $select FROM $from WHERE $where";
@@ -620,7 +628,11 @@ class catscale {
             if (!empty($catscale->name)) {
                 $catscalename = $catscale->name;
 
-                $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
+                // Tab as a parameter, not as a fragment - see above.
+                $url = new moodle_url($url, [
+                    'tab' => 'catscales',
+                    'scaleid' => $catscaleid,
+                ]);
                 $linktoscale = html_writer::link($url, $catscalename);
 
                 return $linktoscale;
@@ -713,6 +725,8 @@ class catscale {
             $record->contextid = $contextid;
             $oldid = $record->id;
             unset($record->id);
+            // Keep the persisted usability flag in step with the rule.
+            itemparam_validity::stamp($record);
             $newid = $DB->insert_record('local_catquiz_itemparams', $record);
             $record->id = $newid;
             $saved[$newid] = $record;
@@ -754,6 +768,7 @@ class catscale {
         foreach ($newitems as $ipid => $itemid) {
             $itemparam = $saved[$ipid];
             $itemparam->itemid = $itemid;
+            itemparam_validity::stamp($itemparam);
             $DB->update_record('local_catquiz_itemparams', $itemparam, true);
         }
     }

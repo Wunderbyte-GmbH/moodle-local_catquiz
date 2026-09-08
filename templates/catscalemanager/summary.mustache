@@ -73,6 +73,18 @@
           <div>{{#str}}healthstatus, local_catquiz{{/str}}: </div>
           <div>{{#str}}catmanagernumberofsubscales, local_catquiz{{/str}}: {{numberofchildren}}</div>
           <div>{{#str}}catmanagernumberofquestions, local_catquiz{{/str}}: {{numberofquestions}}</div>
+          {{#hasunusableitems}}
+            {{! Issue #54: only shown when there is something to act on - a permanent
+                "0 unusable" line would be noise on every scale. The link leads
+                straight into the list filtered to those items. }}
+            <div class="text-danger">
+              <i class="fa fa-exclamation-triangle mr-1" aria-hidden="true"></i>
+              <a href="{{unusablelink}}">
+                {{#str}}catmanagernumberofunusableitems, local_catquiz{{/str}}:
+                {{numberofunusableitems}}
+              </a>
+            </div>
+          {{/hasunusableitems}}
         </div>
     </div>
     {{/subscribed}}

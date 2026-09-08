@@ -188,6 +188,14 @@ export const init = () => {
 
     const formContainer = document.querySelector(SELECTORS.FORMCONTAINER);
 
+    // Issue #29: the CAT manager now renders only the active tab, so this form is
+    // absent on every tab but the importer. Constructing the dynamic form with a null
+    // container throws, and a thrown module leaves the page permanently "not ready" -
+    // which is how seven Behat scenarios began failing at an unrelated step.
+    if (!formContainer) {
+        return;
+    }
+
     // Initialize the form - pass the container element and the form class name.
     const dynamicForm = new CatquizDynamicForm(formContainer,
         'local_catquiz\\form\\csvimport'

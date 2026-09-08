@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\progress;
 
 /**
  * Test strategy maximumquestionscheck.
@@ -46,8 +45,27 @@ final class maximumquestionscheck extends preselect_task {
      *
      */
     public function run(array &$context): result {
-        $maxquestions = $context['maximumquestions'];
-        if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
+        $maxquestions = (int) $context['maximumquestions'];
+        if ($maxquestions === -1) {
+            return result::ok($context);
+        }
+
+        /* The configured test length means ANSWERED productive items. Neither of
+           the two counters used before is authoritative for that:
+           - `questionsattempted` lives on the adaptivequiz attempt record and can
+             drift across a resume (the pending item is re-rendered uncounted);
+           - `playedquestions` counts displayed items, and progress::load() removes
+             the still unanswered last question from it on a resume.
+           Counting the responses avoids both special cases, so the attempt stops
+           after exactly the configured number of answers - never one item later. */
+        if (isset($context['progress'])) {
+            $answered = $context['progress']->get_num_answered_productive_questions();
+        } else {
+            // Legacy fallback for contexts that carry no progress.
+            $answered = (int) $context['questionsattempted'];
+        }
+
+        if ($answered >= $maxquestions) {
             return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
 

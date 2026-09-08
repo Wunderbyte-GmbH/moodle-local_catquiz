@@ -134,127 +134,183 @@ class mathcat {
         return $grad;
     }
 
-    /**
-     * Returns matrix vector product.
-     *
-     * @param mixed $matrix
-     * @param mixed $vector
-     *
-     * @return array
-     *
-     */
-    public static function matrix_vector_product($matrix, $vector) {
-        $result = [];
-        for ($i = 0; $i < count($matrix); $i++) {
-            $result[$i] = 0;
-            for ($j = 0; $j < count($matrix[$i]); $j++) {
-                $result[$i] += $matrix[$i][$j] * $vector[$j];
-            }
-        }
-        return $result;
-    }
 
     /**
-     * Returns bfgs value.
+     * Maximises a function using the BFGS quasi-Newton algorithm.
      *
-     * @param callable $func
-     * @param mixed $startpoint
-     * @param mixed $stepsize
-     * @param mixed $tolerance
-     * @param int $maxiterations
+     * The derivative must return the gradient in the same logical parameter
+     * order as the start parameters. Nested numeric parameter arrays are
+     * flattened and restored through {@see self::array_to_vector()}.
      *
-     * @return mixed
-     *
+     * @param callable $fnfunction Objective function to maximise.
+     * @param callable $fnderivative First derivative (gradient) of the objective function.
+     * @param array $parameterstart Parameter set to start with.
+     * @param int $precision Accuracy in decimal places used as convergence threshold.
+     * @param int $maxiterations Maximum number of iterations.
+     * @param callable|null $fnparameterrestrictions Optional projection to the trusted parameter region.
+     * @param callable|null $fnmapestimator Optional additive MAP objective term.
+     * @param callable|null $fnmapestimatorderivative1st Optional gradient of the MAP objective term.
+     * @return array Optimised parameters in the same structure as $parameterstart.
      */
-    public static function bfgs(callable $func, $startpoint, $stepsize = 0.01, $tolerance = 1e-6, $maxiterations = 1000) {
-        $n = count($startpoint);
-        $currentpoint = $startpoint;
-        $iteration = 0;
-        $h = [];
-
-        // Initialize H with the identity matrix.
-        for ($i = 0; $i < $n; $i++) {
-            $h[$i] = [];
-            for ($j = 0; $j < $n; $j++) {
-                $h[$i][$j] = $i == $j ? 1 : 0;
-            }
+    public static function bfgs(
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
+        int $precision = 6,
+        int $maxiterations = 100,
+        ?callable $fnparameterrestrictions = null,
+        ?callable $fnmapestimator = null,
+        ?callable $fnmapestimatorderivative1st = null
+    ): array {
+        if (($fnmapestimator === null) !== ($fnmapestimatorderivative1st === null)) {
+            throw new \InvalidArgumentException('MAP objective and derivative must either both be provided or both be null.');
         }
 
-        while ($iteration < $maxiterations) {
-            $grad = self::gradient($func, $currentpoint);
-            $direction = self::matrix_vector_product($h, $grad);
+        $parameter = $parameterstart;
+        $parameterstructure = self::array_to_vector($parameter);
+        if ($parameter === []) {
+            return [];
+        }
+        $parameter = array_values($parameter);
+        $dimensions = count($parameter);
+        $tolerance = 10 ** (-$precision);
+        $inversehessian = matrix::identity_array($dimensions);
 
-            for ($i = 0; $i < $n; $i++) {
-                $direction[$i] = -$direction[$i];
+        $evaluate = static function (array $vector) use (
+            $fnfunction,
+            $fnderivative,
+            $parameterstructure,
+            $fnmapestimator,
+            $fnmapestimatorderivative1st
+        ): array {
+            $structured = self::vector_to_array($vector, $parameterstructure);
+            $value = (float) $fnfunction($structured);
+            $gradient = $fnderivative($structured);
+
+            if ($fnmapestimator !== null) {
+                $value += (float) $fnmapestimator($structured);
+                $mapgradient = $fnmapestimatorderivative1st($structured);
+            } else {
+                $mapgradient = null;
             }
 
-            // Line search with constant step size.
-            $nextpoint = [];
-            for ($i = 0; $i < $n; $i++) {
-                $nextpoint[$i] = $currentpoint[$i] + $stepsize * $direction[$i];
-            }
+            $gradientvector = $gradient;
+            self::array_to_vector($gradientvector);
+            $gradientvector = array_values($gradientvector);
 
-            // Update H using BFGS formula.
-            $s = [];
-            $y = [];
-            for ($i = 0; $i < $n; $i++) {
-                $s[$i] = $nextpoint[$i] - $currentpoint[$i];
-                $y[$i] = self::gradient($func, $nextpoint)[$i] - $grad[$i];
-            }
-
-            $rho = 1 / array_sum(array_map(function ($yi, $si) {
-                    return $yi * $si;
-            }, $y, $s));
-
-            $i = [];
-            for ($i = 0; $i < $n; $i++) {
-                $i[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $i[$i][$j] = $i == $j ? 1 : 0;
+            if ($mapgradient !== null) {
+                $mapgradientvector = $mapgradient;
+                self::array_to_vector($mapgradientvector);
+                $mapgradientvector = array_values($mapgradientvector);
+                if (count($mapgradientvector) !== count($gradientvector)) {
+                    throw new \InvalidArgumentException('MAP gradient dimension does not match objective gradient dimension.');
+                }
+                foreach ($gradientvector as $index => $gradientvalue) {
+                    $gradientvector[$index] = $gradientvalue + $mapgradientvector[$index];
                 }
             }
 
-            $a1 = [];
-            for ($i = 0; $i < $n; $i++) {
-                $a1[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $a1[$i][$j] = $i[$i][$j] - $rho * $s[$i] * $y[$j];
+            return [$value, $gradientvector];
+        };
+
+        $applyrestrictions = static function (array $vector) use ($fnparameterrestrictions, $parameterstructure): array {
+            if ($fnparameterrestrictions === null) {
+                return $vector;
+            }
+            $structured = self::vector_to_array($vector, $parameterstructure);
+            $structured = $fnparameterrestrictions($structured);
+            $restricted = $structured;
+            self::array_to_vector($restricted);
+            return array_values($restricted);
+        };
+
+        [$value, $gradient] = $evaluate($parameter);
+        if (count($gradient) !== $dimensions) {
+            throw new \InvalidArgumentException('Gradient dimension does not match parameter dimension.');
+        }
+
+        for ($iteration = 0; $iteration < $maxiterations; $iteration++) {
+            if (matrix::max_absolute_value($gradient) <= $tolerance) {
+                return self::vector_to_array($parameter, $parameterstructure);
+            }
+
+            $direction = matrix::matrix_vector_product($inversehessian, $gradient);
+            $directionalderivative = matrix::dot_product($gradient, $direction);
+
+            // A valid inverse negative-Hessian approximation must yield an ascent direction.
+            if (!is_finite($directionalderivative) || $directionalderivative <= 0.0) {
+                $inversehessian = matrix::identity_array($dimensions);
+                $direction = $gradient;
+                $directionalderivative = matrix::dot_product($gradient, $direction);
+            }
+
+            $steplength = 1.0;
+            $candidate = $parameter;
+            $candidatevalue = $value;
+            $candidategradient = $gradient;
+            $accepted = false;
+
+            // Armijo backtracking line search for maximisation.
+            while ($steplength >= $tolerance) {
+                $trial = [];
+                foreach ($parameter as $index => $parametervalue) {
+                    $trial[$index] = $parametervalue + $steplength * $direction[$index];
                 }
-            }
-
-            $a2 = [];
-            for ($i = 0; $i < $n; $i++) {
-                $a2[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $a2[$i][$j] = $i[$i][$j] - $rho * $y[$i] * $s[$j];
+                $trial = $applyrestrictions($trial);
+                $step = matrix::vector_subtract($trial, $parameter);
+                if (matrix::max_absolute_value($step) <= $tolerance) {
+                    $steplength *= 0.5;
+                    continue;
                 }
-            }
 
-            $hnew = [];
-            for ($i = 0; $i < $n; $i++) {
-                $hnew[$i] = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $hnew[$i][$j] = $a1[$i][$j] * $h[$j][$i] * $a2[$j][$i] + $rho * $s[$i] * $s[$j];
+                [$trialvalue, $trialgradient] = $evaluate($trial);
+                $actualdirectionalderivative = matrix::dot_product($gradient, $step);
+                if ($trialvalue >= $value + 1e-4 * $actualdirectionalderivative) {
+                    $candidate = $trial;
+                    $candidatevalue = $trialvalue;
+                    $candidategradient = $trialgradient;
+                    $accepted = true;
+                    break;
                 }
+                $steplength *= 0.5;
             }
 
-            $h = $hnew;
-
-            // Check for convergence.
-            $diff = 0;
-            for ($i = 0; $i < count($currentpoint); $i++) {
-                $diff += abs($nextpoint[$i] - $currentpoint[$i]);
+            if (!$accepted) {
+                return self::vector_to_array($parameter, $parameterstructure);
             }
 
-            if ($diff < $tolerance) {
+            $step = matrix::vector_subtract($candidate, $parameter);
+            // Standard inverse-BFGS update applied to -f: y = grad(-f)new - grad(-f)old.
+            $y = matrix::vector_subtract($gradient, $candidategradient);
+            $ys = matrix::dot_product($y, $step);
+
+            if (is_finite($ys) && $ys > 1e-12) {
+                $hy = matrix::matrix_vector_product($inversehessian, $y);
+                $yhy = matrix::dot_product($y, $hy);
+                $coefficient = ($ys + $yhy) / ($ys * $ys);
+                $updated = $inversehessian;
+                for ($row = 0; $row < $dimensions; $row++) {
+                    for ($col = 0; $col < $dimensions; $col++) {
+                        $updated[$row][$col] += $coefficient * $step[$row] * $step[$col]
+                            - (($hy[$row] * $step[$col]) + ($step[$row] * $hy[$col])) / $ys;
+                    }
+                }
+                $inversehessian = $updated;
+            } else {
+                // Curvature information is not usable; restart with a neutral approximation.
+                $inversehessian = matrix::identity_array($dimensions);
+            }
+
+            $parameter = $candidate;
+            $value = $candidatevalue;
+            $gradient = $candidategradient;
+
+            if (matrix::max_absolute_value($step) <= $tolerance) {
                 break;
             }
-
-            $currentpoint = $nextpoint;
-            $iteration++;
         }
 
-        return $currentpoint;
+        return self::vector_to_array($parameter, $parameterstructure);
     }
 
     /**
@@ -272,7 +328,7 @@ class mathcat {
      * @return array
      *
      */
-    public static function newton_raphson_multi_stable(
+    public static function newton_raphson(
         callable $fnfunction,
         callable $fnderivative,
         array $parameterstart,
@@ -383,7 +439,160 @@ class mathcat {
         return $parameter;
     }
 
-    // Deprecated, falls bfgs nicht genutzt wird.
+
+    /**
+     * Maximises a function using normalised gradient ascent with adaptive line search.
+     *
+     * @param callable $fnfunction Objective function to maximise.
+     * @param callable $fnderivative First derivative (gradient) of the objective function.
+     * @param array $parameterstart Parameter set to start with.
+     * @param int $precision Accuracy in decimal places used as convergence threshold.
+     * @param int $maxiterations Maximum number of iterations.
+     * @param callable|null $fnparameterrestrictions Optional projection to the trusted parameter region.
+     * @param callable|null $fnmapestimator Optional additive MAP objective term.
+     * @param callable|null $fnmapestimatorderivative1st Optional gradient of the MAP objective term.
+     * @return array Optimised parameters in the same structure as $parameterstart.
+     */
+    public static function gradient_ascent(
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
+        int $precision = 6,
+        int $maxiterations = 50,
+        ?callable $fnparameterrestrictions = null,
+        ?callable $fnmapestimator = null,
+        ?callable $fnmapestimatorderivative1st = null
+    ): array {
+        if (($fnmapestimator === null) !== ($fnmapestimatorderivative1st === null)) {
+            throw new \InvalidArgumentException('MAP objective and derivative must either both be provided or both be null.');
+        }
+
+        $parameter = $parameterstart;
+        $parameterstructure = self::array_to_vector($parameter);
+        if ($parameter === []) {
+            return [];
+        }
+        $parameter = array_values($parameter);
+        $tolerance = 10 ** (-$precision);
+        $steplength = 1.0;
+
+        $evaluate = static function (array $vector) use (
+            $fnfunction,
+            $fnderivative,
+            $parameterstructure,
+            $fnmapestimator,
+            $fnmapestimatorderivative1st
+        ): array {
+            $structured = self::vector_to_array($vector, $parameterstructure);
+            $value = (float) $fnfunction($structured);
+            $gradient = $fnderivative($structured);
+            if ($fnmapestimator !== null) {
+                $value += (float) $fnmapestimator($structured);
+                $mapgradient = $fnmapestimatorderivative1st($structured);
+            } else {
+                $mapgradient = null;
+            }
+
+            $gradientvector = $gradient;
+            self::array_to_vector($gradientvector);
+            $gradientvector = array_values($gradientvector);
+            if ($mapgradient !== null) {
+                $mapgradientvector = $mapgradient;
+                self::array_to_vector($mapgradientvector);
+                $mapgradientvector = array_values($mapgradientvector);
+                if (count($mapgradientvector) !== count($gradientvector)) {
+                    throw new \InvalidArgumentException('MAP gradient dimension does not match objective gradient dimension.');
+                }
+                foreach ($gradientvector as $index => $gradientvalue) {
+                    $gradientvector[$index] = $gradientvalue + $mapgradientvector[$index];
+                }
+            }
+            return [$value, $gradientvector];
+        };
+
+        $applyrestrictions = static function (array $vector) use ($fnparameterrestrictions, $parameterstructure): array {
+            if ($fnparameterrestrictions === null) {
+                return $vector;
+            }
+            $structured = self::vector_to_array($vector, $parameterstructure);
+            $structured = $fnparameterrestrictions($structured);
+            $restricted = $structured;
+            self::array_to_vector($restricted);
+            return array_values($restricted);
+        };
+
+        [$value, $gradient] = $evaluate($parameter);
+        if (count($gradient) !== count($parameter)) {
+            throw new \InvalidArgumentException('Gradient dimension does not match parameter dimension.');
+        }
+
+        for ($iteration = 0; $iteration < $maxiterations; $iteration++) {
+            $gradientlength = sqrt(matrix::dot_product($gradient, $gradient));
+            if (!is_finite($gradientlength) || $gradientlength <= $tolerance) {
+                break;
+            }
+
+            $direction = array_map(static fn($value) => $value / $gradientlength, $gradient);
+            $trialstep = $steplength;
+            $accepted = false;
+            $bestparameter = $parameter;
+            $bestvalue = $value;
+            $bestgradient = $gradient;
+
+            // First find an improving step, reducing the step length as necessary.
+            while ($trialstep >= $tolerance) {
+                $trial = [];
+                foreach ($parameter as $index => $parametervalue) {
+                    $trial[$index] = $parametervalue + $trialstep * $direction[$index];
+                }
+                $trial = $applyrestrictions($trial);
+                [$trialvalue, $trialgradient] = $evaluate($trial);
+                if ($trialvalue > $value) {
+                    $bestparameter = $trial;
+                    $bestvalue = $trialvalue;
+                    $bestgradient = $trialgradient;
+                    $accepted = true;
+                    break;
+                }
+                $trialstep *= 0.5;
+            }
+
+            if (!$accepted) {
+                break;
+            }
+
+            // Expand while the same direction still improves the objective.
+            while (true) {
+                $expandedstep = $trialstep * 2.0;
+                $trial = [];
+                foreach ($parameter as $index => $parametervalue) {
+                    $trial[$index] = $parametervalue + $expandedstep * $direction[$index];
+                }
+                $trial = $applyrestrictions($trial);
+                [$trialvalue, $trialgradient] = $evaluate($trial);
+                if ($trialvalue <= $bestvalue) {
+                    break;
+                }
+                $trialstep = $expandedstep;
+                $bestparameter = $trial;
+                $bestvalue = $trialvalue;
+                $bestgradient = $trialgradient;
+            }
+
+            $step = matrix::vector_subtract($bestparameter, $parameter);
+            $parameter = $bestparameter;
+            $value = $bestvalue;
+            $gradient = $bestgradient;
+            $steplength = $trialstep;
+
+            if (matrix::max_absolute_value($step) <= $tolerance) {
+                break;
+            }
+        }
+
+        return self::vector_to_array($parameter, $parameterstructure);
+    }
+
 
     /**
      * Returns add gauss der1 callable.

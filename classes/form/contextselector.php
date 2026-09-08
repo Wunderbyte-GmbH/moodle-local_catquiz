@@ -60,7 +60,11 @@ class contextselector extends dynamic_form {
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
-            $jsonobj = json_decode($context->json);
+            // The json column is nullable, and PHP 8.1 deprecates passing null here;
+            // a later version turns it into a TypeError. Coercing to a string keeps
+            // the existing behaviour - json_decode('') returns null, which the check
+            // below already handles - without adding a new code path.
+            $jsonobj = json_decode((string) ($context->json ?? ''));
             if (
                 $jsonobj
                 && $jsonobj->default === true

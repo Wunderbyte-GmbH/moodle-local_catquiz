@@ -123,7 +123,50 @@ abstract class model_multiparam extends model_raschmodel {
      *
      * @return string
      */
-    abstract protected function get_multi_param_name(): string;
+    abstract protected static function get_multi_param_name(): string;
+
+    /**
+     * Validates the item parameters of a polytomous model.
+     *
+     * Polytomous models do NOT carry their real parameters in the scalar
+     * `difficulty` column - that column only holds a derived mean. The actual
+     * thresholds/intercepts live in the `json` field under the model's own key
+     * (see get_multi_param_name()). Validating the scalar column would therefore
+     * wave through an item whose json is missing or malformed, which would only
+     * blow up later during estimation. Validate the json payload instead.
+     *
+     * @param \stdClass $record The raw item parameter record.
+     * @return string[] Reasons the parameters are invalid; empty array if valid.
+     */
+    public static function validate_parameters(\stdClass $record): array {
+        $reasons = [];
+        $key = static::get_multi_param_name();
+
+        $json = $record->json ?? '';
+        if (!is_string($json) || trim($json) === '') {
+            return [sprintf('no json payload, so no "%s" are stored', $key)];
+        }
+
+        $decoded = json_decode($json, true);
+        if (!is_array($decoded) || !array_key_exists($key, $decoded)) {
+            return [sprintf('json payload does not contain "%s"', $key)];
+        }
+
+        $values = $decoded[$key];
+        if (!is_array($values) || $values === []) {
+            $reasons[] = sprintf('"%s" is empty', $key);
+            return $reasons;
+        }
+
+        foreach ($values as $index => $value) {
+            if (!self::is_valid_float($value)) {
+                $reasons[] = sprintf('"%s" entry %s is not a valid number', $key, (string) $index);
+                break;
+            }
+        }
+
+        return $reasons;
+    }
 
     /**
      * All multiparam models support editing parameters.
@@ -132,5 +175,32 @@ abstract class model_multiparam extends model_raschmodel {
      */
     public function supports_parameter_edits(): bool {
         return true;
+    }
+    /**
+     * Clamp a discrimination (slope) into the model's configured trusted region.
+     *
+     * The graded/partial-credit models require a strictly positive slope: a
+     * non-positive discrimination would invert the category ordering and produce
+     * degenerate (zero/negative) category probabilities. The bounds are read from
+     * the model's trusted_region_min_b / trusted_region_max_b settings (defaults
+     * 0.1 and 5.0); an unset or empty setting falls back to those defaults, and the
+     * lower bound is additionally floored at a small positive value so a
+     * misconfigured non-positive minimum can never disable the invariant.
+     *
+     * @param string $componentname e.g. 'catmodel_grmgeneralized'
+     * @param float $discrimination raw discrimination
+     *
+     * @return float clamped discrimination
+     */
+    protected static function restrict_discrimination(string $componentname, float $discrimination): float {
+        $floor = 0.1;
+        $minconfig = get_config($componentname, 'trusted_region_min_b');
+        $maxconfig = get_config($componentname, 'trusted_region_max_b');
+        $min = ($minconfig === false || $minconfig === '') ? $floor : max($floor, (float) $minconfig);
+        $max = ($maxconfig === false || $maxconfig === '') ? 5.0 : (float) $maxconfig;
+        if ($max < $min) {
+            $max = $min;
+        }
+        return max($min, min($max, $discrimination));
     }
 }

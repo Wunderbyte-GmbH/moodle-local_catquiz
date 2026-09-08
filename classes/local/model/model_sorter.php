@@ -57,6 +57,10 @@ class model_sorter {
         'rasch' => 1,
         'raschbirnbaum' => 2,
         'mixedraschbirnbaum' => 3,
+        'pcm' => 4,
+        'pcmgeneralized' => 5,
+        'grm' => 6,
+        'grmgeneralized' => 7,
         // Add new models here with their order priority.
     ];
 

@@ -99,7 +99,10 @@ final class testitemimporter_test extends advanced_testcase {
             $content
         );
         // Check that there are no errors.
-        $this->assertEquals(0, count($result['errors']), implode(', ', $result['errors']));
+        // Warnings (e.g. out-of-bounds calibration values) are nested under
+        // 'warnings' and are not import errors; assert only on real errors.
+        $realerrors = array_diff_key($result['errors'], ['warnings' => 1]);
+        $this->assertEquals(0, count($realerrors), var_export($realerrors, true));
     }
 
     /**

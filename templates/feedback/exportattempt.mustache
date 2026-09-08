@@ -39,23 +39,25 @@
 
 <div style="text-align: center;">
     {{#isteacher}}
-    <!--
     <a class="btn btn-info" href="{{{cfg->root}}}/local/catquiz/export_feedback_csv.php?attemptid={{{attemptid}}}&cid={{{cid}}}">
-        Export Attempt CSV
+        {{#str}}exportattemptcsv, local_catquiz{{/str}}
     </a>
-    -->
-    <a class="btn btn-info" download="CATQuiz-Export-Attempt{{{attemptid}}}.csv"
+    {{/isteacher}}
+    {{#debugenabled}}
+    {{#isteacher}}
+    <a class="btn btn-secondary" download="CATQuiz-Export-Attempt{{{attemptid}}}.csv"
     id="download-link" href="data:text/csv;charset=utf-8,{{{data}}}"
-    target="_blank">Export Attempt CSV
+    target="_blank">{{#str}}exportattemptdebugcsv, local_catquiz{{/str}}
     </a>
     {{/isteacher}}
     {{#iscatmanager}}
     <a class="btn btn-secondary" href="{{{cfg->root}}}/local/catquiz/export_debuginfo_pdf.php?attemptid={{{attemptid}}}&cid={{{cid}}}">
-        Export Debug Info PDF
+        {{#str}}exportdebuginfopdf, local_catquiz{{/str}}
     </a>
     <a class="btn btn-secondary" download="Debug_Info_Raw_{{{attemptid}}}.html"
     id="download-link" href="data:text/html;charset=utf-8,{{{debuginfo_raw}}}"
-    target="_blank">View Raw Debug Info
+    target="_blank">{{#str}}viewrawdebuginfo, local_catquiz{{/str}}
     </a>
     {{/iscatmanager}}
+    {{/debugenabled}}
 </div>

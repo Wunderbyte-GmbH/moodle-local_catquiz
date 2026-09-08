@@ -53,6 +53,20 @@
                 </div>
             </div>
         {{/notable}}
+        {{^notable}}
+            <form method="get" class="form-inline my-2" id="catquiz-questiontext-search">
+                {{#hiddenparams}}
+                    <input type="hidden" name="{{name}}" value="{{value}}">
+                {{/hiddenparams}}
+                <label class="mr-2" for="catquiz-qtsearch">{{#str}}questiontextsearch, local_catquiz{{/str}}</label>
+                <input type="text" class="form-control mr-2" id="catquiz-qtsearch" name="qtsearch"
+                       value="{{qtsearch}}">
+                <button type="submit" class="btn btn-secondary">{{#str}}search, core{{/str}}</button>
+            </form>
+            {{#qtsearchtoomany}}
+                <div class="alert alert-warning">{{#str}}questiontextsearch_toomany, local_catquiz{{/str}}</div>
+            {{/qtsearchtoomany}}
+        {{/notable}}
         {{#table}}
             <div>
                 {{{table}}}

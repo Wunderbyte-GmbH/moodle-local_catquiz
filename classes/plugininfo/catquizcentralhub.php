@@ -83,5 +83,4 @@ class catquizcentralhub extends base {
             $ADMIN->add($parentnodename, $settings);
         }
     }
-
 }

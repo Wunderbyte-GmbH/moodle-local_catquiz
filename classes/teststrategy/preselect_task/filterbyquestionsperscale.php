@@ -66,7 +66,7 @@ class filterbyquestionsperscale extends preselect_task {
         $minquestionsperscale = $context['min_attempts_per_scale'];
         $allhaveminquestions = true;
         foreach (array_keys($this->progress->get_abilities()) as $scaleid) {
-            if (count($this->progress->get_playedquestions(true, $scaleid)) < $minquestionsperscale) {
+            if ($this->progress->get_num_answered_productive_questions($scaleid) < $minquestionsperscale) {
                 $allhaveminquestions = false;
                 break;
             }
@@ -91,8 +91,9 @@ class filterbyquestionsperscale extends preselect_task {
 
         // If we are here, not all scales have the minimum questions.
         // Deactivate the active ones that have the minimum questions.
-        foreach ($this->progress->get_playedquestions(true) as $scaleid => $qps) {
-            if (count($qps) >= $minquestionsperscale && $this->progress->is_active_scale($scaleid)) {
+        foreach (array_keys($this->progress->get_playedquestions(true)) as $scaleid) {
+            $answeredinscale = $this->progress->get_num_answered_productive_questions((int) $scaleid);
+            if ($answeredinscale >= $minquestionsperscale && $this->progress->is_active_scale($scaleid)) {
                 $this->progress->deactivate_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "%d: [MinQ] deaact %s%s",

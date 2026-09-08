@@ -87,19 +87,28 @@ class questiondetailview {
         // If no context is set, get default context from DB.
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
-        // Get the record for the specific userid (fetched from optional param).
+        // Restrict the query to the requested question instead of loading
+        // the whole scale and picking one row out in PHP. The detail view shows a
+        // single question, so every other row - and every statistics aggregate
+        // computed for it - was work thrown away.
+        //
+        // The question id goes into its own parameter. Passing it in the $userid slot
+        // would bind it to the per-user statistics join, where it would be compared
+        // against user ids.
         [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
             [$this->catscaleid],
             $catcontext,
-            []
+            [],
+            0,
+            null,
+            (int) $this->testitemid
         );
         $sql = "SELECT $select FROM $from WHERE $where";
-        $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+        $record = $DB->get_record_sql($sql, $params, IGNORE_MISSING);
 
-        if (empty($recordinarray)) {
+        if (empty($record)) {
             return [];
         }
-        $record = $recordinarray[$this->testitemid];
 
         // Output for testitem details card.
         $datacardoutput = $this->render_datacard_of_testitem($record); // Return array.

@@ -28,16 +28,14 @@ declare(strict_types=1);
 
 namespace local_catquiz\external;
 
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
 use local_catquiz\data\dataapi;
 use local_catquiz\data\catscale_structure;
+use context_system;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * External Service for local catquiz.
@@ -56,12 +54,12 @@ class manage_catscale extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(
-                [
+            [
                         'name' => new external_value(PARAM_TEXT, 'The name of the catscale', VALUE_REQUIRED),
                         'description' => new external_value(PARAM_RAW, 'The description of the catscale', VALUE_REQUIRED),
                         'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
-                        'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_OPTIONAL),
-                        'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_OPTIONAL),
+                        'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_DEFAULT, null),
+                        'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_DEFAULT, null),
                         'parentid' => new external_value(PARAM_INT, 'The parent ID of the catscale', VALUE_DEFAULT, 0),
                         'id' => new external_value(PARAM_INT, 'The id of the catscale', VALUE_DEFAULT, 0),
                 ]
@@ -82,14 +80,22 @@ class manage_catscale extends external_api {
      * @return array
      */
     public static function execute(
-                                string $name,
-                                string $description,
-                                string $action,
-                                ?float $minscalevalue = null,
-                                ?float $maxscalevalue = null,
-                                ?int $parentid = null,
-                                ?int $id = null
-                                ): array {
+        string $name,
+        string $description,
+        string $action,
+        ?float $minscalevalue = null,
+        ?float $maxscalevalue = null,
+        ?int $parentid = null,
+        ?int $id = null
+    ): array {
+
+        // Review finding: this endpoint acted without checking anything. Being logged
+        // in is not authorisation - the pages offering these actions are guarded by
+        // the CAT manager capability, and the service behind them has to apply the
+        // same gate rather than trusting the caller to have come from there.
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('local/catquiz:manage_catscales', $context);
 
         $params = self::validate_parameters(self::execute_parameters(), [
                 'name' => $name,
@@ -123,7 +129,7 @@ class manage_catscale extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure(
-                [
+            [
                         'id' => new external_value(PARAM_INT, 'The ID of the newly created catscale'),
                 ]
         );

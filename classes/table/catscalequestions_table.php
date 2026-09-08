@@ -41,6 +41,7 @@ use context_system;
 use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\event\catscale_updated;
+use local_catquiz\local\itemparam_validity;
 use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use moodle_url;
@@ -53,6 +54,11 @@ use moodle_url;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscalequestions_table extends wunderbyte_table {
+    /**
+     * Whether the question text restriction has already been applied.
+     * @var bool
+     */
+    private bool $questiontextsearchapplied = false;
     /** @var int $catscaleid */
     private $catscaleid = 0;
 
@@ -96,7 +102,10 @@ class catscalequestions_table extends wunderbyte_table {
             'contextid' => $this->contextid,
             'scaleid' => $values->catscaleid ?? 0,
             'component' => $values->component ?? "",
-        ], 'lcq_questions');
+            // The tab is a request parameter now; the fragment it used to
+            // use points at a pane that is no longer rendered unless it is active.
+            'tab' => 'questions',
+        ]);
 
         $data['showactionbuttons'][] = [
             'class' => 'btn btn-plain btn-smaller',
@@ -261,33 +270,394 @@ class catscalequestions_table extends wunderbyte_table {
 
 
     /**
+     * Upper bound for the id list produced by the question text search.
+     *
+     * A two letter search term can match most of the question bank, and an IN()
+     * clause with tens of thousands of ids is a performance problem of its own.
+     * @var int
+     */
+    const QUESTIONTEXT_SEARCH_LIMIT = 2000;
+
+    /**
+     * Scale ids and context this table was built for, for the light count query.
+     * @var array|null
+     */
+    private ?array $countcontext = null;
+
+    /**
+     * Context whose attempt counts are shown, or null when the column is not used.
+     * @var int|null
+     */
+    private ?int $contextattemptscontext = null;
+
+    /**
+     * Remembers what the light count query needs to know.
+     *
+     * @param array $catscaleids
+     * @param int $contextid
+     * @return void
+     */
+    public function set_count_context(array $catscaleids, int $contextid): void {
+        $this->countcontext = ['catscaleids' => $catscaleids, 'contextid' => $contextid];
+    }
+
+    /**
+     * Counts the list without computing the attempt statistics.
+     *
+     * Counting the list meant counting the rows of the full query - the
+     * one carrying the per question and per user aggregates. Those are computed only
+     * to be discarded by COUNT(). The row set is defined by the joins up to the
+     * question bank; the statistics are LEFT JOINs and can neither add nor remove a
+     * row, so a light query returns the same number for a fraction of the work.
+     *
+     * Set here rather than when the table is built, for two reasons:
+     *
+     *   * The table library appends its own filter and search to $this->sql->where
+     *     AFTER the table is set up. A count fixed earlier would ignore them and
+     *     report a total that does not match the list - pagination would then offer
+     *     pages that are empty.
+     *   * The free text search may match on columns that only exist in the
+     *     aggregates (the last attempt time among them). With such a condition the
+     *     light query cannot answer the question at all.
+     *
+     * So the light count is used only while neither applies; otherwise the library
+     * falls back to its own behaviour, which stays correct.
+     *
+     * @param int $pagesize
+     * @param bool $useinitialsbar
+     * @return void
+     */
+    public function query_db($pagesize, $useinitialsbar = true) {
+        if ($this->countsql === null && $this->can_use_light_count()) {
+            [$from, $where, $params] = catquiz::return_sql_for_catscalequestions_count(
+                $this->countcontext['catscaleids'],
+                $this->countcontext['contextid']
+            );
+            $this->countsql = "SELECT COUNT(*) FROM $from WHERE $where";
+            $this->countparams = $params;
+        }
+
+        $restore = $this->push_limit_into_subquery($pagesize);
+
+        parent::query_db($pagesize, $useinitialsbar);
+
+        if ($restore !== null) {
+            $this->sql->from = $restore;
+        }
+
+        $this->attach_contextattempts();
+    }
+
+    /**
+     * Moves the page limit into the derived table when that is provably equivalent.
+     *
+     * The statement reads FROM ( SELECT ... ) as s1, and Moodle applies the limit to
+     * the outer query. MariaDB then materialises the whole derived table before
+     * taking ten rows - measured with ANALYZE: 20.010 loops with four index lookups
+     * each, for a page of ten. PostgreSQL stops early and is unaffected.
+     *
+     * Pushing the limit inside asks the same question only while the outer query
+     * neither sorts nor filters. Otherwise the inner limit would take an arbitrary
+     * ten rows and the page would look correct while showing the wrong ones. Both are
+     * checked, and the rewrite is skipped when either is present - which still leaves
+     * the common case covered: the dialog as it opens.
+     *
+     * @param int $pagesize
+     * @return string|null The original FROM to restore afterwards, or null.
+     */
+    private function push_limit_into_subquery(int $pagesize): ?string {
+        if ($pagesize <= 0 || $this->is_downloading()) {
+            return null;
+        }
+
+        // A filter stays outside, and a page that has one keeps the old path.
+        //
+        // Moving it inside looked possible - the columns it names are selected there
+        // too - but they are *aliases*: the inner query has `qc.name as categoryname`,
+        // and SQL does not allow an alias in the WHERE of the same level. A filter on
+        // categoryname fails inside while working outside, and the failure is a
+        // database error on a page that used to work.
+        //
+        // ORDER BY is different, which is why sorting could move: aliases are allowed
+        // there. The two clauses look interchangeable and are not.
+        if (trim((string) ($this->sql->filter ?? '')) !== '') {
+            return null;
+        }
+
+        // Sorting can move inside, but only if every column it names exists there.
+        // The derived table selects id, idnumber, name, qtype and categoryname; a
+        // sort on anything else - an outer alias such as questioncontextattempts, a
+        // constant - would be an unknown column and break the query.
+        $sort = trim((string) $this->get_sql_sort());
+        if ($sort !== '' && !$this->sort_is_available_in_subquery($sort)) {
+            return null;
+        }
+
+        $where = trim((string) $this->sql->where);
+        if ($where !== '1=1' && $where !== '1 = 1') {
+            return null;
+        }
+
+        // Only the shape this was measured against.
+        if (!preg_match('/^\\s*\\(\\s*SELECT\\b(.*)\\)\\s*as\\s+(\\w+)\\s*$/is', (string) $this->sql->from, $m)) {
+            return null;
+        }
+
+        $original = (string) $this->sql->from;
+
+        // LIMIT ... OFFSET is understood by both engines this plugin supports; the
+        // DML layer offers no portable helper for a limit inside a subquery.
+        $this->sql->from = sprintf(
+            '( SELECT %s %s LIMIT %d OFFSET %d ) as %s',
+            $m[1],
+            $sort === '' ? '' : 'ORDER BY ' . $sort,
+            $pagesize,
+            (int) $this->currpage * $pagesize,
+            $m[2]
+        );
+
+        return $original;
+    }
+
+
+    /**
+     * Enables loading the attempt count for the visible page.
+     *
+     * @param int $contextid
+     * @return void
+     */
+    public function set_contextattempts_context(int $contextid): void {
+        $this->contextattemptscontext = $contextid;
+    }
+
+    /**
+     * Fills in the attempt count for the rows on this page.
+     *
+     * The count used to come from the main query, which produced it by
+     * aggregating every question attempt of the context and joining the result onto
+     * all candidates. That aggregate is driven by the number of attempt steps rather
+     * than by the page size, so it cost the same whether ten rows were shown or none
+     * - about eight seconds of a twelve second query in the measured instance.
+     *
+     * One additional query for the visible ids replaces it. Not one per row: that
+     * would trade a slow page for a slower one.
+     *
+     * @return void
+     */
+    private function attach_contextattempts(): void {
+        if ($this->contextattemptscontext === null || empty($this->rawdata)) {
+            return;
+        }
+
+        $questionids = [];
+        foreach ($this->rawdata as $row) {
+            if (isset($row->id)) {
+                $questionids[] = (int) $row->id;
+            }
+        }
+
+        if (empty($questionids)) {
+            return;
+        }
+
+        $counts = catquiz::get_contextattempts_for_questions(
+            $questionids,
+            $this->contextattemptscontext
+        );
+
+        foreach ($this->rawdata as $row) {
+            // Absent means the question has no attempts in this context, which is
+            // zero - not "unknown". The previous LEFT JOIN said the same thing.
+            $row->questioncontextattempts = $counts[(int) $row->id] ?? 0;
+        }
+    }
+
+    /**
+     * Whether the light count can answer the current query.
+     *
+     * @return bool
+     */
+    private function can_use_light_count(): bool {
+        if ($this->countcontext === null) {
+            return false;
+        }
+
+        // Any filter or search the library added narrows the list in a way the light
+        // query does not know about.
+        if (!empty($this->sql->filter) || !empty($this->searchtext)) {
+            return false;
+        }
+
+        // The question text search restricts by id and is not part of the light
+        // query either.
+        if ($this->questiontextsearchapplied) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Narrows the list to questions whose text matches, as the SQL is defined.
+     *
+     * The list queries do not select questiontext, which also removed the
+     * ability to search inside question texts. Carrying the text in every row just
+     * so that it can be searched is precisely what made the lists slow, so the text
+     * is consulted only when somebody actually searches: a small dedicated query
+     * resolves the matching question ids and the list is narrowed to them.
+     *
+     * This is a separate restriction with AND semantics, not part of the table's own
+     * free text box: that box searches a concatenated column which would have to
+     * contain the question text again, which is the thing we removed.
+     *
+     * The restriction has to be applied here rather than while rendering. The table
+     * serialises its own $sql into an encoded, cached instance that later AJAX
+     * reloads are built from; a restriction added at render time is not part of that
+     * snapshot, so the first page looked filtered and every reload silently showed
+     * the unfiltered list again.
+     *
+     * @param string $fields
+     * @param string $from
+     * @param string $where
+     * @param string $filter
+     * @param array $params
+     * @return void
+     */
+    public function set_filter_sql(string $fields, string $from, string $where, string $filter, array $params = []) {
+        parent::set_filter_sql($fields, $from, $where, $filter, $params);
+
+        $this->apply_questiontext_search();
+    }
+
+    /**
+     * Appends the id restriction for the current question text search term.
+     *
+     * @return void
+     */
+    public function apply_questiontext_search(): void {
+        global $DB;
+
+        if ($this->questiontextsearchapplied) {
+            return;
+        }
+
+        $searchtext = trim(optional_param('qtsearch', '', PARAM_TEXT));
+        if ($searchtext === '') {
+            return;
+        }
+        $this->questiontextsearchapplied = true;
+
+        $ids = self::resolve_questiontext_matches($searchtext);
+
+        if ($ids === null) {
+            // Too many matches to restrict by id; leave the list untouched rather
+            // than building a huge IN() clause.
+            return;
+        }
+
+        if (empty($ids)) {
+            // Nothing matched. The correct answer is an empty list, not the
+            // unfiltered one.
+            $this->sql->where .= ' AND 1=0 ';
+            return;
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'catquizqtid');
+        $this->sql->where .= " AND id $insql ";
+        $this->sql->params = array_merge($this->sql->params, $inparams);
+    }
+
+    /**
+     * Returns the ids of questions whose text matches, or null if there are too many.
+     *
+     * @param string $searchtext
+     * @return int[]|null
+     */
+    public static function resolve_questiontext_matches(string $searchtext): ?array {
+        global $DB;
+
+        $like = $DB->sql_like('questiontext', ':catquizqtsearch', false, false);
+        $ids = $DB->get_fieldset_sql(
+            "SELECT id FROM {question} WHERE $like",
+            ['catquizqtsearch' => '%' . $DB->sql_like_escape($searchtext) . '%']
+        );
+
+        if (count($ids) > self::QUESTIONTEXT_SEARCH_LIMIT) {
+            return null;
+        }
+
+        return array_map('intval', $ids);
+    }
+
+    /**
+     * Shows whether the stored item parameters are usable for the item's model.
+     *
+     * An item whose parameters violate the model contract is silently
+     * treated as a pilot item at runtime. That was visible only in the import
+     * feedback and the attempt debug output, never where the pool is maintained.
+     *
+     * The classification is computed from the row the list already selected - model,
+     * difficulty, discrimination, guessing and json are part of the query - so this
+     * column costs no additional query per item.
+     *
+     * The state is conveyed by text and an icon, not by colour alone.
+     *
+     * @param object $values
+     * @return string
+     */
+    public function col_itemparamvalidity($values) {
+        $classification = itemparam_validity::classify((object) (array) $values);
+        $label = itemparam_validity::get_state_label($classification['state']);
+
+        if ($classification['state'] !== itemparam_validity::STATE_UNUSABLE) {
+            return html_writer::span(s($label), 'catquiz-itemparams-' . $classification['state']);
+        }
+
+        $reason = itemparam_validity::get_reason_text($classification);
+
+        return html_writer::span(
+            html_writer::tag('i', '', [
+                'class' => 'fa fa-exclamation-triangle mr-1',
+                'aria-hidden' => 'true',
+            ]) . s($label),
+            'catquiz-itemparams-unusable text-danger',
+            ['title' => $reason]
+        ) . html_writer::span(s($reason), 'sr-only');
+    }
+
+    /**
+     * Returns the short label shown in the list for a question.
+     *
+     * Falls back through the fields the different list queries provide, so both
+     * the scale question list and the "add items" list get a sensible label
+     * without either of them selecting the question text.
+     *
+     * @param object $values
+     * @return string
+     */
+    private function get_question_label($values): string {
+        foreach (['questionname', 'name', 'label', 'idnumber'] as $field) {
+            if (!empty($values->{$field})) {
+                return format_string($values->{$field});
+            }
+        }
+
+        return get_string('question', 'core') . ' ' . (int) $values->id;
+    }
+
+    /**
      * Overrides the output for this column.
      * @param object $values
      */
     public function col_name($values) {
-
         global $OUTPUT;
 
-        $context = context_system::instance();
-
-        $questiontext = question_rewrite_question_urls(
-            $values->questiontext,
-            'pluginfile.php',
-            $context->id,
-            'question',
-            'questiontext',
-            [],
-            $values->id
-        );
-
-        $fulltext = format_text($questiontext);
-        $questiontext = strip_tags($fulltext);
-        $shorttext = substr($questiontext, 0, 30);
-        $shorttext .= strlen($shorttext) < strlen($questiontext) ? '...' : '';
-
+        // The list no longer selects or renders the question text. The
+        // row shows the question name and opens the preview on demand through
+        // local_catquiz_get_question_preview, so a page of rows no longer carries
+        // the formatted text - and any embedded images - of every question.
         $data = [
-            'shorttext' => $shorttext,
-            'fulltext' => $fulltext,
+            'label' => $this->get_question_label($values),
             'id' => $values->id,
         ];
 
@@ -387,37 +757,14 @@ class catscalequestions_table extends wunderbyte_table {
      * @param object $values
      */
     public function col_questiontext($values) {
-
         global $OUTPUT;
 
-        // phpcs:disable
-        // try {
-        // $question = question_bank::load_question($values->id);
-        // } catch (Exception $e) {
-        // return $values->questiontext;
-        // }
-        // phpcs:enable
-
-        $context = context_system::instance();
-
-        $questiontext = question_rewrite_question_urls(
-            $values->questiontext,
-            'pluginfile.php',
-            $context->id,
-            'question',
-            'questiontext',
-            [],
-            $values->id
-        );
-
-        $fulltext = format_text($questiontext);
-        $questiontext = strip_tags($fulltext);
-        $shorttext = substr($questiontext, 0, 30);
-        $shorttext .= strlen($shorttext) < strlen($questiontext) ? '...' : '';
-
+        // The list no longer selects or renders the question text. The
+        // row shows the question name and opens the preview on demand through
+        // local_catquiz_get_question_preview, so a page of rows no longer carries
+        // the formatted text - and any embedded images - of every question.
         $data = [
-            'shorttext' => $shorttext,
-            'fulltext' => $fulltext,
+            'label' => $this->get_question_label($values),
             'id' => $values->id,
         ];
 
@@ -522,5 +869,36 @@ class catscalequestions_table extends wunderbyte_table {
                 ]
             ),
         ];
+    }
+    /**
+     * Whether every column of a sort clause exists inside the derived table.
+     *
+     * The outer select adds columns the inner one does not have - a literal
+     * 'question' as component, 0 as questioncontextattempts. Sorting by those inside
+     * would fail with "unknown column", so the rewrite has to recognise them and step
+     * aside rather than produce a broken statement.
+     *
+     * @param string $sort The clause as get_sql_sort() returns it.
+     * @return bool
+     */
+    private function sort_is_available_in_subquery(string $sort): bool {
+        // What return_sql_for_addcatscalequestions() selects in its inner query.
+        $available = ['id', 'idnumber', 'name', 'qtype', 'categoryname'];
+
+        foreach (explode(',', $sort) as $part) {
+            $column = strtolower(trim(preg_replace('/\\s+(asc|desc)$/i', '', trim($part))));
+
+            // A qualified name would refer to the outer alias, which does not exist
+            // inside either.
+            if ($column === '' || str_contains($column, '.')) {
+                return false;
+            }
+
+            if (!in_array($column, $available, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

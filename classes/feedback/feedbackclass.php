@@ -38,7 +38,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedbackclass {
-
     /**
      * Add Form elements to form.
      * @param MoodleQuickForm $mform
@@ -51,7 +50,7 @@ class feedbackclass {
 
         global $CFG, $PAGE, $OUTPUT;
 
-        require_once($CFG->libdir .'/datalib.php');
+        require_once($CFG->libdir . '/datalib.php');
 
         // If the user just selected a template, get the values from there.
         if ($template) {
@@ -64,8 +63,11 @@ class feedbackclass {
 
         // phpcs:ignore
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
-        $elements[] = $mform->addElement('header', 'catquiz_feedback',
-                get_string('catquiz_feedbackheader', 'local_catquiz'));
+        $elements[] = $mform->addElement(
+            'header',
+            'catquiz_feedback',
+            get_string('catquiz_feedbackheader', 'local_catquiz')
+        );
         $mform->setExpanded('catquiz_feedback');
 
         $options = [
@@ -120,7 +122,7 @@ class feedbackclass {
             $picturewarning = get_string('picturesavewarning', 'local_catquiz');
             $element = $mform->createElement(
                 'html',
-                '<div class="alert alert-warning" role="alert">'.$picturewarning.'</div>'
+                '<div class="alert alert-warning" role="alert">' . $picturewarning . '</div>'
             );
             $element->setName('picturesavewarning');
             $mform->addElement($element);
@@ -129,11 +131,15 @@ class feedbackclass {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitnumberoffeedbackoptions');
-        $elements[] = $mform->addElement('submit', 'submitnumberoffeedbackoptions', 'numberoffeedbackoptionssubmit',
+        $elements[] = $mform->addElement(
+            'submit',
+            'submitnumberoffeedbackoptions',
+            'numberoffeedbackoptionssubmit',
             [
             'class' => 'd-none',
             'data-action' => 'submitNumberOfFeedbackOptions',
-        ]);
+            ]
+        );
 
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($nfeedbpersubscale);
@@ -161,13 +167,14 @@ class feedbackclass {
                 'advcheckbox',
                 'catquiz_scalereportcheckbox_' . $scale->id,
                 get_string('reportscale', 'local_catquiz'),
-                );
+            );
 
             $scalereportcheckbox = isset($defaultvalues['catquiz_scalereportcheckbox_' . $scale->id])
                 ? $defaultvalues['catquiz_scalereportcheckbox_' . $scale->id] : optional_param(
-                'catquiz_scalereportcheckbox_' . $scale->id,
-                LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                PARAM_INT);
+                    'catquiz_scalereportcheckbox_' . $scale->id,
+                    LOCAL_CATQUIZ_RANDOM_DEFAULT,
+                    PARAM_INT
+                );
             if ($scalereportcheckbox == LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                 $mform->setDefault('catquiz_scalereportcheckbox_' . $scale->id, 1);
             }
@@ -175,8 +182,10 @@ class feedbackclass {
             for ($j = 1; $j <= $nfeedbpersubscale; $j++) {
                 // We need to create a div tag to "wrap" feedback range.
                 // Element is only used for testing purpose and can therefore contain scale name.
-                $element = $mform->createElement('html',
-                '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
+                $element = $mform->createElement(
+                    'html',
+                    '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j . '" data-depth="' . $scale->depth . '" >'
+                );
                 $element->setName('feedback_scale_' . $scale->id . '_rangestart_' . $j);
                 $subelements[] = $mform->addElement($element);
 
@@ -208,8 +217,11 @@ class feedbackclass {
                 }
 
                 // Header for Subfeedback.
-                $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . '_'. $j,
-                get_string('feedbacknumber', 'local_catquiz', $j));
+                $subelements[] = $mform->addElement(
+                    'static',
+                    'headingforfeedback' . $scale->id . '_' . $j,
+                    get_string('feedbacknumber', 'local_catquiz', $j)
+                );
 
                 // Define range.
                 // For the lowest range (first range, min) value should be set statically to min of scale ability.
@@ -231,21 +243,22 @@ class feedbackclass {
                 } else {
                     $element = $mform->addElement(
                         'float',
-                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j,
                         get_string('lowerlimit', 'local_catquiz')
+                    );
+                    $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]
+                        ?? self::optional_limit_param(
+                            'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j,
+                            LOCAL_CATQUIZ_RANDOM_DEFAULT
                         );
-                    $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
-                        ?? optional_param(
-                            'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
-                            LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                            PARAM_FLOAT);
                     if ($lowerlimit === LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                         $lowerlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
                             true,
                             $lowestability,
-                            $highestability);
+                            $highestability
+                        );
                     }
                     $element->setValue($lowerlimit);
                 }
@@ -270,22 +283,22 @@ class feedbackclass {
                 } else {
                     $element = $mform->addElement(
                         'float',
-                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                        get_string('upperlimit', 'local_catquiz'
-                    ));
-                    $upperlimit = $defaultvalues['feedback_scaleid_limit_upper_'. $scale->id . '_' . $j]
-                        ?? optional_param(
-                            'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                            LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                            PARAM_FLOAT);
+                        'feedback_scaleid_limit_upper_' . $scale->id . '_' . $j,
+                        get_string('upperlimit', 'local_catquiz')
+                    );
+                    $upperlimit = $defaultvalues['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j]
+                        ?? self::optional_limit_param(
+                            'feedback_scaleid_limit_upper_' . $scale->id . '_' . $j,
+                            LOCAL_CATQUIZ_RANDOM_DEFAULT
+                        );
                     if ($upperlimit === LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                         $upperlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
                             false,
                             $lowestability,
-                            $highestability);
-
+                            $highestability
+                        );
                     }
                     $element->setValue($upperlimit);
                 }
@@ -305,7 +318,8 @@ class feedbackclass {
                         'maxfiles' => EDITOR_UNLIMITED_FILES,
                         'noclean' => true, CONTEXT_SYSTEM,
                         'subdirs' => true,
-                    ]);
+                    ]
+                );
                 $mform->setType('feedbackeditor_scaleid_' . $scale->id . '_' . $j, PARAM_RAW);
                 $editorcontentfieldname = $editorfieldname . '_editor';
                 $element->setValue($data[$editorfieldname]
@@ -324,7 +338,7 @@ class feedbackclass {
 
                 $subelements[] = $mform->addElement(
                     'select',
-                    'wb_colourpicker_' .$scale->id . '_' . $j,
+                    'wb_colourpicker_' . $scale->id . '_' . $j,
                     get_string('feedback_colorrange', 'local_catquiz'),
                     $coloroptions,
                 );
@@ -335,7 +349,7 @@ class feedbackclass {
                     $data['wb_colourpicker_' . $scale->id . '_' . $j] ?? -1;
 
                 if ($savedcolorvalue === -1) {
-                    $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
+                    $mform->setDefault('wb_colourpicker_' . $scale->id . '_' . $j, $sequencecolors[$j - 1]);
                 }
 
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
@@ -351,8 +365,8 @@ class feedbackclass {
                     0 => get_string('courseselection', 'local_catquiz'),
                 ];
                 // Check if courses were saved before (ie from other teacher, directly in db) and in this case allow them.
-                $preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
-                $presavedcourseids = $data['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
+                $preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_' . $j] ?? [];
+                $presavedcourseids = $data['catquiz_courses_' . $scale->id . '_' . $j] ?? [];
                 $precourses = empty($preselectcourseids) ? $presavedcourseids : $preselectcourseids;
 
                 if (!empty($precourses) && is_array($precourses)) {
@@ -376,7 +390,7 @@ class feedbackclass {
                 }
                 $subelements[] = $mform->addElement(
                     'autocomplete',
-                    'catquiz_courses_' . $scale->id . '_'. $j,
+                    'catquiz_courses_' . $scale->id . '_' . $j,
                     get_string('setcourseenrolmentforscale', 'local_catquiz'),
                     $select,
                     $options
@@ -386,7 +400,7 @@ class feedbackclass {
                 // Enrol to a group.
                 $element = $mform->addElement(
                     'text',
-                    'catquiz_group_' . $scale->id . '_'. $j,
+                    'catquiz_group_' . $scale->id . '_' . $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz')
                 );
                 $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolmenthelptext', 'local_catquiz');
@@ -395,21 +409,22 @@ class feedbackclass {
                 // Checkbox messaging of groupselect and courseselect.
                 $subelements[] = $mform->addElement(
                     'advcheckbox',
-                    'enrolment_message_checkbox_' . $scale->id . '_'. $j,
+                    'enrolment_message_checkbox_' . $scale->id . '_' . $j,
                     get_string('setautonitificationonenrolmentforscale', 'local_catquiz'),
                     null,
                     null,
                     [0, 1]
                 );
 
-                $enrolmentcheckbox = isset($defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j])
-                    ? $defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j]
+                $enrolmentcheckbox = isset($defaultvalues['enrolment_message_checkbox_' . $scale->id . '_' . $j])
+                    ? $defaultvalues['enrolment_message_checkbox_' . $scale->id . '_' . $j]
                     : optional_param(
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    LOCAL_CATQUIZ_RANDOM_DEFAULT,
-                    PARAM_INT);
+                        'catquiz_scalereportcheckbox_' . $scale->id,
+                        LOCAL_CATQUIZ_RANDOM_DEFAULT,
+                        PARAM_INT
+                    );
                 if ($enrolmentcheckbox == LOCAL_CATQUIZ_RANDOM_DEFAULT) {
-                    $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1);
+                    $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_' . $j, 1);
                 }
 
                 // Close of feedback range HTML tag element.
@@ -458,8 +473,10 @@ class feedbackclass {
             } else if ($scale->depth == $previousdepth) {
                 $numberofclosinghtmls = 1;
                 // Element on the same level.
-            } else if ($scale->parentid != $prevparentscaleid
-            && $scale->depth < $previousdepth) {
+            } else if (
+                $scale->parentid != $prevparentscaleid
+                && $scale->depth < $previousdepth
+            ) {
                 $depthdifference = $previousdepth - $scale->depth;
                 $numberofclosinghtmls = $depthdifference + 1;
             }
@@ -605,6 +622,47 @@ class feedbackclass {
     }
 
     /**
+     * Reads a feedback range limit from the request in a locale safe way.
+     *
+     * Moodle's PARAM_FLOAT is a plain cast, so clean_param('1,5', PARAM_FLOAT)
+     * yields 1.0 - a German decimal comma is silently truncated. That turned an
+     * upper limit of "1,5" into "1" in the settings form, which then produced the
+     * "no gaps allowed in the person ability range" validation error because the
+     * next lower limit still read 1,5. Read the raw value and parse it with the
+     * locale aware unformat_float() instead, falling back to a dot-decimal read.
+     *
+     * @param string $paramname The request parameter to read.
+     * @param mixed $default Returned when the parameter is absent or unparsable.
+     *
+     * @return mixed The parsed float or the given default.
+     */
+    private static function optional_limit_param(string $paramname, $default) {
+        $raw = optional_param($paramname, null, PARAM_RAW);
+        if ($raw === null || trim((string) $raw) === '') {
+            return $default;
+        }
+
+        $raw = trim((string) $raw);
+
+        // Unformat_float() understands the decimal separator of the active language.
+        $parsed = unformat_float($raw, true);
+        if ($parsed !== false && $parsed !== null) {
+            return (float) $parsed;
+        }
+
+        // The value did not match the current locale - accept a plain dot decimal
+        // as well, and treat a comma as decimal separator when there is no dot.
+        if (strpos($raw, ',') !== false && strpos($raw, '.') === false) {
+            $raw = str_replace(',', '.', $raw);
+        }
+        if (is_numeric($raw)) {
+            return (float) $raw;
+        }
+
+        return $default;
+    }
+
+    /**
      * Returns lower or upper value for scales, depending on bool.
      *
      * @param mixed $nroptions
@@ -621,7 +679,8 @@ class feedbackclass {
         $optioncounter,
         bool $lower,
         float $lowestlimit,
-        float $highestlimit) {
+        float $highestlimit
+    ) {
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs($lowestlimit - $highestlimit);
@@ -649,18 +708,35 @@ class feedbackclass {
             $scales = dataapi::get_catscale_and_children((int) $data["catquiz_catscales"], true);
             $nfeedbpersubscale = ((int) $data['numberoffeedbackoptionsselect']) ?? 1;
             foreach ($scales as $scale) {
-                if (((int) $data["catquiz_catscales"]) === $scale->id ||
-                    !empty($data["catquiz_subscalecheckbox_" . $scale->id])) {
+                if (
+                    ((int) $data["catquiz_catscales"]) === $scale->id ||
+                    !empty($data["catquiz_subscalecheckbox_" . $scale->id])
+                ) {
+                    // The first range must be ascending too
+                    // (upper_1 > lower_1); the loop below only covers j >= 2.
+                    if (
+                        isset($data['feedback_scaleid_limit_upper_' . $scale->id . '_1'])
+                        && isset($data['feedback_scaleid_limit_lower_' . $scale->id . '_1'])
+                        && (float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_1'] <=
+                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_1']
+                    ) {
+                        $errors['feedback_scaleid_limit_upper_' . $scale->id . '_1'] =
+                            get_string('errorupperlimitvalue', 'local_catquiz');
+                    }
                     for ($j = 2; $j <= $nfeedbpersubscale; $j++) {
                         // Upper limit of previous range must be equal of lowest limit for current range.
-                        if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . ($j - 1)] !==
-                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
+                        if (
+                            (float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . ($j - 1)] !==
+                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]
+                        ) {
                             $errors['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j] =
                                 get_string('nogapallowed', 'local_catquiz');
                         }
                         // Upper limit must be always greater than lowest limit.
-                        if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] <=
-                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
+                        if (
+                            (float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] <=
+                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]
+                        ) {
                             $errors['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] =
                                 get_string('errorupperlimitvalue', 'local_catquiz');
                         }

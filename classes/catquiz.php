@@ -26,6 +26,7 @@ namespace local_catquiz;
 
 use dml_exception;
 use local_catquiz\data\dataapi;
+use local_catquiz\local\model\model_person_param;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
 use local_catquiz\local\status;
@@ -34,6 +35,7 @@ use moodle_exception;
 use moodle_url;
 use question_engine;
 use stdClass;
+use local_catquiz\local\itemparam_validity;
 
 /**
  * Class catquiz
@@ -154,7 +156,7 @@ class catquiz {
         global $DB;
 
         $select = '*';
-        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname
+        $from = "( SELECT q.id, q.name, q.qtype, qc.name as categoryname
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
@@ -172,6 +174,73 @@ class catquiz {
     }
 
     /**
+     * The column aliases the item pool query produces.
+     *
+     * Read off a live result rather than transcribed from the heredoc: the first
+     * version of this list was written by hand from the SQL and had 'contextid' where
+     * the alias is 'lcipcontextid', plus six columns missing entirely. The query
+     * failed with "column s.contextid does not exist".
+     *
+     * If a column is added to the query and forgotten here, the lean select simply
+     * does not carry it - which the equivalence test catches, because the runtime
+     * pool would then differ from the full one.
+     *
+     * @return string[]
+     */
+    public static function pool_columns(): array {
+        return [
+            'id',
+            'componentid',
+            'label',
+            'idnumber',
+            'questionname',
+            'qtype',
+            'categoryname',
+            'catscaleid',
+            'testitemstatus',
+            'component',
+            'itemid',
+            'catscalename',
+            'lccscatscaleid',
+            'model',
+            'difficulty',
+            'discrimination',
+            'guessing',
+            'json',
+            'timecreated',
+            'timemodified',
+            'status',
+            'usable',
+            'itemparamvalidity',
+            'lcipcontextid',
+            'attempts',
+            'astatlastattempttime',
+            'userid',
+            'userattempts',
+            'userlastattempttime',
+        ];
+    }
+
+    /**
+     * Columns of the item pool that only the manager interface needs.
+     *
+     * The same query serves two consumers: the runtime selection, which fills the
+     * item cache, and the CAT manager tables, which display and filter questions.
+     * The interface needs these names; the selection never reads them - it works on
+     * ids, scale ids and item parameters.
+     *
+     * Measured over 2.000 rows they are 36 % of the serialised payload, and that
+     * payload is cached per scale and context: 206 MB at 250.000 items.
+     *
+     * @var string[]
+     */
+    const DISPLAYONLY_POOL_COLUMNS = [
+        'questionname',
+        'categoryname',
+        'catscalename',
+    ];
+
+    /**
      * Returns the sql to get all the questions wanted.
      *
      * @param array $catscaleids
@@ -179,6 +248,8 @@ class catquiz {
      * @param array $wherearray
      * @param int $userid
      * @param string|null $orderby If given, order by the given field in ascending order
+     * @param int|null $questionid If given, restrict the query to this single question
+     * @param bool $leanselect Omit the columns only the manager interface displays
      *
      * @return array
      *
@@ -188,7 +259,9 @@ class catquiz {
         int $contextid,
         array $wherearray = [],
         int $userid = 0,
-        ?string $orderby = null
+        ?string $orderby = null,
+        ?int $questionid = null,
+        bool $leanselect = false
     ) {
 
         global $DB;
@@ -201,11 +274,28 @@ class catquiz {
             'contextid' => $contextid,
 
         ];
-        $wherearray['lcipcontextid'] = $contextid;
+        // Items in piloting have no active parameter, so lcipcontextid is
+        // NULL for them. Restricting on it alone would drop exactly those items again
+        // after the join was widened - and their attempt numbers are the interesting
+        // part while an item is being piloted.
+        // The condition itself is appended below, parenthesised: an OR inside the
+        // generic wherecontains loop would bind looser than the surrounding ANDs and
+        // silently widen the whole WHERE clause.
 
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
             $params['userid'] = $userid;
+            $params['statuserid'] = $userid;
+        }
+
+        // The detail view needs exactly one question. Restricting the
+        // innermost query keeps the expensive statistics joins from aggregating
+        // over the whole scale first and discarding the rest afterwards - which is
+        // what exhausted the memory limit on large, image heavy pools.
+        $questionfilter = '';
+        if (!empty($questionid)) {
+            $questionfilter = ' AND q.id = :detailquestionid ';
+            $params['detailquestionid'] = $questionid;
         }
 
         $insql = '';
@@ -214,14 +304,31 @@ class catquiz {
 
             [$parentscales1, $inparams1] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales1');
             [$parentscales2, $inparams2] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales2');
-            $params = array_merge($params, $inparams1, $inparams2);
+            // The statistics subqueries restrict by scale themselves, so
+            // they need their own placeholders - reusing the ones of the outer joins
+            // would bind the same names twice for different clauses.
+            [$parentscales3, $inparams3] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales3');
+            [$parentscales4, $inparams4] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales4');
+            $params = array_merge($params, $inparams1, $inparams2, $inparams3, $inparams4);
+            $params['statcontextid'] = $contextid;
+            $params['statcontextid2'] = $contextid;
 
             [$incatscales, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
             $wherecontains['lccscatscaleid'] = $incatscales;
         }
 
+        // The derived table below still computes every column; what changes is how
+        // much of it is transferred and turned into PHP objects. That is where the
+        // cost sits - the cache holds the hydrated rows, not the query.
         $select = "*";
+        if ($leanselect) {
+            $select = implode(', ', array_map(
+                fn($column) => 's.' . $column,
+                array_diff(self::pool_columns(), self::DISPLAYONLY_POOL_COLUMNS)
+            ));
+        }
+
         $from = <<<SQL
         ( SELECT
             -- Information about the question
@@ -230,7 +337,6 @@ class catquiz {
             qbe.idnumber as label,
             COALESCE (qbe.idnumber, CAST(qbe.id AS CHAR)) as idnumber,
             q.name as questionname,
-            q.questiontext as questiontext,
             q.qtype as qtype,
             qc.name as categoryname,
             -- Information about CAT scales, parameters and contexts
@@ -248,6 +354,13 @@ class catquiz {
             lcip.timecreated,
             lcip.timemodified,
             lcip.status,
+            -- Issue #54: persisted so the backend can filter and sort on it; NULL for
+            -- items in piloting, which have no active parameter row at all.
+            lcip.usable,
+            -- The visible column carries this name, and the table sorts by whatever
+            -- the clicked header is called. Without the alias an ORDER BY on it would
+            -- refer to a column that does not exist.
+            lcip.usable AS itemparamvalidity,
             lcip.contextid AS lcipcontextid,
             -- Information about usage statisitcs
             COALESCE(astat.numberattempts,0) attempts,
@@ -259,28 +372,50 @@ class catquiz {
           -- (INNER JOIN)
             JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
 
-          -- Get all the item parameter for the question for the given context(s),
-          -- skip if not existent
-            JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
+          -- Get the active item parameter, if there is one.
+          --
+          -- Issue #54: this used to be an INNER JOIN, so items without parameters -
+          -- or without an *active* parameter - never appeared in the list at all.
+          -- Those items are exactly the ones in piloting, and their statistics
+          -- (attempt counts, last attempt) are of interest precisely while they are
+          -- being piloted. A LEFT JOIN keeps them visible; the parameter columns are
+          -- then NULL, which the validity column reports as "no parameters".
+            LEFT JOIN {local_catquiz_itemparams} lcip
+              ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
 
           -- Get all information about the question from the questionbank itself
-            JOIN {question} q ON q.id=lci.componentid
+            JOIN {question} q ON q.id=lci.componentid $questionfilter
             JOIN {question_versions} qv ON qv.questionid=q.id
             JOIN {question_bank_entries} qbe ON qbe.id=qv.questionbankentryid
             JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
 
           -- Get all information about the attempts in the scale(s)
           -- and context(s) in general and for specific user(s)
-            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, COUNT(qa.id) numberattempts,
+            -- Issue #21: the restriction to context and scales lives inside the
+            -- aggregation, not only in the outer join. Without it this subquery
+            -- aggregated every CAT attempt of the whole site before a single row was
+            -- discarded, and an outer LIMIT did nothing to shrink that work.
+            --
+            -- COUNT(DISTINCT qa.id): a question attempt has one step per interaction,
+            -- and the join to question_attempt_steps multiplies the rows accordingly.
+            -- A plain COUNT counted steps and reported them as attempts.
+            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid,
+                COUNT(DISTINCT qa.id) numberattempts,
               MAX(qas.timecreated) as lastattempt
               FROM {local_catquiz_attempts} lca
               JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
               JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
               JOIN {question_attempt_steps} qas
                 ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
+              WHERE lca.contextid = :statcontextid AND lca.scaleid $parentscales3
               GROUP BY lca.scaleid, lca.contextid, qa.questionid
             ) astat
-              ON astat.contextid = lcip.contextid AND astat.questionid = q.id
+              -- Issue #54: joined on lcip.contextid before, which is NULL for items
+              -- without an active parameter - so pilot items lost their statistics,
+              -- the very numbers that matter while an item is being piloted. The
+              -- subquery already restricts the context itself (issue #21), so
+              -- matching the context here again was redundant anyway.
+              ON astat.questionid = q.id
                 AND astat.scaleid $parentscales1
         SQL;
 
@@ -292,16 +427,18 @@ class catquiz {
                         lca.contextid,
                         qa.questionid,
                         lca.userid,
-                        COUNT(qa.id) numberattempts,
+                        COUNT(DISTINCT qa.id) numberattempts,
                         MAX(qas.timecreated) as lastattempt
                     FROM {local_catquiz_attempts} lca
                       JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
                       JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
                       JOIN {question_attempt_steps} qas
                         ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
+                    WHERE lca.userid = :statuserid AND lca.contextid = :statcontextid2
+                      AND lca.scaleid $parentscales4
                     GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
                 ) ustat
-                  ON ustat.userid = :userid AND ustat.contextid = lcip.contextid AND ustat.questionid = q.id
+                  ON ustat.userid = :userid AND ustat.questionid = q.id
                     AND ustat.scaleid $parentscales2 ) s
             SQL;
         } else {
@@ -322,6 +459,12 @@ class catquiz {
         foreach ($wherecontains as $key => $value) {
             $where .= sprintf(' AND %s %s', $key, $value);
         }
+
+        // Items in piloting have no active parameter, so lcipcontextid is
+        // NULL for them. Restricting on it alone would drop exactly those items after
+        // the parameter join was widened - and their attempt numbers are the
+        // interesting part while an item is being piloted.
+        $where .= sprintf(' AND (lcipcontextid = %d OR lcipcontextid IS NULL)', (int) $contextid);
 
         if ($orderby) {
             $where .= " ORDER BY $orderby";
@@ -357,40 +500,79 @@ class catquiz {
         $select = "id,
                 idnumber,
                 name,
-                questiontext,
                 qtype,
                 categoryname,
                 'question' as component,
-                contextattempts as questioncontextattempts,
-                catscaleids";
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
-             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) . " as catscaleids
+                -- Issue #58: the attempt count is no longer part of this query. It
+                -- was produced by aggregating every question attempt of the context -
+                -- 2.1 million steps in the measured instance, roughly eight seconds -
+                -- and then thrown away for all but the ten rows on screen. The table
+                -- fetches it for the visible page instead.
+                0 as questioncontextattempts";
+        // The list of scales a question belongs to used to be built with
+        // GROUP_CONCAT into a string like '-3--7-' and then filtered with
+        // LIKE '%-3-%'. That string was never displayed - it existed only to express
+        // "not already assigned to this scale" - and a leading-wildcard LIKE cannot
+        // use an index, so the filter forced a scan and the aggregation forced a
+        // GROUP BY over the whole result. NOT EXISTS states the same condition
+        // directly and is served by the (catscaleid, componentname, componentid)
+        // index added in issue #25.
+        $from = "( SELECT q.id, qbe.idnumber, q.name, q.qtype, qc.name as categoryname
             FROM {question} q
-                JOIN (
-                    SELECT *
-                    FROM (
-                        SELECT *, ROW_NUMBER() OVER (PARTITION BY questionbankentryid ORDER BY version DESC) n
-                        FROM {question_versions}
-                    ) s2
-                    WHERE n = 1
-                ) qv
-                ON q.id=qv.questionid
+                -- Issue #22: the current version used to be found by numbering EVERY
+                -- row of question_versions with a window function and then keeping
+                -- n = 1. That materialises the whole version history of the site
+                -- before a single row is discarded, and a window function cannot use
+                -- an index for it.
+                --
+                -- The condition below says: no newer version of the same bank entry
+                -- exists. That expresses the same
+                -- thing as a correlated check, which is served by the index on
+                -- questionbankentryid. It also stays portable: no window function,
+                -- so PostgreSQL and MariaDB behave alike.
+                JOIN {question_versions} qv
+                ON qv.questionid = q.id
+                   AND NOT EXISTS (
+                       SELECT 1
+                       FROM {question_versions} qvnewer
+                       WHERE qvnewer.questionbankentryid = qv.questionbankentryid
+                         AND qvnewer.version > qv.version
+                   )
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id
-                LEFT JOIN (
-                    SELECT ccc1.id contextid, qa.questionid, COUNT(*) contextattempts
-                    FROM $contextfrom
-                    WHERE $contextfilter
-                    GROUP BY ccc1.id, qa.questionid
-                ) s2 ON q.id = s2.questionid
-                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name, s2.contextattempts
+                -- Issue #58: deliberately NOT EXISTS, not a LEFT JOIN.
+                --
+                -- The rewrite to LEFT JOIN ... IS NULL was tried and measured. On a
+                -- small pool it looked like the answer: MariaDB stopped scanning
+                -- early and the statement went from 113 ms to 20 ms. At 250.000 items
+                -- it reversed - warm p95 rose from 1.089 ms to 1.967 ms, because the
+                -- changed join order makes the version lookups run per candidate row
+                -- instead of per returned row, and that cost grows with the pool.
+                --
+                -- PostgreSQL preferred the outer join (206 -> 113 ms), so an
+                -- engine-dependent form would help there. It is not worth two
+                -- statements: MariaDB is the engine that misses the target, and this
+                -- form is the better one for it.
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM {local_catquiz_items} lci
+                    WHERE lci.componentid = q.id
+                      AND lci.componentname = 'question'
+                      AND lci.catscaleid = :notassignedscaleid
+                )
             ) as s1";
 
-        $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
-        $params['catscaleid'] = "%-$catscaleid-%";
+        $where = '1=1';
+        $params['notassignedscaleid'] = $catscaleid;
         $params['contextid'] = $contextid;
-        $params['default'] = '%"default":true%';
+
+        // Only bound when $contextfilter above actually references it: with
+        // contextid 0 the default context is identified by its JSON flag. This was
+        // briefly dropped while removing the GROUP_CONCAT filter for issue #22,
+        // which would have broken exactly the "no context given" path.
+        if ($contextid === 0) {
+            $params['default'] = '%"default":true%';
+        }
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
@@ -633,40 +815,43 @@ class catquiz {
             'unfinishedstates'
         );
 
+        // Audit (Expertise part C): the previous query keyed on
+        // max(questionattemptid) - the question attempt with the highest id, i.e.
+        // the last ADDED question. That is not the same as the last ANSWERED
+        // question: if the most recently added item had not been answered yet,
+        // the finished-state filter matched nothing and the whole lookup returned
+        // null although earlier items were answered; it also assumed attempt-id
+        // order equals administration order. Instead take the highest slot (the
+        // administration order) that has a finished answer step, and within it the
+        // final step, so questionattemptid, slot, questionid, fraction and
+        // responsesummary always belong to one and the same answered question.
         $sql = <<<SQL
         SELECT
             qs.id,
-            questionattemptid,
-            state,
-            fraction originalfraction,
-            ROUND(fraction, 3) fraction,
-            timecreated,
-            userid,
-            questionusageid,
-            questionid,
-            questionsummary,
-            rightanswer,
-            responsesummary,
-            timemodified
+            qs.questionattemptid,
+            qa.slot,
+            qs.state,
+            qs.fraction originalfraction,
+            ROUND(qs.fraction, 3) fraction,
+            qs.timecreated,
+            qs.userid,
+            qa.questionusageid,
+            qa.questionid,
+            qa.questionsummary,
+            qa.rightanswer,
+            qa.responsesummary,
+            qa.timemodified
         FROM {question_attempt_steps} qs
         JOIN {question_attempts} qa ON qs.questionattemptid = qa.id
-        AND qa.id = (
-            SELECT max(questionattemptid) maxwithresponse
-            FROM {question_attempt_steps} qs
-                     JOIN (SELECT *
-                           FROM {question_attempts}
-                           WHERE questionusageid = :questionusageid
-            ) sub1 ON qs.questionattemptid = sub1.id
-            GROUP BY questionusageid
-        ) AND state NOT $unfinishedstatessql
+        WHERE qa.questionusageid = :questionusageid
+          AND qs.state NOT $unfinishedstatessql
+        ORDER BY qa.slot DESC, qs.sequencenumber DESC, qs.id DESC
         SQL;
 
         $params = $unfinishedstatesparams;
         $params['questionusageid'] = $questionusageid;
-        return $DB->get_record_sql(
-            $sql,
-            $params
-        );
+        $records = $DB->get_records_sql($sql, $params, 0, 1);
+        return $records ? reset($records) : false;
     }
 
     /**
@@ -1035,7 +1220,11 @@ class catquiz {
     ): array {
 
         $sql = "SELECT
-        attemptid, contextid, userid, endtime, timemodified, json, debug_info
+        attemptid, contextid, userid, endtime, timemodified, json, debug_info,
+        -- The strategy is a column of its own. Reading it only from the JSON payload
+        -- fails for attempts whose payload predates that field, and the feedback then
+        -- cannot be built at all.
+        teststrategy
         FROM {local_catquiz_attempts} ";
 
         $wherearray = [];
@@ -1270,6 +1459,437 @@ class catquiz {
     }
 
     /**
+     * Upper bound for the number of data points a chart query returns.
+     *
+     * The classification already collapses a cohort into a handful of
+     * counts, but a misconfigured class width could still produce a long tail of
+     * near-empty classes. This caps what leaves the database; the charts themselves
+     * never draw more than ATTEMPTS_PER_PERSON_CLASSES classes anyway.
+     */
+    const CHART_MAX_DATA_POINTS = 500;
+
+    /**
+     * Returns the largest value of a column within a subquery.
+     *
+     * Finding a maximum by loading every row and looping in PHP makes the
+     * cost grow with the cohort. The database answers it with a single value.
+     *
+     * @param string $innersql A complete SELECT usable as a subquery.
+     * @param array $params Its parameters.
+     * @param string $column The column to take the maximum of.
+     * @return int
+     */
+    public static function get_max_from_subquery(string $innersql, array $params, string $column): int {
+        global $DB;
+
+        return (int) $DB->get_field_sql("SELECT MAX($column) FROM ($innersql) sub", $params);
+    }
+
+    /**
+     * Classifies one row per person into (range, class) counts inside the database.
+     *
+     * Both attempt charts only ever needed the number of people per range
+     * and class - they counted rows they had loaded. This does the counting in SQL,
+     * so only the finished numbers travel back.
+     *
+     * The class follows feedback_helper::get_histogram_bin(): value 0 forms class 0,
+     * everything else is ceil(value / classwidth), which already leaves class 0 free.
+     * The range follows feedback_helper::get_feedback_range_index(): half-open
+     * intervals with the topmost one closed. The boundaries are bound parameters, and
+     * a test compares both implementations directly so they cannot drift apart.
+     *
+     * @param string $innersql A complete SELECT yielding one row per person.
+     * @param array $params Its parameters.
+     * @param string $valuecolumn Column holding the count to classify.
+     * @param int $classwidth Width of one class; at least 1.
+     * @param array $ranges List of ['lower' => float, 'upper' => float], in order.
+     * @param int $unmatchedrange Range for a value outside every configured range.
+     * @return array<int, array<int, int>> Count keyed by range index, then class.
+     */
+    public static function aggregate_person_histogram(
+        string $innersql,
+        array $params,
+        string $valuecolumn,
+        int $classwidth,
+        array $ranges,
+        int $unmatchedrange = 0
+    ): array {
+        global $DB;
+
+        $classwidth = max(1, $classwidth);
+        $params['classwidth'] = $classwidth;
+
+        $cases = [];
+        foreach (array_values($ranges) as $index => $range) {
+            $j = $index + 1;
+            $params['rangelower' . $j] = (float) $range['lower'];
+            $params['rangeupper' . $j] = (float) $range['upper'];
+            // The topmost range includes its upper bound; all others are half-open.
+            $comparison = ($j === count($ranges)) ? '<=' : '<';
+            $cases[] = "WHEN ability >= :rangelower$j AND ability $comparison :rangeupper$j THEN $j";
+        }
+        $rangecase = 'CASE WHEN ability IS NULL THEN 0 '
+            . implode(' ', $cases)
+            . " ELSE $unmatchedrange END";
+
+        // CEIL over a real division: integer division would truncate and push the
+        // boundary value of every class into the class below it.
+        $bincase = "CASE WHEN $valuecolumn = 0 THEN 0
+                         ELSE CAST(CEIL($valuecolumn * 1.0 / :classwidth) AS INTEGER) END";
+
+        $sql = "SELECT rangeindex, bin, COUNT(*) AS frequency
+                  FROM (
+                        SELECT $rangecase AS rangeindex, $bincase AS bin
+                          FROM ($innersql) perperson
+                       ) classified
+                 WHERE rangeindex >= 0
+              GROUP BY rangeindex, bin
+              ORDER BY rangeindex, bin";
+
+        $counts = [];
+        // A recordset, not get_records_sql(): that method uses the first column as
+        // the array key and silently drops every later row repeating it. The first
+        // column here is rangeindex, which is deliberately not unique - there is one
+        // row per range *and* bin. Only one bin per range survived, so a chart built
+        // from 6/60/19/2 people showed 6/-/1/2.
+        $recordset = $DB->get_recordset_sql($sql, $params, 0, self::CHART_MAX_DATA_POINTS);
+        foreach ($recordset as $row) {
+            $counts[(int) $row->rangeindex][(int) $row->bin] = (int) $row->frequency;
+        }
+        $recordset->close();
+
+        return $counts;
+    }
+
+    /**
+     * Returns the highest number of questions a single person answered.
+     *
+     * The chart used to load one row per enrolled person only to find
+     * this maximum in PHP. The database can answer it with a single value, and the
+     * cost then no longer grows with the size of the cohort.
+     *
+     * @param int $contextid
+     * @param int $scaleid
+     * @param int|null $courseid
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
+     * @return int
+     */
+    public static function get_max_questions_answered_per_person(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid = null,
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
+    ): int {
+        global $DB;
+
+        [$inner, $params] = self::get_sql_for_questions_answered_per_person(
+            $contextid,
+            $scaleid,
+            $courseid,
+            $alloweduserids
+        );
+
+        return self::get_max_from_subquery($inner, $params, 'total_answered');
+    }
+
+    /**
+     * Returns the answers-per-person histogram as counts, aggregated in the database.
+     *
+     * The chart only ever needed the number of people per (range, class) -
+     * it counted the rows it had loaded. Loading a row per person to count them is
+     * what made memory and runtime grow with the cohort. The classification happens
+     * in SQL instead, and only the finished counts travel back.
+     *
+     * The class of a person follows feedback_helper::get_histogram_bin(): zero
+     * answers form class 0, everything else is ceil(answers / classwidth), shifted by
+     * one so that class 0 stays reserved.
+     *
+     * The range follows feedback_helper::get_feedback_range_index(): half-open
+     * intervals, with the topmost one closed so the maximum value is still covered.
+     * The boundaries are passed as bound parameters, so the two implementations
+     * cannot drift apart silently - a test compares them directly.
+     *
+     * @param int $contextid
+     * @param int $scaleid
+     * @param int|null $courseid
+     * @param int $classwidth Width of one class; must be at least 1.
+     * @param array $ranges List of ['lower' => float, 'upper' => float], 1-based order.
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
+     * @return array<int, array<int, int>> Count keyed by range index, then class.
+     */
+    public static function get_answers_per_person_histogram(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid,
+        int $classwidth,
+        array $ranges,
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
+    ): array {
+        [$inner, $params] = self::get_sql_for_questions_answered_per_person(
+            $contextid,
+            $scaleid,
+            $courseid,
+            $alloweduserids
+        );
+
+        // Unmatched abilities are dropped here, as the chart did before: a value
+        // outside every configured range had no bar to go into.
+        return self::aggregate_person_histogram($inner, $params, 'total_answered', $classwidth, $ranges, -1);
+    }
+
+    /**
+     * Returns the attempts-per-person histogram as counts, aggregated in the database.
+     *
+     * The twin of get_answers_per_person_histogram() for the attempts
+     * chart, which loaded one row per person for the same reason.
+     *
+     * @param int $contextid
+     * @param int $scaleid
+     * @param int|null $courseid
+     * @param int $classwidth
+     * @param array $ranges
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
+     * @return array<int, array<int, int>>
+     */
+    public static function get_attempts_per_person_histogram(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid,
+        int $classwidth,
+        array $ranges,
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
+    ): array {
+        [$inner, $params] = self::get_sql_for_attempts_per_person(
+            $contextid,
+            $scaleid,
+            $courseid,
+            $alloweduserids,
+            $testid,
+            $starttime,
+            $endtime
+        );
+
+        // Unlike the answers chart, this one puts an unmatched ability into range 0
+        // rather than dropping it - that is what the PHP version did.
+        return self::aggregate_person_histogram($inner, $params, 'attempts', $classwidth, $ranges, 0);
+    }
+
+    /**
+     * Returns the highest number of attempts a single person made.
+     *
+     * @param int $contextid
+     * @param int $scaleid
+     * @param int|null $courseid
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
+     * @return int
+     */
+    public static function get_max_attempts_per_person(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid = null,
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
+    ): int {
+        [$inner, $params] = self::get_sql_for_attempts_per_person(
+            $contextid,
+            $scaleid,
+            $courseid,
+            $alloweduserids,
+            $testid,
+            $starttime,
+            $endtime
+        );
+
+        return self::get_max_from_subquery($inner, $params, 'attempts');
+    }
+
+    /**
+     * Returns the number of attempts per question, for the given questions only.
+     *
+     * The add-questions dialog used to obtain this by aggregating every
+     * question attempt of the context and joining the result onto all candidates. The
+     * aggregate is driven by the number of attempt steps, not by the page size, so it
+     * cost the same whether ten rows or none were shown.
+     *
+     * Restricting it to the questions actually on screen turns a full aggregation
+     * into an indexed lookup of a handful of ids.
+     *
+     * @param array $questionids
+     * @param int $contextid
+     * @return array Attempt count keyed by question id.
+     */
+    public static function get_contextattempts_for_questions(array $questionids, int $contextid): array {
+        global $DB;
+
+        if (empty($questionids)) {
+            return [];
+        }
+
+        [, $contextfrom, , $params] = self::get_sql_for_stat_base_request();
+        $contextfilter = $contextid > 0
+            ? 'ccc1.id = :contextid'
+            : $DB->sql_like('ccc1.json', ':default', false, false);
+        $params['contextid'] = $contextid;
+        $params['default'] = '%"default":true%';
+
+        [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED, 'visibleq');
+        $params = array_merge($params, $inparams);
+
+        $sql = "SELECT qa.questionid, COUNT(DISTINCT qa.id) contextattempts
+                  FROM $contextfrom
+                 WHERE $contextfilter
+                   AND qa.questionid $insql
+              GROUP BY qa.questionid";
+
+        $counts = [];
+        foreach ($DB->get_records_sql($sql, $params) as $row) {
+            $counts[(int) $row->questionid] = (int) $row->contextattempts;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Returns a light FROM/WHERE for counting the rows of the question list.
+     *
+     * Counting the list meant counting the rows of the full query - the
+     * one that carries the per question and per user attempt statistics. Those
+     * aggregates are computed only to be thrown away by COUNT(), which makes the
+     * count as expensive as the list itself.
+     *
+     * The row set is defined entirely by the joins up to the question bank; the
+     * statistics are LEFT JOINs and cannot add or remove a row. Leaving them out
+     * therefore yields exactly the same number.
+     *
+     * The joins are kept in the same order and with the same conditions as in
+     * return_sql_for_catscalequestions(); if that one changes, this has to follow.
+     * A test compares both counts so a divergence shows up rather than silently
+     * producing a wrong total.
+     *
+     * @param array $catscaleids
+     * @param int $contextid
+     * @return array [string $from, string $where, array $params]
+     */
+    public static function return_sql_for_catscalequestions_count(array $catscaleids, int $contextid): array {
+        global $DB;
+
+        $params = ['contextid' => $contextid];
+        $wherecontains = [];
+
+        if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            [$incatscales, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'countcatscales');
+            $params = array_merge($params, $inparams);
+            $wherecontains[] = "lccs.id $incatscales";
+        }
+
+        $from = <<<SQL
+        {local_catquiz_catscales} lccs
+            JOIN {local_catquiz_items} lci ON lci.catscaleid = lccs.id
+            LEFT JOIN {local_catquiz_itemparams} lcip
+              ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
+            JOIN {question} q ON q.id = lci.componentid
+            JOIN {question_versions} qv ON qv.questionid = q.id
+            JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+            JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
+        SQL;
+
+        // Items in piloting have no active parameter, so their context is
+        // NULL - the same allowance the list itself makes.
+        $where = '(lcip.contextid = :contextid OR lcip.contextid IS NULL)';
+        foreach ($wherecontains as $condition) {
+            $where .= " AND $condition";
+        }
+
+        return [$from, $where, $params];
+    }
+
+    /**
+     * Returns the number of items with unusable parameters, per scale.
+     *
+     * The per item column tells a maintainer what is wrong with one row,
+     * but not whether a scale has a problem at all. This answers that for every
+     * scale in one grouped query, so the overview costs the same whether there are
+     * three scales or three hundred.
+     *
+     * Counts only items whose active parameter is stored as unusable. Items in
+     * piloting have no active parameter and are a different, expected state.
+     *
+     * @param int|null $contextid Restrict to one context, or null for all.
+     * @return array<int, int> Number of unusable items keyed by catscaleid.
+     */
+    public static function get_unusable_item_counts_per_scale(?int $contextid = null): array {
+        global $DB;
+
+        $params = [];
+        $contextfilter = '';
+        if ($contextid !== null) {
+            $contextfilter = ' AND lci.contextid = :contextid ';
+            $params['contextid'] = $contextid;
+        }
+
+        $sql = "SELECT lci.catscaleid, COUNT(*) AS unusablecount
+                  FROM {local_catquiz_items} lci
+                  JOIN {local_catquiz_itemparams} lcip
+                    ON lcip.id = lci.activeparamid
+                 WHERE lcip.usable = 0 $contextfilter
+              GROUP BY lci.catscaleid";
+
+        $counts = [];
+        foreach ($DB->get_records_sql($sql, $params) as $row) {
+            $counts[(int) $row->catscaleid] = (int) $row->unusablecount;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Returns the number of questions per scale, for all scales in one query.
+     *
+     * The scale overview called get_sql_for_number_of_questions_in_scale()
+     * once per scale, so the number of count queries grew with the number of scales.
+     * One grouped query answers the same question for every scale at once.
+     *
+     * @return array<int, int> Question count keyed by catscaleid.
+     */
+    public static function get_number_of_questions_per_scale(): array {
+        global $DB;
+
+        $sql = "SELECT catscaleid, COUNT(*) AS numberofquestions
+                  FROM {local_catquiz_items}
+              GROUP BY catscaleid";
+
+        $counts = [];
+        foreach ($DB->get_records_sql($sql) as $row) {
+            $counts[(int) $row->catscaleid] = (int) $row->numberofquestions;
+        }
+
+        return $counts;
+    }
+
+    /**
      * Returns the default context id from DB.
      *
      * @return int
@@ -1368,13 +1988,31 @@ class catquiz {
      */
     public static function get_attempt_statistics(int $attemptid) {
         global $DB;
+        // Return exactly one row per question (per question attempt),
+        // carrying the fraction of its LAST graded step. A question can have
+        // several graded steps, so counting steps would overcount; here the inner
+        // subquery reduces to the latest graded step per question attempt. A
+        // question without any graded step (skipped/unanswered) yields a NULL
+        // fraction via the LEFT JOIN, which the caller counts as "unanswered"
+        // rather than "wrong". Pilot exclusion happens in the caller because the
+        // pilot flag is context-computed, not a database column.
         return $DB->get_records_sql(
-            "SELECT state, COUNT(*) as count
+            "SELECT qa.id AS questionattemptid, qa.questionid, laststep.fraction
             FROM {adaptivequiz_attempt} aa
-            LEFT JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
-            LEFT JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid AND fraction IS NOT NULL
-            WHERE aa.id = :attemptid
-            GROUP BY state;",
+            JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
+            LEFT JOIN (
+                SELECT qas.questionattemptid, qas.fraction
+                FROM {question_attempt_steps} qas
+                JOIN (
+                    SELECT questionattemptid, MAX(sequencenumber) AS maxseq
+                    FROM {question_attempt_steps}
+                    WHERE fraction IS NOT NULL
+                    GROUP BY questionattemptid
+                ) laststepseq
+                    ON laststepseq.questionattemptid = qas.questionattemptid
+                    AND laststepseq.maxseq = qas.sequencenumber
+            ) laststep ON laststep.questionattemptid = qa.id
+            WHERE aa.id = :attemptid",
             ['attemptid' => $attemptid]
         );
     }
@@ -1423,6 +2061,112 @@ class catquiz {
             $sql,
             $params
         );
+    }
+
+    /**
+     * Reduces attempt snapshots to one historical ability per person.
+     *
+     * Historical statistics must use the ability recorded at the time
+     * of the attempt (personability_after_attempt), not the person's current
+     * parameter. For a person-weighted analysis exactly one value per person is
+     * used; the documented rule here is the latest attempt in the period (by
+     * endtime). Attempts without a stored snapshot (legacy) are excluded.
+     *
+     * @param array $attempts Attempt records with userid, endtime and
+     *                        personability_after_attempt.
+     * @param string $rule    Selection rule for multiple attempts: 'last',
+     *                        'first' or 'best'.
+     *
+     * @return array Map of userid => historical ability (float).
+     */
+    public static function get_snapshot_ability_per_person(array $attempts, string $rule = 'last'): array {
+        // Build (userid, endtime, value) items from the attempt
+        // snapshots and reduce to one value per person via the shared rule, so
+        // charts, statistics and exports all apply the same selection.
+        $items = [];
+        foreach ($attempts as $attempt) {
+            $items[] = [
+                'userid' => (int) $attempt->userid,
+                'endtime' => (int) ($attempt->endtime ?? 0),
+                // A missing snapshot (legacy attempt) becomes null and is dropped.
+                'value' => $attempt->personability_after_attempt ?? null,
+            ];
+        }
+        return \local_catquiz\teststrategy\feedback_helper::reduce_to_one_value_per_person($items, $rule);
+    }
+
+    /**
+     * Returns aggregated peer-comparison statistics for one context and scale.
+     *
+     * The reference group is context-true and statistically sound.
+     * It comprises, within the given CAT context and scale, exactly one value per
+     * person (the latest personparam per user), excludes the compared user, and
+     * is aggregated in SQL rather than loading every row into PHP. The returned
+     * counts allow a midrank percentile:
+     *     100 * (lowercount + 0.5 * equalcount) / n
+     * where n is the number of distinct peers.
+     *
+     * @param int $contextid     CAT context the comparison is scoped to.
+     * @param int $catscaleid    Scale the comparison is scoped to.
+     * @param float $score       The compared person's ability (rounded to 4 dp).
+     * @param int $excludeuserid The user to exclude from the reference group.
+     *
+     * @return \stdClass Object with n, meanvalue, lowercount, equalcount.
+     */
+    public static function get_peer_comparison_stats(
+        int $contextid,
+        int $catscaleid,
+        float $score,
+        int $excludeuserid
+    ): \stdClass {
+        global $DB;
+        // Compare at the stored precision (4 decimals) so ties are detected.
+        $score = round($score, 4);
+        // Issue #15 + #10: only valid results count as peers. Invalid results
+        // (e.g. the "all correct" / "all wrong" case that #10 excludes from
+        // feedback) diverge and are stored clamped to the saturation bound
+        // ±MODEL_POS_INF; a valid ability is strictly inside that bound.
+        $inf = model_person_param::MODEL_POS_INF;
+        $sql = "
+            SELECT
+                COUNT(1) AS n,
+                AVG(peers.ability) AS meanvalue,
+                SUM(CASE WHEN peers.ability < :scorelt THEN 1 ELSE 0 END) AS lowercount,
+                SUM(CASE WHEN peers.ability = :scoreeq THEN 1 ELSE 0 END) AS equalcount
+            FROM (
+                SELECT pp.userid, pp.ability
+                FROM {local_catquiz_personparams} pp
+                WHERE pp.contextid = :contextid
+                  AND pp.catscaleid = :catscaleid
+                  AND pp.userid <> :excludeuserid
+                  AND pp.ability IS NOT NULL
+                  AND ABS(pp.ability) < :inf
+                  AND pp.id = (
+                      SELECT MAX(pp2.id)
+                      FROM {local_catquiz_personparams} pp2
+                      WHERE pp2.contextid = pp.contextid
+                        AND pp2.catscaleid = pp.catscaleid
+                        AND pp2.userid = pp.userid
+                        AND pp2.ability IS NOT NULL
+                        AND ABS(pp2.ability) < :inf2
+                  )
+            ) peers";
+        $params = [
+            'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
+            'excludeuserid' => $excludeuserid,
+            'scorelt' => $score,
+            'scoreeq' => $score,
+            'inf' => $inf,
+            'inf2' => $inf,
+        ];
+        $record = $DB->get_record_sql($sql, $params);
+        return (object) [
+            'n' => (int) ($record->n ?? 0),
+            'meanvalue' => $record->meanvalue !== null ? (float) $record->meanvalue : 0.0,
+            'lowercount' => (int) ($record->lowercount ?? 0),
+            'equalcount' => (int) ($record->equalcount ?? 0),
+        ];
     }
 
     /**
@@ -1733,7 +2477,11 @@ class catquiz {
         $data->personability_before_attempt = $attemptdata['ability_before_attempt'];
         $data->personability_after_attempt = $attemptdata['progress']->get_abilities()[$attemptdata['catscaleid']] ?? null;
         $data->starttime = $attemptdata['starttime'] ?? null;
-        $data->endtime = $attemptdata['endtime'] ?: time();
+        // Never stamp an end time here. save_attempt_to_db() runs after
+        // every response (i.e. while the attempt is still running); the end time
+        // is set exactly once by attempt_finalizer at completion. On INSERT the
+        // running attempt gets endtime = null; on UPDATE the field is left
+        // untouched so a finalised end time is never clobbered.
 
         if (get_config('local_catquiz', 'store_debug_info')) {
             $data->debug_info = json_encode($attemptdata['debuginfo']);
@@ -1755,7 +2503,6 @@ class catquiz {
 
         $now = time();
         $data->timemodified = $now;
-        $data->timecreated = $now;
 
         $attemptdata['courseid'] = $courseandinstance['courseid'];
 
@@ -1770,9 +2517,17 @@ class catquiz {
         $existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptdata['attemptid']]);
         if ($existingrecord) {
             $data->id = $existingrecord->id;
+            // Preserve the original creation time and never touch the
+            // end time on update. The end time is owned by attempt_finalizer.
+            unset($data->timecreated);
+            unset($data->endtime);
             $DB->update_record('local_catquiz_attempts', $data);
             return $existingrecord->id;
         }
+
+        // INSERT: fresh (running) attempt. No end time yet.
+        $data->timecreated = $now;
+        $data->endtime = null;
 
         $id = $DB->insert_record('local_catquiz_attempts', (object) $data);
 
@@ -1880,6 +2635,7 @@ class catquiz {
      * @param ?int $starttime
      * @param ?int $endtime
      * @param bool $enrolled
+     * @param string $fields Columns to select; defaults to all.
      *
      * @return array
      */
@@ -1891,7 +2647,8 @@ class catquiz {
         ?int $contextid = null,
         ?int $starttime = null,
         ?int $endtime = null,
-        bool $enrolled = true
+        bool $enrolled = true,
+        string $fields = '*'
     ) {
         global $DB;
 
@@ -1912,7 +2669,11 @@ class catquiz {
             SQL;
         }
 
-        $sql = "$with SELECT * FROM {local_catquiz_attempts} a $join WHERE 1=1";
+        // The caller decides which columns it needs. SELECT * always
+        // carried debug_info along - a field that can hold the full trace of an
+        // attempt and that none of the charts ever reads. On a large cohort that is
+        // the bulk of the transferred bytes, thrown away right after loading.
+        $sql = "$with SELECT $fields FROM {local_catquiz_attempts} a $join WHERE 1=1";
 
         if (!is_null($userid)) {
             $sql .= " AND userid = :userid";
@@ -1930,10 +2691,11 @@ class catquiz {
             $sql .= " AND contextid = :contextid";
         }
         if (!is_null($starttime)) {
-            $sql .= " AND a.timecreated >= :starttime";
+            // Filter historical periods by actual completion time.
+            $sql .= " AND a.endtime >= :starttime";
         }
         if (!is_null($endtime)) {
-            $sql .= " AND a.timecreated <= :endtime";
+            $sql .= " AND a.endtime <= :endtime";
         }
         $sql .= " ORDER BY a.endtime";
         $params = [
@@ -2363,11 +3125,17 @@ class catquiz {
      * @param int $contextid
      * @param int $scaleid
      * @param ?int $courseid
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
      *
      * @return array
      *
      */
-    public static function get_sql_for_questions_answered_per_person(int $contextid, int $scaleid, ?int $courseid = null) {
+    public static function get_sql_for_questions_answered_per_person(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid = null,
+        ?array $alloweduserids = null
+    ) {
         global $DB;
 
         $catscaleids = [$scaleid, ...catscale::get_subscale_ids($scaleid)];
@@ -2384,10 +3152,35 @@ class catquiz {
             $params = array_merge($params, ['courseid' => $courseid, 'courseid2' => $courseid]);
         }
 
+        // Review finding on issue #18: the group restriction reached the CSV export
+        // only, so the charts could still aggregate over members of other groups. It
+        // belongs to the cohort itself - every consumer then inherits it.
+        //
+        // Null means no restriction applies; an empty array means nothing is visible
+        // and must yield no rows rather than all of them.
+        $userfilter = '';
+        if ($alloweduserids !== null) {
+            if (empty($alloweduserids)) {
+                $userfilter = ' AND 1=0 ';
+            } else {
+                [$useridsql, $useridparams] = $DB->get_in_or_equal(
+                    $alloweduserids,
+                    SQL_PARAMS_NAMED,
+                    'alloweduser'
+                );
+                $userfilter = " AND ue.userid $useridsql ";
+                $params = array_merge($params, $useridparams);
+            }
+        }
+
         $sql = "SELECT DISTINCT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                -- No join on {role}: enrol.roleid belongs to the enrolment instance,
+                -- not to the person, and plugins such as the LTI enrolment leave it
+                -- at 0. Requiring a matching role - let alone the shortname
+                -- 'student' - silently removes everyone enrolled that way, which on
+                -- an LTI course is nearly the entire population.
                 LEFT JOIN (
                     SELECT s1.userid, COUNT(*) as answercount
                     FROM (
@@ -2405,7 +3198,7 @@ class catquiz {
                     GROUP BY s1.userid
                 ) s2 ON ue.userid = s2.userid
                 LEFT JOIN {local_catquiz_personparams} lcp ON ue.userid = lcp.userid AND lcp.catscaleid = :catscaleid
-                WHERE $where2";
+                WHERE $where2 $userfilter";
         return [$sql, $params];
     }
 
@@ -2415,49 +3208,158 @@ class catquiz {
      * @param int $contextid
      * @param int $scaleid
      * @param ?int $courseid
+     * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      */
-    public static function get_sql_for_attempts_per_person(int $contextid, int $scaleid, ?int $courseid) {
-        $where = "1 = 1";
-        $params = [
-            'catscaleid' => $scaleid,
-            'contextid' => $contextid,
-        ];
+    public static function get_sql_for_attempts_per_person(
+        int $contextid,
+        int $scaleid,
+        ?int $courseid,
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
+    ): array {
+        global $DB;
+
+        // The attempts are the primary source, not the enrolments.
+        //
+        // The previous construction started from {enrol}, joined {user_enrolments}
+        // and {role}, and attached the attempts with a LEFT JOIN. Every defect this
+        // chart has had came from that direction: an inner join on {role} removed
+        // everyone enrolled through LTI, because enrol.roleid is a property of the
+        // enrolment instance and those plugins leave it at 0; a second enrolment in
+        // the same course multiplied the count; people unenrolled since their test
+        // disappeared, and people enrolled afterwards appeared retroactively as
+        // "no attempt". None of it has anything to do with counting attempts.
+        //
+        // Counting from {local_catquiz_attempts} is immune to all of it: an attempt
+        // that exists is counted once, whatever the person's enrolment looks like
+        // today.
+        //
+        // The context is deliberately not a filter here. It records which calibration
+        // an attempt was scored under, not whether it happened - and after a
+        // recalibration the older attempts carry the previous context. Restricting on
+        // it made the whole history vanish from the chart.
+        $params = ['attemptscaleid' => $scaleid];
+        $where = 'a.scaleid = :attemptscaleid';
+
         if ($courseid) {
-            $where = "e.courseid = :courseid";
-            $params = array_merge($params, ['courseid' => $courseid]);
+            $where .= ' AND a.courseid = :courseid';
+            $params['courseid'] = $courseid;
         }
 
-        // Subquery s3  summarizes the attempts for multiple courses. This is
-        // used, if the shortcode is used outside a course and we want to know
-        // all attempt across all courses.
-        // Subquery s2 gets the number of attempts per course/context combination for all users
-        // The outermost query takes the highest (MAX) ability in case we have
-        // multiple abilities for the given user.
-        $sql = "SELECT s3.userid, MAX(s3.ability) ability, SUM(attemptcount) attempts
-                FROM (
-                    SELECT s2.userid, s2.ability, SUM(attemptcount) attemptcount
-                    FROM (
-                        SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
-                        FROM {enrol} e
-                        JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                        JOIN {role} r ON e.roleid = r.id
-                        LEFT JOIN (
-                            SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
-                            FROM {local_catquiz_attempts} a
-                            WHERE a.contextid = :contextid
-                            GROUP BY a.userid, a.contextid, a.courseid
-                        ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
-                        LEFT JOIN {local_catquiz_personparams} lcp ON
-                            ue.userid = lcp.userid
-                            AND lcp.catscaleid = :catscaleid
-                            AND lcp.contextid = s1.contextid
-                        WHERE $where
-                    ) s2
-                    GROUP BY s2.userid, s2.ability
-                    ORDER BY attemptcount
-                ) s3
-                GROUP BY s3.userid
-                ORDER BY attempts";
+        // The same scope the rest of the statistics uses. Without these the chart
+        // answered a different question than the page around it: a shortcode naming
+        // one test and one date range still counted attempts of other tests and from
+        // outside the range.
+        if ($testid) {
+            $where .= ' AND a.instanceid = :testinstance';
+            $params['testinstance'] = $testid;
+        }
+
+        // Bounded by endtime, like get_attempts(): an attempt belongs to the period
+        // in which it was finished, not the one in which it was begun.
+        if ($starttime) {
+            $where .= ' AND a.endtime >= :starttime';
+            $params['starttime'] = $starttime;
+        }
+
+        if ($endtime) {
+            $where .= ' AND a.endtime <= :endtime';
+            $params['endtime'] = $endtime;
+        }
+
+        // Null means no restriction; an empty array means nothing is visible and has
+        // to yield no rows rather than all of them.
+        $enrolwhere = $courseid ? 'e.courseid = :enrolcourseid' : '1 = 1';
+        $enrolparams = $courseid ? ['enrolcourseid' => $courseid] : [];
+
+        if ($alloweduserids !== null) {
+            if (empty($alloweduserids)) {
+                $where .= ' AND 1 = 0';
+                $enrolwhere .= ' AND 1 = 0';
+            } else {
+                [$insql, $inparams] = $DB->get_in_or_equal(
+                    $alloweduserids,
+                    SQL_PARAMS_NAMED,
+                    'alloweduser'
+                );
+                $where .= " AND a.userid $insql";
+                $params = array_merge($params, $inparams);
+
+                [$insql2, $inparams2] = $DB->get_in_or_equal(
+                    $alloweduserids,
+                    SQL_PARAMS_NAMED,
+                    'allowedenrol'
+                );
+                $enrolwhere .= " AND ue.userid $insql2";
+                $enrolparams = array_merge($enrolparams, $inparams2);
+            }
+        }
+
+        // The ability that colours the bar comes from the person's last attempt in
+        // the same selection - the value they were actually shown - rather than from
+        // {local_catquiz_personparams}, which holds the current estimate and is
+        // overwritten by every recalibration.
+        $abilitysql = "SELECT a2.personability_after_attempt
+                         FROM {local_catquiz_attempts} a2
+                        WHERE a2.userid = a.userid
+                          AND a2.scaleid = a.scaleid
+                        ORDER BY a2.endtime DESC, a2.id DESC
+                        LIMIT 1";
+
+        // The clause $where appears twice in the statement below. Moodle counts named parameters
+        // per occurrence, so the second copy needs its own names - otherwise the
+        // query fails with "Incorrect number of query parameters" rather than
+        // silently doing the wrong thing.
+        $notexistswhere = $where;
+        $notexistsparams = [];
+        foreach ($params as $name => $value) {
+            $notexistswhere = preg_replace(
+                '/:' . preg_quote($name, '/') . '\b/',
+                ':ne' . $name,
+                $notexistswhere
+            );
+            $notexistsparams['ne' . $name] = $value;
+        }
+
+        // People enrolled today who have no attempt at all form the "no attempt"
+        // bucket. They are the one thing the attempts table cannot supply, so the
+        // enrolments are consulted for that alone - without any join on {role}.
+        //
+        // The NOT EXISTS repeats $where deliberately. It used to test the scale
+        // alone, while the counting half above also filtered course, test and period.
+        // Anyone who had attempted this scale somewhere else therefore fell out of
+        // both halves at once: out of the counts because of those filters, and out of
+        // "no attempt" because the bare scale check found their other attempt. They
+        // vanished from the chart entirely rather than landing in a bucket.
+        $sql = "SELECT userid, MAX(ability) ability, SUM(attempts) attempts
+                  FROM (
+                        SELECT a.userid, ($abilitysql) ability, COUNT(*) attempts
+                          FROM {local_catquiz_attempts} a
+                         WHERE $where
+                      GROUP BY a.userid, a.scaleid
+
+                         UNION ALL
+
+                        SELECT DISTINCT ue.userid, CAST(NULL AS DECIMAL(10,5)) ability, 0 attempts
+                          FROM {enrol} e
+                          JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                         WHERE $enrolwhere
+                           AND NOT EXISTS (
+                               SELECT 1
+                                 FROM {local_catquiz_attempts} a
+                                WHERE a.userid = ue.userid
+                                  AND $notexistswhere
+                           )
+                  ) counted
+              GROUP BY userid
+              ORDER BY attempts";
+
+        $params = array_merge($params, $enrolparams, $notexistsparams);
 
         return [$sql, $params];
     }
@@ -2485,14 +3387,23 @@ class catquiz {
         bool $enrolled = true
     ): array {
         $params = [
-            'contextid' => $contextid,
             'scaleid' => $scaleid,
             'courseid' => $courseid,
             'testid' => $testid,
             'starttime' => $starttime,
             'endtime' => $endtime,
         ];
-        $where = "a.contextid = :contextid AND a.scaleid = :scaleid";
+        // No restriction on the context. This is the raw data export: it has to
+        // contain every attempt on the scale, and the context only records which
+        // calibration an attempt was scored under, not whether it happened.
+        //
+        // Filtering on it returned the attempts of the currently active context
+        // alone, so everything from before a recalibration was missing - silently,
+        // because the file looked complete.
+        //
+        // The parameter is kept in the signature and written into the exported rows;
+        // callers that want a single calibration can still filter on that column.
+        $where = "a.scaleid = :scaleid";
         $join = "";
         if ($courseid) {
             $where .= " AND a.courseid = :courseid";
@@ -2512,11 +3423,12 @@ class catquiz {
         }
 
         if ($starttime) {
-            $where .= " AND a.starttime >= :starttime";
+            // Same completion-time period rule as the charts.
+            $where .= " AND a.endtime >= :starttime";
         }
 
         if ($endtime) {
-            $where .= " AND a.starttime <= :endtime";
+            $where .= " AND a.endtime <= :endtime";
         }
 
         $sql = "SELECT a.attemptid,
@@ -2566,9 +3478,13 @@ class catquiz {
 
         // If no itemparamid is given, select the one with the highest status.
         if (!$activeparamid) {
-            // Find the itemparam that should be selected.
+            // Sort DESCENDING by status so that index 0 really is the highest status.
+            // This used to sort ascending and then take element 0, which selected the
+            // LEAST calibrated parameter - for an item carrying parameters for several
+            // models that meant the stale/uncalibrated row (often an all-zero default)
+            // became the active one and was played during the test.
             $sortfun = function ($a, $b) {
-                return $a->status - $b->status;
+                return $b->status <=> $a->status;
             };
             usort($itemparams, $sortfun);
             $activeparamid = $itemparams[0]->id;
@@ -2613,6 +3529,7 @@ class catquiz {
     public static function save_item_param(stdClass $record): int {
         global $DB;
         $record->timemodified = time();
+        itemparam_validity::stamp($record);
         $id = $DB->insert_record('local_catquiz_itemparams', $record);
         return $id;
     }
@@ -2626,6 +3543,7 @@ class catquiz {
     public static function update_item_param(stdClass $record): int {
         global $DB;
         $record->timemodified = time();
+        itemparam_validity::stamp($record);
         $DB->update_record('local_catquiz_itemparams', $record);
         return $record->id;
     }
@@ -2776,6 +3694,9 @@ SQL;
                 },
                 $remainingparams
             );
+            foreach ($remainingparams as $remainingparam) {
+                itemparam_validity::stamp($remainingparam);
+            }
             $DB->insert_records('local_catquiz_itemparams', $remainingparams);
         }
 
@@ -2842,6 +3763,7 @@ SQL;
             }
             foreach ($qid2params[$questionid] as $p) {
                 $p->itemid = $itemid;
+                itemparam_validity::stamp($p);
                 $DB->update_record('local_catquiz_itemparams', $p, true);
             }
         }

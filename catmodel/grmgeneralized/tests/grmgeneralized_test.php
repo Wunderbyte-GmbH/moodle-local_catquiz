@@ -40,6 +40,245 @@ use local_catquiz\local\model\model_responses;
  * @covers \catmodel_grmgeneralized\grmgeneralized
  */
 final class grmgeneralized_test extends TestCase {
+    use \local_catquiz\derivative_fd_trait;
+
+    /**
+     * restrict_to_trusted_region() must return ascending thresholds and a finite likelihood.
+     *
+     * @return void
+     */
+    public function test_restrict_to_trusted_region_orders_thresholds(): void {
+        // Deliberately out of order: a_2 (0.5) > a_3 (1.0) would make P_middle negative.
+        $ip = ['difficulties' => ['0.0' => 0.0, '0.5' => 1.5, '1.0' => -1.5], 'discrimination' => 1.2];
+        $restricted = grmgeneralized::restrict_to_trusted_region($ip);
+
+        $values = array_values($restricted['difficulties']);
+        // Skip the baseline placeholder (index 0); the real thresholds must be ascending.
+        for ($i = 2; $i < count($values); $i++) {
+            $this->assertGreaterThan($values[$i - 1], $values[$i], 'Thresholds must be strictly ascending.');
+        }
+
+        $ll = grmgeneralized::log_likelihood(['ability' => 0.0], $restricted, 0.5);
+        $this->assertIsFloat($ll);
+        $this->assertFalse(is_nan($ll), 'Ordered thresholds must yield a finite log-likelihood.');
+    }
+
+
+    /**
+     * Verifies least_mean_squares_1st_derivative_ip() against the numeric gradient.
+     *
+     * @dataProvider lms_fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_1st_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $frac, $n) {
+            return grmgeneralized::least_mean_squares($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $frac, $n);
+        };
+        $analytic = grmgeneralized::least_mean_squares_1st_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_gradient_close($this->fd_gradient($f, $x), $analytic);
+    }
+
+    /**
+     * Verifies least_mean_squares_2nd_derivative_ip() against the numeric Hessian.
+     *
+     * @dataProvider lms_fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_2nd_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $frac, $n) {
+            return grmgeneralized::least_mean_squares($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $frac, $n);
+        };
+        $analytic = grmgeneralized::least_mean_squares_2nd_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_hessian_close($this->fd_hessian($f, $x), $analytic);
+    }
+
+    /**
+     * Deterministic grid for the LMS FD checks.
+     *
+     * @return array
+     */
+    public static function lms_fd_cases_provider(): array {
+        $items = [
+            'a' => ['difficulties' => ['0.0' => 0.0, '0.5' => -0.7, '1.0' => 0.9], 'discrimination' => 1.2],
+            'b' => [
+                'difficulties' => ['0.0' => 0.0, '0.25' => -1.2, '0.5' => -0.2, '0.75' => 0.5, '1.0' => 1.4],
+                'discrimination' => 0.8,
+            ],
+        ];
+        $abilities = [-1.0, 0.3, 1.2];
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach (array_keys($ip['difficulties']) as $frac) {
+                    $cases[sprintf('%s-a%d-f%s', $label, $ai, $frac)] = [
+                        'pp' => ['ability' => $ability], 'ip' => $ip, 'frac' => (float) $frac, 'n' => 3.0,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+
+
+    /**
+     * Verifies lors_1st_derivative_ip() against the numeric gradient of lors_residuals().
+     *
+     * @dataProvider lors_fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_1st_derivative_numeric(array $pp, array $ip, array $ors, float $n): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $ors, $n) {
+            return grmgeneralized::lors_residuals($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $ors, $n);
+        };
+        $this->assert_gradient_close($this->fd_gradient($f, $x), grmgeneralized::lors_1st_derivative_ip($pp, $ip, $ors, $n));
+    }
+
+    /**
+     * Verifies lors_2nd_derivative_ip() against the numeric Hessian of lors_residuals().
+     *
+     * @dataProvider lors_fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_2nd_derivative_numeric(array $pp, array $ip, array $ors, float $n): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $ors, $n) {
+            return grmgeneralized::lors_residuals($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $ors, $n);
+        };
+        $this->assert_hessian_close($this->fd_hessian($f, $x), grmgeneralized::lors_2nd_derivative_ip($pp, $ip, $ors, $n));
+    }
+
+    /**
+     * Deterministic (item x ability x odds ratios) grid for the LORS FD checks.
+     *
+     * @return array
+     */
+    public static function lors_fd_cases_provider(): array {
+        $items = [
+            'a' => ['difficulties' => ['0.0' => 0.0, '0.5' => -0.7, '1.0' => 0.9], 'discrimination' => 1.3],
+            'b' => [
+                'difficulties' => ['0.0' => 0.0, '0.25' => -1.2, '0.5' => -0.2, '0.75' => 0.5, '1.0' => 1.4],
+                'discrimination' => 0.8,
+            ],
+        ];
+        $orsets = [
+            'a' => ['0.5' => 1.5, '1.0' => 0.6],
+            'b' => ['0.25' => 2.0, '0.5' => 1.1, '0.75' => 0.7, '1.0' => 0.4],
+        ];
+        $abilities = [-1.0, 0.3, 1.2];
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                $cases[sprintf('%s-a%d', $label, $ai)] = [
+                    'pp' => ['ability' => $ability],
+                    'ip' => $ip,
+                    'ors' => $orsets[$label],
+                    'n' => 1.0,
+                ];
+            }
+        }
+        return $cases;
+    }
+
+
+    /**
+     * Verifies get_log_jacobian() against the numeric gradient of log_likelihood().
+     *
+     * @dataProvider fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     *
+     * @return void
+     */
+    public function test_get_log_jacobian_numeric(array $pp, array $ip, float $frac): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $frac) {
+            return grmgeneralized::log_likelihood($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $frac);
+        };
+        $this->assert_gradient_close($this->fd_gradient($f, $x), grmgeneralized::get_log_jacobian($pp, $ip, $frac));
+    }
+
+    /**
+     * Verifies get_log_hessian() against the numeric Hessian of log_likelihood().
+     *
+     * @dataProvider fd_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     *
+     * @return void
+     */
+    public function test_get_log_hessian_numeric(array $pp, array $ip, float $frac): void {
+        $fractions = array_keys($ip['difficulties']);
+        $x = grmgeneralized::convert_ip_to_vector($ip);
+        $f = function (array $v) use ($pp, $fractions, $frac) {
+            return grmgeneralized::log_likelihood($pp, grmgeneralized::convert_vector_to_ip($v, $fractions), $frac);
+        };
+        $this->assert_hessian_close($this->fd_hessian($f, $x), grmgeneralized::get_log_hessian($pp, $ip, $frac));
+    }
+
+    /**
+     * Deterministic grid of (item, ability, response) for the FD checks.
+     *
+     * @return array
+     */
+    public static function fd_cases_provider(): array {
+        $items = [
+            'a' => ['difficulties' => ['0.0' => 0.0, '0.5' => -0.7, '1.0' => 0.9], 'discrimination' => 1.3],
+            'b' => [
+                'difficulties' => ['0.0' => 0.0, '0.25' => -1.2, '0.5' => -0.2, '0.75' => 0.5, '1.0' => 1.4],
+                'discrimination' => 0.8,
+            ],
+        ];
+        $abilities = [-1.3, 0.0, 1.1];
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach (array_keys($ip['difficulties']) as $frac) {
+                    $cases[sprintf('%s-a%d-f%s', $label, $ai, $frac)] = [
+                        'pp' => ['ability' => $ability], 'ip' => $ip, 'frac' => (float) $frac,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+
+
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
      *
@@ -338,6 +577,177 @@ final class grmgeneralized_test extends TestCase {
     public static function get_log_hessian_provider(): array {
 
         return [];
+    }
+
+    /**
+     * Verifies the analytic polytomous Fisher information against an independent
+     * numeric reference.
+     *
+     * For a polytomous item the item (Fisher) information is
+     *   I(theta) = sum_k P_k(theta) * (-d^2/dtheta^2 log P_k(theta)),
+     * where the second derivative of each category log-probability is approximated
+     * by a central finite difference of the model's own likelihood(). The numeric
+     * path shares no code with fisher_info()/item_information() (it does not reuse
+     * log_likelihood_p_p()). This test fails if the baseline category is
+     * double-counted, as the historical bug inflated I by a factor 1 + P_baseline.
+     *
+     * @dataProvider fisher_info_numeric_provider
+     *
+     * @param array $pp
+     * @param array $ip
+     * @param array $fractions
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     */
+    public function test_fisher_info_numeric(array $pp, array $ip, array $fractions): void {
+        $model = $this->getmodel();
+
+        $h = 1e-5;
+        $theta = $pp['ability'];
+        $numeric = 0.0;
+        foreach ($fractions as $fraction) {
+            $logp = function ($t) use ($ip, $fraction) {
+                return log(max(1e-300, grmgeneralized::likelihood(['ability' => $t], $ip, (float) $fraction)));
+            };
+            $d2 = ($logp($theta + $h) - 2.0 * $logp($theta) + $logp($theta - $h)) / ($h * $h);
+            $pk = grmgeneralized::likelihood($pp, $ip, (float) $fraction);
+            $numeric += $pk * (-$d2);
+        }
+
+        $analytic = $model->fisher_info($pp, $ip);
+        $this->assertEqualsWithDelta($numeric, $analytic, 1e-3);
+    }
+
+    /**
+     * Deterministic parameter grid for the numeric Fisher test.
+     *
+     * @return array
+     */
+    public static function fisher_info_numeric_provider(): array {
+        $items = [
+            ['difficulties' => ['0.0' => 0.0, '0.5' => -0.4, '1.0' => 0.7], 'discrimination' => 1.3],
+            ['difficulties' => ['0.0' => 0.0, '0.333' => -0.6, '0.666' => 0.1, '1.0' => 0.9], 'discrimination' => 0.8],
+        ];
+        $abilities = [-1.5, -0.4, 0.0, 0.9, 2.0];
+        $cases = [];
+        foreach ($items as $i => $ip) {
+            $fractions = array_keys($ip['difficulties']);
+            foreach ($abilities as $j => $ability) {
+                $cases["item{$i}-ability{$j}"] = [
+                    'pp' => ['ability' => $ability],
+                    'ip' => $ip,
+                    'fractions' => $fractions,
+                ];
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * The combined get_ability_derivatives() must return exactly the same values
+     * as the separate log_likelihood_p()/log_likelihood_p_p() methods (this guards
+     * the memoised PP-Stufe-2 wiring in catcalc::estimate_person_ability()).
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     */
+    public function test_get_ability_derivatives_matches_separate(): void {
+        $ip = ['difficulties' => ['0.0' => 0.0, '0.5' => -0.4, '1.0' => 0.7], 'discrimination' => 1.3];
+        foreach (array_keys($ip['difficulties']) as $frac) {
+            foreach ([-2.5, -0.7, 0.0, 0.8, 2.5, 40.0, -40.0] as $theta) {
+                $pp = ['ability' => $theta];
+                $combined = grmgeneralized::get_ability_derivatives($pp, $ip, (float) $frac);
+                $this->assertEqualsWithDelta(
+                    grmgeneralized::log_likelihood_p($pp, $ip, (float) $frac),
+                    $combined['jacobian'],
+                    1e-9
+                );
+                $this->assertEqualsWithDelta(
+                    grmgeneralized::log_likelihood_p_p($pp, $ip, (float) $frac),
+                    $combined['hessian'],
+                    1e-9
+                );
+            }
+        }
+    }
+
+    /**
+     * Numeric check of the person-ability (theta) derivatives against central
+     * finite differences of the model's own log-likelihood. Independent of the
+     * analytic P/W/moment formulae used by log_likelihood_p()/_p_p().
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     */
+    public function test_ability_derivatives_match_finite_differences(): void {
+        $ip = ['difficulties' => ['0.0' => 0.0, '0.5' => -0.4, '1.0' => 0.7], 'discrimination' => 1.3];
+        $h = 1e-5;
+        foreach (array_keys($ip['difficulties']) as $frac) {
+            foreach ([-1.5, -0.4, 0.0, 0.9, 2.0] as $theta) {
+                $pp = ['ability' => $theta];
+                $logl = function ($t) use ($ip, $frac) {
+                    return log(max(1e-300, grmgeneralized::likelihood(['ability' => $t], $ip, (float) $frac)));
+                };
+                $fdp = ($logl($theta + $h) - $logl($theta - $h)) / (2.0 * $h);
+                $fdpp = ($logl($theta + $h) - 2.0 * $logl($theta) + $logl($theta - $h)) / ($h * $h);
+                $this->assertEqualsWithDelta($fdp, grmgeneralized::log_likelihood_p($pp, $ip, (float) $frac), 1e-3);
+                $this->assertEqualsWithDelta($fdpp, grmgeneralized::log_likelihood_p_p($pp, $ip, (float) $frac), 1e-2);
+            }
+        }
+    }
+
+
+    /**
+     * When thresholds exceed the trusted-region maximum, the projection must keep
+     * them inside [min, max] (box constraint) while preserving the ascending gap.
+     * Previously the ordering step could push the top threshold past max.
+     *
+     * @return void
+     */
+    public function test_restrict_to_trusted_region_keeps_box_constraint(): void {
+        // Several thresholds at/above the ceiling; a middle one below the floor.
+        $ip = ['difficulties' => ['0.0' => 0.0, '0.25' => 12.0, '0.5' => 12.0, '0.75' => -9.0, '1.0' => 20.0]];
+        $restricted = grmgeneralized::restrict_to_trusted_region($ip);
+
+        // Read the actually configured bounds (the code uses the same fallback).
+        $minconfig = get_config('catmodel_grmgeneralized', 'trusted_region_min_a');
+        $maxconfig = get_config('catmodel_grmgeneralized', 'trusted_region_max_a');
+        $min = ($minconfig === false || $minconfig === '') ? -5.0 : (float) $minconfig;
+        $max = ($maxconfig === false || $maxconfig === '') ? 5.0 : (float) $maxconfig;
+
+        $values = array_values($restricted['difficulties']);
+        $prev = null;
+        for ($i = 1; $i < count($values); $i++) {
+            $this->assertLessThanOrEqual($max + 1e-9, $values[$i], 'Threshold must not exceed max.');
+            $this->assertGreaterThanOrEqual($min - 1e-9, $values[$i], 'Threshold must not fall below min.');
+            if ($prev !== null) {
+                $this->assertGreaterThanOrEqual($prev, $values[$i], 'Thresholds must stay ascending.');
+            }
+            $prev = $values[$i];
+        }
+    }
+
+
+    /**
+     * The discrimination (slope) must be clamped into the configured positive
+     * trusted region: a negative or non-positive slope is floored to a small
+     * positive value, and an oversized slope is capped at the maximum.
+     *
+     * @return void
+     */
+    public function test_restrict_to_trusted_region_keeps_discrimination_positive(): void {
+        $base = ['difficulties' => ['0.0' => 0.0, '0.5' => -0.2, '1.0' => 0.4]];
+
+        $neg = grmgeneralized::restrict_to_trusted_region($base + ['discrimination' => -2.0]);
+        $this->assertGreaterThan(0.0, $neg['discrimination'], 'Discrimination must stay positive.');
+
+        $big = grmgeneralized::restrict_to_trusted_region($base + ['discrimination' => 99.0]);
+        $this->assertLessThanOrEqual(5.0 + 1e-9, $big['discrimination'], 'Discrimination must be capped.');
+
+        $ok = grmgeneralized::restrict_to_trusted_region($base + ['discrimination' => 1.4]);
+        $this->assertEqualsWithDelta(1.4, $ok['discrimination'], 1e-9, 'In-range discrimination is unchanged.');
     }
 
     /**

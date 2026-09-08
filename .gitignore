@@ -1,16 +1,84 @@
+# OS artefacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*Zone.Identifier
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ... but the Playwright lockfile belongs in the repository: the CI workflow runs
+# "npm ci", which refuses to work without one. Same trap as amd/build/ before:
+# the file exists locally and in every package, and git silently leaves it out.
+!tests/playwright/package-lock.json
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# AMD tooling. The compiled output under amd/build/ is deliberately NOT ignored:
+# Moodle loads amd/build/*.min.js at runtime and an administrator installing the
+# plugin has no Node toolchain, so the artefacts belong in the repository.
+#
+# Ignoring them had a subtle effect that cost a CI cycle: files added before the
+# rule stayed tracked and kept updating, so everything looked fine locally, while
+# every NEW module (questionpreview) was silently dropped from commits and CI
+# reported "File is newly generated and needs to be added".
+amd/Gruntfile.js
+amd/package.json
+amd/package-lock.json
+amd/node_modules
+
+# moodle-plugin-ci working directories
+ci/
+moodle/
+
+# PHPUnit / coverage
+.phpunit.result.cache
+.phpunit.cache/
+coverage/
+*.clover
+
+# Behat screenshots
+behatfaildumps/
+
+# Temporary / backup files
+*.bak
+*.tmp
+*.swp
+*~
+
+# Local developer overrides
+.env
+.env.local
+
 .project
 .settings
 /nbproject/private/
 project.xml
 project.properties
-.DS_Store
-.idea
-amd/Gruntfile.js
-amd/package.json
-amd/package-lock.json
-amd/node_modules
-.vscode/launch.json
-workspace.php
-workspace2.php
-/catquizcentralhub/
-/connectivity/
+
+/catquizcentralhub/host
+/catquizcentralhub/client
+
+# Interne Sitzungsdokumentation - nicht ausliefern/hochladen.
+/doc/
+
+# Playwright browser test artefacts (the sources under tests/playwright are tracked).
+tests/playwright/node_modules/
+tests/playwright/test-results/
+tests/playwright/playwright-report/
+
+# Subplugin folders
+catquizcentralhub/client
+catquizcentralhub/host

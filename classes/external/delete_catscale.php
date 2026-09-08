@@ -28,16 +28,13 @@ declare(strict_types=1);
 namespace local_catquiz\external;
 
 use context_system;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
 use local_catquiz\data;
 use moodle_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * External Service for local catquiz.
@@ -48,7 +45,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_catscale extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -57,8 +53,7 @@ class delete_catscale extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'id'  => new external_value(PARAM_INT, 'id', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -73,7 +68,19 @@ class delete_catscale extends external_api {
             'id' => $id,
         ]);
         require_login();
+
         $context = context_system::instance();
+
+        // Every external function has to call this: it establishes the context the
+        // request acts in for the rest of the call and checks that the web service
+        // session may use it at all. The capability below answers a different
+        // question - who may act - and does not replace it.
+        //
+        // The system context is right here: manage_catscales is declared
+        // CONTEXT_SYSTEM in db/access.php, so scale management is a site-wide
+        // permission rather than one granted inside an activity.
+        self::validate_context($context);
+
         if (!has_capability('local/catquiz:manage_catscales', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_catquiz');
         }
@@ -91,7 +98,6 @@ class delete_catscale extends external_api {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
             'message' => new external_value(PARAM_RAW, 'message if necessary', VALUE_OPTIONAL, ''),
-            ]
-        );
+            ]);
     }
 }

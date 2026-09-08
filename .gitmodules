@@ -1,0 +1,6 @@
+[submodule "catquizcentralhub/host"]
+	path = catquizcentralhub/host
+	url = https://github.com/ralferlebach/moodle-catquizcentralhub_host.git
+[submodule "catquizcentralhub/client"]
+	path = catquizcentralhub/client
+	url = https://github.com/ralferlebach/moodle-catquizcentralhub_client.git

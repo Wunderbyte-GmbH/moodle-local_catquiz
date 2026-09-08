@@ -49,7 +49,7 @@ class remote_settings_form extends dynamic_form {
         $this->add_action_buttons(false, get_string('saveconfig', 'local_catquiz'));
 
         // Load initial data.
-        $config = get_config('local_catquiz');
+        $config = get_config('catquizcentralhub_client');
         $this->set_data((array)$config);
     }
 
@@ -60,15 +60,26 @@ class remote_settings_form extends dynamic_form {
      */
     public function process_dynamic_submission() {
         $data = $this->get_data();
-        if ($data) {
-            foreach ($data as $name => $value) {
-                if ($name !== 'submitbutton') {
-                    set_config($name, $value, 'local_catquiz');
-                }
-            }
-            return ['success' => true];
+        if (!$data) {
+            return ['success' => false];
         }
-        return ['success' => false];
+
+        // These credentials used to be written under local_catquiz, while
+        // the code that actually contacts a hub reads them from
+        // catquizcentralhub_client. Nothing read the copy written here - it was a
+        // second store for a host and a token that no kill-switch covered, because
+        // the switch belongs to the client plugin.
+        //
+        // Writing to the one place that is read keeps the credentials under the same
+        // guard as everything else.
+        foreach ($data as $name => $value) {
+            if ($name === 'submitbutton') {
+                continue;
+            }
+            set_config($name, $value, 'catquizcentralhub_client');
+        }
+
+        return ['success' => true];
     }
 
     /**
@@ -91,7 +102,7 @@ class remote_settings_form extends dynamic_form {
      * Set the default data for the form.
      */
     public function set_data_for_dynamic_submission(): void {
-        $config = get_config('local_catquiz');
+        $config = get_config('catquizcentralhub_client');
         $this->set_data($config);
     }
 

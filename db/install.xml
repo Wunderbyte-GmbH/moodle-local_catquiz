@@ -36,7 +36,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
-        <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_subscriptions" COMMENT="Handle subscriptions to different data records in catquiz">
@@ -58,7 +57,6 @@
       <INDEXES>
         <INDEX NAME="subscription" UNIQUE="true" FIELDS="userid,itemid,area"/>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
-        <INDEX NAME="itemid" UNIQUE="false" FIELDS="itemid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_tests" COMMENT="Handle tests for catquiz">
@@ -85,8 +83,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="component" UNIQUE="false" FIELDS="componentid,component"/>
-        <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
-        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_catcontext" COMMENT="The catcontext holds all the settings for a new calculation of item params or person abilities">
@@ -132,9 +128,8 @@
       <INDEXES>
         <INDEX NAME="component" UNIQUE="false" FIELDS="componentid,componentname"/>
         <INDEX NAME="componentid" UNIQUE="false" FIELDS="componentid"/>
-        <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
-        <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
-        <INDEX NAME="activeparamid" UNIQUE="false" FIELDS="activeparamid"/>
+        <INDEX NAME="catscaleid_componentname_componentid" UNIQUE="false" FIELDS="catscaleid,componentname,componentid" COMMENT="Issue #25: item lookup by scale and component."/>
+        <INDEX NAME="catscaleid_activeparamid" UNIQUE="false" FIELDS="catscaleid,activeparamid" COMMENT="Issue #25: joins from items to their active parameter per scale."/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_itemparams" COMMENT="Store cat item parameters">
@@ -150,6 +145,7 @@
         <FIELD NAME="guessing" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT = "0" SEQUENCE="false" DECIMALS="4" COMMENT="overall influence of guessing on probability of successful solution of item"/>
         <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="values for item paramters"/> <!-- TODO: To be implemented soon -->
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Issue #54: 1 when the stored parameters satisfy the contract of their model, 0 when the item is played as a pilot item instead. Derived from model_strategy::validate_item_parameters() when the row is written, so that the backend can filter and sort on it."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -159,8 +155,8 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="uniqueitemparam" UNIQUE="true" FIELDS="itemid,contextid,model"/>
+        <INDEX NAME="contextid_usable" UNIQUE="false" FIELDS="contextid,usable" COMMENT="Issue #54: serves the backend filter for unusable parameters and the per scale counts."/>
         <INDEX NAME="itemid" UNIQUE="false" FIELDS="itemid"/>
-        <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_personparams" COMMENT="Table to save person params dependent on contexts">
@@ -184,10 +180,7 @@
         <KEY NAME="attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
-        <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
-        <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
-        <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
+        <INDEX NAME="userid_contextid_catscaleid" UNIQUE="true" FIELDS="userid,contextid,catscaleid" COMMENT="Issue #25: one person parameter per user, context and scale. The saving code keyed existing rows by userid and therefore already assumed this."/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_attempts" COMMENT="Table to save all relevant data about attempts of adaptive quiz instances.">
@@ -221,14 +214,11 @@
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
-        <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="scaleid"/>
-        <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
-        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
-        <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
+        <INDEX NAME="attemptid" UNIQUE="true" FIELDS="attemptid" COMMENT="Issue #5: at most one CATquiz attempt per adaptive quiz attempt."/>
         <INDEX NAME="instanceid" UNIQUE="false" FIELDS="instanceid"/>
         <INDEX NAME="endtime" UNIQUE="false" FIELDS="endtime"/>
-        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="instanceid"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated" COMMENT="Issue #25: this index was named timecreated but indexed instanceid, duplicating the instanceid index and leaving time-range filters unindexed."/>
+        <INDEX NAME="contextid_scaleid_userid_attemptid" UNIQUE="false" FIELDS="contextid,scaleid,userid,attemptid" COMMENT="Issue #25: covers the statistics access pattern context + scale + user."/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_progress" COMMENT="Stores the progress of attempts that are not yet finished.">
@@ -243,11 +233,9 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
+        <KEY NAME="attemptid" TYPE="foreign-unique" FIELDS="attemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
-        <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_qhashmap" COMMENT="Maps questions between instances using hashes">
@@ -302,6 +290,37 @@
             <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
             <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
         </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_catquiz_attemptscale" COMMENT="Per-attempt, per-scale CAT result history (issue #9). One row per finalised attempt and successfully tested scale.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="catattemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to local_catquiz_attempts.id (the CATquiz attempt, not the adaptivequiz attempt)"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catcontext"/>
+        <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="score" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="ability estimate for the scale in this attempt"/>
+        <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/>
+        <FIELD NAME="n" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="number of graded, non-pilot items in this attempt for the scale"/>
+        <FIELD NAME="fraction" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="fraction of correct answers"/>
+        <FIELD NAME="isprimary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if this is the primary/reported scale of the attempt"/>
+        <FIELD NAME="isvalid" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if the scale result is valid (primary, statistically valid, measured in this attempt)"/>
+        <FIELD NAME="resultsource" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="origin of the value: current | prior | legacy"/>
+        <FIELD NAME="validationstatus" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="comma-separated machine-readable rejection reason codes, empty when valid"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="catattemptid" TYPE="foreign" FIELDS="catattemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="catscaleid" TYPE="foreign" FIELDS="catscaleid" REFTABLE="local_catquiz_catscales" REFFIELDS="id"/>
+        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="local_catquiz_catcontext" REFFIELDS="id"/>
+        <KEY NAME="catattemptid_catscaleid" TYPE="unique" FIELDS="catattemptid, catscaleid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_contextid_catscaleid" UNIQUE="false" FIELDS="userid, contextid, catscaleid"/>
+        <INDEX NAME="isvalid" UNIQUE="false" FIELDS="isvalid"/>
+        <INDEX NAME="isprimary" UNIQUE="false" FIELDS="isprimary"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

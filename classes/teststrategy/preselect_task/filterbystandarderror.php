@@ -210,8 +210,9 @@ class filterbystandarderror extends preselect_task {
         if (
             $ismainscale
             && (
-                count($this->progress->get_playedquestions()) < $this->context['minimumquestions']
-                || count($playeditems) < $this->context['min_attempts_per_scale']
+                $this->progress->get_num_answered_productive_questions() < $this->context['minimumquestions']
+                || $this->progress->get_num_answered_productive_questions($scaleid)
+                    < $this->context['min_attempts_per_scale']
             )
         ) {
             return false;

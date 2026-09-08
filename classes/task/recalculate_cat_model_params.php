@@ -25,10 +25,11 @@
 
 namespace local_catquiz\task;
 
-use local_catquiz\catcontext;
-use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
-use local_catquiz\data\dataapi;
+use local_catquiz\local\calculation\calculation_mode;
+use local_catquiz\local\calculation\calculation_request;
+use local_catquiz\local\calculation\calculation_service;
+use local_catquiz\local\calculation\calculation_trigger;
 
 /**
  * Runs through all contexts and recalculates values for all CAT models.
@@ -53,15 +54,26 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
      */
     public function execute() {
         $mainscales = catquiz::get_all_scales_for_active_contexts();
-        $cmi = new catmodel_info();
+        $service = new calculation_service();
         foreach ($mainscales as $scale) {
-            if (!$context = catcontext::get_instance($scale->id)) {
-                $context = dataapi::create_new_context_for_scale($scale->id, $scale->name);
-            }
-            if (!$cmi->needs_update($context, $scale->id)) {
+            // Use the scale's persistent active context (loaded from
+            // the database, never a process-local cache) and route the run through
+            // the central service in the incremental mode. A scheduled trigger may
+            // only ever run the incremental mode, so it never creates or activates
+            // a new context and never hides historical statistics/exports.
+            if (empty($scale->contextid)) {
+                mtrace("catquiz recalculation: scale {$scale->id} has no active context; skipped.");
                 continue;
             }
-            $cmi->update_params($context->id, $scale->id);
+            $request = new calculation_request(
+                (int) $scale->id,
+                (int) $scale->contextid,
+                calculation_mode::INCREMENTAL_RECALCULATION,
+                calculation_trigger::SCHEDULED,
+                0
+            );
+            // The service echoes the run summary to the cron console itself.
+            $service->execute($request);
         }
     }
 }

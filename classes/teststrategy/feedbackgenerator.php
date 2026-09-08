@@ -25,10 +25,10 @@
 namespace local_catquiz\teststrategy;
 
 use coding_exception;
-use context_course;
 use context_system;
 use local_catquiz\catscale;
 use local_catquiz\data\catscale_structure;
+use local_catquiz\local\access\context_resolver;
 use stdClass;
 use UnexpectedValueException;
 
@@ -256,25 +256,37 @@ abstract class feedbackgenerator {
 
         $feedbacksettings->set_params_from_attempt($newdata, $quizsettings);
 
+        // Forward the forced-scale configuration end to end. When the
+        // caller passes the defaults, fall back to the values carried on the
+        // feedback settings, then hand them to the selection strategy (which maps
+        // $forcedscaleid onto its $catscaleid parameter).
+        $forcedscaleid = $forcedscaleid ?: (int) $feedbacksettings->forcedscaleid;
+        $feedbackonlyfordefinedscaleid = $feedbackonlyfordefinedscaleid
+            || $feedbacksettings->feedbackonlyfordefinedscaleid;
+
         return info::get_teststrategy($strategyid)
         ->select_scales_for_report(
             $feedbacksettings,
             $transformedpersonabilities,
-            $newdata
+            $newdata,
+            $forcedscaleid,
+            $feedbackonlyfordefinedscaleid
         );
     }
 
     /**
-     * Returns a fallback if no feedback can be generated.
+     * Returns an empty result when a generator has no reportable data.
+     *
+     * A generator without data must not produce a tab. The assembly
+     * (attemptfeedback::generate_feedback) skips empty results, so returning an
+     * empty array here suppresses the tab instead of rendering a stray
+     * "feedback not available" block. When the whole attempt has no reportable
+     * result, a single central notice is shown by the assembly instead.
      *
      * @return array
-     * @throws coding_exception
      */
     protected function no_data(): array {
-        return [
-            'heading' => $this->get_heading(),
-            'content' => get_string('attemptfeedbacknotavailable', 'local_catquiz'),
-        ];
+        return [];
     }
 
     /**
@@ -327,7 +339,7 @@ abstract class feedbackgenerator {
     protected function has_teacherfeedbackpermission(): bool {
         return has_capability(
             'local/catquiz:view_teacher_feedback',
-            context_system::instance()
+            $this->get_attempt_context()
         );
     }
 
@@ -337,19 +349,46 @@ abstract class feedbackgenerator {
      * @return bool
      */
     protected function has_extended_view_permissions(): bool {
-        global $COURSE;
-
-        if ($COURSE) {
-            $context = context_course::instance($COURSE->id);
-            if (has_capability('local/catquiz:view_users_feedback', $context)) {
-                return true;
-            }
+        if (has_capability('local/catquiz:view_users_feedback', $this->get_attempt_context())) {
+            return true;
         }
         if (has_capability('local/catquiz:canmanage', context_system::instance())) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Returns the context the current attempt belongs to.
+     *
+     * Permissions must be judged in the course or module context of the
+     * attempt being viewed, not in the system context and not via the global
+     * $COURSE, which during shortcode or AJAX rendering is not necessarily the
+     * course of the attempt.
+     *
+     * @return \context
+     */
+    protected function get_attempt_context(): \context {
+        return context_resolver::for_attempt($this->get_attemptid(), $this->component);
+    }
+
+    /**
+     * Returns the id of the attempt this generator is working on.
+     *
+     * @return int
+     */
+    protected function get_attemptid(): int {
+        return $this->attemptid ?? 0;
+    }
+
+    /**
+     * Returns the component the current attempt belongs to.
+     *
+     * @return string
+     */
+    protected function get_component(): string {
+        return $this->component;
     }
 
     /**
@@ -386,7 +425,12 @@ abstract class feedbackgenerator {
             $this->structuredabilities = [];
             return [];
         }
-        $catscales = $newdata['catscales'];
+        // Attemptfeedback::update_data() returns early when no person
+        // abilities exist yet and never sets 'catscales'. array_key_first([]) is null,
+        // which used to reach catscale::__construct() and fail there with a TypeError
+        // - one level below the mistake, and in place of the message that would have
+        // named the real cause.
+        $catscales = $newdata['catscales'] ?? [];
 
         // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
@@ -397,10 +441,27 @@ abstract class feedbackgenerator {
 
         $personabilities = [];
         $selectedscaleid = null;
-        // Ability range is the same for all scales with same root scale.
-        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
+        /* Issue #7 DoD 2: the display gate comes from the central result object,
+           not from the raw `excluded` flag. That flag conflates a measurement
+           problem (SE below the minimum) with a pure display decision (reporting
+           checkbox off), so every consumer had to know which combination meant
+           what. is_displayable() asks the same object the validator uses. */
+        $attemptresult = feedback_helper::build_attempt_result($personabilitiesfeedbackeditor, $newdata);
+        // Ability range is the same for all scales with same root scale, so the test's
+        // primary scale is the right reference when no scale list is available.
+        $abiltiyrange = $this->feedbackhelper->get_ability_range(
+            $catscales === []
+                ? self::get_primary_catscaleid($newdata)
+                : (int) array_key_first($catscales)
+        );
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
+            // The feedback predicate, not the completion one. is_displayable()
+            // requires $scale->reportable, and that flag is set by the strategy for
+            // the single scale it singles out - inferlowestskillgap marks exactly
+            // one. Every other properly measured subscale was dropped from the table
+            // as a result, and with only one entry left the comparison chart
+            // reported "not enough valid results".
+            if (!feedback_helper::is_feedback_eligible($attemptresult, (int) $catscale)) {
                 continue;
             }
             if (isset($personability['primary'])) {
@@ -481,5 +542,29 @@ abstract class feedbackgenerator {
             ->get_quiz_settings()
             ->catquiz_catscales;
         return catscale::return_catscale_object($globalscaleid);
+    }
+    /**
+     * Returns the primary scale of the test.
+     *
+     * Used when no scale list is available yet. Falls back to the first configured
+     * scale, and finally to zero, so the caller always receives an int - the point of
+     * issue #59 is that this value must never be null.
+     *
+     * @param array $newdata
+     * @return int
+     */
+    private static function get_primary_catscaleid(array $newdata): int {
+        if (!isset($newdata['progress'])) {
+            return 0;
+        }
+
+        $settings = $newdata['progress']->get_quiz_settings();
+        $scales = $settings->catquiz_catscales ?? null;
+
+        if (is_array($scales)) {
+            return (int) reset($scales);
+        }
+
+        return (int) ($scales ?? 0);
     }
 }

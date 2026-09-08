@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\local\access\context_resolver;
+use local_catquiz\local\access\feedback_access;
 use local_catquiz\output\catquizstatistics;
 
 require_once('../../config.php');
@@ -39,12 +41,14 @@ $endtime = optional_param('endtime', 0, PARAM_INT) ?: null;
 
 require_login();
 
-$PAGE->set_context(context_course::instance($cid));
+// Issue #18: resolve the context these statistics actually belong to (the quiz
+// module if the export is scoped to one test, otherwise the course) and apply the
+// same access rule the rendered statistics page uses, so that the export can never
+// hand out more than the page shows.
+$exportcontext = context_resolver::for_statistics($courseid ?: $cid, $testid);
+$PAGE->set_context($exportcontext);
 
-if (
-    !has_capability('local/catquiz:view_users_feedback', context_course::instance($cid)) &&
-    !has_capability('local/catquiz:canmanage', context_system::instance())
-) {
+if (!feedback_access::can_view_other_users($exportcontext)) {
     die(get_string('error:permissionforcsvdownload', 'local_catquiz', 'local/catquiz:view_users_feedback'));
 }
 
