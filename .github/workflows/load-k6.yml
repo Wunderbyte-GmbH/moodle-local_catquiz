@@ -30,9 +30,10 @@ on:
         description: 'Questions with item parameters to seed (0 disables)'
         required: false
         default: '20000'
-  push:
-    branches:
-      - main
+  # No push trigger. These runs seed hundreds of thousands of items and take the
+  # better part of an hour; on every merge to main they occupied the runners without
+  # anyone reading the result. Start them from the Actions tab when a measurement is
+  # actually wanted - the workflow takes its parameters as inputs.
 
 concurrency:
   group: load-k6-${{ github.event.pull_request.number || github.ref }}

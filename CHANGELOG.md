@@ -1,5 +1,18 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090528)
+
+- **Lasttests laufen nur noch auf Anforderung.** `load-k6` und `load-jmeter`
+  starteten bei jedem Push auf main; sie seeden Hunderttausende Items und belegen die
+  Runner fast eine Stunde, ohne dass jemand das Ergebnis liest. Der `push`-Trigger
+  ist entfernt, die Begruendung steht im Workflow. Alle drei Lasttests sind jetzt
+  `workflow_dispatch`.
+- **Regressionstest zu Attempt 12357** (`feedback_all_valid_scales_test`): vier
+  Skalen mit je 3 Fragen und SE unter dem Maximum, eine davon primary. Erwartet wird,
+  dass **alle vier** im Feedback zulaessig sind und genau eine primary bleibt. Ein
+  dritter Fall haelt fest, dass eine Skala unter dem Minimum weiterhin ausgeschlossen
+  wird - sonst bestuende der Test auch mit entferntem Filter.
+
 ## 1.2.0 (interne Version 2026090527)
 
 > CI rot: zwei Wrapper reichten Variablen weiter, die ihre Signatur nicht kennt.
