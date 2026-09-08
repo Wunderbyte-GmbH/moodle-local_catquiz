@@ -46,11 +46,13 @@ $context = context_resolver::for_attempt($attemptid);
 // context leaves it without a course and it fails while rendering the header.
 // require_login() with the course also enforces enrolment for the resolved course.
 $course = null;
+$cm = null;
 if ($context->contextlevel == CONTEXT_MODULE) {
-    // Only the course is taken from the resolution: the course module is not passed
-    // to require_login() below, so keeping it would be dead weight that reads like
-    // an oversight.
-    [$course] = get_course_and_cm_from_cmid($context->instanceid);
+    // Both are needed, for different reasons: the course for require_login() below,
+    // the course module for $PAGE. Dropping the module once looked like removing dead
+    // code - it is not passed to require_login() - but the navigation reads it while
+    // building the secondary nav and fails on null without it.
+    [$course, $cm] = get_course_and_cm_from_cmid($context->instanceid);
 } else if ($context->contextlevel == CONTEXT_COURSE) {
     $course = get_course($context->instanceid);
 }
@@ -69,6 +71,13 @@ if ($course) {
 } else {
     require_login();
 }
+// Set explicitly rather than through require_login(): passing the module there would
+// enforce $cm->uservisible and close this page for exactly the completed attempts it
+// exists to show.
+if (!empty($cm)) {
+    $PAGE->set_cm($cm, $course);
+}
+
 $PAGE->set_context($context);
 
 if (!feedback_access::can_view_other_users($context)) {

@@ -296,13 +296,19 @@ class questionsdisplay {
         $table->add_filter($standardfilter);
 
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'qtype']);
-        // The keys have to match define_columns() above, or the declaration is
-        // silently ignored and the header simply is not sortable. 'name' was such a
-        // key: the column that shows the question name is 'questiontext' - its header
-        // reads "Name", which is where the mismatch came from.
+        // Two name spaces meet here. define_columns() names *display* columns -
+        // 'questiontext' is one, rendered by col_questiontext(). This list names
+        // columns the database can sort by, and they must exist in the statement this
+        // table runs: return_sql_for_addcatscalequestions() selects the question name
+        // as 'name'.
+        //
+        // The distinction matters because the two lists differ per table: the main
+        // question list runs return_sql_for_catscalequestions(), which calls the same
+        // value 'questionname'. Verified against each query rather than assumed -
+        // 'questiontext' fails on both, 'questionname' fails on this one.
         $table->define_sortablecolumns([
             'idnumber',
-            'questiontext',
+            'name',
             'qtype',
             'questioncontextattempts',
         ]);

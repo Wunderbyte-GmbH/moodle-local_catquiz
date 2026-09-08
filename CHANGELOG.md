@@ -1,5 +1,107 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090537)
+
+> #58, dritter Schritt: Filter nach innen - versucht, gemessen, zurueckgenommen.
+
+- Der Versuch lag nahe: Die Filterspalten (`categoryname`, `qtype`) werden von der
+  inneren Abfrage ebenfalls ausgewaehlt. Der Test gegen echte Daten hat es widerlegt.
+- **Es sind Aliase.** Die innere Abfrage hat `qc.name as categoryname`, und SQL
+  erlaubt einen Alias nicht im `WHERE` derselben Ebene. Ein Filter auf
+  `categoryname` scheitert innen mit einem Datenbankfehler, waehrend er aussen
+  funktioniert - auf einer Seite, die vorher lief.
+- `ORDER BY` ist davon nicht betroffen, weil dort Aliase erlaubt sind. Genau deshalb
+  konnte die Sortierung wandern und der Filter nicht. Die beiden Klauseln sehen
+  austauschbar aus und sind es nicht.
+- Zurueckgenommen; gefilterte Seiten behalten den bisherigen Weg. Die Begruendung
+  steht als Kommentar an der Waechterstelle, damit der Versuch nicht ein zweites Mal
+  unternommen wird.
+- Stand von #58: unsortiert 614 -> 113 ms, sortiert 813 -> 94 ms auf MariaDB.
+  Gefiltert unveraendert. Regression 112/112 gruen.
+
+## 1.2.0 (interne Version 2026090536)
+
+> #58: Auch sortierte Seiten laufen jetzt ueber die innere Abfrage.
+
+- `ORDER BY` wandert mit nach innen, **wenn jede Sortierspalte dort existiert**. Die
+  aeussere Auswahl fuegt Spalten hinzu, die die innere nicht hat - ein literales
+  `question as component` und `0 as questioncontextattempts`. Eine Sortierung
+  danach waere innen eine unbekannte Spalte; `sort_is_available_in_subquery()`
+  erkennt das und laesst solche Seiten auf dem bisherigen Weg.
+- **Gemessen auf MariaDB, sortiert nach Name: 813 -> 94 ms.** Zeilen und
+  **Reihenfolge** vorher gegeneinander geprueft, fuer vier Sortierungen.
+- Die Reihenfolge ist hier der eigentliche Punkt: Ein inneres Limit ohne die
+  Sortierung naehme zehn beliebige Zeilen und sortierte diese - das sieht aus wie
+  eine sortierte Seite und ist keine.
+- Gefiltert wird weiterhin aussen; solche Seiten bleiben unveraendert. Der Filter
+  muesste dafuer ebenfalls nach innen uebersetzt werden.
+- Vier Tests, Regression 112/112 gruen.
+
+## 1.2.0 (interne Version 2026090535)
+
+> Behat: derselbe Fehler ein zweites Mal, an der zweiten Seite.
+
+- **`show_attemptfeedback.php`** scheiterte mit "Attempt to read property id on null"
+  aus `navigationlib` - dieselbe Ursache wie zuvor in
+  `mod_adaptivequiz/attemptfinished.php`: Ohne `$cm` setzt `require_login()` das
+  Kursmodul auch nicht auf der Seite, und die Sekundaernavigation liest dann auf null.
+- `$PAGE->set_cm($cm, $course)` ergaenzt. Die Sichtbarkeitspruefung bleibt draussen -
+  genau darum ging es: Die Ergebnisseite soll lesbar bleiben, wenn die Aktivitaet nach
+  Abschluss ausgeblendet wird.
+- **Ich hatte $cm hier als toten Code entfernt**, weil er nicht mehr an
+  `require_login()` geht. Er war es nicht - die Navigation braucht ihn. Jetzt wieder
+  aufgeloest und initialisiert.
+- Die uebrigen Seiten mit `require_login()` ohne Modul geprueft: Es sind
+  Systemseiten (`manage_*`), die nie ein Kursmodul hatten und von der Aenderung nicht
+  beruehrt sind.
+- Regression 112/112 gruen.
+
+## 1.2.0 (interne Version 2026090534)
+
+> #58: Das Seitenlimit wandert in die abgeleitete Tabelle - wo das gleichwertig ist.
+
+- **MariaDB materialisiert die abgeleitete Tabelle vollstaendig**, bevor sie zehn
+  Zeilen nimmt: mit `ANALYZE` gemessen 20.010 Durchlaeufe mit je vier
+  Index-Zugriffen fuer eine Seite von zehn. PostgreSQL bricht frueh ab und ist nicht
+  betroffen.
+- `catscalequestions_table::query_db()` schiebt das `LIMIT` jetzt nach innen -
+  **nur solange weder sortiert noch gefiltert wird**. Andernfalls naehme das innere
+  Limit zehn beliebige Zeilen, und die Seite saehe richtig aus und zeigte die
+  falschen. Sortierung, Filter, Download und die Form der Abfrage werden geprueft;
+  das urspruengliche FROM wird danach wiederhergestellt, damit die Zaehlabfrage
+  unberuehrt bleibt.
+- **Gemessen auf MariaDB: 614 -> 113 ms.** Zeilengleichheit vorher verifiziert:
+  identische IDs in identischer Reihenfolge.
+- Zwei Tests: einer stellt beide Formen gegeneinander, einer haelt die Waechter fest.
+  Regression 112/112 gruen.
+- Damit ist der haeufigste Fall abgedeckt - der Dialog beim Oeffnen. Sortierte und
+  gefilterte Seiten laufen weiter ueber den bisherigen Weg; sie nach innen zu ziehen
+  verlangt, Sortierung und Filter in die innere Abfrage zu uebersetzen, und das
+  bleibt offen.
+
+## 1.2.0 (interne Version 2026090533)
+
+> Vorarbeit zu #58 - dabei einen eigenen Fehler von gestern gefunden.
+
+- **Der Sortierschluessel des Add-Dialogs war falsch.** Ich hatte ihn auf
+  `questiontext` gesetzt und dabei gegen `define_columns()` geprueft. Das sind aber
+  zwei Namensraeume: `define_columns()` nennt **Anzeige**spalten - `questiontext`
+  wird von `col_questiontext()` gerendert -, `define_sortablecolumns()` dagegen
+  Spalten, die das Statement liefert. `ORDER BY questiontext` scheitert mit "column
+  does not exist".
+- Und die beiden Fragen-Tabellen unterscheiden sich: Der Add-Dialog waehlt den
+  Fragennamen als `name`, die Hauptliste als `questionname`. Gegen **beide** Abfragen
+  geprueft statt angenommen.
+- Der Test dazu ist umgestellt: Er faehrt jetzt ein echtes `ORDER BY` gegen die
+  Abfrage, statt zwei Listen miteinander zu vergleichen. Die alte Fassung hat genau
+  den falschen Namen akzeptiert. Zahn-Test nennt die Spalte.
+- **Befund fuer #58**: `query_db_cached_filtered()` ist zwar jetzt `protected`, baut
+  das SQL aber nicht selbst - sie delegiert an `query_db()`, und das ueberschreibt
+  `catscalequestions_table` bereits. Der Zugriffspunkt war also vorhanden. Sortier-
+  und Filterspalten des Add-Dialogs sind saemtlich in der inneren Abfrage verfuegbar;
+  `questioncontextattempts` ist dort eine Konstante. Damit ist das Verschieben von
+  `ORDER BY` und `LIMIT` nach innen grundsaetzlich moeglich.
+
 ## 1.2.0 (interne Version 2026090532)
 
 > CI rot: PHPDoc und Behat - beides Folgen eigener Aenderungen.

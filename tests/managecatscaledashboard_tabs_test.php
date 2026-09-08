@@ -415,58 +415,64 @@ final class managecatscaledashboard_tabs_test extends advanced_testcase {
         );
     }
     /**
-     * Every sortable column is a column the table actually has.
+     * Every sortable column is one the query can actually sort by.
      *
-     * A name that matches nothing is silently ignored: the header simply is not
-     * sortable, and nothing fails. 'idnunber' sat in this list instead of 'idnumber',
-     * so the label column could not be sorted at all - visible only to whoever tried.
+     * Two name spaces meet in this table. define_columns() names display columns -
+     * 'questiontext' is one, rendered by col_questiontext(). define_sortablecolumns()
+     * names columns the statement selects, and sorting by a display column fails with
+     * "column does not exist".
      *
-     * The comparison is against define_columns() rather than against a fixed list, so
-     * a column renamed later is caught without anyone editing this test.
+     * An earlier version of this test compared the two lists with each other and so
+     * accepted exactly the wrong name. Only the query can settle it, so the query is
+     * asked - the more so because the two question tables differ: the add dialog
+     * selects the question name as 'name', the main list as 'questionname'.
      *
      * @return void
      */
-    public function test_sortable_columns_exist(): void {
-        global $CFG;
+    public function test_sortable_columns_are_real_sql_columns(): void {
+        global $DB, $USER;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
-        $source = file_get_contents(
-            $CFG->dirroot . '/local/catquiz/classes/output/catscalemanager/questions/'
-                . 'questionsdisplay.php'
+        $now = time();
+        $contextid = (int) $DB->insert_record('local_catquiz_catcontext', (object) [
+            'name' => 'Sort context',
+            'description' => '',
+            'descriptionformat' => FORMAT_HTML,
+            'starttimestamp' => $now - 100,
+            'endtimestamp' => $now + 10000,
+            'timecreated' => $now,
+            'timemodified' => $now,
+            'usermodified' => 0,
+        ]);
+        $scaleid = (int) $DB->insert_record('local_catquiz_catscales', (object) [
+            'parentid' => 0,
+            'name' => 'Sort scale',
+            'label' => 'SRT1',
+            'contextid' => $contextid,
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
+
+        [$select, $from, $where, , $params] = catquiz::return_sql_for_addcatscalequestions(
+            $scaleid,
+            $contextid
         );
 
-        $extract = function (string $method) use ($source): array {
-            $names = [];
-            foreach (['define_columns', 'define_sortablecolumns'] as $unused) {
-                // Placeholder to keep the closure signature obvious.
-                break;
+        foreach (['idnumber', 'name', 'qtype', 'questioncontextattempts'] as $column) {
+            try {
+                $DB->get_records_sql(
+                    "SELECT $select FROM $from WHERE $where ORDER BY $column",
+                    $params,
+                    0,
+                    1
+                );
+            } catch (\Throwable $e) {
+                $this->fail("The add dialog cannot sort by '$column'.");
             }
-            $offset = 0;
-            while (($start = strpos($source, $method . '([', $offset)) !== false) {
-                $end = strpos($source, ']', $start);
-                $block = substr($source, $start, $end - $start);
-                preg_match_all("/'([a-z_]+)'/", $block, $matches);
-                $names = array_merge($names, $matches[1]);
-                $offset = $end;
-            }
+        }
 
-            return array_unique($names);
-        };
-
-        $columns = $extract('define_columns');
-        $sortable = $extract('define_sortablecolumns');
-
-        $this->assertNotEmpty($columns, 'No columns were found - the test cannot judge.');
-        $this->assertNotEmpty($sortable);
-
-        $unknown = array_values(array_diff($sortable, $columns));
-
-        $this->assertSame(
-            [],
-            $unknown,
-            'These columns are declared sortable but do not exist; the declaration is '
-                . 'ignored without any error.'
-        );
+        $this->assertTrue(true, 'Every declared sort column exists in the statement.');
     }
 }

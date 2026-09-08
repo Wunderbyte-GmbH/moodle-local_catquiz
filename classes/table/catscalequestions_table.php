@@ -337,10 +337,88 @@ class catscalequestions_table extends wunderbyte_table {
             $this->countparams = $params;
         }
 
+        $restore = $this->push_limit_into_subquery($pagesize);
+
         parent::query_db($pagesize, $useinitialsbar);
+
+        if ($restore !== null) {
+            $this->sql->from = $restore;
+        }
 
         $this->attach_contextattempts();
     }
+
+    /**
+     * Moves the page limit into the derived table when that is provably equivalent.
+     *
+     * The statement reads FROM ( SELECT ... ) as s1, and Moodle applies the limit to
+     * the outer query. MariaDB then materialises the whole derived table before
+     * taking ten rows - measured with ANALYZE: 20.010 loops with four index lookups
+     * each, for a page of ten. PostgreSQL stops early and is unaffected.
+     *
+     * Pushing the limit inside asks the same question only while the outer query
+     * neither sorts nor filters. Otherwise the inner limit would take an arbitrary
+     * ten rows and the page would look correct while showing the wrong ones. Both are
+     * checked, and the rewrite is skipped when either is present - which still leaves
+     * the common case covered: the dialog as it opens.
+     *
+     * @param int $pagesize
+     * @return string|null The original FROM to restore afterwards, or null.
+     */
+    private function push_limit_into_subquery(int $pagesize): ?string {
+        if ($pagesize <= 0 || $this->is_downloading()) {
+            return null;
+        }
+
+        // A filter stays outside, and a page that has one keeps the old path.
+        //
+        // Moving it inside looked possible - the columns it names are selected there
+        // too - but they are *aliases*: the inner query has `qc.name as categoryname`,
+        // and SQL does not allow an alias in the WHERE of the same level. A filter on
+        // categoryname fails inside while working outside, and the failure is a
+        // database error on a page that used to work.
+        //
+        // ORDER BY is different, which is why sorting could move: aliases are allowed
+        // there. The two clauses look interchangeable and are not.
+        if (trim((string) ($this->sql->filter ?? '')) !== '') {
+            return null;
+        }
+
+        // Sorting can move inside, but only if every column it names exists there.
+        // The derived table selects id, idnumber, name, qtype and categoryname; a
+        // sort on anything else - an outer alias such as questioncontextattempts, a
+        // constant - would be an unknown column and break the query.
+        $sort = trim((string) $this->get_sql_sort());
+        if ($sort !== '' && !$this->sort_is_available_in_subquery($sort)) {
+            return null;
+        }
+
+        $where = trim((string) $this->sql->where);
+        if ($where !== '1=1' && $where !== '1 = 1') {
+            return null;
+        }
+
+        // Only the shape this was measured against.
+        if (!preg_match('/^\\s*\\(\\s*SELECT\\b(.*)\\)\\s*as\\s+(\\w+)\\s*$/is', (string) $this->sql->from, $m)) {
+            return null;
+        }
+
+        $original = (string) $this->sql->from;
+
+        // LIMIT ... OFFSET is understood by both engines this plugin supports; the
+        // DML layer offers no portable helper for a limit inside a subquery.
+        $this->sql->from = sprintf(
+            '( SELECT %s %s LIMIT %d OFFSET %d ) as %s',
+            $m[1],
+            $sort === '' ? '' : 'ORDER BY ' . $sort,
+            $pagesize,
+            (int) $this->currpage * $pagesize,
+            $m[2]
+        );
+
+        return $original;
+    }
+
 
     /**
      * Enables loading the attempt count for the visible page.
@@ -791,5 +869,36 @@ class catscalequestions_table extends wunderbyte_table {
                 ]
             ),
         ];
+    }
+    /**
+     * Whether every column of a sort clause exists inside the derived table.
+     *
+     * The outer select adds columns the inner one does not have - a literal
+     * 'question' as component, 0 as questioncontextattempts. Sorting by those inside
+     * would fail with "unknown column", so the rewrite has to recognise them and step
+     * aside rather than produce a broken statement.
+     *
+     * @param string $sort The clause as get_sql_sort() returns it.
+     * @return bool
+     */
+    private function sort_is_available_in_subquery(string $sort): bool {
+        // What return_sql_for_addcatscalequestions() selects in its inner query.
+        $available = ['id', 'idnumber', 'name', 'qtype', 'categoryname'];
+
+        foreach (explode(',', $sort) as $part) {
+            $column = strtolower(trim(preg_replace('/\\s+(asc|desc)$/i', '', trim($part))));
+
+            // A qualified name would refer to the outer alias, which does not exist
+            // inside either.
+            if ($column === '' || str_contains($column, '.')) {
+                return false;
+            }
+
+            if (!in_array($column, $available, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
