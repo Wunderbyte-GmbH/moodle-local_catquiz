@@ -1,5 +1,28 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090551)
+
+> Alle vier Rueckmeldungen geprueft - alle vier trafen zu - und behoben.
+
+- **Der Harness wurde nach dem Verzeichnistausch nicht mitkopiert.** Die
+  Vergleichsversion enthaelt `measure_screens.php` nicht; der Fehlerpfad kuendigte
+  das Kopieren an und kopierte nicht, und `|| true` verschluckte den Fehlschlag. Der
+  Lauf haette gegen eine nicht existierende Datei gemessen. Jetzt wird die Datei beim
+  Tausch hineinkopiert, und der Bericht nennt beides getrennt: Anwendungscode aus der
+  Vergleichsversion, Messcode von hier, mit SHA.
+- **Die Workflow-Vorgabe stand weiter auf 7 Wiederholungen.** Der Rueckfall auf 20
+  griff nie, weil die Eingabe belegt war. Vorgabe jetzt 20, mit Begruendung.
+- **Fingerabdruecke wurden nicht verglichen.** Neu: `cli/compare_runs.php` stellt
+  zwei Laeufe gegenueber und **verweigert den Faktor**, wenn die Ergebnisse
+  abweichen - "NOT COMPARABLE" statt einer Zahl, die anderes mit anderem vergleicht.
+  Im Workflow verdrahtet, fuer beide Durchgaenge.
+- **Der Manager-Fingerabdruck war zu schwach.** Er lief nur ueber die oberste Ebene,
+  wodurch die verschachtelte Template-Struktur zu Fragezeichen wurde. Jetzt rekursiv
+  und kanonisch: Schluessel sortiert, Objekte auf ihre Eigenschaften reduziert. Zwei
+  unterschiedliche Manager-Seiten koennen keinen gleichen Hash mehr ergeben.
+- Zahn-Test des Gates: Ein manipulierter Fingerabdruck fuehrt zu "NOT COMPARABLE"
+  und keinem Faktor.
+
 ## 1.2.0 (interne Version 2026090550)
 
 > Rueckmeldungen zum Messharness umgesetzt.

@@ -122,16 +122,14 @@ function measure(callable $run, int $repeats): array {
  * @return string
  */
 function fingerprint($result): string {
-    if (is_array($result)) {
+    // A flat list of rows: the count and the ordered ids. The payload legitimately
+    // differs between versions - a column added, a label reworded - while the set and
+    // the order of rows is what "the same screen" means.
+    if (is_array($result) && $result !== [] && array_key_exists('id', (array) reset($result))) {
         $ids = array_map(
             function ($row) {
-                if (is_object($row)) {
-                    return $row->id ?? '?';
-                }
-                if (is_array($row)) {
-                    return $row['id'] ?? '?';
-                }
-                return '?';
+                $row = (array) $row;
+                return $row['id'] ?? '?';
             },
             array_values($result)
         );
@@ -139,11 +137,50 @@ function fingerprint($result): string {
         return sprintf('%d rows, ids %s', count($result), substr(sha1(implode(',', $ids)), 0, 12));
     }
 
+    // Anything else - the manager page returns a nested template structure. Walking
+    // only the top level turned most of it into question marks, so two clearly
+    // different pages could share a hash that said nothing. The whole structure is
+    // canonicalised instead: keys sorted, so an unordered difference does not count
+    // as one, and objects reduced to their properties.
+    if (is_array($result) || is_object($result)) {
+        $canonical = canonicalise($result);
+
+        return sprintf(
+            'structure %s, %d top-level keys',
+            substr(sha1(json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), 0, 12),
+            is_array($canonical) ? count($canonical) : 0
+        );
+    }
+
     if (is_scalar($result)) {
         return 'value ' . substr(sha1((string) $result), 0, 12);
     }
 
     return 'not comparable';
+}
+
+/**
+ * Sorts keys throughout a structure so equal content hashes equally.
+ *
+ * Without this the hash depends on the order a version happened to assemble its
+ * template data, and a reordering would read as a behavioural difference.
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+function canonicalise($value) {
+    if (is_object($value)) {
+        $value = get_object_vars($value);
+    }
+
+    if (is_array($value)) {
+        ksort($value);
+        foreach ($value as $key => $child) {
+            $value[$key] = canonicalise($child);
+        }
+    }
+
+    return $value;
 }
 
 /**

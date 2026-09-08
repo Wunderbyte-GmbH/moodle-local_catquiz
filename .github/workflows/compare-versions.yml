@@ -63,9 +63,12 @@ on:
           agreed limit for large ones.
         default: '1000'
       repeats:
-        description: 'Warm runs per size (median and p95 are taken from these)'
+        description: >-
+          Warm runs per measurement. Twenty, not seven: at seven a p95 is effectively
+          the slowest run rather than a percentile, and the comparison is meant to be
+          quotable.
         required: false
-        default: '7'
+        default: '20'
 
 jobs:
   # Both engines always: MariaDB has produced defects PostgreSQL hid - a DECIMAL
@@ -350,6 +353,17 @@ jobs:
           rm -rf moodle/local/catquiz
           cp -a compare-version moodle/local/catquiz
 
+          # The comparison version predates this harness and does not contain it.
+          # Copied in deliberately: the application code under test stays entirely
+          # the other version, only the stopwatch comes from here. Without this the
+          # measurement ran against a file that does not exist and the failure was
+          # swallowed by `|| true`.
+          mkdir -p moodle/local/catquiz/cli
+          cp plugin/cli/measure_screens.php moodle/local/catquiz/cli/measure_screens.php
+
+          echo "Application code: ${{ github.event.inputs.compare_ref || 'adaptive-catquiz-v3' }}"
+          echo "Benchmark harness: this branch, ${{ github.sha }}"
+
       - name: "Measure the comparison version (first pass)"
         working-directory: moodle
         run: |
@@ -387,6 +401,23 @@ jobs:
             --mode=${{ github.event.inputs.level || 'all' }} \
             | tee /tmp/current-second.txt
 
+      - name: Compare the two runs and gate on result equality
+        working-directory: moodle
+        run: |
+          php local/catquiz/cli/compare_runs.php \
+            --a=/tmp/current-first.txt \
+            --b=/tmp/compare-first.txt \
+            --labela=current \
+            --labelb=compare \
+            | tee /tmp/verdict-first.txt
+
+          php local/catquiz/cli/compare_runs.php \
+            --a=/tmp/current-second.txt \
+            --b=/tmp/compare-second.txt \
+            --labela=current \
+            --labelb=compare \
+            | tee /tmp/verdict-second.txt
+
       - name: Upload both versions side by side
         if: always()
         uses: actions/upload-artifact@v4
@@ -397,6 +428,8 @@ jobs:
             /tmp/compare-first.txt
             /tmp/compare-second.txt
             /tmp/current-second.txt
+            /tmp/verdict-first.txt
+            /tmp/verdict-second.txt
 
       - name: Verify the recalculation lock across two processes (issue #44)
         run: |
