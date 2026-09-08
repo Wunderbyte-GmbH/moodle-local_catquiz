@@ -38,6 +38,7 @@ use local_catquiz\output\attemptfeedback;
 use LogicException;
 use moodle_database;
 use stdClass;
+use local_catquiz\teststrategy\progress;
 
 /**
  * Contains helper functions for quiz feedback.
@@ -169,10 +170,24 @@ class feedback_helper {
             }
         }
 
+        // The question count per scale decides whether a value was measured in this
+        // attempt or only inherited from the parent scale. Passing an empty array
+        // made every scale count as measured, so REASON_NOT_MEASURED never fired and
+        // scales that were never asked appeared in the feedback with the parent's
+        // value - several at once with the identical number.
+        $nbyscale = [];
+        if (isset($feedbackdata['progress']) && $feedbackdata['progress'] instanceof progress) {
+            foreach (array_keys($personabilities) as $scaleid) {
+                $nbyscale[(int) $scaleid] = count(
+                    $feedbackdata['progress']->get_playedquestions(true, (int) $scaleid)
+                );
+            }
+        }
+
         return attempt_result_validator::from_personabilities(
             $personabilities,
             $sebyscale,
-            [],
+            $nbyscale,
             [],
             $primaryscaleid
         );
@@ -241,6 +256,10 @@ class feedback_helper {
             [
             scale_result::REASON_HIDDEN,
             scale_result::REASON_REPORTING_DISABLED,
+            // A scale that was never asked in this attempt carries the value of its
+            // parent, not a measurement. Showing it suggests a result that was not
+            // obtained.
+            scale_result::REASON_NOT_MEASURED,
             ] as $reason
         ) {
             if (in_array($reason, $scale->rejectionreasons, true)) {

@@ -1559,6 +1559,9 @@ class catquiz {
      * @param int $scaleid
      * @param int|null $courseid
      * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      * @return int
      */
     public static function get_max_questions_answered_per_person(
@@ -1605,6 +1608,9 @@ class catquiz {
      * @param int $classwidth Width of one class; must be at least 1.
      * @param array $ranges List of ['lower' => float, 'upper' => float], 1-based order.
      * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      * @return array<int, array<int, int>> Count keyed by range index, then class.
      */
     public static function get_answers_per_person_histogram(
@@ -1642,6 +1648,9 @@ class catquiz {
      * @param int $classwidth
      * @param array $ranges
      * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      * @return array<int, array<int, int>>
      */
     public static function get_attempts_per_person_histogram(
@@ -1677,6 +1686,9 @@ class catquiz {
      * @param int $scaleid
      * @param int|null $courseid
      * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      * @return int
      */
     public static function get_max_attempts_per_person(
@@ -3184,6 +3196,9 @@ class catquiz {
      * @param int $scaleid
      * @param ?int $courseid
      * @param array|null $alloweduserids Restriction from the group rules, or null.
+     * @param int|null $testid Restrict to one activity instance, or null for all.
+     * @param int|null $starttime Only attempts ending at or after this time.
+     * @param int|null $endtime Only attempts ending at or before this time.
      */
     public static function get_sql_for_attempts_per_person(
         int $contextid,

@@ -32,7 +32,7 @@ $plugin->component = 'local_catquiz';
 // Moodle 5.x is a work package of its own.
 $plugin->supported = [405, 405];
 $plugin->release = '1.2.0';
-$plugin->version = 2026090528;
+$plugin->version = 2026090532;
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [

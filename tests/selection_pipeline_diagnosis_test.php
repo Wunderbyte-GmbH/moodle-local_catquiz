@@ -301,4 +301,75 @@ final class selection_pipeline_diagnosis_test extends advanced_testcase {
             );
         }
     }
+    /**
+     * The question pool is loaded before the selection chain, on every path.
+     *
+     * first_question_selector() used to be the only place that filled
+     * $context['questions'], and it returns early on three paths: not the first
+     * question, the classic strategy, and an existing ability when
+     * firstquestion_use_existing_data is on. The chain then ran with 'questions'
+     * unset and noremainingquestions did count(null).
+     *
+     * In PHP 8 that is a TypeError - an Error, not an Exception, so the catch around
+     * the chain does not hold it. The attempt died after question one, which is the
+     * symptom reported in issue #64. Reproduced on a production instance: all six
+     * strategies failed identically at noremainingquestions.php:49.
+     *
+     * The guard against a regression is the load, not a null check. A `?? []` in
+     * noremainingquestions would turn the fatal into "no remaining questions" and so
+     * produce the reported symptom instead of removing it.
+     *
+     * @return void
+     */
+    public function test_pool_is_loaded_before_the_chain(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $source = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/teststrategy/strategy.php'
+        );
+
+        $load = strpos($source, 'new questions_loader()');
+        $this->assertNotFalse(
+            $load,
+            'Nothing loads the pool. The chain then depends on first_question_selector '
+                . 'having taken a path that happens to fill it.'
+        );
+
+        // Before the chain, not inside it: the first stage already reads the pool.
+        $chain = strpos($source, "record_stage('start')");
+        $this->assertNotFalse($chain);
+        $this->assertLessThan(
+            $chain,
+            $load,
+            'The pool has to exist before the first stage runs.'
+        );
+    }
+
+    /**
+     * noremainingquestions still counts a real array rather than a fallback.
+     *
+     * A null-coalescing default there would hide the missing pool and report "no
+     * remaining questions" - the very outcome issue #64 describes.
+     *
+     * @return void
+     */
+    public function test_no_silent_fallback_for_the_pool(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $source = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/teststrategy/preselect_task/'
+                . 'noremainingquestions.php'
+        );
+
+        $this->assertStringNotContainsString(
+            "\$context['questions'] ?? []",
+            $source,
+            'A fallback here turns a missing pool into "no remaining questions" and '
+                . 'reproduces the defect instead of fixing it.'
+        );
+    }
 }

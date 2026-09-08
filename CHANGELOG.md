@@ -1,5 +1,85 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090532)
+
+> CI rot: PHPDoc und Behat - beides Folgen eigener Aenderungen.
+
+- **PHPDoc-Checker**: Fuenf Funktionen in `catquiz.php` hatten erweiterte Signaturen
+  (`$testid`, `$starttime`, `$endtime`) bei unveraendertem Docblock. Nachgezogen,
+  Checker Exit 0. Dieselbe Fehlerklasse wie schon bei `reload_template` und
+  `return_sql_for_catscalequestions` - eine Signatur zu erweitern und den Docblock zu
+  vergessen.
+- **Behat** scheiterte in `mod_adaptivequiz/attemptfinished.php` mit
+  "Attempt to read property id on null" aus `navigationlib`. Ursache war die
+  Entkopplung von der Modulsichtbarkeit: Ohne `$cm` setzt `require_login()` das
+  Kursmodul auch nicht auf der Seite, und die Navigation liest dann auf null.
+  `$PAGE->set_cm($cm, $course)` stellt das her, ohne die Sichtbarkeitspruefung
+  zurueckzuholen - die Ergebnisseite bleibt bei ausgeblendeter Aktivitaet lesbar.
+  Behoben in `mod_adaptivequiz-3.0.0-2026090604`.
+
+## 1.2.0 (interne Version 2026090531)
+
+> #64 gefunden und behoben: Der Versuch endete nach Frage 1.
+
+- **Der Fragenpool wurde nur als Nebenprodukt der Erstfragenauswahl geladen.**
+  `first_question_selector()` war die einzige Stelle, die `$context[questions]`
+  fuellt, und sie steigt auf drei Wegen vorher aus: nicht die erste Frage, klassische
+  Strategie, sowie vorhandene Faehigkeit bei `firstquestion_use_existing_data`.
+- Die Kette lief dann mit **ungesetztem** `questions` weiter, und
+  `noremainingquestions` rief `count(null)` auf. In PHP 8 ist das ein `TypeError` -
+  ein `Error`, kein `Exception`, und das `catch` um die Kette faengt ihn nicht. Der
+  Versuch starb nach der ersten Frage.
+- Auf der Produktivinstanz reproduziert: **alle sechs Strategien** scheiterten
+  identisch an `noremainingquestions.php:49`.
+- `questions_loader` wird jetzt vor der Kette aufgerufen - die Klasse existierte seit
+  jeher und wurde **nirgends** verwendet. Damit hat die Kette den Pool auf jedem Weg.
+- **Kein `?? []`.** Ein solcher Fallback haette den Fatal in "keine Fragen mehr"
+  verwandelt und damit genau das Symptom von #64 erzeugt. Ein Test haelt fest, dass
+  er nicht eingebaut wird.
+- Strategie-Suite unveraendert (38 Tests, 2.549 Assertions), Regression 112/112 ohne
+  den bekannten schweren Schaetzer.
+
+## 1.2.0 (interne Version 2026090530)
+
+> Nicht gemessene Skalen erschienen im Feedback; #61 abgeschlossen.
+
+- **`build_attempt_result()` uebergab dem Validator eine leere Fragenzahl je Skala.**
+  Damit galt jede Skala als "in diesem Versuch gemessen", `REASON_NOT_MEASURED`
+  konnte nie greifen, und Skalen, die nie gefragt wurden, erschienen mit dem **Wert
+  ihrer Elternskala**. In Attempt 12357 trugen sieben Skalen denselben Wert -1.07.
+- Die Zahl kommt jetzt aus dem Attempt-Fortschritt; das Feedback-Gate schliesst
+  `REASON_NOT_MEASURED` aus. Zwei Tests: einer prueft den Ausschluss, einer die
+  Verdrahtung - der erste allein bestuende auch, wenn die Zahl gar nicht ankaeme.
+- **Diagnoselauf zu 12357 ausgewertet**: Das Gate laesst heute 12 Skalen durch,
+  gespeichert war eine. Die urspruenglich vermutete Regression ist in der
+  ausgelieferten Fassung bereits behoben; uebrig blieb der Messbarkeits-Defekt oben.
+- **#61 abgeschlossen.** Dritte Messreihe bei 250.000 Items: Pool warm 1.781 ms
+  (PostgreSQL) gegen 4.235 ms (MariaDB), 177 MB Payload unveraendert. Der Aufwand
+  liegt im Pool, nicht in der Kohortenaggregation - kein Handlungsbedarf an den
+  Charts.
+- **#58**: PostgreSQL 190 ms p95, deutlich unter der Schwelle. MariaDB 2.069 ms,
+  weiterhin verfehlt; die Materialisierung wirkt sich mit wachsender Zeilenzahl
+  staerker aus.
+- **#21** bestaetigt sich im dritten Lauf: 22 % Ersparnis auf MariaDB, auf
+  PostgreSQL im Rauschen.
+
+## 1.2.0 (interne Version 2026090529)
+
+- **Neu: `cli/diagnose_feedback_scales.php`.** Gibt fuer eine Attempt-ID aus, welche
+  Skalen nach jedem Schritt uebrig sind: `updated_personabilities` wie gespeichert,
+  nach `filter_excluded_scales`, nach `select_scales_for_report`, nach
+  `is_feedback_eligible` - jeweils mit den Flags und Ablehnungsgruenden. Zum
+  Vergleich die im Versuch gespeicherte `personabilities_abilities`.
+- Damit ist entscheidbar, ob Skalen im Filterpfad verloren gehen oder schon in den
+  gespeicherten Daten fehlen. Lesen allein hat es nicht geklaert: Der Pfad enthaelt
+  keinen Filter auf `primary`, und ein Test, der den gemeldeten Fall nachbaut, haelt
+  alle vier Skalen.
+- Beim Bau des Skripts zwei eigene Fehler gefunden und behoben: `progress::load()`
+  faellt auf `create_new()` zurueck und verlangt Quizeinstellungen; und
+  `info::get_teststrategy()` liefert bei unbekannter ID **false**, nicht null - eine
+  strikte Null-Pruefung laesst das durch, und `method_exists()` scheitert dann an
+  einem Boolean.
+
 ## 1.2.0 (interne Version 2026090528)
 
 - **Lasttests laufen nur noch auf Anforderung.** `load-k6` und `load-jmeter`

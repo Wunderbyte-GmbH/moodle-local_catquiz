@@ -39,6 +39,7 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
+use local_catquiz\teststrategy\context\loader\questions_loader;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -224,6 +225,20 @@ abstract class strategy {
         }
 
         // Core methods called in every strategy.
+        /* Issue #64: the pool is a precondition of the whole chain, not a by-product
+           of picking the first question. first_question_selector() used to be the
+           only place that filled $context['questions'], and it returns early on
+           three paths - not the first question, the classic strategy, and an
+           existing ability with firstquestion_use_existing_data. The chain then ran
+           with 'questions' unset, and noremainingquestions did count(null): in PHP 8
+           a TypeError, which is an Error and not caught by the Exception handler
+           around the chain. The attempt died after question one.
+           Loading it here means the chain always has the pool, whichever path the
+           selector takes. The loader has existed all along and was called nowhere. */
+        if (!isset($this->context['questions'])) {
+            $this->context = (new questions_loader())->load($this->context);
+        }
+
         $res = $this->update_personability()
             ->and_then(fn () => $this->first_question_selector())
             ->or_else(fn ($res) => $this->after_error($res));

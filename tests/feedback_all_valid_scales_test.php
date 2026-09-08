@@ -147,4 +147,82 @@ final class feedback_all_valid_scales_test extends advanced_testcase {
             'A scale below the configured minimum must not be displayed.'
         );
     }
+    /**
+     * A scale without questions of its own is not shown.
+     *
+     * Attempt 12357 carried seven scales with the identical value -1.07 - the value of
+     * their parent, inherited because they were never asked. They passed every check
+     * because build_attempt_result() handed the validator an empty question count, so
+     * "measured in this attempt" was true for everything and REASON_NOT_MEASURED
+     * could not fire.
+     *
+     * The count now comes from the attempt progress. A scale with zero questions is
+     * excluded: showing it presents a value as a result that was never obtained.
+     *
+     * @return void
+     */
+    public function test_unmeasured_scales_are_excluded(): void {
+        $this->resetAfterTest();
+
+        $abilities = [
+            121 => ['value' => -0.96, 'se' => 0.7476, 'primary' => true, 'toreport' => true],
+            // The inherited value: same as its parent, no questions of its own.
+            119 => ['value' => -1.07],
+            120 => ['value' => -1.07],
+        ];
+
+        // Passed the way the validator receives it: three for the measured scale,
+        // none for the two that were never asked.
+        $result = attempt_result_validator::from_personabilities(
+            $abilities,
+            [121 => 0.7476],
+            [121 => 3, 119 => 0, 120 => 0],
+            [],
+            121
+        );
+
+        $this->assertTrue(
+            feedback_helper::is_feedback_eligible($result, 121),
+            'The measured scale has to stay.'
+        );
+
+        foreach ([119, 120] as $scaleid) {
+            $this->assertFalse(
+                feedback_helper::is_feedback_eligible($result, $scaleid),
+                "Scale $scaleid was never asked; its value belongs to the parent."
+            );
+        }
+    }
+
+    /**
+     * The question count reaches the validator at all.
+     *
+     * The test above passes the counts by hand and would keep passing even if
+     * build_attempt_result() still supplied an empty array - which is exactly the
+     * defect. This one checks the wiring.
+     *
+     * @return void
+     */
+    public function test_question_counts_reach_the_validator(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $source = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/teststrategy/feedback_helper.php'
+        );
+
+        $start = strpos($source, 'function build_attempt_result');
+        $this->assertNotFalse($start);
+
+        $body = substr($source, $start, 1600);
+
+        $this->assertStringContainsString(
+            'get_playedquestions',
+            $body,
+            'Without the per-scale question count every scale counts as measured and '
+                . 'inherited values appear as results.'
+        );
+        $this->assertStringContainsString('$nbyscale', $body);
+    }
 }
