@@ -169,7 +169,7 @@ $screens[] = [
 $screens[] = [
     'name' => 'List the questions of a scale, sorted by name',
     'url' => '/local/catquiz/manage_catscales.php?tab=questions&scaleid=' . $scaleid,
-    'what' => 'Ten rows of the question table, ordered by question name.',
+    'what' => 'Ten rows, ordered by question name - the sort is what costs here.',
     'run' => function (string $class) use ($scaleid, $contextid) {
         global $DB, $USER;
 
@@ -178,13 +178,24 @@ $screens[] = [
         // The current version takes a seventh argument for the lean column set.
         $reflection = new ReflectionMethod($class, 'return_sql_for_catscalequestions');
         if ($reflection->getNumberOfParameters() >= 7) {
-            $args[] = true;
+            $args[] = false;
         }
 
         [$select, $from, $where, , $params] = $reflection->invokeArgs(null, $args);
 
-        return function () use ($DB, $select, $from, $where, $params) {
-            $DB->get_records_sql("SELECT $select FROM $from WHERE $where", $params, 0, 10);
+        // Fixed rather than derived from the select list. The name is produced
+        // inside the statement and does not appear in the select literally, so
+        // probing that string chose a column the query does not have and the
+        // sort failed. Verified by running it against both versions.
+        $order = 'questionname';
+
+        return function () use ($DB, $select, $from, $where, $params, $order) {
+            $DB->get_records_sql(
+                "SELECT $select FROM $from WHERE $where ORDER BY $order",
+                $params,
+                0,
+                10
+            );
         };
     },
 ];

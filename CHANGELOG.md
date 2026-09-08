@@ -1,5 +1,24 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090547)
+
+> Der Vergleich hat einen Bildschirm gemessen, den er nicht gemessen hat.
+
+- **`compare_versions.php` sortierte nicht**, obwohl der Bildschirm "sorted by name"
+  hiess. Ohne `ORDER BY` liefert die Datenbank die ersten zehn Zeilen, die sie
+  erreicht, und hoert auf - **1 ms** auf einem Bestand, auf dem das Zaehlen derselben
+  Zeilen zwei Sekunden dauert. Die Zahl war echt und sagte nichts, weil die
+  Sortierung der Aufwand ist.
+- Mit `ORDER BY` gemessen (250.000 Items, PostgreSQL, 5 Laeufe):
+  **155 ms gegen 416 ms** - der Arbeitsstand ist 2,6-mal schneller. Vorher stand dort
+  1 ms gegen 1 ms.
+- Zwei Folgefehler auf dem Weg dorthin, beide durch Ausfuehren gefunden: Der schlanke
+  Spaltensatz laesst `questionname` weg, weshalb dieser Bildschirm den vollen nimmt;
+  und der Name erscheint im Select nicht woertlich, weshalb ihn aus dem String zu
+  raten die falsche Spalte waehlte.
+- Vollstaendiger Lauf auf 250.000 Items, PostgreSQL: Auswahldialog 2 ms gegen
+  1.099 ms, Fragenliste 155 gegen 416 ms, Gesamtzahl 145 gegen 257 ms.
+
 ## 1.2.0 (interne Version 2026090546)
 
 > Neuer, ausdruecklich temporaerer Workflow: Versionsvergleich in der CI.
