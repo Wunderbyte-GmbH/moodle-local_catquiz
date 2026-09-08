@@ -1,5 +1,19 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090544)
+
+> Startup failure: `matrix` gibt es im Job-`if` nicht.
+
+- **Meine Groessenauswahl hat den Workflow unstartbar gemacht.** Die Bedingung stand
+  am Job und las `matrix.items` - GitHub wertet ein Job-`if` aus, **bevor** die
+  Matrix existiert, und lehnt die Datei ab. Nicht ein Lauf schlaegt fehl, sondern der
+  Workflow startet nicht.
+- Die Matrix wird jetzt in einem vorgelagerten Job `prepare` berechnet und ueber
+  `fromJSON` uebernommen. `sizes=all` ergibt sechs Jobs, eine einzelne Groesse zwei
+  - beides gegengeprueft.
+- Umbenannt in **"Load test (DB Engines)"**.
+- Alle Workflows auf dasselbe Muster geprueft: keine weitere Stelle.
+
 ## 1.2.0 (interne Version 2026090543)
 
 > #58 geschlossen, Messwerkzeug parametrisiert.

@@ -1,4 +1,4 @@
-name: load-runtime-pool
+name: Load test (DB Engines)
 
 # Runs the load-test matrix that issue #26 makes binding: the runtime item pool at
 # 50k, 100k and 250k eligible items.
@@ -39,6 +39,41 @@ on:
         default: '7'
 
 jobs:
+  # Both engines always: MariaDB has produced defects PostgreSQL hid - a DECIMAL
+  # without precision rounding a value away, and a column-position clause only MySQL
+  # honours. The sizes are what the caller may narrow.
+  prepare:
+    name: "Select sizes"
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.build.outputs.matrix }}
+    steps:
+      - name: Build the matrix from the requested sizes
+        id: build
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+
+          sizes = {
+              '50000': 60000,
+              '100000': 120000,
+              '250000': 300000,
+          }
+
+          requested = os.environ.get('SIZES', 'all') or 'all'
+          chosen = sizes if requested == 'all' else {requested: sizes[requested]}
+
+          include = [
+              {'db': db, 'items': int(i), 'questions': q}
+              for i, q in chosen.items()
+              for db in ('pgsql', 'mariadb')
+          ]
+
+          print('matrix=' + json.dumps({'include': include}))
+          PY
+        env:
+          SIZES: ${{ github.event.inputs.sizes || 'all' }}
+
   measure:
     runs-on: ubuntu-22.04
     timeout-minutes: 180
@@ -72,31 +107,15 @@ jobs:
           --health-cmd="mysqladmin ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
 
-    # On the job, not on a step: a step that exits early stops only itself, and the
-    # seeding after it would run regardless. An unselected size is skipped whole and
-    # still shows up in the run as skipped.
-    if: >-
-      github.event.inputs.sizes == '' ||
-      github.event.inputs.sizes == 'all' ||
-      github.event.inputs.sizes == format('{0}', matrix.items)
+    needs: prepare
 
     strategy:
       fail-fast: false
-      matrix:
-        # Issue #58 requires both engines: MariaDB has already produced defects that
-        # PostgreSQL hid - a DECIMAL without precision rounding away a value, and a
-        # column-position clause that only MySQL honours.
-        db: [pgsql, mariadb]
-        include:
-          - items: 50000
-            questions: 60000
-          - items: 100000
-            questions: 120000
-          - items: 250000
-            questions: 300000
-        # The chosen size is applied per job below rather than by building the matrix
-        # dynamically: a matrix expression cannot read an input on this runner, and a
-        # skipped job is visible in the run while a missing one is not.
+      # Computed in the job above rather than written out here. A job-level `if` was
+      # tried first and is rejected by GitHub at startup: the matrix context does not
+      # exist yet when that condition is evaluated, so the whole workflow fails to
+      # start rather than skipping one size.
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
 
     steps:
       - name: Check out plugin
