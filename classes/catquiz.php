@@ -1534,9 +1534,16 @@ class catquiz {
               ORDER BY rangeindex, bin";
 
         $counts = [];
-        foreach ($DB->get_records_sql($sql, $params, 0, self::CHART_MAX_DATA_POINTS) as $row) {
+        // A recordset, not get_records_sql(): that method uses the first column as
+        // the array key and silently drops every later row repeating it. The first
+        // column here is rangeindex, which is deliberately not unique - there is one
+        // row per range *and* bin. Only one bin per range survived, so a chart built
+        // from 6/60/19/2 people showed 6/-/1/2.
+        $recordset = $DB->get_recordset_sql($sql, $params, 0, self::CHART_MAX_DATA_POINTS);
+        foreach ($recordset as $row) {
             $counts[(int) $row->rangeindex][(int) $row->bin] = (int) $row->frequency;
         }
+        $recordset->close();
 
         return $counts;
     }

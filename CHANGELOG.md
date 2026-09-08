@@ -1,5 +1,23 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090525)
+
+> "Testversuche pro Person": Die Abfrage war richtig, das Einlesen nicht.
+
+- **`aggregate_person_histogram()` las das Ergebnis mit `get_records_sql()` ein.**
+  Diese Methode nimmt die **erste Spalte als Array-Schluessel** und verwirft jede
+  spaetere Zeile, die ihn wiederholt - ohne Fehler, ohne Warnung. Erste Spalte ist
+  `rangeindex`, und der ist absichtlich nicht eindeutig: Es gibt eine Zeile je
+  Bereich **und Bin**. Damit ueberlebte pro Farbbereich genau ein Bin.
+- Aus 6/60/19/2 Personen wurde so ein Diagramm mit 6/-/1/2. Die SQL-Abfrage selbst
+  war die ganze Zeit korrekt - das Diagnoseskript hat sie auf der Produktivinstanz
+  mit exakt den erwarteten Zahlen ausgegeben.
+- Auf ein Recordset umgestellt. Lokal gegengeprueft: vorher `{"25":20}`, danach
+  `{"24":480,"25":20}`.
+- Neu: `cli/diagnose_attempts_chart.php` gibt das erzeugte Statement, die gebundenen
+  Parameter und die Verteilung neben einer unabhaengigen Referenzabfrage aus. Ohne
+  dieses Werkzeug waere die Ursache weiter im SQL vermutet worden, wo sie nicht lag.
+
 ## 1.2.0 (interne Version 2026090523)
 
 - **Beide Statistik-Issue-Entwuerfe ueberarbeitet.** Der erste stellte die
