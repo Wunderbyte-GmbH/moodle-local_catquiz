@@ -1,5 +1,58 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090540)
+
+> CI brach erneut bei Exit 143 ab - diesmal am schweren 3PL-Datensatz.
+
+- **Die 3PL-Personabilitaets-Schaetzung laeuft nicht mehr im Gesamtlauf.** Sie ist mit
+  Abstand der teuerste Fall der Suite: Der stabilisierte Newton geht auf diesen Daten
+  bis theta um +-800 und braucht Minuten. In der CI erschoepfte sie den Schritt, und
+  der Lauf endete mit einem blossen Exit-Code - das Log bricht mitten in der Suite ab
+  und liest sich wie ein abgestuerzter Test statt wie ein langsamer.
+- Sie wird **uebersprungen, nicht geloescht**: Es ist der Fall, der eine Regression im
+  Schaetzer am ehesten faengt. Ein eigener CI-Schritt fuehrt ihn mit
+  `CATQUIZ_RUN_SLOW=1` und `--filter 3PL` aus, mit 20 Minuten Zeitlimit und
+  `continue-on-error` - ein Timeout dort soll sichtbar sein, nicht die Pipeline
+  toeten.
+- Lokal: Die Suite laeuft jetzt in **231 s** statt bis zum Abbruch (3 Tests, davon 1
+  uebersprungen).
+
+## 1.2.0 (interne Version 2026090539)
+
+> #58 gemessen: 47 % schneller, Schwelle weiter verfehlt. #21 abgeschlossen.
+
+- **#58 bei 250.000 Items mit dem Fix**: MariaDB warm p95 **2.069 -> 1.089 ms**,
+  PostgreSQL 206 ms. Das innere Limit wirkt deutlich, reicht aber nicht: Das Ziel
+  liegt bei 500 ms.
+- `ANALYZE` zeigt, was sich geaendert hat: `q` und `qvnewer` laufen statt 20.010 nur
+  noch **10 Mal**. Geblieben ist der Scan ueber `qbe` mit dem Versions-Join `qv` -
+  MariaDB bricht dort nicht frueh ab, weil das `NOT EXISTS` auf
+  `local_catquiz_items` als materialisierter Anti-Join laeuft und die vollstaendige
+  Kandidatenmenge braucht.
+- **#21 abgeschlossen.** Der Light Count wirkt (vierte Bestaetigung, 16 % auf
+  MariaDB), und der Anschluss aus `doc/issue-21-followup.md` hat sich erledigt: Die
+  Statistik der sichtbaren Zeilen kostet gemessen **2 ms**. Der zweistufige
+  Ladevorgang sollte genau das erreichen - er ist bereits so.
+- **Zum PR wunderbyte_table#141**: Er war fuer keinen der beiden Faelle noetig. Der
+  Zugriffspunkt fuer #58 ist `query_db()`, das die Tabelle seit jeher ueberschreibt;
+  und der zweistufige Ladevorgang, fuer den `query_db_cached_filtered()` gebraucht
+  worden waere, ist entbehrlich. Die Annahme im Issue-Entwurf - die Statistik werde
+  fuer alle Zeilen berechnet - hat die Messung nicht bestaetigt.
+
+## 1.2.0 (interne Version 2026090538)
+
+> Die 250k-Messung hat den Fix gar nicht durchlaufen.
+
+- **`measure_runtime_pool.php` baute das Add-Questions-SQL selbst** und ging nie
+  durch `catscalequestions_table::query_db()`. Die gemessenen 1.720 ms auf MariaDB
+  beziehen sich also auf den **alten** Weg - ueber den Fix sagen sie nichts.
+- Dieselbe Fehlerklasse wie beim Pool, den das Werkzeug ohne den schlanken
+  Spaltensatz gemessen hatte: Das Werkzeug misst einen anderen Weg als die Anwendung.
+- Die Umschreibung wird jetzt reproduziert, mit Verweis auf die Stelle, die sie im
+  Produktivcode vornimmt. Lokal auf PostgreSQL: warm p95 3 ms.
+- **#58 bleibt damit offen**, bis eine 250k-Messung mit diesem Werkzeug vorliegt.
+  Die bisherigen Zahlen (614 -> 113 ms, 813 -> 94 ms) stammen aus 20.000 Items.
+
 ## 1.2.0 (interne Version 2026090537)
 
 > #58, dritter Schritt: Filter nach innen - versucht, gemessen, zurueckgenommen.
