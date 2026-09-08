@@ -1650,7 +1650,10 @@ class catquiz {
         ?int $courseid,
         int $classwidth,
         array $ranges,
-        ?array $alloweduserids = null
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
     ): array {
         [$inner, $params] = self::get_sql_for_attempts_per_person(
             $contextid,
@@ -1680,7 +1683,10 @@ class catquiz {
         int $contextid,
         int $scaleid,
         ?int $courseid = null,
-        ?array $alloweduserids = null
+        ?array $alloweduserids = null,
+        ?int $testid = null,
+        ?int $starttime = null,
+        ?int $endtime = null
     ): int {
         [$inner, $params] = self::get_sql_for_attempts_per_person(
             $contextid,

@@ -32,6 +32,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\result\attempt_result;
+use local_catquiz\local\result\attempt_result_validator;
 use local_catquiz\local\result\scale_result;
 use local_catquiz\output\attemptfeedback;
 use LogicException;

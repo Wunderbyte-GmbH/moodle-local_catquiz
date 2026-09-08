@@ -178,4 +178,64 @@ final class feedback_eligibility_test extends advanced_testcase {
             'The abilities table has to use the feedback predicate.'
         );
     }
+    /**
+     * Every class feedback_helper calls statically can actually be resolved.
+     *
+     * `attempt_result_validator` was used without a `use` statement. PHP then looks
+     * for it in the file's own namespace, finds nothing, and the request dies with
+     * "Class not found" - at render time, inside the feedback page. Every attempt
+     * feedback on the site came out empty; the list of attempts still rendered, so it
+     * looked like missing data rather than a fatal.
+     *
+     * Static analysis catches this, PHPUnit normally does not: the call sits behind a
+     * branch that the other tests do not enter. Hence this test, which reads the
+     * source rather than executing it.
+     *
+     * @return void
+     */
+    public function test_every_used_class_is_imported(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $file = $CFG->dirroot . '/local/catquiz/classes/teststrategy/feedback_helper.php';
+        $source = file_get_contents($file);
+
+        preg_match_all('/^use\s+([^;]+);/m', $source, $uses);
+
+        $imported = [];
+        foreach ($uses[1] as $use) {
+            $parts = explode('\\', trim($use));
+            $imported[] = end($parts);
+        }
+
+        // Static calls to a bare class name: Foo::bar(). Names that are fully
+        // qualified (a leading backslash) resolve on their own.
+        preg_match_all('/(?<![\\\w$>])([a-z_][a-z0-9_]*)::/i', $source, $calls);
+
+        $ownclass = 'feedback_helper';
+        $builtin = ['self', 'static', 'parent'];
+
+        $missing = [];
+        foreach (array_unique($calls[1]) as $name) {
+            if ($name === $ownclass || in_array(strtolower($name), $builtin, true)) {
+                continue;
+            }
+            if (in_array($name, $imported, true)) {
+                continue;
+            }
+            // A class in the same namespace needs no import.
+            if (file_exists(dirname($file) . '/' . $name . '.php')) {
+                continue;
+            }
+            $missing[] = $name;
+        }
+
+        $this->assertSame(
+            [],
+            $missing,
+            'These classes are called statically but neither imported nor in the same '
+                . 'namespace, so the call fails at run time rather than at parse time.'
+        );
+    }
 }

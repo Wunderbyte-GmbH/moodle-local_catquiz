@@ -1,5 +1,40 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090527)
+
+> CI rot: zwei Wrapper reichten Variablen weiter, die ihre Signatur nicht kennt.
+
+- **`get_attempts_per_person_histogram()` und `get_max_attempts_per_person()`**
+  uebergaben `$testid`, `$starttime` und `$endtime` an
+  `get_sql_for_attempts_per_person()`, ohne diese Parameter selbst zu haben:
+  "Undefined variable $testid". Unter PHP 8 ist das ein Fehler, kein stiller `null`.
+- Beide Signaturen ergaenzt; die Werte werden jetzt tatsaechlich durchgereicht.
+  Damit koennen die Diagramme Test und Zeitraum ueberhaupt erst beruecksichtigen.
+- `chart_aggregation_test` wieder gruen (13 Tests, 70 Assertions).
+- Vollstaendige Suite gefahren: **113 von 114 Dateien gruen**. Offen bleibt nur
+  `model_person_ability_estimator_catcalc_test` - der bekannte schwere
+  3PL-Datensatz, der laut Engineering-Guide isoliert zu fahren ist.
+
+## 1.2.0 (interne Version 2026090526)
+
+> Alle Attempt-Feedbacks blieben leer.
+
+- **Fehlender `use`-Import**: `feedback_helper.php` rief
+  `attempt_result_validator::from_personabilities()` auf, ohne die Klasse zu
+  importieren. PHP sucht sie dann im eigenen Namensraum `local_catquiz	eststrategy`,
+  findet nichts, und die Anfrage endet mit "Class not found" - **zur Renderzeit,
+  mitten in der Feedback-Seite**.
+- Die Versuchsliste rendert davor und blieb sichtbar; nur die Feedback-Inhalte
+  fehlten. Das sah nach fehlenden Daten aus, war aber ein Fatal.
+- Import ergaenzt. Die acht Feedback-Suiten sind wieder gruen; zwei davon waren rot
+  (`feedback_gating_test`, `attemptfeedback_test`) und haetten den Fehler vor der
+  Auslieferung gezeigt.
+- **Neuer Regressionstest**: Er liest den Quelltext und prueft, dass jede statisch
+  aufgerufene Klasse importiert ist oder im selben Namensraum liegt. PHPUnit faengt
+  so etwas sonst nicht, weil der Aufruf hinter einem Zweig liegt, den die anderen
+  Tests nicht betreten. Zahn-Test: Ohne den Import meldet er
+  `attempt_result_validator` namentlich.
+
 ## 1.2.0 (interne Version 2026090525)
 
 > "Testversuche pro Person": Die Abfrage war richtig, das Einlesen nicht.
