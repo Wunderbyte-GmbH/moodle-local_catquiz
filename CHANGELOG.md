@@ -1,5 +1,33 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090550)
+
+> Rueckmeldungen zum Messharness umgesetzt.
+
+- **Drei Messebenen, waehlbar ueber `--mode`:** `query` (nur das Statement),
+  `screen` (durch die Tabellenklasse, mit Seitenlimit und Nachladen), **`manager`
+  (die ganze CAT-Manager-Seite)**. Die dritte Ebene beantwortet die eigentliche
+  Frage: Sie sieht, ob eine Version alle Bereiche im Voraus baut oder nur den aktiven
+  mit zehn Zeilen. Die beiden unteren Ebenen koennen das gar nicht zeigen.
+- **Ergebnis-Fingerabdruck je Messung** (Zeilenzahl und Hash der geordneten IDs).
+  Eine schnellere Abfrage, die weniger Zeilen liefert, ist keine Verbesserung; und
+  zwischen zwei Versionen mit gewollten fachlichen Unterschieden trennt der
+  Fingerabdruck "gleiche Arbeit, schneller" von "andere Arbeit, nicht vergleichbar".
+- **Der Laufzeit-Bildschirm heisst jetzt, was er misst**: Kandidaten laden - **kein**
+  vollstaendiger Antwortzyklus. Antwort speichern, Faehigkeit neu schaetzen, naechste
+  Frage waehlen sind nicht enthalten, und die alte Beschriftung behauptete das.
+- **Vorgabe 20 Wiederholungen** statt 7, dazu Minimum und Maximum in der Ausgabe: Bei
+  sieben Laeufen ist ein p95 praktisch der langsamste Wert, und die Spanne macht das
+  sichtbar, statt es als Perzentil auszugeben.
+- **Der Vergleichs-Workflow tauscht jetzt das ganze Verzeichnis** und misst in
+  getrennten PHP-Prozessen, in der Reihenfolge A, B, B, A. Der bisherige Weg - eine
+  Klasse umbenennen und beide Versionen gleichzeitig laden - trug nicht: Die Klassen
+  eines Moodle-Plugins verweisen namentlich aufeinander, der Rest zeigte weiter auf
+  die installierte Version, und gemessen wurde ein Hybrid. `compare_versions.php`
+  ist entfernt.
+- Die doppelte Reihenfolge macht sichtbar, ob die zweite Messung von der
+  aufgewaermten Datenbank profitiert, statt das im Ergebnis zu lassen.
+
 ## 1.2.0 (interne Version 2026090549)
 
 > Der dritte Bildschirm laeuft; die Ursache war eine andere als vermutet.

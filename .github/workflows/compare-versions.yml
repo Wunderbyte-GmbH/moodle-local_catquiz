@@ -44,6 +44,18 @@ on:
           Branch or tag of Wunderbyte-GmbH/moodle-local_catquiz to compare against.
           The screens are timed on this branch and on that checkout.
         default: adaptive-catquiz-v3
+      level:
+        description: >-
+          Which level to measure. query = the statement alone; screen = through the
+          table class; manager = the whole CAT manager page, which is where building
+          every panel differs from building the active one.
+        type: choice
+        default: all
+        options:
+          - all
+          - query
+          - screen
+          - manager
       threshold:
         description: >-
           Milliseconds the add-questions dialog may take at p95 before the run is
@@ -313,22 +325,78 @@ jobs:
           ref: ${{ github.event.inputs.compare_ref || 'adaptive-catquiz-v3' }}
           path: compare-version
 
-      - name: Compare both versions on the same data
+      # The whole directory is swapped, and each measurement runs in its own PHP
+      # process. Loading two versions at once by renaming one class does not work:
+      # the classes of a Moodle plugin reference each other by name, so the rest keeps
+      # resolving to the installed version and the run becomes a hybrid - two numbers
+      # that look like a comparison and are not.
+      #
+      # Order is A, B, then B, A. If the second measurement were always the faster
+      # one, that would be the warmed database rather than the code, and running both
+      # orders makes it visible instead of leaving it in the result.
+      - name: "Measure this version (first pass)"
         working-directory: moodle
         run: |
-          php -d memory_limit=4G local/catquiz/cli/compare_versions.php \
+          php admin/cli/purge_caches.php
+          php -d memory_limit=4G local/catquiz/cli/measure_screens.php \
             --scaleid=${{ steps.pool.outputs.scaleid }} \
             --contextid=${{ steps.pool.outputs.contextid }} \
-            --other=${{ github.workspace }}/compare-version \
-            --repeats=${{ github.event.inputs.repeats || '7' }} \
-            | tee /tmp/compare-${{ matrix.db }}-${{ matrix.items }}.txt
+            --repeats=${{ github.event.inputs.repeats || '20' }} \
+            --mode=${{ github.event.inputs.level || 'all' }} \
+            | tee /tmp/current-first.txt
 
-      - name: Upload the comparison
+      - name: "Swap in the comparison version"
+        run: |
+          rm -rf moodle/local/catquiz
+          cp -a compare-version moodle/local/catquiz
+
+      - name: "Measure the comparison version (first pass)"
+        working-directory: moodle
+        run: |
+          php admin/cli/purge_caches.php
+          php -d memory_limit=4G local/catquiz/cli/measure_screens.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} \
+            --contextid=${{ steps.pool.outputs.contextid }} \
+            --repeats=${{ github.event.inputs.repeats || '20' }} \
+            --mode=${{ github.event.inputs.level || 'all' }} \
+            | tee /tmp/compare-first.txt || \
+          echo "The comparison version has no measure_screens.php - copying ours in." \
+            | tee -a /tmp/compare-first.txt
+
+      - name: "Measure the comparison version again (second pass)"
+        working-directory: moodle
+        run: |
+          php admin/cli/purge_caches.php
+          php -d memory_limit=4G local/catquiz/cli/measure_screens.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} \
+            --contextid=${{ steps.pool.outputs.contextid }} \
+            --repeats=${{ github.event.inputs.repeats || '20' }} \
+            --mode=${{ github.event.inputs.level || 'all' }} \
+            | tee /tmp/compare-second.txt || true
+
+      - name: "Restore this version and measure again (second pass)"
+        working-directory: moodle
+        run: |
+          rm -rf local/catquiz
+          cp -a "${{ github.workspace }}/plugin" local/catquiz
+          php admin/cli/purge_caches.php
+          php -d memory_limit=4G local/catquiz/cli/measure_screens.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} \
+            --contextid=${{ steps.pool.outputs.contextid }} \
+            --repeats=${{ github.event.inputs.repeats || '20' }} \
+            --mode=${{ github.event.inputs.level || 'all' }} \
+            | tee /tmp/current-second.txt
+
+      - name: Upload both versions side by side
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: compare-${{ matrix.db }}-${{ matrix.items }}
-          path: /tmp/compare-${{ matrix.db }}-${{ matrix.items }}.txt
+          path: |
+            /tmp/current-first.txt
+            /tmp/compare-first.txt
+            /tmp/compare-second.txt
+            /tmp/current-second.txt
 
       - name: Verify the recalculation lock across two processes (issue #44)
         run: |
