@@ -1,5 +1,37 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090546)
+
+> Neuer, ausdruecklich temporaerer Workflow: Versionsvergleich in der CI.
+
+- `compare-versions.yml` ist eine Kopie des Lasttests, die denselben Bestand seedet
+  und danach dieselben Bildschirme auf **zwei** Staenden misst: diesem Branch und
+  einem Checkout, der als Eingabe `compare_ref` angegeben wird (Vorgabe
+  `adaptive-catquiz-v3`).
+- Vorgabegroesse **100.000** - dort unterscheiden sich die Staende deutlich, ohne
+  dass ein Lauf eine Stunde dauert. `sizes` erlaubt weiterhin 50k, 250k oder alle.
+- **Der Lasttest bleibt unveraendert** und ist der dauerhafte: Er misst den aktuellen
+  Stand gegen ein Ziel und bleibt nuetzlich, wenn dieser Vergleich verworfen wird.
+  Der Kopf der neuen Datei sagt das ausdruecklich, samt Hinweis auf das Loeschen.
+- Die geerbten Messartefakte heissen dort `compare-baseline-*`, damit sie nicht mit
+  `runtime-pool-*` des dauerhaften Laufs verwechselt werden.
+
+## 1.2.0 (interne Version 2026090545)
+
+> Neu: Direktvergleich zweier Plugin-Staende auf derselben Datenbank.
+
+- `cli/compare_versions.php` misst dieselben Bildschirme auf zwei Staenden - dem
+  Arbeitsstand und einem beliebigen Checkout - **im selben Prozess, auf derselben
+  Datenbank, in derselben Minute**. Eine Messung eines Standes allein sagt, wie
+  schnell er ist; sie sagt nicht, was sich geaendert hat.
+- Der zweite Stand wird unter einem eigenen Namensraum geladen, damit beide
+  gleichzeitig existieren. Ein Neuinstallieren zwischen den Laeufen wuerde Cache- und
+  Verbindungseffekte in den gemessenen Unterschied hineintragen.
+- Die Bildschirme sind in Klartext benannt, mit URL und einer Zeile dazu, was
+  gemessen wird - nicht ueber Issue-Nummern.
+- Erster Lauf gegen `adaptive-catquiz-v3` (Release 1.1.4) auf 250.000 Items siehe
+  Abschlussbericht.
+
 ## 1.2.0 (interne Version 2026090544)
 
 > Startup failure: `matrix` gibt es im Job-`if` nicht.
