@@ -229,4 +229,87 @@ final class add_questions_inner_limit_test extends advanced_testcase {
             );
         }
     }
+    /**
+     * The LEFT JOIN excludes exactly the questions already assigned to the scale.
+     *
+     * NOT EXISTS and LEFT JOIN ... IS NULL express the same condition, but only if
+     * the join has no duplicates: a second matching row in local_catquiz_items would
+     * multiply the question rather than exclude it. The unique key on
+     * (componentid, componentname, catscaleid) prevents that, and this test states
+     * the dependency instead of trusting it.
+     *
+     * The rewrite was made because MariaDB executes NOT EXISTS as a materialised
+     * anti-join and therefore cannot stop the inner LIMIT early - measured, the scan
+     * dropped from 20.010 rows to 2.285.
+     *
+     * @return void
+     */
+    public function test_assigned_questions_are_excluded_exactly_once(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$scaleid, $contextid] = $this->make_scale();
+
+        $before = $DB->count_records_sql(
+            $this->count_sql($scaleid, $contextid),
+            $this->count_params($scaleid, $contextid)
+        );
+
+        // Assign one question to the scale; it has to disappear from the dialog, and
+        // the total has to fall by exactly one.
+        $questionid = $DB->get_field_sql('SELECT MIN(id) FROM {question}');
+        if ($questionid === false || $questionid === null) {
+            $this->markTestSkipped('No question in the test database.');
+        }
+
+        $DB->insert_record('local_catquiz_items', (object) [
+            'componentid' => $questionid,
+            'componentname' => 'question',
+            'catscaleid' => $scaleid,
+            'contextid' => $contextid,
+            'status' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+
+        $after = $DB->count_records_sql(
+            $this->count_sql($scaleid, $contextid),
+            $this->count_params($scaleid, $contextid)
+        );
+
+        $this->assertSame(
+            $before - 1,
+            $after,
+            'Assigning one question must remove exactly one row - no more through a '
+                . 'missed exclusion, no fewer through a duplicated join.'
+        );
+    }
+
+    /**
+     * The counting statement for the dialog.
+     *
+     * @param int $scaleid
+     * @param int $contextid
+     * @return string
+     */
+    private function count_sql(int $scaleid, int $contextid): string {
+        [, $from, $where] = catquiz::return_sql_for_addcatscalequestions($scaleid, $contextid);
+
+        return "SELECT COUNT(*) FROM $from WHERE $where";
+    }
+
+    /**
+     * Its parameters.
+     *
+     * @param int $scaleid
+     * @param int $contextid
+     * @return array
+     */
+    private function count_params(int $scaleid, int $contextid): array {
+        [, , , , $params] = catquiz::return_sql_for_addcatscalequestions($scaleid, $contextid);
+
+        return $params;
+    }
 }

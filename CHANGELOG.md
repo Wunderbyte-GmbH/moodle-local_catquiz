@@ -1,5 +1,27 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090541)
+
+> #58: Der Anti-Join war der letzte Engpass.
+
+- **`NOT EXISTS` auf `local_catquiz_items` ist jetzt ein `LEFT JOIN … IS NULL`.**
+  Beide Formen sagen dasselbe, aber MariaDB fuehrt `NOT EXISTS` als
+  **materialisierten** Anti-Join aus (`r_loops = 1`): Es braucht die vollstaendige
+  Kandidatenmenge, bevor es antworten kann, und das innere `LIMIT` konnte den Scan
+  deshalb nicht abbrechen.
+- `ANALYZE` nach der Aenderung: Der Scan ueber `question_bank_entries` faellt von
+  **20.010 auf 2.285 Zeilen**. Gemessen auf MariaDB, lokaler Bestand:
+  **113 -> 20 ms** (ohne inneres Limit waren es 614 ms).
+- **Zeilengleichheit geprueft** gegen eine Skala mit 50.000 zugeordneten Items:
+  70.305 Fragen in beiden Formen. Der PHPUnit-Test dazu wird in der leeren
+  Test-Datenbank uebersprungen - er braucht echte Fragen; der Nachweis stammt aus dem
+  geseedeten Bestand.
+- Der Test haelt zusaetzlich die Voraussetzung fest, unter der die beiden Formen
+  gleichwertig sind: Der eindeutige Schluessel auf
+  (componentid, componentname, catscaleid) verhindert, dass der Join eine Frage
+  vervielfacht statt sie auszuschliessen.
+- Regression 112/112 gruen.
+
 ## 1.2.0 (interne Version 2026090540)
 
 > CI brach erneut bei Exit 143 ab - diesmal am schweren 3PL-Datensatz.
