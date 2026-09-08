@@ -3270,9 +3270,31 @@ class catquiz {
                         ORDER BY a2.endtime DESC, a2.id DESC
                         LIMIT 1";
 
+        // The clause $where appears twice in the statement below. Moodle counts named parameters
+        // per occurrence, so the second copy needs its own names - otherwise the
+        // query fails with "Incorrect number of query parameters" rather than
+        // silently doing the wrong thing.
+        $notexistswhere = $where;
+        $notexistsparams = [];
+        foreach ($params as $name => $value) {
+            $notexistswhere = preg_replace(
+                '/:' . preg_quote($name, '/') . '\b/',
+                ':ne' . $name,
+                $notexistswhere
+            );
+            $notexistsparams['ne' . $name] = $value;
+        }
+
         // People enrolled today who have no attempt at all form the "no attempt"
         // bucket. They are the one thing the attempts table cannot supply, so the
         // enrolments are consulted for that alone - without any join on {role}.
+        //
+        // The NOT EXISTS repeats $where deliberately. It used to test the scale
+        // alone, while the counting half above also filtered course, test and period.
+        // Anyone who had attempted this scale somewhere else therefore fell out of
+        // both halves at once: out of the counts because of those filters, and out of
+        // "no attempt" because the bare scale check found their other attempt. They
+        // vanished from the chart entirely rather than landing in a bucket.
         $sql = "SELECT userid, MAX(ability) ability, SUM(attempts) attempts
                   FROM (
                         SELECT a.userid, ($abilitysql) ability, COUNT(*) attempts
@@ -3288,15 +3310,15 @@ class catquiz {
                          WHERE $enrolwhere
                            AND NOT EXISTS (
                                SELECT 1
-                                 FROM {local_catquiz_attempts} inner_a
-                                WHERE inner_a.userid = ue.userid
-                                  AND inner_a.scaleid = :nonparticipantscale
+                                 FROM {local_catquiz_attempts} a
+                                WHERE a.userid = ue.userid
+                                  AND $notexistswhere
                            )
                   ) counted
               GROUP BY userid
               ORDER BY attempts";
 
-        $params = array_merge($params, $enrolparams, ['nonparticipantscale' => $scaleid]);
+        $params = array_merge($params, $enrolparams, $notexistsparams);
 
         return [$sql, $params];
     }

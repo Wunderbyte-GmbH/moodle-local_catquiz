@@ -1,5 +1,18 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090523)
+
+- **Beide Statistik-Issue-Entwuerfe ueberarbeitet.** Der erste stellte die
+  Kontextbindung als alleinige Ursache dar; das ist nach der Analyse nicht haltbar.
+  Er grenzt jetzt die zwei kontextunabhaengigen Defekte ab, die in `2026090513`
+  (fehlende Spalte `personability_after_attempt`) und `2026090514` (asymmetrischer
+  `NOT EXISTS`) behoben wurden, und nennt die Mindestversion fuer eine Nachpruefung.
+- **ID-Bereiche wie `contextid=8-18` zurueckgezogen.** Datenbank-IDs haben keine
+  fachliche Intervallsemantik. Es bleiben Einzelwert und explizite Liste.
+- Die Parameter-Falle ist vermerkt: Dieselbe Klausel steht in
+  `get_sql_for_attempts_per_person()` zweimal im Statement, und Moodle zaehlt
+  benannte Parameter je Vorkommen.
+
 ## 1.2.0 (interne Version 2026090522)
 
 > P1 abgeschlossen: Das Diagramm verwendet denselben Scope wie die uebrige Statistik.
@@ -165,6 +178,20 @@
 - `render_question_with_response_test` ist nicht betroffen - der Endpunkt nutzt
   weiterhin `require_capability`, geprueft statt angenommen.
 
+## 1.2.0 (interne Version 2026090515)
+
+- **Beide Statistik-Issue-Entwuerfe ueberarbeitet.** Der erste stellte die
+  Kontextbindung als alleinige Ursache dar; das ist nach der Analyse nicht haltbar.
+  Er grenzt jetzt ausdruecklich die zwei kontextunabhaengigen Defekte ab, die in
+  `2026090513` und `2026090514` behoben wurden, und nennt die noetige
+  Mindestversion fuer eine Nachpruefung.
+- **ID-Bereiche wie `contextid=8-18` zurueckgezogen.** Datenbank-IDs haben keine
+  fachliche Intervallsemantik - die Kontexte dazwischen koennen zu ganz anderen
+  Skalen gehoeren. Es bleiben Einzelwert und explizite Liste.
+- Im zweiten Entwurf ist die Parameter-Falle vermerkt: Dieselbe Klausel steht in
+  `get_sql_for_attempts_per_person()` inzwischen zweimal im Statement, und Moodle
+  zaehlt benannte Parameter je Vorkommen.
+
 ## 1.2.0 (interne Version 2026090514)
 
 > Vier Defekte in `get_sql_for_attempts_per_person()` - alle unabhaengig vom
@@ -190,6 +217,23 @@
 
 > Diese Defekte standen hinter dem zuvor gemeldeten Kontextwechsel. Meine erste
 > Analyse hat den Kontext fuer *die* Ursache gehalten - er ist einer von mehreren.
+
+## 1.2.0 (interne Version 2026090514)
+
+> "Testversuche pro Person": Personen fielen aus beiden Haelften der Abfrage.
+
+- **Der `NOT EXISTS` fuer den Eimer "Ohne Versuch" filterte nur nach der Skala**,
+  waehrend die Zaehlseite zusaetzlich nach Kurs, Test und Zeitraum filtert. Wer diese
+  Skala anderswo bearbeitet hatte, fiel aus **beiden** Haelften: aus der Zaehlung
+  wegen der Filter, aus "Ohne Versuch", weil die blosse Skalenpruefung den anderen
+  Versuch fand. Diese Personen verschwanden ersatzlos aus dem Diagramm.
+- Der `NOT EXISTS` traegt jetzt dieselbe Bedingung wie die Zaehlseite.
+- **Dabei gefunden:** `$where` steht nun zweimal im Statement, und Moodle zaehlt
+  benannte Parameter je Vorkommen - die Abfrage scheiterte mit "Incorrect number of
+  query parameters". Die zweite Fassung bekommt eigene Parameternamen. Aufgefallen
+  nur, weil die Abfrage nach der Aenderung real ausgefuehrt wurde.
+- Gegengeprueft: Die korrigierte Abfrage liefert dieselbe Verteilung wie eine
+  unabhaengig formulierte Referenzabfrage (480 Personen mit 24, 20 mit 25 Versuchen).
 
 ## 1.2.0 (interne Version 2026090513)
 

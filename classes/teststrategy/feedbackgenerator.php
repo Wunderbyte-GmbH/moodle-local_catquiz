@@ -455,7 +455,13 @@ abstract class feedbackgenerator {
                 : (int) array_key_first($catscales)
         );
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (!feedback_helper::is_displayable($attemptresult, (int) $catscale)) {
+            // The feedback predicate, not the completion one. is_displayable()
+            // requires $scale->reportable, and that flag is set by the strategy for
+            // the single scale it singles out - inferlowestskillgap marks exactly
+            // one. Every other properly measured subscale was dropped from the table
+            // as a result, and with only one entry left the comparison chart
+            // reported "not enough valid results".
+            if (!feedback_helper::is_feedback_eligible($attemptresult, (int) $catscale)) {
                 continue;
             }
             if (isset($personability['primary'])) {

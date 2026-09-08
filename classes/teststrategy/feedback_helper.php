@@ -33,7 +33,6 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\result\attempt_result;
 use local_catquiz\local\result\scale_result;
-use local_catquiz\local\result\attempt_result_validator;
 use local_catquiz\output\attemptfeedback;
 use LogicException;
 use moodle_database;
@@ -196,6 +195,59 @@ class feedback_helper {
             return false;
         }
         return $scale->reportable && $scale->statisticallyvalid;
+    }
+
+    /**
+     * Whether a scale belongs in the feedback table shown to the participant.
+     *
+     * Deliberately not the same question as is_displayable(). That one requires
+     * $scale->reportable, which is built as `$toreport && !$hidden && !$notreported`
+     * - and $toreport is set by the strategy only for the scale it singles out.
+     * inferlowestskillgap marks exactly one, so every other statistically sound
+     * subscale was filtered out of the table although it had been measured properly.
+     *
+     * Three different ideas were being read off one flag:
+     *
+     *   statisticallyvalid  - the measurement can be used
+     *   primary             - the strategy highlights this one scale
+     *   reportable          - the scale may be shown at all
+     *
+     * Being primary is a reason to emphasise a scale, never a condition for showing
+     * the others. What has to hold here is that the value was measured, is sound, is
+     * not hidden, and reporting was not switched off in the quiz settings.
+     *
+     * Completion keeps the stricter rule; that is a decision about the test result,
+     * not about what a participant may read.
+     *
+     * @param attempt_result $result
+     * @param int $scaleid
+     * @return bool
+     */
+    public static function is_feedback_eligible(attempt_result $result, int $scaleid): bool {
+        $scale = $result->get_scale_result($scaleid);
+        if ($scale === null) {
+            return false;
+        }
+
+        if (!$scale->statisticallyvalid) {
+            return false;
+        }
+
+        // Hidden and "reporting disabled" stay exclusions: both are explicit
+        // decisions by whoever configured the test, unlike "not primary", which is an
+        // outcome of the strategy.
+        foreach (
+            [
+            scale_result::REASON_HIDDEN,
+            scale_result::REASON_REPORTING_DISABLED,
+            ] as $reason
+        ) {
+            if (in_array($reason, $scale->rejectionreasons, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
