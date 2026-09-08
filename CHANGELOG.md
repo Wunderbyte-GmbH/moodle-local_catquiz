@@ -1,5 +1,23 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090549)
+
+> Der dritte Bildschirm laeuft; die Ursache war eine andere als vermutet.
+
+- **`ORDER BY` gehoerte nicht in den SQL-Builder.** Der Builder schreibt es in das
+  Statement, und die Tabelle umschliesst dieses fuer den Seitenzaehler mit
+  `SELECT COUNT(1) FROM ( … )`. PostgreSQL lehnt das ab: *column s.questionname must
+  appear in the GROUP BY clause*. Die Seite selbst trifft das nie, weil sie ueber die
+  Tabelle sortiert - deren `ORDER BY` steht **ausserhalb** der gezaehlten
+  Unterabfrage.
+- Sortierung an `define_sortablecolumns()` und `sortable()` verlagert.
+- Dabei ein zweiter Fehler: `query_db(10, false)` wendet das Limit nicht an und holte
+  **50.000 Zeilen** statt zehn - gemessen waere damit etwas ganz anderes gewesen als
+  der Bildschirm. Jetzt mit `pageable(true)`.
+- Alle drei Bildschirme ueber den echten Codeweg (250.000 Items, PostgreSQL):
+  Auswahldialog kalt 37 / warm 4 ms, Fragenliste sortiert kalt 337 / warm 276 ms,
+  Antwort im laufenden Test kalt 1.427 / warm 198 ms.
+
 ## 1.2.0 (interne Version 2026090548)
 
 > Messung ueber den echten Codeweg statt ueber einzelne SQL-Aufrufe.

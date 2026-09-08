@@ -194,7 +194,12 @@ report(
             'return_sql_for_catscalequestions'
         );
 
-        $args = [[$scaleid], $contextid, [], $USER->id, 'questionname', null];
+        // No sort passed to the builder. It writes ORDER BY into the statement, and
+        // the table then wraps that statement in SELECT COUNT(1) FROM ( ... ) for the
+        // pager - where PostgreSQL rejects it: "column s.questionname must appear in
+        // the GROUP BY clause". The page never hits this because it sorts through the
+        // table, which appends ORDER BY outside the counted subquery.
+        $args = [[$scaleid], $contextid, [], $USER->id, null, null];
         if ($reflection->getNumberOfParameters() >= 7) {
             $args[] = false;
         }
@@ -203,12 +208,19 @@ report(
 
         $table->define_columns(['idnumber', 'questionname', 'qtype', 'categoryname']);
         $table->define_headers(['ID', 'Name', 'Type', 'Category']);
+        $table->define_sortablecolumns(['questionname']);
         $table->define_baseurl(new moodle_url('/local/catquiz/manage_catscales.php'));
+        $table->sortable(true, 'questionname', SORT_ASC);
+        $table->pageable(true);
         $table->setup();
 
         $table->set_sql($select, $from, $where, $params);
         $table->pagesize(10, 10);
-        $table->query_db(10, false);
+
+        // With pages: query_db() only applies the limit when the table is paging, and
+        // without it the measurement fetches every row - 50.000 here - which is not
+        // the screen.
+        $table->query_db(10, true);
 
         return $table->rawdata ?? [];
     },
