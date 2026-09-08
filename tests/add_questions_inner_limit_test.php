@@ -232,15 +232,13 @@ final class add_questions_inner_limit_test extends advanced_testcase {
     /**
      * The LEFT JOIN excludes exactly the questions already assigned to the scale.
      *
-     * NOT EXISTS and LEFT JOIN ... IS NULL express the same condition, but only if
-     * the join has no duplicates: a second matching row in local_catquiz_items would
-     * multiply the question rather than exclude it. The unique key on
-     * (componentid, componentname, catscaleid) prevents that, and this test states
-     * the dependency instead of trusting it.
+     * The exclusion is expressed as NOT EXISTS. A rewrite to LEFT JOIN ... IS NULL
+     * was tried for issue #58 and reverted: it was faster on a small pool and slower
+     * at 250.000 items on MariaDB, the engine that misses the target.
      *
-     * The rewrite was made because MariaDB executes NOT EXISTS as a materialised
-     * anti-join and therefore cannot stop the inner LIMIT early - measured, the scan
-     * dropped from 20.010 rows to 2.285.
+     * This test does not care which form is used - it states the property both have
+     * to satisfy, so a future attempt at the same optimisation is checked rather than
+     * trusted.
      *
      * @return void
      */

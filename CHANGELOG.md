@@ -1,5 +1,37 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090543)
+
+> #58 geschlossen, Messwerkzeug parametrisiert.
+
+- **Schwellwert 1.000 ms fuer grosse Bestaende.** Das Messwerkzeug nimmt ihn als
+  `--threshold` und gibt ein Urteil aus ("Target 1000 ms -> met" bzw. "MISSED by
+  N ms"). Eine Zahl ohne ihr Ziel laedt zu der Lesart ein, die gerade passt.
+- **Der Workflow nimmt Groesse und Schwellwert als Eingaben.** `sizes` waehlt 50k,
+  100k, 250k oder alle - die Matrix enthielt alle drei schon, nur liess sich keine
+  einzeln fahren. Die Bedingung sitzt am **Job**, nicht an einem Schritt: Ein Schritt
+  mit `exit 0` beendet nur sich selbst, und das Seeding danach liefe trotzdem.
+- Beide Eingaben haben Vorgaben, damit ein Lauf ohne Angabe sich verhaelt wie bisher.
+
+## 1.2.0 (interne Version 2026090542)
+
+> Der LEFT JOIN half lokal und schadete im Massstab. Zurueckgenommen.
+
+- Der Umbau von `NOT EXISTS` zu `LEFT JOIN … IS NULL` sah nach der Loesung aus:
+  lokal auf MariaDB **113 -> 20 ms**, der Scan fiel von 20.010 auf 2.285 Zeilen.
+- **Bei 250.000 Items kehrt es sich um**: warm p95 **1.089 -> 1.967 ms**. Die
+  geaenderte Join-Reihenfolge laesst die Versionszugriffe je Kandidatenzeile laufen
+  statt je zurueckgegebener Zeile, und dieser Aufwand waechst mit dem Pool.
+- **PostgreSQL bevorzugt die Form** (206 -> 113 ms). Zwei Statements je Engine sind
+  es nicht wert: MariaDB ist die Engine, die das Ziel verfehlt.
+- Zurueckgenommen, mit der Messung als Begruendung im Code - damit der naheliegende
+  Umbau nicht ein zweites Mal versucht wird.
+- Der Aequivalenztest bleibt und ist auf die Eigenschaft formuliert statt auf die
+  Form: Er prueft, dass eine zugeordnete Frage **genau eine** Zeile entfernt, und
+  gilt fuer beide Schreibweisen.
+- **Stand #58**: MariaDB 2.069 -> 1.089 ms (das innere LIMIT), PostgreSQL 218 -> 206
+  ms. Ziel 500 ms auf MariaDB weiterhin verfehlt.
+
 ## 1.2.0 (interne Version 2026090541)
 
 > #58: Der Anti-Join war der letzte Engpass.

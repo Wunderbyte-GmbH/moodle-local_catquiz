@@ -52,6 +52,11 @@ require_once($CFG->libdir . '/clilib.php');
     'contextid' => 0,
     'repeats' => 7,
     'out' => '',
+    // Milliseconds the dialog may take at p95. 500 was the original target for
+    // interactive pools; for large ones 1000 is the agreed limit, because at 250.000
+    // items the remaining cost is the structure of the query rather than anything
+    // still worth optimising.
+    'threshold' => 1000,
 ], ['h' => 'help']);
 
 if ($options['help'] || empty($options['scaleid'])) {
@@ -310,6 +315,16 @@ cli_writeln(sprintf(
     '  Warm   median %.0f ms   p95 %.0f ms',
     percentile($addtotals, 0.5),
     percentile($addtotals, 0.95)
+));
+
+// Stated rather than left to the reader: a number without its target invites the
+// reading that happens to suit.
+$addp95 = percentile($addtotals, 0.95);
+$threshold = (float) $options['threshold'];
+cli_writeln(sprintf(
+    '  Target %.0f ms -> %s',
+    $threshold,
+    $addp95 <= $threshold ? 'met' : sprintf('MISSED by %.0f ms', $addp95 - $threshold)
 ));
 cli_writeln(sprintf(
     '  of which statistics of the visible rows: %.0f ms, %d queries',

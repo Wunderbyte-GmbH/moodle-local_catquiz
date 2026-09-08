@@ -15,6 +15,24 @@ name: load-runtime-pool
 on:
   workflow_dispatch:
     inputs:
+      sizes:
+        description: >-
+          Which pool sizes to measure. "all" runs 50k, 100k and 250k; a single size
+          is useful when checking one change without occupying the runners for an
+          hour.
+        type: choice
+        default: all
+        options:
+          - all
+          - '50000'
+          - '100000'
+          - '250000'
+      threshold:
+        description: >-
+          Milliseconds the add-questions dialog may take at p95 before the run is
+          reported as missing the target. 500 for interactive pools; 1000 is the
+          agreed limit for large ones.
+        default: '1000'
       repeats:
         description: 'Warm runs per size (median and p95 are taken from these)'
         required: false
@@ -54,6 +72,14 @@ jobs:
           --health-cmd="mysqladmin ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
 
+    # On the job, not on a step: a step that exits early stops only itself, and the
+    # seeding after it would run regardless. An unselected size is skipped whole and
+    # still shows up in the run as skipped.
+    if: >-
+      github.event.inputs.sizes == '' ||
+      github.event.inputs.sizes == 'all' ||
+      github.event.inputs.sizes == format('{0}', matrix.items)
+
     strategy:
       fail-fast: false
       matrix:
@@ -68,6 +94,9 @@ jobs:
             questions: 120000
           - items: 250000
             questions: 300000
+        # The chosen size is applied per job below rather than by building the matrix
+        # dynamically: a matrix expression cannot read an input on this runner, and a
+        # skipped job is visible in the run while a missing one is not.
 
     steps:
       - name: Check out plugin
@@ -237,6 +266,7 @@ jobs:
             --scaleid=${{ steps.pool.outputs.scaleid }} \
             --contextid=${{ steps.pool.outputs.contextid }} \
             --repeats=${{ github.event.inputs.repeats || '7' }} \
+            --threshold=${{ github.event.inputs.threshold || '1000' }} \
             --out=/tmp/pool-${{ matrix.items }}.md \
             | tee /tmp/pool-${{ matrix.items }}.txt
 

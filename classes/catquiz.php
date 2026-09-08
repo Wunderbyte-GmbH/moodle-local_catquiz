@@ -540,22 +540,26 @@ class catquiz {
                    )
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                -- Issue #58: written as a LEFT JOIN rather than NOT EXISTS.
+                -- Issue #58: deliberately NOT EXISTS, not a LEFT JOIN.
                 --
-                -- Both express the same condition - questions not yet assigned to
-                -- this scale - but MariaDB executes NOT EXISTS as a materialised
-                -- anti-join (ANALYZE: r_loops = 1 on lci). It needs the complete
-                -- candidate set before it can answer, so the LIMIT inside this
-                -- subquery cannot stop the scan early: 20.010 rows of
-                -- question_bank_entries with a version join each, to show ten.
+                -- The rewrite to LEFT JOIN ... IS NULL was tried and measured. On a
+                -- small pool it looked like the answer: MariaDB stopped scanning
+                -- early and the statement went from 113 ms to 20 ms. At 250.000 items
+                -- it reversed - warm p95 rose from 1.089 ms to 1.967 ms, because the
+                -- changed join order makes the version lookups run per candidate row
+                -- instead of per returned row, and that cost grows with the pool.
                 --
-                -- As an outer join the condition is evaluated row by row and the
-                -- limit takes effect. PostgreSQL plans both forms alike.
-                LEFT JOIN {local_catquiz_items} lci
-                       ON lci.componentid = q.id
+                -- PostgreSQL preferred the outer join (206 -> 113 ms), so an
+                -- engine-dependent form would help there. It is not worth two
+                -- statements: MariaDB is the engine that misses the target, and this
+                -- form is the better one for it.
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM {local_catquiz_items} lci
+                    WHERE lci.componentid = q.id
                       AND lci.componentname = 'question'
                       AND lci.catscaleid = :notassignedscaleid
-                WHERE lci.id IS NULL
+                )
             ) as s1";
 
         $where = '1=1';
