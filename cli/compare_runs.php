@@ -46,6 +46,7 @@ require_once($CFG->libdir . '/clilib.php');
     'b' => '',
     'labela' => 'A',
     'labelb' => 'B',
+    'allow-different' => false,
 ], ['h' => 'help']);
 
 if ($options['help'] || empty($options['a']) || empty($options['b'])) {
@@ -54,6 +55,12 @@ if ($options['help'] || empty($options['a']) || empty($options['b'])) {
     cli_writeln('  --b=FILE        Second run.');
     cli_writeln('  --labela=NAME   What to call the first (default A).');
     cli_writeln('  --labelb=NAME   What to call the second (default B).');
+    cli_writeln('  --allow-different  Show the ratio even when the results differ.');
+    cli_writeln('');
+    cli_writeln('  The last one is for a difference that is understood and wanted -');
+    cli_writeln('  a page that shows the same thing while building less of it, say.');
+    cli_writeln('  The ratio is then printed with the difference stated beside it,');
+    cli_writeln('  never silently.');
     exit(0);
 }
 
@@ -141,13 +148,23 @@ foreach ($a as $name => $left) {
         $right['fingerprint'] ?? '-'
     ));
 
-    // The gate. Same numbers, different work - that is the case this exists to catch.
-    if ($left['fingerprint'] !== $right['fingerprint']) {
+    // The gate. Same numbers, different work - that is the case this exists to
+    // catch. It is not always the answer, though: a page that shows what it showed
+    // before while building fewer panels differs here and is exactly the improvement
+    // being measured. --allow-different says the difference has been looked at.
+    $differs = $left['fingerprint'] !== $right['fingerprint'];
+
+    if ($differs && empty($options['allow-different'])) {
         cli_writeln('  NOT COMPARABLE - the two runs produced different results.');
-        cli_writeln('  A ratio here would compare different work and read as a speedup.');
+        cli_writeln('  If that difference is the point - the same page built with less -');
+        cli_writeln('  re-run with --allow-different and the ratio is shown beside it.');
         $blocked++;
         cli_writeln('');
         continue;
+    }
+
+    if ($differs) {
+        cli_writeln('  Results differ; the ratio below is released deliberately.');
     }
 
     if ($left['median'] > 0 && $right['median'] > 0) {

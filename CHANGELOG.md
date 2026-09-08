@@ -1,5 +1,48 @@
 # Changelog – local_catquiz
 
+## 1.2.0 (interne Version 2026090553)
+
+> Das Gate war an der Manager-Seite zu streng - weniger bauen ist der Gewinn.
+
+- **Der Fingerabdruck verglich die interne Struktur** und markierte die Manager-Seite
+  damit als nicht vergleichbar. Das war die falsche Antwort: Eine Version traegt
+  `isQuestions`-artige Flags und baut nur den aktiven Bereich, die andere baut jeden.
+  **Mehr Schluessel, weniger Arbeit, dieselbe Seite** - genau die Verbesserung, nicht
+  ein Unterschied im Ergebnis.
+- Zuerst die Schluesselnamen ausgegeben statt nur den Hash. Erst dadurch war
+  erkennbar, worin der Unterschied besteht - jede engere Definition davor waere
+  geraten gewesen.
+- Der Fingerabdruck nennt jetzt, **was die Seite zeigt**: gefuellte Bereiche und den
+  aktiven. Lesbar statt als Hash: `page: panels [] active [summary]`.
+- **`--allow-different` in `compare_runs.php`**: Wo der Unterschied verstanden und
+  gewollt ist, wird der Faktor ausgegeben - mit dem Hinweis daneben, nie stillschweigend.
+  Ohne die Angabe bleibt es bei NOT COMPARABLE, jetzt mit dem Hinweis auf diesen Weg.
+
+## 1.2.0 (interne Version 2026090552)
+
+> Der vollstaendige Antwortzyklus - die groesste verbliebene Luecke.
+
+- **`cli/measure_attempt.php`** misst einen echten CAT-Versuch Schritt fuer Schritt
+  ueber `catquiz_handler::fetch_question_id()` - denselben Einstieg, den
+  `mod_adaptivequiz` je Frage nutzt. Kein nachgebauter Ablauf: Ein rekonstruierter
+  Pfad wuerde das Messskript vermessen statt das Plugin.
+- Ausgegeben werden `attempt_start_ms`, `qN_select_ms` je Frage,
+  `total_attempt_ms`, Abfragezahl und Spitzenspeicher.
+- **Fuenf Fragen, fest, mit fester Antwortfolge** (richtig, falsch, richtig, richtig,
+  falsch). Ein adaptiver Test mit anderen Antworten nimmt einen anderen Pfad, und
+  dann vergleichen die beiden Laeufe nicht mehr dasselbe.
+- **Zwei Stufen der Uebereinstimmung**: *fachlich aequivalent* (fuenf Fragen
+  verarbeitet, gleiche Antworten) und *algorithmisch identisch* (dieselben Fragen).
+  Eine Version, die einen Auswahlfehler behebt, weicht algorithmisch **gewollt** ab -
+  ein Vergleich, der das nicht unterscheiden kann, wuerde den Fix entweder verbergen
+  oder den ganzen Benchmark verwerfen.
+- **Vorbedingung wird vorab geprueft.** Ein Test ohne Strategie scheiterte zuvor tief
+  in der Auswahl mit einem Typfehler, was wie ein Plugin-Defekt aussah statt wie eine
+  unfertige Konfiguration. Jetzt: eine Zeile Klartext.
+
+**Offen und benannt:** Die Kursseite mit 50/100/250 Shortcodes und die Browser-Ebene
+per Playwright. Beide sind sinnvoll und beide sind ein eigener Bau.
+
 ## 1.2.0 (interne Version 2026090551)
 
 > Alle vier Rueckmeldungen geprueft - alle vier trafen zu - und behoben.

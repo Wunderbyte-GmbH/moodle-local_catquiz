@@ -145,10 +145,38 @@ function fingerprint($result): string {
     if (is_array($result) || is_object($result)) {
         $canonical = canonicalise($result);
 
+        // What the page shows, not how it was assembled.
+        //
+        // Comparing the whole structure marked the two versions as incomparable, and
+        // that was the wrong answer: one carries isQuestions-style flags and builds
+        // only the active panel, the other builds every panel. More keys, less work,
+        // same page - which is the improvement, not a difference in result.
+        //
+        // So the fingerprint takes the panels that carry content and the active one.
+        // A page that shows the same panels with the same content is the same page,
+        // however much was built behind it. A panel that lost its content still
+        // shows up, because that would be a loss rather than an optimisation.
+        $keys = is_array($canonical) ? array_keys($canonical) : [];
+
+        $panels = [];
+        $active = [];
+        foreach ($keys as $key) {
+            if (str_starts_with($key, 'is') && !empty($canonical[$key])) {
+                $active[] = substr($key, 2);
+                continue;
+            }
+            if (str_ends_with($key, 'display') && !empty($canonical[$key])) {
+                $panels[] = substr($key, 0, -7);
+            }
+        }
+
+        sort($panels);
+        sort($active);
+
         return sprintf(
-            'structure %s, %d top-level keys',
-            substr(sha1(json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), 0, 12),
-            is_array($canonical) ? count($canonical) : 0
+            'page: panels [%s] active [%s]',
+            implode(' ', $panels),
+            implode(' ', $active) ?: 'none declared'
         );
     }
 
