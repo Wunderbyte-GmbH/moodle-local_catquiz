@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Class model_raschmodel.
@@ -58,6 +58,331 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
 
         $discrimination = 1; // Hardcode override because of 1pl.
         return (1 / (1 + exp($discrimination * ($itemdifficulty - $personability))));
+    }
+
+    /**
+     * Numerically stable logistic (sigmoid) function sigma(z) = 1 / (1 + e^{-z}).
+     *
+     * Branches on the sign of $z so that exp() is only ever evaluated for a
+     * non-positive argument. This avoids the overflow that arises when large
+     * exponentials (e.g. exp($a * $b), exp($b * $theta)) are formed separately
+     * and only cancel afterwards. All logistic IRT models should express their
+     * likelihood and derivatives through this primitive.
+     *
+     * @param float $z linear predictor
+     *
+     * @return float sigma(z), saturating to 0.0 or 1.0 for extreme |z|
+     *
+     */
+    public static function logistic(float $z): float {
+        if ($z >= 0.0) {
+            return 1.0 / (1.0 + exp(-$z));
+        }
+        $ez = exp($z);
+        return $ez / (1.0 + $ez);
+    }
+
+    /**
+     * Logistic variance term W = P(1 - P) = sigma'(z), the first derivative of the logistic.
+     *
+     * @param float $p a logistic probability sigma(z)
+     *
+     * @return float
+     *
+     */
+    public static function logistic_w(float $p): float {
+        return $p * (1.0 - $p);
+    }
+
+    /**
+     * Data-driven number of estimated parameters (item parameters + ability).
+     *
+     * Derived from the parameter codec rather than a fixed constant, so that
+     * variable-length polytomous models (with a data-dependent number of
+     * thresholds or intercepts) report the correct dimensionality.
+     *
+     * @param array $ip item parameters
+     *
+     * @return int
+     *
+     */
+    public static function get_model_dim_from_ip(array $ip): int {
+        return 1 + count(static::convert_ip_to_vector($ip));
+    }
+
+    /**
+     * Combined person-ability score and hessian in a single call.
+     *
+     * The person-ability Newton step evaluates the gradient and the hessian at the
+     * same point every iteration. Computing them together lets a model share the
+     * (potentially expensive) probability/moment computation between the two instead
+     * of repeating it. This base implementation simply delegates to the separate
+     * methods; models override it where a shared computation pays off.
+     *
+     * @param array $pp person ability parameter ('ability')
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     *
+     * @return array ['jacobian' => 1st derivative, 'hessian' => 2nd derivative]
+     *
+     */
+    public static function get_ability_derivatives(array $pp, array $ip, float $frac): array {
+        return [
+            'jacobian' => static::log_likelihood_p($pp, $ip, $frac),
+            'hessian' => static::log_likelihood_p_p($pp, $ip, $frac),
+        ];
+    }
+
+    /**
+     * Nudge a denominator away from exactly zero to avoid a hard division error.
+     *
+     * At extreme abilities the polytomous category probabilities (and the 3PL
+     * Bernoulli variance P (1 - P)) underflow to exactly 0.0, which makes the
+     * division in the log-likelihood derivatives throw a DivisionByZeroError under
+     * PHP 8. Replacing an exactly-zero (or sub-epsilon) denominator with a signed
+     * epsilon yields a large-but-finite derivative instead of a crash. The guard is
+     * inert at all realistic operating points (|denominator| >> epsilon), so it does
+     * not affect the finite-difference-verified values in the normal range.
+     *
+     * @param float $denominator the denominator to stabilise
+     * @param float $epsilon smallest permitted magnitude
+     *
+     * @return float
+     *
+     */
+    protected static function stabilize_denominator(float $denominator, float $epsilon = 1e-12): float {
+        if (abs($denominator) >= $epsilon) {
+            return $denominator;
+        }
+        return ($denominator < 0.0) ? -$epsilon : $epsilon;
+    }
+
+    /**
+     * Shared LMS (least mean squares) assembly from the expected-score moments.
+     *
+     * The LMS objective is S = n (frac - mu)^2 with the expected score
+     * mu = sum_k frac_k P_k. Given mu and its gradient/Hessian w.r.t. the free
+     * item parameters (0-indexed, aligned with the codec), this returns the
+     * objective value together with its gradient and Hessian:
+     *   dS/dp_j      = 2n (mu - frac) dmu/dp_j
+     *   d2S/dp_i dp_j = 2n (dmu/dp_i dmu/dp_j + (mu - frac) d2mu/dp_i dp_j)
+     *
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     * @param float $mu expected score
+     * @param array $dmu gradient of mu (0-indexed vector)
+     * @param array $ddmu Hessian of mu (0-indexed matrix)
+     *
+     * @return array ['residuals' => float, 'jacobian' => array, 'hessian' => array]
+     *
+     */
+    protected static function lms_assemble(float $frac, float $n, float $mu, array $dmu, array $ddmu): array {
+        $diff = $mu - $frac;
+        $dim = count($dmu);
+
+        $jacobian = [];
+        for ($j = 0; $j < $dim; $j++) {
+            $jacobian[] = 2 * $n * $diff * $dmu[$j];
+        }
+
+        $hessian = [];
+        for ($i = 0; $i < $dim; $i++) {
+            $row = [];
+            for ($j = 0; $j < $dim; $j++) {
+                $row[] = 2 * $n * ($dmu[$i] * $dmu[$j] + $diff * $ddmu[$i][$j]);
+            }
+            $hessian[] = $row;
+        }
+
+        return [
+            'residuals' => $n * $diff ** 2,
+            'jacobian' => $jacobian,
+            'hessian' => $hessian,
+        ];
+    }
+
+    /**
+     * Shared LORS (Log'ed Odds-Ratio Squared) computation for polytomous models.
+     *
+     * Both polytomous families are log-linear in a per-boundary odds ratio:
+     *   - graded (GRM/GGRM): the cumulative odds  P(X>=k)/P(X<k),
+     *   - partial credit (PCM/GPCM): the adjacent odds  P_k/P_{k-1},
+     * with the same linear predictor eta_k = b (theta - p_k) for the k-th free
+     * parameter p_k (threshold or step intercept). The residual is therefore
+     * R_k = log(OR_k) + b (p_k - theta) and the objective S = n * sum_k R_k^2 —
+     * one dichotomous LORS problem per boundary. The threshold/intercept block of
+     * the Hessian is diagonal (residuals do not couple across boundaries); only
+     * the discrimination couples across them.
+     *
+     * The returned gradient and Hessian are aligned with the baseline-free codec:
+     * the M free parameters, optionally followed by the discrimination.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios, keyed by the free fractions
+     * @param float $n number of observations
+     * @param string $key item-parameter key ('difficulties' or 'intercepts')
+     * @param bool $hasdiscrimination whether the model estimates a discrimination
+     *
+     * @return array ['residuals' => float, 'jacobian' => array, 'hessian' => array]
+     *
+     */
+    protected static function compute_lors(
+        array $pp,
+        array $ip,
+        array $ors,
+        float $n,
+        string $key,
+        bool $hasdiscrimination
+    ): array {
+        $ability = $pp['ability'];
+        $params = self::sort_fractions($ip[$key]);
+        $ors = self::sanitize_fractions($ors);
+        $b = $hasdiscrimination ? $ip['discrimination'] : 1.0;
+        $fractions = self::get_fractions($params);
+        $kmax = max(array_keys($fractions));
+
+        // Free boundaries k = 1..M (baseline fraction excluded).
+        $xs = [];
+        $rs = [];
+        $logors = [];
+        $residualsum = 0.0;
+        for ($k = 1; $k <= $kmax; $k++) {
+            $frac = $fractions[$k];
+            $x = $params[$frac] - $ability;
+            $logor = log($ors[$frac]);
+            $r = $b * $x + $logor;
+            $xs[$k] = $x;
+            $rs[$k] = $r;
+            $logors[$k] = $logor;
+            $residualsum += $r ** 2;
+        }
+
+        // Gradient aligned with the codec: free parameters, then discrimination.
+        $jacobian = [];
+        for ($k = 1; $k <= $kmax; $k++) {
+            $jacobian[] = $n * 2 * $b * $rs[$k];
+        }
+        if ($hasdiscrimination) {
+            $jb = 0.0;
+            for ($k = 1; $k <= $kmax; $k++) {
+                $jb += $rs[$k] * $xs[$k];
+            }
+            $jacobian[] = $n * 2 * $jb;
+        }
+
+        $dim = $kmax + ($hasdiscrimination ? 1 : 0);
+        $hessian = array_fill(0, $dim, array_fill(0, $dim, 0.0));
+        for ($k = 1; $k <= $kmax; $k++) {
+            $hessian[$k - 1][$k - 1] = $n * 2 * $b ** 2;
+        }
+        if ($hasdiscrimination) {
+            $bidx = $kmax;
+            $hbb = 0.0;
+            for ($k = 1; $k <= $kmax; $k++) {
+                $hbb += $xs[$k] ** 2;
+                $cross = $n * 2 * (2 * $b * $xs[$k] + $logors[$k]);
+                $hessian[$k - 1][$bidx] = $cross;
+                $hessian[$bidx][$k - 1] = $cross;
+            }
+            $hessian[$bidx][$bidx] = $n * 2 * $hbb;
+        }
+
+        return [
+            'residuals' => $n * $residualsum,
+            'jacobian' => $jacobian,
+            'hessian' => $hessian,
+        ];
+    }
+
+    /**
+     * Whether the model has a data-dependent number of item parameters.
+     *
+     * @return bool
+     *
+     */
+    public static function is_polytomous(): bool {
+        return false;
+    }
+
+    /**
+     * Data-driven start thresholds for a polytomous item.
+     *
+     * Category structure from the item, frequencies from the responses: when the
+     * item's declared category fractions are passed in via $categoryfractions, that
+     * complete set defines the categories (so a category that happens to be
+     * unobserved in the calibration sample is still modelled); otherwise the
+     * distinct observed response fractions are used as a fallback structure.
+     *
+     * Given the structure, the free thresholds are initialised from the empirical
+     * cumulative category proportions as ordered -logit values. If any category is
+     * unobserved (proportion 0 or 1, degenerate logit), evenly spaced thresholds in
+     * [-2, 2] are used instead. The baseline category (first fraction) is fixed at 0.
+     *
+     * @param array $itemresponse array of model_item_response
+     * @param array|null $categoryfractions optional declared category fractions of
+     *                                       the item (e.g. [0.0, 0.5, 1.0]); when
+     *                                       null the observed fractions are used
+     *
+     * @return array thresholds keyed by fraction (baseline first, value 0)
+     *
+     */
+    protected static function empirical_start_thresholds(
+        array $itemresponse,
+        ?array $categoryfractions = null
+    ): array {
+        if ($categoryfractions !== null && count($categoryfractions) > 0) {
+            // Structure from the item: keep every declared category, observed or not.
+            $fractions = [];
+            foreach ($categoryfractions as $value) {
+                $fractions[(string) $value] = true;
+            }
+        } else {
+            // Fallback structure: the distinct observed response fractions.
+            $fractions = [];
+            foreach ($itemresponse as $r) {
+                $fractions[(string) $r->get_response()] = true;
+            }
+        }
+        $fractions = array_keys($fractions);
+        usort($fractions, fn($x, $y) => (float) $x <=> (float) $y);
+        $m = count($fractions) - 1;
+
+        $index = array_flip($fractions);
+        $counts = array_fill(0, count($fractions), 0);
+        $n = 0;
+        foreach ($itemresponse as $r) {
+            $key = (string) $r->get_response();
+            // A response outside the declared structure is ignored for frequencies.
+            if (array_key_exists($key, $index)) {
+                $counts[$index[$key]]++;
+                $n++;
+            }
+        }
+
+        $result = [(string) $fractions[0] => 0.0];
+        $usefallback = false;
+        for ($k = 1; $k <= $m; $k++) {
+            $cum = 0;
+            for ($j = $k; $j <= $m; $j++) {
+                $cum += $counts[$j];
+            }
+            $prop = ($n > 0) ? $cum / $n : 0.0;
+            if ($prop <= 0.0 || $prop >= 1.0) {
+                $usefallback = true;
+                break;
+            }
+            $result[(string) $fractions[$k]] = -log($prop / (1.0 - $prop));
+        }
+
+        if ($usefallback) {
+            $result = [(string) $fractions[0] => 0.0];
+            for ($k = 1; $k <= $m; $k++) {
+                $result[(string) $fractions[$k]] = ($m > 1) ? (-2.0 + 4.0 * ($k - 1) / ($m - 1)) : 0.0;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -171,6 +496,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
             case 'aic':
                 return $this->calc_aic_item($personabilities, $itemparams, $k);
 
+            case 'bic':
+                return $this->calc_bic_item($personabilities, $itemparams, $k);
+
+            case 'caic':
+                return $this->calc_caic_item($personabilities, $itemparams, $k);
+
             default:
                 throw new \UnexpectedValueException("Unknown information criterium" . $criterion);
         }
@@ -213,7 +544,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float
      */
     public function calc_aic_item($personabilities, $item, model_responses $k) {
-        $numberofparameters = $this->get_model_dim() - 1;
+        // Data-driven parameter count from the estimated item parameters via the
+        // codec; falls back to the fixed dimension only when no parameters exist.
+        $ip = $item->get_params_array();
+        $numberofparameters = ($ip !== null)
+            ? static::get_model_dim_from_ip($ip) - 1
+            : $this->get_model_dim() - 1;
         return 2 * $numberofparameters + $this->calc_dic_item($personabilities, $item, $k);
     }
 
@@ -228,7 +564,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float
      */
     public function calc_bic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
-        $numberofparameters = $this->get_model_dim() - 1;
+        // Data-driven parameter count from the estimated item parameters via the
+        // codec; falls back to the fixed dimension only when no parameters exist.
+        $ip = $item->get_params_array();
+        $numberofparameters = ($ip !== null)
+            ? static::get_model_dim_from_ip($ip) - 1
+            : $this->get_model_dim() - 1;
         $numberofcases = count($personabilities->only_valid());
         return $numberofparameters * log($numberofcases) + $this->calc_dic_item($personabilities, $item, $k);
     }
@@ -244,7 +585,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float
      */
     public function calc_caic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
-        $numberofparameters = $this->get_model_dim() - 1;
+        // Data-driven parameter count from the estimated item parameters via the
+        // codec; falls back to the fixed dimension only when no parameters exist.
+        $ip = $item->get_params_array();
+        $numberofparameters = ($ip !== null)
+            ? static::get_model_dim_from_ip($ip) - 1
+            : $this->get_model_dim() - 1;
         $numberofcases = count($personabilities->only_valid());
         return $numberofparameters * (log($numberofcases + 1)) + $this->calc_dic_item($personabilities, $item, $k);
     }
@@ -260,7 +606,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float
      */
     public function calc_aicc_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
-        $numberofparameters = $this->get_model_dim() - 1;
+        // Data-driven parameter count from the estimated item parameters via the
+        // codec; falls back to the fixed dimension only when no parameters exist.
+        $ip = $item->get_params_array();
+        $numberofparameters = ($ip !== null)
+            ? static::get_model_dim_from_ip($ip) - 1
+            : $this->get_model_dim() - 1;
         $numberofcases = count($personabilities->only_valid());
         if ($numberofcases - $numberofparameters - 1 <= 0) {
             return 0;
@@ -281,7 +632,12 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float
      */
     public function calc_sabic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
-        $numberofparameters = $this->get_model_dim() - 1;
+        // Data-driven parameter count from the estimated item parameters via the
+        // codec; falls back to the fixed dimension only when no parameters exist.
+        $ip = $item->get_params_array();
+        $numberofparameters = ($ip !== null)
+            ? static::get_model_dim_from_ip($ip) - 1
+            : $this->get_model_dim() - 1;
         $numberofcases = count($personabilities->only_valid());
         if ($numberofcases - $numberofparameters - 1 <= 0) {
             return 0;
@@ -312,7 +668,7 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
         foreach ($filteredresponses as $itemid => $itemresponse) {
             $parameters = $this->calculate_params($itemresponse, $startvalues[$itemid] ?? null);
             // Now create a new item difficulty object (param).
-            $param = $starvalues[$itemid] ?? $this->create_item_param($itemid);
+            $param = $startvalues[$itemid] ?? $this->create_item_param($itemid);
             $param->set_parameters($parameters)
                 ->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
             $estimateditemparams->add($param);

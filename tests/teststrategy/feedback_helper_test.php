@@ -20,7 +20,7 @@
  * @package    local_catquiz
  * @author     Magdalena Holczik
  * @copyright  2023 onwards <info@wunderbyte.at>
- * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz;

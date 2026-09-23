@@ -34,50 +34,6 @@ namespace local_catquiz;
  */
 interface catcalc_item_estimator {
     /**
-     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
-     *
-     * @param array $ability
-     * @param array $ip
-     * @param float $itemresponse
-     *
-     * @return array
-     *
-     */
-    public static function get_log_jacobian(array $ability, array $ip, float $itemresponse): array;
-
-    /**
-     * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
-     *
-     * @param array $ability
-     * @param array $ip
-     * @param float $itemresponse
-     *
-     * @return array
-     *
-     */
-    public static function get_log_hessian(array $ability, array $ip, float $itemresponse): array;
-
-    /**
-     * Get log tr jacobian.
-     *
-     * @param array $ip
-     *
-     * @return array
-     *
-     */
-    public static function get_log_tr_jacobian(array $ip): array;
-
-    /**
-     * Get log tr hessian.
-     *
-     * @param array $ip
-     *
-     * @return array
-     *
-     */
-    public static function get_log_tr_hessian(array $ip): array;
-
-    /**
      * Get model dim.
      *
      * @return int
@@ -86,10 +42,52 @@ interface catcalc_item_estimator {
     public static function get_model_dim(): int;
 
     /**
+     * Numerically stable logistic (sigmoid) function.
+     *
+     * Shared primitive for all logistic IRT models so the compute-intensive
+     * likelihood and derivative code can be expressed via P and W = P(1 - P)
+     * instead of repeated raw exponentials.
+     *
+     * @param float $z linear predictor
+     *
+     * @return float
+     *
+     */
+    public static function logistic(float $z): float;
+
+    /**
      * Update parameters so that they are located in a trusted region
      * @param array $parameters
      *
      * @return array
      */
     public static function restrict_to_trusted_region(array $parameters): array;
+
+    /**
+     * 1st derivative of the log likelihood with respect to the item parameters.
+     *
+     * Required by catcalc::estimate_item_params(), which builds the item-parameter
+     * jacobian from this method.
+     *
+     * @param array $ability person ability parameter ('ability')
+     * @param array $ip item parameters
+     * @param float $itemresponse response fraction
+     *
+     * @return array jacobian vector
+     */
+    public static function get_log_jacobian(array $ability, array $ip, float $itemresponse): array;
+
+    /**
+     * 2nd derivative (hessian) of the log likelihood with respect to the item parameters.
+     *
+     * Required by catcalc::estimate_item_params(), which builds the item-parameter
+     * hessian from this method.
+     *
+     * @param array $ability person ability parameter ('ability')
+     * @param array $ip item parameters
+     * @param float $itemresponse response fraction
+     *
+     * @return array hessian matrix
+     */
+    public static function get_log_hessian(array $ability, array $ip, float $itemresponse): array;
 }

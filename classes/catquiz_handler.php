@@ -33,12 +33,14 @@ use coding_exception;
 use context_module;
 use context_system;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\attempt\attempt_finalizer;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
 use MoodleQuickForm;
 use stdClass;
+use local_catquiz\local\progress_retention;
 
 /**
  * Class catquiz
@@ -48,7 +50,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_handler {
-
     /** @var int If this is selected, the catquiz engine is deactivated. */
     public const DEACTIVATED_MODEL = 0;
     /** @var int Rasch model to select next question to be displayed to user */
@@ -60,7 +61,6 @@ class catquiz_handler {
      * Constructor for catquiz.
      */
     public function __construct() {
-
     }
 
     /**
@@ -72,7 +72,6 @@ class catquiz_handler {
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
         global $DB, $PAGE;
-
 
         $elements = [];
 
@@ -113,7 +112,8 @@ class catquiz_handler {
             $elements[] = $mform->addElement(
                 'advcheckbox',
                 'testenvironment_addoredittemplate',
-                get_string('addoredittemplate', 'local_catquiz'));
+                get_string('addoredittemplate', 'local_catquiz')
+            );
 
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
             $mform->setType('testenvironment_name', PARAM_TEXT);
@@ -125,15 +125,22 @@ class catquiz_handler {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcattestoption');
-        $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
+        $elements[] = $mform->addElement(
+            'submit',
+            'submitcattestoption',
+            'cattestsubmit',
             [
             'class' => 'd-none',
             'data-action' => 'submitCatTest',
-        ]);
+            ]
+        );
 
         // Add a special header for catquiz.
-        $elements[] = $mform->addElement('header', 'catquiz_header',
-                get_string('catquizsettings', 'local_catquiz'));
+        $elements[] = $mform->addElement(
+            'header',
+            'catquiz_header',
+            get_string('catquizsettings', 'local_catquiz')
+        );
         $mform->setExpanded('catquiz_header');
 
         $selectedcontext = optional_param('contextid', 0, PARAM_INT);
@@ -164,7 +171,10 @@ class catquiz_handler {
         $elements[] = $mform->addElement(
             'select',
             'catquiz_catscales',
-            get_string('selectparentscale', 'local_catquiz'), $select, $options);
+            get_string('selectparentscale', 'local_catquiz'),
+            $select,
+            $options
+        );
         $mform->addHelpButton('catquiz_catscales', 'catcatscales', 'local_catquiz');
 
         // We want to adjust our form depending on the nosubmit action which might just have taken place.
@@ -198,13 +208,40 @@ class catquiz_handler {
         $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
         self::generate_subscale_checkboxes($subscales, $elements, $mform);
 
+        // How long the working state of an attempt is kept, per test.
+        //
+        // Only the levels the site permits are offered. A site configured for data
+        // minimisation must not be overridden here, and an option that would be
+        // capped away on save would be misleading to show at all.
+        $retentionoptions = [
+            '' => get_string('progressretention_default', 'local_catquiz'),
+        ];
+        foreach (progress_retention::levels() as $level) {
+            if (progress_retention::effective_level($level) !== $level) {
+                continue;
+            }
+            $retentionoptions[$level] = get_string('progressretention_' . $level, 'local_catquiz');
+        }
+        $elements[] = $mform->addElement(
+            'select',
+            'catquiz_progressretention',
+            get_string('progressretention', 'local_catquiz'),
+            $retentionoptions
+        );
+        $mform->setType('catquiz_progressretention', PARAM_ALPHA);
+        $mform->addHelpButton('catquiz_progressretention', 'progressretention', 'local_catquiz');
+
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
-        $elements[] = $mform->addElement('submit', 'submitcatscaleoption', get_string('applychanges', 'local_catquiz'),
+        $elements[] = $mform->addElement(
+            'submit',
+            'submitcatscaleoption',
+            get_string('applychanges', 'local_catquiz'),
             [
             'class' => 'hidden',
             'data-action' => 'submitCatScale',
-        ]);
+            ]
+        );
 
         info::instance_form_definition($mform, $elements, $template);
 
@@ -223,7 +260,8 @@ class catquiz_handler {
         array $subscales,
         array &$elements,
         $mform,
-        string $elementadded = '') {
+        string $elementadded = ''
+    ) {
 
         if (empty($subscales)) {
             return;
@@ -322,10 +360,11 @@ class catquiz_handler {
             $_POST['contextid'] = $test->get_contextid() ?? 0;
 
             self::write_variables_to_post($formdefaultvalues);
-
-        } else if (isset($data['submitcattestoption'])
+        } else if (
+            isset($data['submitcattestoption'])
             && !empty($data['choosetemplate'])
-            && ($data['submitcattestoption'] == "cattestsubmit")) {
+            && ($data['submitcattestoption'] == "cattestsubmit")
+        ) {
             // B) If we have submitted a new testenvironment, we need to take this an load different json values.
             // cattestsubmit && choosetemplate not empty.
             // Post variable has to be set with json value.
@@ -407,7 +446,6 @@ class catquiz_handler {
                 }
             }
         }
-
     }
 
     /**
@@ -417,7 +455,6 @@ class catquiz_handler {
      * @return void
      */
     public static function instance_form_definition_after_data(stdClass &$data) {
-
     }
 
     /**
@@ -448,8 +485,10 @@ class catquiz_handler {
         // Standarderror- values should be positive float with min lower than max.
         $semin = false;
         $semax = false;
-        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
-            && $data['catquiz_standarderrorgroup']['catquiz_standarderror_min'] !== "") {
+        if (
+            isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
+            && $data['catquiz_standarderrorgroup']['catquiz_standarderror_min'] !== ""
+        ) {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
@@ -459,23 +498,29 @@ class catquiz_handler {
                 $semin = true;
             }
         }
-        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
-            && $data['catquiz_standarderrorgroup']['catquiz_standarderror_max'] !== "") {
-            if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
-                && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+        if (
+            isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+            && $data['catquiz_standarderrorgroup']['catquiz_standarderror_max'] !== ""
+        ) {
+            if (
+                !is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+                && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+            ) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0.0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
-            } else if ($semin && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min']
-                >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+            } else if (
+                $semin && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min']
+                >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+            ) {
                     $errors['catquiz_standarderrorgroup']
                     = get_string('formminquestgreaterthan', 'local_catquiz');
             } else {
                 $semax = true;
             }
         }
-        $sevalues = new stdClass;
+        $sevalues = new stdClass();
         $sevalues->min = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN;
         $sevalues->max = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX;
         if ((!$semin || !$semax) && empty($errors['catquiz_standarderrorgroup'])) {
@@ -485,25 +530,33 @@ class catquiz_handler {
 
         $hasmaxqpscale = array_key_exists('maxquestionsscalegroup', $data);
         // Number of questions - validate higher and lower values.
-        if ($hasmaxqpscale
+        if (
+            $hasmaxqpscale
             && (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
-            && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
+            && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
+        ) {
             $errors['maxquestionsscalegroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-        if ($hasmaxqpscale
+        if (
+            $hasmaxqpscale
             && (int) $data['maxquestionsgroup']['catquiz_minquestions']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
-            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
+            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']
+        ) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
 
         // Min questions per scale <= max questions per test.
-        if ($hasmaxqpscale
+        if (
+            $hasmaxqpscale
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
-            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
-            if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
-                > (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
+            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']
+        ) {
+            if (
+                (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+                > (int) $data['maxquestionsgroup']['catquiz_maxquestions']
+            ) {
                     $errors['maxquestionsgroup']
                     = get_string('formmscalegreaterthantest', 'local_catquiz');
             }
@@ -511,8 +564,10 @@ class catquiz_handler {
 
         // Validate time: at least on value must be provided if time limitation checked.
         if (!empty($data['catquiz_includetimelimit'])) {
-            if (empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperitem'])
-                && empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperattempt'])) {
+            if (
+                empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperitem'])
+                && empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperattempt'])
+            ) {
                     $errors['catquiz_timelimitgroup'] = get_string('formetimelimitnotprovided', 'local_catquiz');
             }
         }
@@ -568,8 +623,12 @@ class catquiz_handler {
         // We can hardcode this at this moment.
         $component = 'mod_adaptivequiz';
 
-        if (!$catquiz = $DB->get_record('local_catquiz_tests',
-            ['component' => $component, 'componentid' => $componentid])) {
+        if (
+            !$catquiz = $DB->get_record(
+                'local_catquiz_tests',
+                ['component' => $component, 'componentid' => $componentid]
+            )
+        ) {
             return;
         }
     }
@@ -660,6 +719,46 @@ class catquiz_handler {
         $test->save_or_update();
 
         cache_helper::purge_by_event('changesintestenvironments');
+
+        // The progress bar on the attempt page is drawn by mod_adaptivequiz
+        // against its own maximumquestions field. Keeping it in step here is what
+        // makes that bar show the CAT limit instead of a placeholder.
+        self::sync_activity_question_limit($quizdata);
+    }
+
+    /**
+     * Writes the CAT question limit into the activity's own maximumquestions field.
+     *
+     * The attempt page draws its progress bar from $adaptivequiz->maximumquestions -
+     * the activity's field, not ours. On a test run through catquiz that field is
+     * usually left at a large placeholder so the activity's hard stop never fires
+     * before the CAT logic does. The bar then counts against the wrong reference:
+     * "5 / 1000" on a test that ends after twenty questions, and a bar that never
+     * visibly moves.
+     *
+     * Syncing here keeps one field but only one source. Reading the CAT setting from
+     * mod_adaptivequiz instead would make the activity depend on this plugin, which
+     * is the wrong direction.
+     *
+     * @param stdClass $quizdata
+     * @return void
+     */
+    private static function sync_activity_question_limit(stdClass $quizdata): void {
+        global $DB;
+
+        $catmax = (int) ($quizdata->maxquestionsgroup->catquiz_maxquestions ?? 0);
+
+        // No CAT limit configured: the activity's own value is all there is, and
+        // overwriting it with zero would remove the stop altogether.
+        if ($catmax <= 0) {
+            return;
+        }
+
+        if (empty($quizdata->id)) {
+            return;
+        }
+
+        $DB->set_field('adaptivequiz', 'maximumquestions', $catmax, ['id' => $quizdata->id]);
     }
 
     /**
@@ -681,23 +780,21 @@ class catquiz_handler {
                 $scaleidofcopyvalue = substr($key, strlen('copysettingsforallsubscales_'));
                 $subscaleids = catscale::get_subscale_ids(intval($scaleidofcopyvalue));
             }
-
         };
 
         // If we just changed the number of the feedbackoptions.
         // We add the right values.
-        if (isset($values["submitnumberoffeedbackoptions"])
-            && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
+        if (
+            isset($values["submitnumberoffeedbackoptions"])
+            && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit"
+        ) {
             $parentscale = catscale::return_catscale_object($values['catquiz_catscales']);
             // First, get the setting.
             $numberofoptions = $values['numberoffeedbackoptionsselect'];
 
             foreach ($values as $k => $v) {
-
                 if (strpos($k, 'feedback_scaleid_limit_') !== false) {
-
                     if ($mform->elementExists($k)) {
-
                         preg_match('/_(\d+)$/', $k, $matches);
                         $j = $matches[1];
 
@@ -752,9 +849,24 @@ class catquiz_handler {
                     $standardvalues[$feedbackvaluekey] = $values[$keyname] ?? null;
                     continue;
                 }
+                // The range limit fields carry localised numbers taken raw from
+                // getSubmitValues(). A German decimal comma ("1,5") must be parsed
+                // with unformat_float() here; a plain (float)/floatval() would
+                // truncate it to 1.0 and silently corrupt the stored yellow/green
+                // boundary for every copied-to subscale (Issue: mis-coloured
+                // feedback because 1,5 collapsed to 1).
+                $islimitkey = ($feedbackvaluekey === 'feedback_scaleid_limit_lower_'
+                    || $feedbackvaluekey === 'feedback_scaleid_limit_upper_');
                 for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                     $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
-                    $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
+                    $rawvalue = $values[$keyname] ?? null;
+                    if ($islimitkey && is_string($rawvalue) && trim($rawvalue) !== '') {
+                        $parsed = unformat_float($rawvalue, true);
+                        if ($parsed !== false && $parsed !== null) {
+                            $rawvalue = $parsed;
+                        }
+                    }
+                    $standardvalues[$feedbackvaluekey][$j] = $rawvalue;
                 }
             }
 
@@ -799,8 +911,10 @@ class catquiz_handler {
             }
             // In this case, we keep the selected template.
             $keepselectedtemplate = true;
-        } else if (!isset($values["submitcattestoption"])
-        || $values["submitcattestoption"] != "cattestsubmit") {
+        } else if (
+            !isset($values["submitcattestoption"])
+            || $values["submitcattestoption"] != "cattestsubmit"
+        ) {
             return;
         }
 
@@ -825,7 +939,6 @@ class catquiz_handler {
         }
 
         foreach ($values as $k => $v) {
-
             if (isset($overridevalues[$k])) {
                 $v = $overridevalues[$k];
             }
@@ -923,17 +1036,24 @@ class catquiz_handler {
         mixed $cm,
         stdClass $attemptrecord
     ): string {
-        // Update the endtime and number of testitems used in the attempts table.
         global $DB, $COURSE;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
-        $data = (object) [
-            'id' => $id,
-            'number_of_testitems_used' => $attemptrecord->questionsattempted,
-            'endtime' => $cache->get('endtime'),
-            'timemodified' => time(),
-        ];
-        $DB->update_record('local_catquiz_attempts', $data);
+
+        // Finalisation is owned by attempt_finalizer and is normally
+        // triggered from the authoritative status change in
+        // adaptivequiz_complete_attempt(). Here we only call it again as an
+        // idempotent safety net (in case this render path is reached without the
+        // status-change hook having run) and then render the feedback. The end
+        // time comes from the attempt's immutable timefinished, never a cache.
+        $timefinished = (int) ($DB->get_field(
+            'adaptivequiz_attempt',
+            'timefinished',
+            ['id' => $attemptrecord->id]
+        ) ?: ($attemptrecord->timemodified ?? time()));
+        attempt_finalizer::finalize(
+            (int) $attemptrecord->id,
+            $timefinished,
+            (string) ($attemptrecord->attemptstopcriteria ?? '')
+        );
 
         // If there was an error before the quiz could be started, return that.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -966,7 +1086,7 @@ class catquiz_handler {
         stdClass $attemptrecord,
         attemptfeedback $attemptfeedback,
         string $enrolmentmessage
-        ): string {
+    ): string {
         global $OUTPUT;
 
         $data = $attemptfeedback->export_for_template($OUTPUT);
@@ -996,7 +1116,7 @@ class catquiz_handler {
                 intval($attemptdata->id),
                 'mod_adaptivequiz',
                 $quizsettings->catquiz_catscales
-                )
+            )
                 ->get_quiz_settings();
         }
 
@@ -1022,18 +1142,24 @@ class catquiz_handler {
         if (!$maxquestions) {
             $maxquestions = -1;
         }
-        if (!empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt)
-            && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_attempt)) {
+        if (
+            !empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt)
+            && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_attempt)
+        ) {
                 $attemptseconds = self::get_number_of_seconds(
                     $quizsettings->catquiz_timelimitgroup->catquiz_timeselect_attempt,
-                    (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt);
+                    (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt
+                );
         }
 
-        if (!empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem)
-        && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_item)) {
+        if (
+            !empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem)
+            && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_item)
+        ) {
             $itemseconds = self::get_number_of_seconds(
                 $quizsettings->catquiz_timelimitgroup->catquiz_timeselect_item,
-                (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem);
+                (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem
+            );
         }
 
         $firstuseexistingdata = false;

@@ -57,6 +57,24 @@ class grm extends model_multiparam {
     }
 
     /**
+     * Serialise the polytomous parameters into the record so they survive persistence.
+     *
+     * The reverse of get_parameters_from_record(): the 'difficulties' map is stored in the
+     * record JSON, and the scalar difficulty column receives the mean difficulty.
+     *
+     * @param stdClass $record the record to enrich
+     * @param array $parameters the item parameters
+     *
+     * @return stdClass
+     *
+     */
+    public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
+        $record->json = json_encode(['difficulties' => $parameters['difficulties']]);
+        $record->difficulty = $record->difficulty ?? self::calculate_mean_difficulty($parameters);
+        return $record;
+    }
+
+    /**
      * Returns the name of this model.
      *
      * @return string
@@ -75,9 +93,8 @@ class grm extends model_multiparam {
      * @return array
      */
     public static function convert_ip_to_vector(array $ip): array {
-
-        // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return array_merge($ip['difficulty']);
+        // Free thresholds only: the baseline (first fraction) is not estimated.
+        return array_slice(array_values($ip['difficulties']), 1);
     }
 
     /**
@@ -89,11 +106,13 @@ class grm extends model_multiparam {
      * @return array
      */
     public static function convert_vector_to_ip(array $vector, $fractions): array {
-
-        // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return [
-            'difficulty' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
-        ];
+        // Re-insert the fixed baseline (first fraction => 0) and key the free
+        // thresholds by the remaining fractions.
+        $difficulties = [(string) $fractions[0] => 0.0];
+        foreach ($vector as $i => $value) {
+            $difficulties[(string) $fractions[$i + 1]] = $value;
+        }
+        return ['difficulties' => $difficulties];
     }
 
     /**
@@ -116,8 +135,187 @@ class grm extends model_multiparam {
      *
      * @return int
      */
+    /**
+     * This model has a data-dependent number of parameters.
+     *
+     * @return bool
+     *
+     */
+    public static function is_polytomous(): bool {
+        return true;
+    }
+
+    /**
+     * Data-driven start item parameters (empirical thresholds + fallback).
+     *
+     * @param array $itemresponse array of model_item_response
+     *
+     * @return array
+     *
+     */
+    public static function get_start_ip(array $itemresponse): array {
+        return [
+            'difficulties' => self::empirical_start_thresholds($itemresponse),
+        ];
+    }
+
+    /**
+     * LORS objective value: n * sum_k R_k^2 over the free boundaries.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return float
+     *
+     */
+    public static function lors_residuals(array $pp, array $ip, array $ors, float $n = 1): float {
+        return self::compute_lors($pp, $ip, $ors, $n, 'difficulties', false)['residuals'];
+    }
+
+    /**
+     * First derivative of the LORS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function lors_1st_derivative_ip(array $pp, array $ip, array $ors, float $n = 1): array {
+        return self::compute_lors($pp, $ip, $ors, $n, 'difficulties', false)['jacobian'];
+    }
+
+    /**
+     * Second derivative of the LORS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function lors_2nd_derivative_ip(array $pp, array $ip, array $ors, float $n = 1): array {
+        return self::compute_lors($pp, $ip, $ors, $n, 'difficulties', false)['hessian'];
+    }
+
+    /**
+     * LMS objective: n (frac - mu)^2 with the expected score mu = sum_k frac_k P_k.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return float
+     *
+     */
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n): float {
+        return self::grm_lms($pp, $ip, $frac, $n)['residuals'];
+    }
+
+    /**
+     * First derivative of the LMS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
+        return self::grm_lms($pp, $ip, $frac, $n)['jacobian'];
+    }
+
+    /**
+     * Second derivative of the LMS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
+        return self::grm_lms($pp, $ip, $frac, $n)['hessian'];
+    }
+
+    /**
+     * Expected-score moments and LMS assembly for GRM (discrimination fixed at 1).
+     *
+     * mu = sum_k frac_k P_k with P_k = Q_k - Q_{k+1}, Q_m = sigma(theta - a_m).
+     * Only the boundary a_j enters P_{j-1} and P_j, giving
+     * dmu/da_j = W_j (frac_{j-1} - frac_j) and a diagonal d2mu/da_j^2 = -V_j (...).
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    private static function grm_lms(array $pp, array $ip, float $frac, float $n): array {
+        $ability = $pp['ability'];
+        $a = self::sort_fractions($ip['difficulties']);
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+
+        // Fraction (score) values per category and cumulative/category probabilities.
+        $fr = [];
+        $q = [1.0];
+        for ($m = 1; $m <= $kmax; $m++) {
+            $q[$m] = self::logistic($ability - $a[$fractions[$m]]);
+        }
+        $q[$kmax + 1] = 0.0;
+        for ($k = 0; $k <= $kmax; $k++) {
+            $fr[$k] = (float) $fractions[$k];
+        }
+        $mu = 0.0;
+        for ($k = 0; $k <= $kmax; $k++) {
+            $mu += $fr[$k] * ($q[$k] - $q[$k + 1]);
+        }
+
+        // Gradient / diagonal Hessian of mu w.r.t. the free thresholds a_1..a_kmax.
+        $dmu = [];
+        $ddmu = [];
+        for ($i = 0; $i < $kmax; $i++) {
+            $ddmu[$i] = array_fill(0, $kmax, 0.0);
+        }
+        for ($j = 1; $j <= $kmax; $j++) {
+            $w = self::logistic_w($q[$j]);
+            $v = $w * (1.0 - 2.0 * $q[$j]);
+            $weight = $fr[$j - 1] - $fr[$j];
+            $dmu[$j - 1] = $w * $weight;
+            $ddmu[$j - 1][$j - 1] = -$v * $weight;
+        }
+
+        return self::lms_assemble($frac, $n, $mu, $dmu, $ddmu);
+    }
+
+    /**
+     * A fixed model dimension is undefined for polytomous models; use the
+     * data-driven get_model_dim_from_ip($ip) instead.
+     *
+     * @return int
+     *
+     */
     public static function get_model_dim(): int {
-        return array_sum(array_map("count", self::get_parameter_names()));
+        // The number of parameters of a polytomous model depends on the number of
+        // response categories in the data, so a fixed dimensionality is undefined.
+        // Callers must use the data-driven get_model_dim_from_ip($ip) instead.
+        throw new \coding_exception(
+            'get_model_dim() is data-driven for polytomous models; use get_model_dim_from_ip($ip).'
+        );
     }
 
     /**
@@ -150,7 +348,7 @@ class grm extends model_multiparam {
      *
      */
     public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array {
-        return catcalc::estimate_item_params($itemresponse, $this);
+        return catcalc::estimate_item_params($itemresponse, $this, $startvalue);
     }
 
     /**
@@ -191,8 +389,18 @@ class grm extends model_multiparam {
 
         $a = self::sort_fractions($array);
 
+        // Skip the lowest fraction: it is the baseline category, whatever its
+        // value. The previous "> 0" test wrongly assumed the baseline is always
+        // 0.0; for a reduced category structure (e.g. an unobserved bottom
+        // category shifting the baseline to 0.25) it double-counted the baseline
+        // and produced a jacobian one component too long (see experiments K3).
+        $first = true;
         foreach ($a as $fraction => $val) {
-            if ((float) $fraction > 0 && (float) $fraction <= 1) {
+            if ($first) {
+                $first = false;
+                continue;
+            }
+            if ((float) $fraction <= 1) {
                 $frac[] = $fraction;
             }
         }
@@ -308,8 +516,78 @@ class grm extends model_multiparam {
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
-        // We do it the easy way by using the log'f(x) = f'(x)/f(x) method.
-        return self::likelihood_p($pp, $ip, $frac) / self::likelihood($pp, $ip, $frac);
+        $t = self::grm_ability_terms($pp, $ip, $frac);
+        // Score d/dtheta log L = (W_r - W_{r+1}) / P_r.
+        return ($t['wr'] - $t['wr1']) / self::stabilize_denominator($t['pr']);
+    }
+
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     * @return float
+     */
+    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
+        $t = self::grm_ability_terms($pp, $ip, $frac);
+        $pr = self::stabilize_denominator($t['pr']);
+        $dp = $t['wr'] - $t['wr1'];
+        $ddp = $t['vr'] - $t['vr1'];
+        // Hessian d^2/dtheta^2 log L = (P_r P_r'' - (P_r')^2) / P_r^2, with
+        // P_r'  = 1 * (W_r - W_{r+1}) and P_r'' = 1 * (V_r - V_{r+1}).
+        return ($t['pr'] * $ddp - ($dp) ** 2) / ($pr ** 2);
+    }
+
+    /**
+     * Combined score and hessian sharing a single terms computation.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     * @return array ['jacobian' => 1st derivative, 'hessian' => 2nd derivative]
+     */
+    public static function get_ability_derivatives(array $pp, array $ip, float $frac): array {
+        $t = self::grm_ability_terms($pp, $ip, $frac);
+        $pr = self::stabilize_denominator($t['pr']);
+        $dp = $t['wr'] - $t['wr1'];
+        $ddp = $t['vr'] - $t['vr1'];
+        return [
+            'jacobian' => $dp / $pr,
+            'hessian' => ($t['pr'] * $ddp - $dp ** 2) / ($pr ** 2),
+        ];
+    }
+
+    /**
+     * Cumulative-logistic terms for the observed category, used by the ability derivatives.
+     *
+     * Q_j = sigma((theta - a_j)) with Q_0 = 1 and Q_{kmax+1} = 0; the observed
+     * category r has P_r = Q_r - Q_{r+1}. Returns the boundary W = Q(1-Q) and
+     * V = W(1-2Q) values (dsigma, d2sigma cores) at r and r+1.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     * @return array
+     */
+    private static function grm_ability_terms(array $pp, array $ip, float $frac): array {
+        $ability = $pp['ability'];
+        $a = self::sort_fractions($ip['difficulties']);
+        $b = 1.0;
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+        $r = self::get_key_by_fractions(min(1.0, max(0.0, $frac)), $a);
+
+        $qr = ($r == 0) ? 1.0 : self::logistic($b * ($ability - $a[$fractions[$r]]));
+        $qr1 = ($r == $kmax) ? 0.0 : self::logistic($b * ($ability - $a[$fractions[$r + 1]]));
+
+        return [
+            'pr' => $qr - $qr1,
+            'wr' => self::logistic_w($qr),
+            'wr1' => self::logistic_w($qr1),
+            'vr' => self::logistic_w($qr) * (1.0 - 2.0 * $qr),
+            'vr1' => self::logistic_w($qr1) * (1.0 - 2.0 * $qr1),
+        ];
     }
 
     /**
@@ -320,21 +598,45 @@ class grm extends model_multiparam {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
-        // We do it the easy way by using the log''f(x) = (f(x)*f''(x)-f'(x)^2)/f(x)^2 method.
-        return (self::likelihood($pp, $ip, $frac) * self::likelihood_p_p($pp, $ip, $frac) -
-            self::likelihood_p($pp, $ip, $frac) ** 2) / self::likelihood($pp, $ip, $frac) ** 2;
-    }
 
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      * @return array - jacobian vector
      */
-    public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+    public static function get_log_jacobian(array $pp, array $ip, float $frac): array {
+        // GRM item-parameter score. The category probability is a difference of
+        // adjacent cumulative logistics P_r = Q_r - Q_{r+1}, Q_k = sigma(theta - a_k).
+        // Only the two boundaries of the observed category r contribute:
+        // d/da_r   log L = -W_r / P_r      (r > 0)
+        // d/da_{r+1} log L =  W_{r+1} / P_r  (r < kmax).
+        $ability = $pp['ability'];
+        $a = self::sort_fractions($ip['difficulties']);
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+        $r = self::get_key_by_fractions($frac, $a);
+
+        $likelihood = self::stabilize_denominator(self::likelihood($pp, $ip, $frac));
+
+        // Free thresholds a_1..a_M map to 0-based codec indices (a_j -> j-1).
+        $result = [];
+        for ($p = 0; $p < $kmax; $p++) {
+            $result[$p] = 0.0;
+        }
+
+        if ($r > 0) {
+            $qr = self::logistic($ability - $a[$fractions[$r]]);
+            $result[$r - 1] = -self::logistic_w($qr) / $likelihood;
+        }
+        if ($r < $kmax) {
+            $qr1 = self::logistic($ability - $a[$fractions[$r + 1]]);
+            $result[$r] = self::logistic_w($qr1) / $likelihood;
+        }
+        return $result;
     }
 
     /**
@@ -342,13 +644,55 @@ class grm extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $itemresponse - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      *
      * @return array - hessian matrx
      */
-    public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
-    }
+    public static function get_log_hessian(array $pp, array $ip, float $frac): array {
+        // GRM item-parameter curvature. With Q_k = sigma(theta - a_k),
+        // W_k = Q_k(1-Q_k), V_k = W_k(1-2 Q_k) and P_r = Q_r - Q_{r+1}:
+        // H_{r,r}     =  V_r / P_r     - (W_r / P_r)^2
+        // H_{r+1,r+1} = -V_{r+1} / P_r - (W_{r+1} / P_r)^2
+        // H_{r,r+1}   =  W_r W_{r+1} / P_r^2.
+        $ability = $pp['ability'];
+        $a = self::sort_fractions($ip['difficulties']);
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+        $r = self::get_key_by_fractions($frac, $a);
 
+        $likelihood = self::stabilize_denominator(self::likelihood($pp, $ip, $frac));
+
+        // Free thresholds a_1..a_M map to 0-based codec indices (a_j -> j-1).
+        $result = [];
+        for ($pi = 0; $pi < $kmax; $pi++) {
+            $result[$pi] = [];
+            for ($pj = 0; $pj < $kmax; $pj++) {
+                $result[$pi][$pj] = 0.0;
+            }
+        }
+
+        $wr = null;
+        $wr1 = null;
+        if ($r > 0) {
+            $qr = self::logistic($ability - $a[$fractions[$r]]);
+            $wr = self::logistic_w($qr);
+            $vr = $wr * (1.0 - 2.0 * $qr);
+            $result[$r - 1][$r - 1] = $vr / $likelihood - ($wr / $likelihood) ** 2;
+        }
+        if ($r < $kmax) {
+            $qr1 = self::logistic($ability - $a[$fractions[$r + 1]]);
+            $wr1 = self::logistic_w($qr1);
+            $vr1 = $wr1 * (1.0 - 2.0 * $qr1);
+            $result[$r][$r] = -$vr1 / $likelihood - ($wr1 / $likelihood) ** 2;
+        }
+        if ($wr !== null && $wr1 !== null) {
+            $cross = $wr * $wr1 / $likelihood ** 2;
+            $result[$r - 1][$r] = $cross;
+            $result[$r][$r - 1] = $cross;
+        }
+        return $result;
+    }
 
     /**
      * Calculate Item and Category-Information.
@@ -396,9 +740,14 @@ class grm extends model_multiparam {
      * @return float
      */
     public static function item_information(array $pp, array $ip): float {
-        $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
+        // Fisher information I(theta) = sum_k P_k * (-d^2/dtheta^2 log P_k).
+        // The category array already contains the baseline category, so it must be
+        // summed exactly once. (The earlier code added the baseline term separately
+        // and then again inside the loop, inflating the information by a factor
+        // (1 + P_baseline).)
+        $iif = 0.0;
         foreach ($ip['difficulties'] as $f => $val) {
-            $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
+            $iif += self::category_information($pp, $ip, (float) $f) * self::likelihood($pp, $ip, (float) $f);
         }
         return $iif;
     }
@@ -412,107 +761,56 @@ class grm extends model_multiparam {
      * @return array - chunked item parameter
      */
     public static function restrict_to_trusted_region(array $ip): array {
-        // Set values for difficulty parameter.
-        $a = $ip['difficulty'];
+        // Clamp each free threshold to a sensible range and enforce the ascending
+        // ordering a_1 <= a_2 <= ... <= a_M that the graded model requires: with
+        // P_k = Q_k - Q_{k+1} and Q_m = sigma(b (theta - a_m)), an out-of-order
+        // threshold would yield a negative category probability and hence NaN in the
+        // likelihood. The baseline entry (lowest fraction) is a placeholder and stays 0.
+        // Trusted-region bounds from the model's admin settings (fallback to +/-5).
+        // Only an unset (false) or empty config falls back; a configured 0 is honoured.
+        $minconfig = get_config('catmodel_grm', 'trusted_region_min_a');
+        $min = ($minconfig === false || $minconfig === '') ? -5.0 : (float) $minconfig;
+        $maxconfig = get_config('catmodel_grm', 'trusted_region_max_a');
+        $max = ($maxconfig === false || $maxconfig === '') ? 5.0 : (float) $maxconfig;
+        $gap = 1e-3;
+        $sorted = self::sort_fractions($ip['difficulties']);
+        $fractions = array_keys($sorted);
 
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Use x times of SD as range of trusted regions.
-        $atr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_sd_a'));
-        $amin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_a'));
-        $amax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_a'));
-
-        // Set values for disrciminatory parameter.
-        $b = 1;
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-        // Use x times of placement as maximal value of trusted region.
-        $btr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_max_b'));
-
-        $bmin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_b'));
-        $bmax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
-
-        // Test TR for difficulty.
-        if ($a < max($am - ($atr * $as), $amin)) {
-            $a = max($am - ($atr * $as), $amin);
-        }
-        if ($a > min($am + ($atr * $as), $amax)) {
-            $a = min($am + ($atr * $as), $amax);
+        // Collect the free thresholds (all but the baseline placeholder) and clamp
+        // each into [min, max].
+        $free = [];
+        foreach ($fractions as $index => $fraction) {
+            if ($index === 0) {
+                // Baseline category placeholder: not a real threshold.
+                continue;
+            }
+            $free[] = $fraction;
+            $sorted[$fraction] = max($min, min($max, $sorted[$fraction]));
         }
 
-        $ip['difficulty'] = $a;
-
-        // Test TR for discriminatory.
-        if ($b < $bmin) {
-            $b = $bmin;
+        // Forward pass: enforce the ascending minimum gap a_i >= a_{i-1} + gap.
+        $count = count($free);
+        for ($i = 1; $i < $count; $i++) {
+            $lower = $sorted[$free[$i - 1]] + $gap;
+            if ($sorted[$free[$i]] < $lower) {
+                $sorted[$free[$i]] = $lower;
+            }
         }
-        if ($b > min(($btr * $bp), $bmax)) {
-            $b = min(($btr * $bp), $bmax);
+
+        // The forward pass can push the top threshold past max. Project the whole
+        // ascending chain back into [min, max] with a backward pass from max, so the
+        // box constraint stays satisfied while the ordering/gap is preserved.
+        if ($count > 0 && $sorted[$free[$count - 1]] > $max) {
+            $sorted[$free[$count - 1]] = $max;
+            for ($i = $count - 2; $i >= 0; $i--) {
+                $upper = $sorted[$free[$i + 1]] - $gap;
+                if ($sorted[$free[$i]] > $upper) {
+                    $sorted[$free[$i]] = $upper;
+                }
+            }
         }
-
-        $ip['discrimination'] = $b;
-
+        $ip['difficulties'] = $sorted;
         return $ip;
-    }
-
-    /**
-     * Calculates the 1st derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @return array - 1st derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_jacobian($ip): array {
-        // Set values for difficulty parameter.
-
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-
-        return [
-        ($am - $ip['difficulty']) / ($as ** 2), // Calculates d/da.
-        -($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])), // Calculates d/db.
-        ];
-    }
-
-    /**
-     * Calculates the 2nd derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     *
-     * @return array - 2nd derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_hessian(array $ip): array {
-        // Set values for difficulty parameter.
-
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-
-        return [
-            [
-                -1 / ($as ** 2), // Calculates d²/da².
-                0, // Calculates d/da d/db.
-            ],
-            [
-                0, // Calculates d/da d/db.
-                -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
-                    (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
-            ],
-        ];
     }
 
     /**
@@ -536,7 +834,7 @@ class grm extends model_multiparam {
      *
      * @return string
      */
-    protected function get_multi_param_name(): string {
+    protected static function get_multi_param_name(): string {
         return 'difficulties';
     }
 

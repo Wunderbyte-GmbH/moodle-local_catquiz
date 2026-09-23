@@ -27,6 +27,7 @@
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_raschmodel;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -40,6 +41,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \catmodel_mixedraschbirnbaum\mixedraschbirnbaum
  */
 final class mixedraschbirnbaum_test extends TestCase {
+    use \local_catquiz\derivative_fd_trait;
+
     /**
      * Tests that the model calculates the item parameters correctly.
      *
@@ -781,27 +784,6 @@ final class mixedraschbirnbaum_test extends TestCase {
                 ],
                 'expected' => [1.428861, -1.905148, -1.333333],
             ],
-            // Add the remaining test cases...
-            "testcase 9" => [
-                'pp' => ['ability' => 3.5],
-                'k' => 1,
-                'ip' => [
-                    "difficulty" => 1.5,
-                    "discrimination" => 1.5,
-                    "guessing" => 0.25,
-                ],
-                'expected' => [-0.05269819, 0.07026425, 0.049175],
-            ],
-            "testcase 10" => [
-                'pp' => ['ability' => 3.5],
-                'k' => 0,
-                'ip' => [
-                    "difficulty" => 1.5,
-                    "discrimination" => 1.5,
-                    "guessing" => 0.25,
-                ],
-                'expected' => [1.428861, -1.905148, -1.333333],
-            ],
         ];
     }
 
@@ -924,36 +906,424 @@ final class mixedraschbirnbaum_test extends TestCase {
                     [-4.171454e-10, -7.032597e-11, -1.777778e+00],
                 ],
             ],
-            // Add the remaining test cases...
-            "testcase 9" => [
-                'pp' => ['ability' => 3.5],
-                'k' => 1,
-                'ip' => [
-                    "difficulty" => 1.50,
-                    "discrimination" => 1.50,
-                    "guessing" => 0.25,
-                ],
-                'expected' => [
-                    [-0.07432660, 0.06397002, 0.07285568],
-                    [ 0.06397002, -0.13213619, -0.09714091],
-                    [ 0.07285568, -0.09714091, -0.00241818],
-                ],
-            ],
-            "testcase 10" => [
-                'pp' => ['ability' => 3.5],
-                'k' => 0,
-                'ip' => [
-                    "difficulty" => 1.50,
-                    "discrimination" => 1.50,
-                    "guessing" => 0.25,
-                ],
-                'expected' => [
-                    [-1.016475e-01, 1.088104e+00, -4.171454e-10],
-                    [ 1.088104e+00, -1.807066e-01, -7.032597e-11],
-                    [-4.171454e-10, -7.032597e-11, -1.777778e+00],
-                ],
-            ],
         ];
+    }
+
+    /**
+     * Verifies the analytic Fisher information against an independent numeric reference.
+     *
+     * For a dichotomous item the item (Fisher) information is
+     *   I(theta) = P'(theta)^2 / (P(theta) * (1 - P(theta)))
+     * with P = P(Y = 1). P'(theta) is approximated here by a central finite
+     * difference of the model's own likelihood(), so the numeric path shares no
+     * code with fisher_info(). This test fails if the 3PL information formula is
+     * reverted to the (incorrect) difficulty-based expression.
+     *
+     * @dataProvider fisher_info_numeric_provider
+     *
+     * @param array $pp
+     * @param array $ip
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     */
+    public function test_fisher_info_numeric(array $pp, array $ip): void {
+        $model = $this->getmodel();
+
+        // Numeric reference: I = P'^2 / (P (1 - P)), P' via central difference.
+        $h = 1e-6;
+        $p = mixedraschbirnbaum::likelihood($pp, $ip, 1.0);
+        $pplus = mixedraschbirnbaum::likelihood(['ability' => $pp['ability'] + $h], $ip, 1.0);
+        $pminus = mixedraschbirnbaum::likelihood(['ability' => $pp['ability'] - $h], $ip, 1.0);
+        $dp = ($pplus - $pminus) / (2 * $h);
+        $numeric = ($dp ** 2) / ($p * (1 - $p));
+
+        $analytic = $model->fisher_info($pp, $ip);
+
+        // Tolerance derived from the plugin's own item-parameter precision.
+        $delta = 10 ** (-model_raschmodel::PRECISION);
+        $this->assertEqualsWithDelta($numeric, $analytic, $delta);
+    }
+
+    /**
+     * Dynamic but deterministic parameter grid for the numeric Fisher test.
+     *
+     * @return array
+     */
+    public static function fisher_info_numeric_provider(): array {
+        $abilities = [-2.1, -0.35, 0.0, 0.8, 2.0];
+        $items = [
+            ['difficulty' => 0.0, 'discrimination' => 2.0, 'guessing' => 0.25],
+            ['difficulty' => 0.5, 'discrimination' => 1.5, 'guessing' => 0.20],
+            ['difficulty' => -0.3, 'discrimination' => 1.0, 'guessing' => 0.10],
+            ['difficulty' => 1.2, 'discrimination' => 0.8, 'guessing' => 0.25],
+            ['difficulty' => -0.8, 'discrimination' => 1.7, 'guessing' => 0.00],
+        ];
+        $cases = [];
+        foreach ($items as $i => $ip) {
+            foreach ($abilities as $j => $ability) {
+                $cases["item{$i}-ability{$j}"] = [
+                    'pp' => ['ability' => $ability],
+                    'ip' => $ip,
+                ];
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * Regression guard for the historical 3PL Fisher-information bug.
+     *
+     * With a = 0, b = 2, c = 0.25, theta = 0 the true information is 0.6, whereas
+     * the previous implementation returned difficulty^2 * ... = 0. This pins the
+     * exact value and guarantees the result is not the degenerate zero.
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     */
+    public function test_fisher_info_regression_zero_difficulty(): void {
+        $model = $this->getmodel();
+        $pp = ['ability' => 0.0];
+        $ip = ['difficulty' => 0.0, 'discrimination' => 2.0, 'guessing' => 0.25];
+        $info = $model->fisher_info($pp, $ip);
+        $this->assertEqualsWithDelta(0.6, $info, 10 ** (-model_raschmodel::PRECISION));
+        $this->assertGreaterThan(0.0, $info);
+    }
+
+    /**
+     * Verifies get_log_jacobian() against the numeric gradient of log_likelihood().
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response (0.0 or 1.0)
+     *
+     * @return void
+     */
+    public function test_get_log_jacobian_numeric(array $pp, array $ip, float $response): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $response, $keys) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::log_likelihood($pp, $ip, $response);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = mixedraschbirnbaum::get_log_jacobian($pp, $ip, $response);
+        $this->assert_gradient_close($numeric, $analytic);
+    }
+
+    /**
+     * Verifies get_log_hessian() against the numeric Hessian of log_likelihood().
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response (0.0 or 1.0)
+     *
+     * @return void
+     */
+    public function test_get_log_hessian_numeric(array $pp, array $ip, float $response): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $response, $keys) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::log_likelihood($pp, $ip, $response);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = mixedraschbirnbaum::get_log_hessian($pp, $ip, $response);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x response) grid.
+     *
+     * @return array
+     */
+    public static function derivative_cases_provider(): array {
+        $abilities = [-2.1, -0.35, 0.0, 0.8, 2.0];
+        $responses = [0.0, 1.0];
+        $items = self::derivative_item_sets();
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($responses as $response) {
+                    $name = sprintf('%s-a%d-y%d', $label, $ai, (int) $response);
+                    $cases[$name] = [
+                        'pp' => ['ability' => $ability],
+                        'ip' => $ip,
+                        'response' => $response,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+    /**
+     * Item parameter sets for the derivative grid.
+     *
+     * @return array
+     */
+    private static function derivative_item_sets(): array {
+        return [
+            'lowc' => ['difficulty' => -0.4, 'discrimination' => 1.0, 'guessing' => 0.10],
+            'midc' => ['difficulty' => 0.5, 'discrimination' => 1.5, 'guessing' => 0.20],
+            'highc' => ['difficulty' => 1.2, 'discrimination' => 0.8, 'guessing' => 0.25],
+        ];
+    }
+
+    /**
+     * Verifies lors_1st_derivative_ip() against the numeric gradient of
+     * lors_residuals() with respect to the item parameters (a, b, c).
+     *
+     * The LORS residual is independent of the guessing parameter c, so the
+     * analytic d/dc entry must be exactly zero; the numeric reference confirms it.
+     *
+     * @dataProvider lors_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters (difficulty, discrimination, guessing)
+     * @param float $or odds ratio
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_1st_derivative_numeric(array $pp, array $ip, float $or, float $n): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $or, $n) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::lors_residuals($pp, $ip, $or, $n);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = mixedraschbirnbaum::lors_1st_derivative_ip($pp, $ip, $or, $n);
+        $this->assert_gradient_close($numeric, $analytic);
+        $this->assertEqualsWithDelta(0.0, (float) $analytic[2], 1e-12, 'LORS d/dc must be zero');
+    }
+
+    /**
+     * Verifies lors_2nd_derivative_ip() against the numeric Hessian of
+     * lors_residuals() with respect to the item parameters (a, b, c).
+     *
+     * @dataProvider lors_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters (difficulty, discrimination, guessing)
+     * @param float $or odds ratio
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_2nd_derivative_numeric(array $pp, array $ip, float $or, float $n): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $or, $n) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::lors_residuals($pp, $ip, $or, $n);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = mixedraschbirnbaum::lors_2nd_derivative_ip($pp, $ip, $or, $n);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x odds ratio) grid for LORS.
+     *
+     * @return array
+     */
+    public static function lors_cases_provider(): array {
+        $abilities = [-1.5, 0.0, 1.2];
+        $ors = [0.4, 1.0, 2.5];
+        $items = [
+            'lowc' => ['difficulty' => -0.4, 'discrimination' => 1.0, 'guessing' => 0.10],
+            'midc' => ['difficulty' => 0.5, 'discrimination' => 1.5, 'guessing' => 0.20],
+            'highc' => ['difficulty' => 1.2, 'discrimination' => 0.8, 'guessing' => 0.25],
+        ];
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($ors as $oi => $or) {
+                    $name = sprintf('%s-a%d-or%d', $label, $ai, $oi);
+                    $cases[$name] = [
+                        'pp' => ['ability' => $ability],
+                        'ip' => $ip,
+                        'or' => $or,
+                        'n' => 1.0,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+
+
+    /**
+     * Verifies least_mean_squares_1st_derivative_ip() against the numeric
+     * gradient of least_mean_squares() with respect to the item parameters.
+     *
+     * @dataProvider lms_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed fraction correct
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_1st_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $frac, $n) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::least_mean_squares($pp, $ip, $frac, $n);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = mixedraschbirnbaum::least_mean_squares_1st_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_gradient_close($numeric, $analytic);
+    }
+
+    /**
+     * Verifies least_mean_squares_2nd_derivative_ip() against the numeric
+     * Hessian of least_mean_squares() with respect to the item parameters.
+     *
+     * @dataProvider lms_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed fraction correct
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_2nd_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $keys = ['difficulty', 'discrimination', 'guessing'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $frac, $n) {
+            $ip = array_combine($keys, $v);
+            return mixedraschbirnbaum::least_mean_squares($pp, $ip, $frac, $n);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = mixedraschbirnbaum::least_mean_squares_2nd_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x fraction x n) grid for LMS.
+     *
+     * @return array
+     */
+    public static function lms_cases_provider(): array {
+        $abilities = [-1.5, 0.0, 1.2];
+        $fracs = [0.2, 0.5, 0.8];
+        $ns = [1.0, 4.0];
+        $items = self::derivative_item_sets();
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($fracs as $fi => $frac) {
+                    foreach ($ns as $ni => $n) {
+                        $name = sprintf('%s-a%d-f%d-n%d', $label, $ai, $fi, $ni);
+                        $cases[$name] = [
+                            'pp' => ['ability' => $ability],
+                            'ip' => $ip,
+                            'frac' => $frac,
+                            'n' => $n,
+                        ];
+                    }
+                }
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * Verifies log_likelihood_p() (person-ability score) against the numeric
+     * gradient of log_likelihood() with respect to theta.
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response
+     *
+     * @return void
+     */
+    public function test_log_likelihood_p_numeric(array $pp, array $ip, float $response): void {
+        $f = function (array $v) use ($ip, $response) {
+            return mixedraschbirnbaum::log_likelihood(['ability' => $v[0]], $ip, $response);
+        };
+        $numeric = $this->fd_gradient($f, [$pp['ability']]);
+        $analytic = mixedraschbirnbaum::log_likelihood_p($pp, $ip, $response);
+        $this->assert_close(array_values($numeric)[0], $analytic, $this->fd_atol(), $this->fd_atol());
+    }
+
+    /**
+     * Verifies log_likelihood_p_p() (person-ability curvature) against the
+     * numeric second derivative of log_likelihood() with respect to theta.
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response
+     *
+     * @return void
+     */
+    public function test_log_likelihood_p_p_numeric(array $pp, array $ip, float $response): void {
+        $f = function (array $v) use ($ip, $response) {
+            return mixedraschbirnbaum::log_likelihood(['ability' => $v[0]], $ip, $response);
+        };
+        $numeric = $this->fd_hessian($f, [$pp['ability']]);
+        $analytic = mixedraschbirnbaum::log_likelihood_p_p($pp, $ip, $response);
+        $this->assert_close(array_values($numeric)[0][0], $analytic, $this->fd_atol(), 10 * $this->fd_atol());
+    }
+
+    /**
+     * The combined get_ability_derivatives() must return exactly the same values
+     * as the separate log_likelihood_p()/log_likelihood_p_p() methods (this guards
+     * the memoised PP-Stufe-2 wiring in catcalc::estimate_person_ability()).
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     */
+    public function test_get_ability_derivatives_matches_separate(): void {
+        $ip = ['difficulty' => 0.3, 'discrimination' => 1.2, 'guessing' => 0.15];
+        foreach ([0.0, 1.0] as $frac) {
+            foreach ([-2.5, -0.7, 0.0, 0.8, 2.5, 40.0, -40.0] as $theta) {
+                $pp = ['ability' => $theta];
+                $combined = mixedraschbirnbaum::get_ability_derivatives($pp, $ip, (float) $frac);
+                $this->assertEqualsWithDelta(
+                    mixedraschbirnbaum::log_likelihood_p($pp, $ip, (float) $frac),
+                    $combined['jacobian'],
+                    1e-9
+                );
+                $this->assertEqualsWithDelta(
+                    mixedraschbirnbaum::log_likelihood_p_p($pp, $ip, (float) $frac),
+                    $combined['hessian'],
+                    1e-9
+                );
+            }
+        }
     }
 
     /**
@@ -964,5 +1334,50 @@ final class mixedraschbirnbaum_test extends TestCase {
      */
     private function getmodel(): mixedraschbirnbaum {
         return model_model::get_instance('mixedraschbirnbaum');
+    }
+
+    /**
+     * With guessing c = 0 the 3PL collapses exactly onto the 2PL. The person-ability
+     * derivatives (jacobian, hessian, and the combined get_ability_derivatives form)
+     * must therefore agree with the 2PL reference bit-for-bit, and stay finite, even
+     * at deep saturation where the logistic core L underflows to a denormal.
+     *
+     * Regression guard: an earlier P/W form divided by P^2, which underflows to 0.0
+     * for a denormal P and — after stabilize_denominator — left a spurious +b^2 in the
+     * hessian instead of the correct 2PL limit (approx 0). Reverting the ratio-based
+     * form makes this test red at the negative-theta / k = 1 saturation points.
+     *
+     * @covers \catmodel_mixedraschbirnbaum\mixedraschbirnbaum::log_likelihood_p_p
+     * @covers \catmodel_mixedraschbirnbaum\mixedraschbirnbaum::get_ability_derivatives
+     * @return void
+     */
+    public function test_c0_reduces_to_2pl_at_saturation(): void {
+        $items = [
+            [-4.28, 4.43], [-0.76, 2.34], [0.14, 4.46],
+            [0.54, 5.91], [4.63, 4.79], [3.37, 0.55],
+        ];
+        $thetas = [0.0, 5.0, -5.0, 40.0, -40.0, 200.0, -200.0, 800.0, -800.0];
+        foreach ($items as [$a, $b]) {
+            $ip3 = ['difficulty' => $a, 'discrimination' => $b, 'guessing' => 0.0];
+            $ip2 = ['difficulty' => $a, 'discrimination' => $b];
+            foreach ($thetas as $th) {
+                $pp = ['ability' => $th];
+                foreach ([0.0, 1.0] as $k) {
+                    $j3 = \catmodel_mixedraschbirnbaum\mixedraschbirnbaum::log_likelihood_p($pp, $ip3, $k);
+                    $h3 = \catmodel_mixedraschbirnbaum\mixedraschbirnbaum::log_likelihood_p_p($pp, $ip3, $k);
+                    $g3 = \catmodel_mixedraschbirnbaum\mixedraschbirnbaum::get_ability_derivatives($pp, $ip3, $k);
+                    $j2 = \catmodel_raschbirnbaum\raschbirnbaum::log_likelihood_p($pp, $ip2, $k);
+                    $h2 = \catmodel_raschbirnbaum\raschbirnbaum::log_likelihood_p_p($pp, $ip2, $k);
+                    foreach ([$j3, $h3, $g3['jacobian'], $g3['hessian']] as $v) {
+                        $this->assertTrue(is_finite($v), "non-finite derivative at a=$a b=$b theta=$th k=$k");
+                    }
+                    $msg = "3PL(c=0) must equal 2PL at a=$a b=$b theta=$th k=$k";
+                    $this->assertEqualsWithDelta($j2, $j3, 1e-9, $msg);
+                    $this->assertEqualsWithDelta($h2, $h3, 1e-9, $msg);
+                    $this->assertEqualsWithDelta($j2, $g3['jacobian'], 1e-9, $msg);
+                    $this->assertEqualsWithDelta($h2, $g3['hessian'], 1e-9, $msg);
+                }
+            }
+        }
     }
 }

@@ -315,6 +315,9 @@ class model_item_param {
     public function set_parameters(array $parameters): self {
         $this->update_history('set_parameters');
         $this->parameters = $parameters;
+        // Invalidate any cached JSON so that to_record() rebuilds it from the new
+        // parameters via the model's add_parameters_to_record() hook.
+        $this->json = null;
         return $this;
     }
 

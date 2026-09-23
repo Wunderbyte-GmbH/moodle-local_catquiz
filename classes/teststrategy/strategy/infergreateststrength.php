@@ -147,13 +147,22 @@ class infergreateststrength extends strategy {
         // Exclude scales where standarderror is not in range.
         $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
 
-        if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
-            // Force selected scale. Will also be applied to excluded scales.
-            $relevantscale = $personabilities[$catscaleid];
+        if ($feedbackonlyfordefinedscaleid && !empty($catscaleid) && isset($personabilities[$catscaleid])) {
+            // Force the selected scale. Will also be applied to excluded scales.
+            // Use the scale id itself as the key, not the ability
+            // record (which would be an illegal array offset).
+            $relevantscale = $catscaleid;
         } else {
             $filterabilities = [];
             foreach ($personabilities as $scaleid => $array) {
-                if (!isset($array['error']) && !isset($array['excluded'])) {
+                /* 'excluded' now covers only measurement problems; a scale whose
+                   reporting is switched off carries FIELD_NOTREPORTED. Both must stay
+                   out of the primary-scale selection, as before the split. */
+                if (
+                    !isset($array['error'])
+                    && !isset($array['excluded'])
+                    && !isset($array[feedbacksettings::FIELD_NOTREPORTED])
+                ) {
                     $filterabilities[$scaleid] = $array['value'];
                 }
             }

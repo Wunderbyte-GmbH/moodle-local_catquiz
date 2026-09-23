@@ -15,27 +15,25 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_catquiz/buttons/button_subscribe
+    @template local_catquiz/modals/modal_questionpreview
+
+    Issue #20: this used to embed the full, formatted question text - images and
+    all - into a hidden modal in every single table row. The row now carries only
+    the label and the question id; the text is fetched through
+    local_catquiz_get_question_preview when the preview is actually opened.
 
     Classes required for JS:
-    * none
+    * catquiz-question-preview
 
     Data attributes required for JS:
-    * data-region
+    * data-action="catquiz-question-preview"
+    * data-questionid
 
     Example context (json):
     {
-        "shorttext": "Short ...",
-        "fulltext": "Fulltext"
+        "label": "Question name",
+        "id": 42
     }
 }}
-
-<div class="" data-toggle="modal" data-target=".preview-question-{{id}}">{{shorttext}}</div>
-
-<div class="modal fade preview-question-{{id}}" tabindex="-1" role="dialog" aria-label="{{#str}} previewquestion, local_catquiz {{/str}}" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content preview-question">
-      {{{fulltext}}}
-    </div>
-  </div>
-</div>
+<a href="#" class="catquiz-question-preview" data-action="catquiz-question-preview"
+   data-questionid="{{id}}" role="button">{{label}}</a>

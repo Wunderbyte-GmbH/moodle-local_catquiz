@@ -67,6 +67,33 @@ class pcmgeneralized extends model_multiparam {
      * @param stdClass $record
      * @return array
      */
+    /**
+     * Validates the item parameters for this generalized polytomous model.
+     *
+     * On top of the polytomous contract (a well formed json payload) this model
+     * uses a discrimination, which must be strictly positive. With a slope of 0 the
+     * category probabilities no longer depend on the ability at all: the item
+     * carries no information and the ability estimate stops moving.
+     *
+     * @param stdClass $record The raw item parameter record.
+     * @return string[] Reasons the parameters are invalid; empty array if valid.
+     */
+    public static function validate_parameters(stdClass $record): array {
+        $reasons = parent::validate_parameters($record);
+
+        if (!self::is_valid_positive_float($record->discrimination ?? null)) {
+            $reasons[] = 'discrimination must be a number greater than 0';
+        }
+
+        return $reasons;
+    }
+
+    /**
+     * Returns the parameters as associative array, where the key is the parameter name.
+     *
+     * @param stdClass $record
+     * @return array
+     */
     public static function get_parameters_from_record(stdClass $record): array {
 
         $intercepts = json_decode($record->json, true)['intercepts'];
@@ -77,6 +104,25 @@ class pcmgeneralized extends model_multiparam {
             'discrimination' => $discrimination,
             'intercepts' => $intercepts,
         ];
+    }
+
+    /**
+     * Serialise the polytomous parameters into the record so they survive persistence.
+     *
+     * The reverse of get_parameters_from_record(): the 'intercepts' map is stored in the
+     * record JSON, and the scalar difficulty column receives the mean difficulty.
+     *
+     * @param stdClass $record the record to enrich
+     * @param array $parameters the item parameters
+     *
+     * @return stdClass
+     *
+     */
+    public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
+        $record->json = json_encode(['intercepts' => $parameters['intercepts']]);
+        $record->difficulty = $record->difficulty ?? self::calculate_mean_difficulty($parameters);
+        $record->discrimination = $parameters['discrimination'] ?? $record->discrimination;
+        return $record;
     }
 
     /**
@@ -98,9 +144,8 @@ class pcmgeneralized extends model_multiparam {
      * @return array
      */
     public static function convert_ip_to_vector(array $ip): array {
-
-        // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return array_merge($ip['intercepts'], [$ip['intercepts']]);
+        // Free intercepts (baseline excluded) followed by the discrimination.
+        return array_merge(array_slice(array_values($ip['intercepts']), 1), [$ip['discrimination']]);
     }
 
     /**
@@ -112,12 +157,13 @@ class pcmgeneralized extends model_multiparam {
      * @return array
      */
     public static function convert_vector_to_ip(array $vector, $fractions): array {
-
-        // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return [
-            'intercepts' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
-            'discrimination' => $vector[count($vector) - 1],
-        ];
+        // Last element is the discrimination; the remainder are the free intercepts.
+        $discrimination = array_pop($vector);
+        $intercepts = [(string) $fractions[0] => 0.0];
+        foreach ($vector as $i => $value) {
+            $intercepts[(string) $fractions[$i + 1]] = $value;
+        }
+        return ['intercepts' => $intercepts, 'discrimination' => $discrimination];
     }
 
     /**
@@ -151,9 +197,244 @@ class pcmgeneralized extends model_multiparam {
      *
      * @return int
      */
+    /**
+     * This model has a data-dependent number of parameters.
+     *
+     * @return bool
+     *
+     */
+    public static function is_polytomous(): bool {
+        return true;
+    }
+
+    /**
+     * Data-driven start item parameters (empirical thresholds + fallback).
+     *
+     * @param array $itemresponse array of model_item_response
+     *
+     * @return array
+     *
+     */
+    public static function get_start_ip(array $itemresponse): array {
+        return [
+            'intercepts' => self::empirical_start_thresholds($itemresponse),
+            'discrimination' => 1.0,
+        ];
+    }
+
+    /**
+     * LORS objective value: n * sum_k R_k^2 over the free boundaries.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return float
+     *
+     */
+    public static function lors_residuals(array $pp, array $ip, array $ors, float $n = 1): float {
+        return self::compute_lors($pp, $ip, $ors, $n, 'intercepts', true)['residuals'];
+    }
+
+    /**
+     * First derivative of the LORS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function lors_1st_derivative_ip(array $pp, array $ip, array $ors, float $n = 1): array {
+        return self::compute_lors($pp, $ip, $ors, $n, 'intercepts', true)['jacobian'];
+    }
+
+    /**
+     * Second derivative of the LORS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param array $ors observed odds ratios keyed by the free fractions
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function lors_2nd_derivative_ip(array $pp, array $ip, array $ors, float $n = 1): array {
+        return self::compute_lors($pp, $ip, $ors, $n, 'intercepts', true)['hessian'];
+    }
+
+    /**
+     * LMS objective: n (frac - mu)^2 with the expected score mu = sum_k frac_k P_k.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return float
+     *
+     */
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n): float {
+        return self::gpcm_lms($pp, $ip, $frac, $n)['residuals'];
+    }
+
+    /**
+     * First derivative of the LMS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
+        return self::gpcm_lms($pp, $ip, $frac, $n)['jacobian'];
+    }
+
+    /**
+     * Second derivative of the LMS objective w.r.t. the item parameters.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
+        return self::gpcm_lms($pp, $ip, $frac, $n)['hessian'];
+    }
+
+    /**
+     * Expected-score moments and LMS assembly for GPCM (partial credit with discrimination).
+     *
+     * With P_k = softmax(b s_k)_k, s_k = k theta - D_k and mu = sum_k frac_k P_k, the
+     * expected-score derivatives use the tail sums T_j, the frac-weighted tails FF_j and
+     * FMS_j, and the (frac-weighted) score moments. Codec order: the free intercepts
+     * delta_1..delta_M followed by the discrimination b.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     * @param float $n number of observations
+     *
+     * @return array
+     *
+     */
+    private static function gpcm_lms(array $pp, array $ip, float $frac, float $n): array {
+        $ability = $pp['ability'];
+        $a = self::sanitize_fractions($ip['intercepts']);
+        $b = $ip['discrimination'];
+        $fractions = self::get_fractions($a);
+        $kmax = count($fractions) - 1;
+        $bidx = $kmax;
+
+        $cumulative = 0.0;
+        $sc = [];
+        $fr = [];
+        for ($k = 0; $k <= $kmax; $k++) {
+            if ($k > 0) {
+                $cumulative += $a[$fractions[$k]];
+            }
+            $sc[$k] = $k * $ability - $cumulative;
+            $fr[$k] = (float) $fractions[$k];
+        }
+        $shift = max(array_map(fn($scv) => $b * $scv, $sc));
+        $weights = [];
+        for ($k = 0; $k <= $kmax; $k++) {
+            $weights[$k] = exp($b * $sc[$k] - $shift);
+        }
+        $z = array_sum($weights);
+
+        $p = [];
+        $mu = 0.0;
+        $es = 0.0;
+        $es2 = 0.0;
+        $fs = 0.0;
+        $fss = 0.0;
+        for ($k = 0; $k <= $kmax; $k++) {
+            $p[$k] = $weights[$k] / $z;
+            $mu += $fr[$k] * $p[$k];
+            $es += $p[$k] * $sc[$k];
+            $es2 += $p[$k] * $sc[$k] ** 2;
+            $fs += $fr[$k] * $p[$k] * $sc[$k];
+            $fss += $fr[$k] * $p[$k] * $sc[$k] ** 2;
+        }
+        $var = $es2 - $es ** 2;
+
+        // Tail sums and frac-weighted tail sums.
+        $t = [];
+        $ff = [];
+        $ms = [];
+        $fms = [];
+        for ($j = 0; $j <= $kmax; $j++) {
+            $tp = 0.0;
+            $ffj = 0.0;
+            $msj = 0.0;
+            $fmsj = 0.0;
+            for ($k = $j; $k <= $kmax; $k++) {
+                $tp += $p[$k];
+                $ffj += $fr[$k] * $p[$k];
+                $msj += $p[$k] * $sc[$k];
+                $fmsj += $fr[$k] * $p[$k] * $sc[$k];
+            }
+            $t[$j] = $tp;
+            $ff[$j] = $ffj;
+            $ms[$j] = $msj;
+            $fms[$j] = $fmsj;
+        }
+
+        $dim = $kmax + 1;
+        $dmu = array_fill(0, $dim, 0.0);
+        $ddmu = [];
+        for ($i = 0; $i < $dim; $i++) {
+            $ddmu[$i] = array_fill(0, $dim, 0.0);
+        }
+
+        for ($j = 1; $j <= $kmax; $j++) {
+            $dmu[$j - 1] = $b * ($t[$j] * $mu - $ff[$j]);
+        }
+        $dmu[$bidx] = $fs - $es * $mu;
+
+        for ($j = 1; $j <= $kmax; $j++) {
+            for ($l = 1; $l <= $kmax; $l++) {
+                $mx = max($j, $l);
+                $ddmu[$j - 1][$l - 1] = $b ** 2 * (
+                    2 * $t[$j] * $t[$l] * $mu - $t[$mx] * $mu
+                    - $t[$j] * $ff[$l] - $t[$l] * $ff[$j] + $ff[$mx]
+                );
+            }
+            $cross = ($t[$j] * $mu - $ff[$j])
+                + $b * ($ms[$j] * $mu + $t[$j] * $fs - 2 * $t[$j] * $es * $mu - $fms[$j] + $es * $ff[$j]);
+            $ddmu[$j - 1][$bidx] = $cross;
+            $ddmu[$bidx][$j - 1] = $cross;
+        }
+        $ddmu[$bidx][$bidx] = $fss - 2 * $es * $fs - $var * $mu + $es ** 2 * $mu;
+
+        return self::lms_assemble($frac, $n, $mu, $dmu, $ddmu);
+    }
+
+    /**
+     * A fixed model dimension is undefined for polytomous models; use the
+     * data-driven get_model_dim_from_ip($ip) instead.
+     *
+     * @return int
+     *
+     */
     public static function get_model_dim(): int {
-        // Adds +1 for the person ability.
-        return array_sum(array_map("count", self::get_parameter_names())) + 1;
+        // The number of parameters of a polytomous model depends on the number of
+        // response categories in the data, so a fixed dimensionality is undefined.
+        // Callers must use the data-driven get_model_dim_from_ip($ip) instead.
+        throw new \coding_exception(
+            'get_model_dim() is data-driven for polytomous models; use get_model_dim_from_ip($ip).'
+        );
     }
 
     /**
@@ -185,7 +466,7 @@ class pcmgeneralized extends model_multiparam {
      * @return array
      */
     public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array {
-        return catcalc::estimate_item_params($itemresponse, $this);
+        return catcalc::estimate_item_params($itemresponse, $this, $startvalue);
     }
 
     /**
@@ -223,21 +504,23 @@ class pcmgeneralized extends model_multiparam {
         $fractions = self::get_fractions($a);
         $kmax = count($fractions) - 1;
 
-        // Calculation the denominator of the formulae.
-        $denominator = 0;
-        $intercepts = 0;
+        // Category log-weights l_k = b*(k*theta - sum_{j<=k} intercept_j). A
+        // max-shifted softmax keeps exp() finite at extreme abilities/discriminations
+        // where the raw sum would overflow to INF and yield INF/INF = NaN.
+        $logweights = [];
+        $intercepts = 0.0;
         for ($k = 0; $k <= $kmax; $k++) {
-            $intercepts += ($k == 0) ? (0) : $a[$fractions[$k]];
-            $denominator += exp($b * ($k * $ability - $intercepts));
+            $intercepts += ($k == 0) ? 0.0 : $a[$fractions[$k]];
+            $logweights[$k] = $b * ($k * $ability - $intercepts);
+        }
+        $max = max($logweights);
+        $denominator = 0.0;
+        foreach ($logweights as $logweight) {
+            $denominator += exp($logweight - $max);
         }
 
-        // Calculation the probability.
         $kfrac = self::get_key_by_fractions($frac, $a);
-        $intercepts = 0;
-        for ($k = 0; $k <= $kfrac; $k++) {
-            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
-        }
-        return exp($b * ($kfrac * $ability - $intercepts)) / $denominator;
+        return exp($logweights[$kfrac] - $max) / $denominator;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
@@ -263,26 +546,84 @@ class pcmgeneralized extends model_multiparam {
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
-        $ability = $pp['ability'];
+        $m = self::gpcm_ability_moments($pp, $ip);
+        $r = self::get_key_by_fractions($frac, $m['a']);
+        // Score d/dtheta log L = b (r - E[K]).
+        return $m['b'] * ($r - $m['ek']);
+    }
 
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     * @return float
+     */
+    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
+        $m = self::gpcm_ability_moments($pp, $ip);
+        // Hessian d^2/dtheta^2 log L = -b^2 Var(K).
+        return -($m['b'] ** 2) * ($m['ek2'] - $m['ek'] ** 2);
+    }
+
+    /**
+     * Combined score and hessian sharing a single moment computation.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac response fraction
+     * @return array ['jacobian' => b(r - E[K]), 'hessian' => -b^2 Var(K)]
+     */
+    public static function get_ability_derivatives(array $pp, array $ip, float $frac): array {
+        $m = self::gpcm_ability_moments($pp, $ip);
+        $r = self::get_key_by_fractions($frac, $m['a']);
+        return [
+            'jacobian' => $m['b'] * ($r - $m['ek']),
+            'hessian' => -($m['b'] ** 2) * ($m['ek2'] - $m['ek'] ** 2),
+        ];
+    }
+
+    /**
+     * Stable category moments E[K] and E[K^2] of the GPCM response distribution.
+     *
+     * Uses a max-shifted softmax over b*(k*theta - D_k) to avoid overflow, replacing
+     * the earlier raw exp() sums.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @return array ['a' => sanitized intercepts, 'b' => discrimination, 'ek' => E[K], 'ek2' => E[K^2]]
+     */
+    private static function gpcm_ability_moments(array $pp, array $ip): array {
+        $ability = $pp['ability'];
         $a = self::sanitize_fractions($ip['intercepts']);
         $b = $ip['discrimination'];
-
         $fractions = self::get_fractions($a);
         $kmax = count($fractions) - 1;
 
-        // Calculation the denominator of the formulae.
-        $denominator = 0;
-        $firstderivative = 0;
-        $intercepts = 0;
+        $cumulative = 0.0;
+        $logweights = [];
         for ($k = 0; $k <= $kmax; $k++) {
-            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
-            $denominator += exp($b * ($k * $ability - $intercepts));
-            $firstderivative += $k * $b * exp($b * ($k * $ability - $intercepts));
+            if ($k > 0) {
+                $cumulative += $a[$fractions[$k]];
+            }
+            $logweights[$k] = $b * ($k * $ability - $cumulative);
         }
+        $shift = max($logweights);
 
-        $k = self::get_key_by_fractions($frac, $a);
-        return $b * $k - $firstderivative / $denominator;
+        $z = 0.0;
+        $weights = [];
+        for ($k = 0; $k <= $kmax; $k++) {
+            $weights[$k] = exp($logweights[$k] - $shift);
+            $z += $weights[$k];
+        }
+        $ek = 0.0;
+        $ek2 = 0.0;
+        for ($k = 0; $k <= $kmax; $k++) {
+            $pk = $weights[$k] / $z;
+            $ek += $k * $pk;
+            $ek2 += $k * $k * $pk;
+        }
+        return ['a' => $a, 'b' => $b, 'ek' => $ek, 'ek2' => $ek2];
     }
 
     /**
@@ -293,29 +634,6 @@ class pcmgeneralized extends model_multiparam {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
-        $ability = $pp['ability'];
-
-        $a = self::sanitize_fractions($ip['intercepts']);
-        $b = $ip['discrimination'];
-
-        $fractions = self::get_fractions($a);
-        $kmax = count($fractions) - 1;
-
-        // Calculation the denominator of the formulae.
-        $denominator = 0;
-        $firstderivative = 0;
-        $secondderivative = 0;
-        $intercepts = 0;
-        for ($k = 0; $k <= $kmax; $k++) {
-            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
-            $denominator += exp($b * ($k * $ability - $intercepts));
-            $firstderivative += $k * $b * exp($b * ($k * $ability - $intercepts));
-            $secondderivative += $k ** 2 * $b ** 2 * exp($b * ($k * $ability - $intercepts));
-        }
-
-        return $firstderivative ** 2 / $denominator ** 2 - $secondderivative / $denominator;
-    }
 
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
@@ -326,6 +644,89 @@ class pcmgeneralized extends model_multiparam {
      * @return array - jacobian vector
      */
     public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+        // GPCM item-parameter score. With s_cat = cat*theta - D_cat, category
+        // probabilities P_cat = exp(b s_cat)/Z, tail probabilities T_j and the
+        // observed category r:  d/ddelta_j = b (T_j - [r>=j]) and d/db = s_r - E[s].
+        $m = self::gpcm_moments($pp, $ip, $k);
+        $b = $ip['discrimination'];
+        $kmax = $m['kmax'];
+
+        $result = [];
+        for ($p = 0; $p < $kmax; $p++) {
+            $j = $p + 1;
+            $result[$p] = $b * ($m['t'][$j] - (($m['r'] >= $j) ? 1.0 : 0.0));
+        }
+        // Discrimination derivative is the last codec entry (after M free intercepts).
+        $result[$kmax] = $m['s'][$m['r']] - $m['es'];
+        return $result;
+    }
+
+    /**
+     * Category probabilities and moments used by the GPCM derivatives.
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed response fraction
+     *
+     * @return array
+     *
+     */
+    private static function gpcm_moments(array $pp, array $ip, float $frac): array {
+        $ability = $pp['ability'];
+        $a = self::sanitize_fractions($ip['intercepts']);
+        $b = $ip['discrimination'];
+        $fractions = self::get_fractions($a);
+        $kmax = count($fractions) - 1;
+
+        // Score term s_cat = cat*theta - D_cat with cumulative intercepts D_cat.
+        // A max-shift on b*s_cat keeps the exponentials finite at extreme abilities.
+        $cumulative = 0.0;
+        $s = [];
+        for ($cat = 0; $cat <= $kmax; $cat++) {
+            if ($cat > 0) {
+                $cumulative += $a[$fractions[$cat]];
+            }
+            $s[$cat] = $cat * $ability - $cumulative;
+        }
+        $shift = max(array_map(fn($sc) => $b * $sc, $s));
+        $weights = [];
+        for ($cat = 0; $cat <= $kmax; $cat++) {
+            $weights[$cat] = exp($b * $s[$cat] - $shift);
+        }
+        $z = array_sum($weights);
+
+        $p = [];
+        $es = 0.0;
+        $es2 = 0.0;
+        for ($cat = 0; $cat <= $kmax; $cat++) {
+            $p[$cat] = $weights[$cat] / $z;
+            $es += $p[$cat] * $s[$cat];
+            $es2 += $p[$cat] * $s[$cat] ** 2;
+        }
+
+        // Tail probabilities T_j and partial moments Msum_j = sum_{cat>=j} P_cat s_cat.
+        $t = [];
+        $msum = [];
+        for ($j = 0; $j <= $kmax; $j++) {
+            $tailp = 0.0;
+            $tailm = 0.0;
+            for ($cat = $j; $cat <= $kmax; $cat++) {
+                $tailp += $p[$cat];
+                $tailm += $p[$cat] * $s[$cat];
+            }
+            $t[$j] = $tailp;
+            $msum[$j] = $tailm;
+        }
+
+        return [
+            's' => $s,
+            't' => $t,
+            'msum' => $msum,
+            'es' => $es,
+            'es2' => $es2,
+            'r' => self::get_key_by_fractions($frac, $a),
+            'kmax' => $kmax,
+        ];
     }
 
     /**
@@ -338,6 +739,43 @@ class pcmgeneralized extends model_multiparam {
      * @return array - hessian matrx
      */
     public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+        // GPCM item-parameter curvature. Intercept block scaled by b^2; the
+        // discrimination row/column via partial moments; H_bb = -Var(s).
+        $m = self::gpcm_moments($pp, $ip, $itemresponse);
+        $b = $ip['discrimination'];
+        $kmax = $m['kmax'];
+        $t = $m['t'];
+        $bidx = $kmax; // Discrimination index (after M free intercepts 0..kmax-1).
+
+        $result = [];
+        for ($i = 0; $i <= $bidx; $i++) {
+            $result[$i] = [];
+            for ($j = 0; $j <= $bidx; $j++) {
+                $result[$i][$j] = 0.0;
+            }
+        }
+
+        // Intercept-intercept block: b^2 (T_i T_j - T_max(i,j)), free params 0-based.
+        for ($pi = 0; $pi < $kmax; $pi++) {
+            for ($pj = 0; $pj < $kmax; $pj++) {
+                $i = $pi + 1;
+                $j = $pj + 1;
+                $result[$pi][$pj] = $b ** 2 * ($t[$i] * $t[$j] - $t[max($i, $j)]);
+            }
+        }
+
+        // Intercept-discrimination cross terms: (T_j - [r>=j]) + b (Msum_j - T_j E[s]).
+        for ($pj = 0; $pj < $kmax; $pj++) {
+            $j = $pj + 1;
+            $indicator = ($m['r'] >= $j) ? 1.0 : 0.0;
+            $cross = ($t[$j] - $indicator) + $b * ($m['msum'][$j] - $t[$j] * $m['es']);
+            $result[$pj][$bidx] = $cross;
+            $result[$bidx][$pj] = $cross;
+        }
+
+        // Discrimination-discrimination: -Var(s).
+        $result[$bidx][$bidx] = -($m['es2'] - $m['es'] ** 2);
+        return $result;
     }
 
 
@@ -387,9 +825,14 @@ class pcmgeneralized extends model_multiparam {
      * @return float
      */
     public static function item_information(array $pp, array $ip): float {
-        $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
+        // Fisher information I(theta) = sum_k P_k * (-d^2/dtheta^2 log P_k).
+        // The category array already contains the baseline category, so it must be
+        // summed exactly once. (The earlier code added the baseline term separately
+        // and then again inside the loop, inflating the information by a factor
+        // (1 + P_baseline).)
+        $iif = 0.0;
         foreach ($ip['intercepts'] as $f => $val) {
-            $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
+            $iif += self::category_information($pp, $ip, (float) $f) * self::likelihood($pp, $ip, (float) $f);
         }
         return $iif;
     }
@@ -403,107 +846,21 @@ class pcmgeneralized extends model_multiparam {
      * @return array - chunked item parameter
      */
     public static function restrict_to_trusted_region(array $ip): array {
-        // Set values for difficulty parameter.
-        $a = $ip['difficulty'];
-
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Use x times of SD as range of trusted regions.
-        $atr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_sd_a'));
-        $amin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_a'));
-        $amax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_a'));
-
-        // Set values for disrciminatory parameter.
-        $b = $ip['discrimination'];
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-        // Use x times of placement as maximal value of trusted region.
-        $btr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_max_b'));
-
-        $bmin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_b'));
-        $bmax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
-
-        // Test TR for difficulty.
-        if ($a < max($am - ($atr * $as), $amin)) {
-            $a = max($am - ($atr * $as), $amin);
+        // Clamp each free threshold to a sensible range; keep discrimination
+        // positive. The baseline entry stays 0 (re-inserted by the codec).
+        // Trusted-region bounds from the model's admin settings (fallback to +/-5).
+        // Only an unset (false) or empty config falls back; a configured 0 is honoured.
+        $minconfig = get_config('catmodel_pcmgeneralized', 'trusted_region_min_a');
+        $min = ($minconfig === false || $minconfig === '') ? -5.0 : (float) $minconfig;
+        $maxconfig = get_config('catmodel_pcmgeneralized', 'trusted_region_max_a');
+        $max = ($maxconfig === false || $maxconfig === '') ? 5.0 : (float) $maxconfig;
+        foreach ($ip['intercepts'] as $fraction => $value) {
+            $ip['intercepts'][$fraction] = max($min, min($max, $value));
         }
-        if ($a > min($am + ($atr * $as), $amax)) {
-            $a = min($am + ($atr * $as), $amax);
+        if (isset($ip['discrimination'])) {
+            $ip['discrimination'] = self::restrict_discrimination('catmodel_pcmgeneralized', $ip['discrimination']);
         }
-
-        $ip['difficulty'] = $a;
-
-        // Test TR for discriminatory.
-        if ($b < $bmin) {
-            $b = $bmin;
-        }
-        if ($b > min(($btr * $bp), $bmax)) {
-            $b = min(($btr * $bp), $bmax);
-        }
-
-        $ip['discrimination'] = $b;
-
         return $ip;
-    }
-
-    /**
-     * Calculates the 1st derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @return array - 1st derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_jacobian($ip): array {
-        // Set values for difficulty parameter.
-
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-
-        return [
-        ($am - $ip['difficulty']) / ($as ** 2), // Calculates d/da.
-        -($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])), // Calculates d/db.
-        ];
-    }
-
-    /**
-     * Calculates the 2nd derivative trusted regions for item parameters
-     *
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     *
-     * @return array - 2nd derivative of TR function with respect to $ip
-     */
-    public static function get_log_tr_hessian(array $ip): array {
-        // Set values for difficulty parameter.
-
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-
-        return [
-            [
-                -1 / ($as ** 2), // Calculates d²/da².
-                0, // Calculates d/da d/db.
-            ],
-            [
-                0, // Calculates d/da d/db.
-                -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
-                    (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
-            ],
-        ];
     }
 
     /**
@@ -527,7 +884,7 @@ class pcmgeneralized extends model_multiparam {
      *
      * @return string
      */
-    protected function get_multi_param_name(): string {
+    protected static function get_multi_param_name(): string {
         return 'intercepts';
     }
 

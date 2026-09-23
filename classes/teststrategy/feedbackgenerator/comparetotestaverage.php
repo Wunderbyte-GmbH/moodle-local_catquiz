@@ -61,7 +61,6 @@ class comparetotestaverage extends feedbackgenerator {
      * @var int
      */
     const MIN_USERS = 3;
-
     /**
      * Limit to show comparison text
      *
@@ -163,6 +162,19 @@ class comparetotestaverage extends feedbackgenerator {
     }
 
     /**
+     * Minimum number of distinct peers required to show the comparison.
+     *
+     * Configurable via the plugin setting minpeersforcomparison;
+     * falls back to MIN_USERS when the setting is absent or invalid.
+     *
+     * @return int
+     */
+    public static function get_min_peers(): int {
+        $configured = (int) get_config('local_catquiz', 'minpeersforcomparison');
+        return $configured >= 1 ? $configured : self::MIN_USERS;
+    }
+
+    /**
      * Write information about colorgradient for colorbar.
      *
      * @param object $quizsettings
@@ -227,17 +239,13 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        global $DB;
         $progress = $this->get_progress();
         $quizsettings = $progress->get_quiz_settings();
 
         if (!$progress->get_playedquestions()) {
             return [];
         }
-
-        $personparams = catquiz::get_person_abilities(
-            $existingdata['contextid'],
-            array_keys($newdata['updated_personabilities'])
-        );
 
         $catscaleid = $quizsettings->catquiz_catscales;
         $abilities = $progress->get_abilities();
@@ -246,32 +254,29 @@ class comparetotestaverage extends feedbackgenerator {
         }
         $ability = $abilities[$catscaleid];
 
-        // Just keep the parameters for the global scale, because that's the one we want to compare.
-        $personparams = array_filter($personparams, fn ($pp) => $pp->catscaleid == $catscaleid);
-
-        // If we do not have enough data to show a meaningful comparison, don't display this feedback.
-        $distinctusers = array_unique(
-            array_map(
-                fn ($pp) => $pp->userid,
-                $personparams
-            )
+        // Compute the peer comparison against a context-true reference
+        // group via SQL aggregates: same context and scale, exactly one value per
+        // person, the compared user excluded. This replaces loading every
+        // personparam into PHP, computing a mean that included the user, and a
+        // percentile that ignored ties.
+        $attemptuserid = (int) $DB->get_field('adaptivequiz_attempt', 'userid', ['id' => $attemptid]);
+        $stats = catquiz::get_peer_comparison_stats(
+            (int) $existingdata['contextid'],
+            (int) $catscaleid,
+            round($ability, 4),
+            $attemptuserid
         );
+        $npeers = (int) $stats->n;
 
         $catscale = catscale::return_catscale_object($catscaleid);
 
-        $worseabilities = array_filter(
-            $personparams,
-            fn ($pp) => $pp->ability < round($ability, 4)
-        );
-
-        $quantile = count($personparams) <= 1
+        // Midrank percentile: 100 * (n_lower + 0.5 * n_equal) / n_peers. Ties are
+        // split evenly, and the compared user is not part of n_peers.
+        $quantile = $npeers <= 0
             ? 0
-            : (count($worseabilities) / (count($personparams) - 1)) * 100;
+            : (((float) $stats->lowercount + 0.5 * (float) $stats->equalcount) / $npeers) * 100;
 
-        $testaverage = 0;
-        if (!empty($personparams)) {
-            $testaverage = array_sum(array_map(fn ($pp) => $pp->ability, $personparams)) / count($personparams);
-        }
+        $testaverage = $npeers > 0 ? (float) $stats->meanvalue : 0;
 
         $catscaleclass = new catscale($catscaleid);
         $abilityrange = $catscaleclass->get_ability_range();
@@ -300,8 +305,9 @@ class comparetotestaverage extends feedbackgenerator {
             $betterthan = get_string('feedbackcomparison_betterthan', 'local_catquiz', ['quantile' => round($quantile, 0)]);
         }
 
+        $hasenoughpeers = $npeers >= self::get_min_peers();
         $text = get_string(
-            'feedbackcomparetoaverage',
+            $hasenoughpeers ? 'feedbackcomparetoaverage' : 'feedbackcomparetoaverage_nopeers',
             'local_catquiz',
             [
                 'betterthan' => $betterthan,
@@ -332,8 +338,8 @@ class comparetotestaverage extends feedbackgenerator {
             'lowerscalelimit' => $abilityrange['minscalevalue'],
             'upperscalelimit' => $abilityrange['maxscalevalue'],
             'middle' => $middle,
-            'comparetotestaverage_has_worse' => count($worseabilities) > 0,
-            'comparetotestaverage_has_enough_peers' => count($distinctusers) >= self::MIN_USERS,
+            'comparetotestaverage_has_worse' => (int) $stats->lowercount > 0,
+            'comparetotestaverage_has_enough_peers' => $hasenoughpeers,
             'personabilities_abilities' => $this->get_restructured_abilities($existingdata, $newdata),
         ];
     }
@@ -357,7 +363,7 @@ class comparetotestaverage extends feedbackgenerator {
         if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
             $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
         } else {
-            $abilityrange = $this->feedbackhelper->get_ability_range($primarycatscale['id']);
+            $abilityrange = $this->feedbackhelper->get_ability_range((int) $primarycatscale['id']);
         };
 
         $ul = (float) $abilityrange['maxscalevalue'];
@@ -395,7 +401,12 @@ class comparetotestaverage extends feedbackgenerator {
 
         $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
         // Prepare data for scorecounter bars.
-        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
+        // Scope the histogram to the current CAT context so it does
+        // not mix person parameters from other contexts.
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', [
+            'catscaleid' => $primarycatscale['id'],
+            'contextid' => $initialcontext['contextid'],
+        ]);
         $abilityseries = [];
         foreach ($abilitysteps as $as) {
             $counter = 0;

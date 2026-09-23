@@ -93,7 +93,13 @@ $string['cachedef_teststrategies'] = 'Teststrategien';
 $string['calculate'] = 'Berechnen';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
 $string['calculation_skipped'] = 'Berechnung wurde nicht durchgeführt.';
+$string['calculationmanagement'] = 'Nachberechnung verwalten';
+$string['calculationmanagement_help'] = 'Starten Sie eine inkrementelle Nachberechnung (behält den aktuellen Kontext) oder eine disruptive Neuberechnung (erzeugt bei Erfolg einen neuen Kontext) und sehen Sie den letzten Lauf je Skala ein.';
+$string['calculationpending'] = 'Wartet';
+$string['calculationqueued'] = 'Die Nachberechnung wurde als Ad-hoc-Aufgabe eingeplant.';
+$string['calculationrunning'] = 'Läuft';
 $string['calculations'] = 'Berechnungen';
+$string['calculationstatus'] = 'Berechnungsstatus';
 $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
@@ -109,7 +115,10 @@ $string['catcontext'] = 'Einsatz-Kontext';
 $string['catmanager'] = 'CAT-Manager';
 $string['catmanagernumberofquestions'] = 'Anzahl Fragen';
 $string['catmanagernumberofsubscales'] = 'Anzahl untergeordneter Skalen';
+$string['catmanagernumberofunusableitems'] = 'Items mit unbrauchbaren Parametern';
+$string['catmodelsettings'] = 'CAT-Modell';
 $string['catquiz'] = 'CAT-Manager';
+$string['catquiz:canaccess'] = 'An einem CAT-Test teilnehmen';
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
 $string['catquiz:manage_catcontexts'] = 'Verwalte Einsatz-Kontexte';
 $string['catquiz:manage_catscales'] = 'Darf Skalen verwalten';
@@ -194,6 +203,7 @@ $string['choosetags'] = 'Tag(s) auswählen';
 $string['choosetags:disclaimer'] = 'Mehrfachauswahl mit „⌘ command“ (Apple) oder „Ctrl“ (Windows, Linux)';
 $string['choosetemplate'] = 'Einstellungs-Vorlage wählen';
 $string['classicalcat'] = 'Klassischer Test';
+$string['cleanupprogress'] = 'Attempt-Fortschritt aufräumen';
 $string['close'] = 'Schließen';
 $string['cogwheeltitle'] = 'Details anzeigen';
 $string['color_1_code'] = '#000000';
@@ -219,11 +229,12 @@ $string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des fol
 $string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> „{$a->data}“';
 $string['context_created'] = 'Einsatz-Kontext erzeugt';
 $string['context_updated'] = 'Einsatz-Kontext aktualisiert';
+$string['contextid'] = 'Kontext-ID';
 $string['contextidselect'] = 'Einsatz-Kontext - ohne Auswahl wird ein neuer Einsatz-Kontext erstellt';
-$string['copysettingsforallsubscales'] = 'Gewählte Einstellungen für untergeordnete Skalen übernehmen';
-$string['copyingsubscalesettings'] = 'Einstellungen werden auf die ausgewählten Subskalen übertragen...';
 $string['copiedsubscalesettings'] = 'Einstellungen auf {$a} Subskala(en) übertragen.';
-$string['nosubscalechosenforcopy'] = 'Es ist keine untergeordnete Skala zum Übertragen vorhanden.';
+$string['copyingsubscalesettings'] = 'Einstellungen werden auf die ausgewählten Subskalen übertragen...';
+$string['copysettingsforallsubscales'] = 'Gewählte Einstellungen für untergeordnete Skalen übernehmen';
+$string['courseenrolementstring'] = 'Aufgrund Ihrer Testergebnisse sind Sie jetzt in folgende(n) Kurs(e) eingeschrieben: {$a}. Viel Erfolg beim Lernen.';
 $string['courseselection'] = 'Kursauswahl';
 $string['create_catscale_description'] = 'Skala „{$a->catscalelink}“ mit der ID {$a->objectid} erzeugt.';
 $string['create_context_description'] = 'Einsatz-Kontext {$a} erzeugt.';
@@ -246,6 +257,12 @@ $string['csvexportheader:teststrategy'] = 'Strategie';
 $string['csvexportheader:useremail'] = 'User-E-Mail';
 $string['csvexportheader:userid'] = 'User-ID';
 $string['csvexportheader:username'] = 'User-Name';
+$string['csvimporterrors'] = 'Fehler';
+$string['csvimportgeneralerrors'] = 'Allgemeine Fehler';
+$string['csvimportmissingquestionlabeldetail'] = 'Die folgenden Labels wurden in der Fragenbank nicht gefunden:';
+$string['csvimportmissingquestionlabels'] = 'Fehlende Fragen-Labels';
+$string['csvimportremovedolderquestionversions'] = 'Ältere Versionen der Frage';
+$string['csvimportwarnings'] = 'Warnungen';
 $string['currentability'] = 'Ihr Fähigkeits-Wert';
 $string['currentabilityfellowstudents'] = 'Durchschnitt';
 $string['dataincomplete'] = 'Der Datensatz mit „componentid“ {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld „{$a->field}“.';
@@ -276,6 +293,7 @@ $string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
 $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
 $string['disclaimer:numberoffeedbackchange'] = 'Änderungen erfordern möglicherweise eine Anpassung der Feedbacks.';
 $string['discrimination'] = 'Trennschärfe';
+$string['disruptiveconfirm'] = 'Eine disruptive Neuberechnung berechnet alle Parameter neu und erzeugt bei Erfolg einen neuen, aktivierten Kontext. Möchten Sie sie einplanen?';
 $string['documentation'] = 'Dokumentation';
 $string['downloaddemofile'] = 'Demofile herunterladen';
 $string['duration'] = 'Dauer';
@@ -309,6 +327,7 @@ $string['error:nminscale'] = 'Leider konnten wir kein Ergebnis ermitteln, da im 
 $string['error:noscalestoreport'] = 'Leider konnten wir mit der aktuellen Anzahl an gestellten Fragen in den getesteten Bereichen
 kein verlässliches Ergebnis ermitteln. Wir empfehlen Ihnen, sich an die Verantwortlichen für den Test zu wenden und zu bitten,
 die Anzahl der zu beantwortenden Fragen zu erhöhen.';
+$string['error:notestenvironmentsettings'] = 'Für {$a->component} mit der Instanz-ID {$a->componentid} sind keine CAT-Quiz-Einstellungen gespeichert. Vermutlich wurde die Aktivität noch nicht als CAT-Quiz konfiguriert.';
 $string['error:permissionforcsvdownload'] = 'Ihnen fehlt die notwendige Berechtigung ({$a}), die gewünschte Informationen herunterzuladen.';
 $string['error:rootonly'] = '';
 $string['error:semax'] = 'Leider konnten wir in den getesteten Bereichen kein Ergebnis mit der vorgegebenen Mindestgenauigkeit ermitteln.
@@ -332,6 +351,9 @@ $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['exceededmaxattempttime'] = 'Die erlaubte Zeit für den Versuch wurde überschritten';
 $string['executed_calculation_description'] = 'Es wurde eine Berechnung der CAT-Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext
     {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
+$string['exportattemptcsv'] = 'Versuch exportieren (CSV)';
+$string['exportattemptdebugcsv'] = 'Debug-Verlauf exportieren (CSV)';
+$string['exportdebuginfopdf'] = 'Debug-Info exportieren (PDF)';
 $string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
 $string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
@@ -344,14 +366,21 @@ $string['feedback_details_highestskill'] = 'Teilbereich (Skala) „<b>{$a->name}
     persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihre größte
     Stärke ermittelt.';
 $string['feedback_details_lowestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
-    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihr größtes
-    Defizit ermittelt.';
+    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihr <b>schwächster
+    getesteter Teilbereich</b> ermittelt. Das bedeutet nicht zwingend, dass Sie dort
+    schwach sind – es ist der Bereich, in dem Sie im Vergleich zu den übrigen
+    getesteten Bereichen am wenigsten Punkte erreicht haben und der sich deshalb zum
+    Weiterlernen am ehesten anbietet.';
 $string['feedback_tab_clicked'] = 'Klick auf Feedback Tab';
 $string['feedback_tab_clicked_description'] = 'Nutzer {$a->userid} hat auf Feedback {$a->feedback_translated} in {$a->attemptlink} geklickt';
 $string['feedback_table_answercorrect'] = 'Richtig';
 $string['feedback_table_answerincorrect'] = 'Falsch';
 $string['feedback_table_answerpartlycorrect'] = 'Teilweise richtig';
+$string['feedback_table_correctness'] = 'Ergebnis';
+$string['feedback_table_givenanswer'] = 'Gegebene Antwort:';
 $string['feedback_table_questionnumber'] = 'Nr.';
+$string['feedback_uncertainty_factor_desc'] = 'Wenn groesser als 0, wird ein Feedbackbereich nur angezeigt, wenn das Konfidenzintervall Faehigkeit +/- k*SE vollstaendig in einem Bereich liegt. 0 deaktiviert dies.';
+$string['feedback_uncertainty_factor_name'] = 'Feedback-Unsicherheitsfaktor (k)';
 $string['feedbackbarlegend'] = 'Bedeutung der Farben';
 $string['feedbackcomparetoaverage'] = '<p>Der Test misst Ihr Wissen und Können in „{$a->quotedscale}“ in Form eines Fähigkeits-Wertes zwischen
 {$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeits-Wert ausfällt, desto besser ist Ihr Wissen und Ihr
@@ -360,12 +389,21 @@ Können in der Skala.</p>
 durchschnittliche Fähigkeits-Wert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. {$a->betterthan}</p>
 <p>Die folgende Graﬁk stellt Ihren Fähigkeitswert (obere Markierung) und den aktuellen
 Durchschnitt (untere Markierung) dar:</p>';
+$string['feedbackcomparetoaverage_nopeers'] = '<p>Der Test misst Ihr Wissen und Können in „{$a->quotedscale}“ in Form eines Fähigkeits-Wertes zwischen
+{$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeits-Wert ausfällt, desto besser ist Ihr Wissen und Ihr
+Können in der Skala.</p>
+<p>Ihr erreichter Fähigkeits-Wert ist <b>{$a->ability_global}</b> (mit einem Standardfehler von ±{$a->se_global}).</p>
+<p>Es liegen noch nicht genügend Vergleichsergebnisse vor, um einen Durchschnitt für diesen Test anzuzeigen.</p>
+<p>Die folgende Graﬁk stellt Ihren Fähigkeitswert dar:</p>';
 $string['feedbackcomparison_betterthan'] = 'Mit Ihrem Ergebnis sind Sie momentan <b>besser als {$a->quantile}% aller anderen Test-Teilnehmenden</b>.';
 $string['feedbackcompletedentirely'] = 'Alle Feedbacks für diese CAT-Skala hinterlegt.';
 $string['feedbackcompletedpartially'] = '{$a} Feedbacks für diese Skala hinterlegt.';
 $string['feedbacklegend'] = 'Beschreibung der Fähigkeits-Stufe';
+$string['feedbacknovalidresult'] = 'Für diesen Versuch konnte kein valides Testergebnis bestimmt werden.';
+$string['feedbacknovalidresultheading'] = 'Testergebnis';
 $string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe {$a}';
 $string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
+$string['feedbackrangeuncertain'] = 'Ihr Ergebnis liegt nahe an der Grenze zwischen zwei Feedbackbereichen, daher ist noch keine eindeutige Einordnung moeglich.';
 $string['feedbacksheader'] = 'Testversuch {$a}';
 $string['fetchempty'] = 'Parameter sind am aktuellsten Stand';
 $string['fetchingparameters'] = 'Parameter werden von der zentralen Instanz abgerufen...';
@@ -391,6 +429,7 @@ $string['formetimelimitnotprovided'] = 'Geben Sie zumindest einen Wert ein';
 $string['formminquestgreaterthan'] = 'Minimum muss kleiner als Maximum sein';
 $string['formmscalegreaterthantest'] = 'Minimum pro CAT-Skala muss kleiner sein als Maximum des Tests';
 $string['fraction'] = 'Fraction';
+$string['functiondoesntexist'] = 'Die angeforderte Funktion existiert nicht.';
 $string['genericsubmit'] = 'Bestätigen';
 $string['global_scale'] = 'Globalskala';
 $string['graphicalsummary_description'] = 'Während des Verlaufs des Testversuchs wird Ihrer Fähigkeits-Wert mit jeder Antwort neu
@@ -398,8 +437,8 @@ berechnet und aktualisiert. Die folgende Grafik zeigt Ihnen, wie sich die Einsch
 Ihres Fähigkeits-Wertes in „{$a}“ über den Verlauf des Testversuchs hinweg
 verändert hat.';
 $string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
-    Entwicklung Ihres Fähigkeits-Wertes bezüglich der als Defizit
-    identifizierten Skala {$a} dargestellt:';
+    Entwicklung Ihres Fähigkeits-Wertes bezüglich Ihres schwächsten getesteten
+    Teilbereichs {$a} dargestellt:';
 $string['greateststrenght:tooltiptitle'] = 'Ihre stärkste Skala „{$a}„';
 $string['groupenrolementstring'] = '„{$a->groupname}“ in Kurs <a href={$a->courseurl}>{$a->coursename}</a>“';
 $string['groupenrolmenthelptext'] = 'Bitte geben Sie den/die genauen Namen existierender Gruppe/n ein (z.B.: „Gruppe1,Gruppe2“ oder „Gruppe3“).';
@@ -412,6 +451,10 @@ $string['hubactions'] = 'Berechnungen auf zentraler Instanz';
 $string['hubactionshelp'] = 'Hier können Berechnungen, die spezifisch für zentrale Instanzen sind, ausgeführt werden';
 $string['id'] = 'ID';
 $string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
+$string['import_warning_capped_difficulty'] = 'Item „{$a->id}“: Schwierigkeit {$a->value} liegt an oder jenseits der ±{$a->cap}-Grenze und ist höchstwahrscheinlich ein gedeckelter Schätzwert und kein echter Wert.';
+$string['import_warning_capped_discrimination'] = 'Item „{$a->id}“: Trennschärfe {$a->value} liegt an oder jenseits der {$a->cap}-Grenze und ist höchstwahrscheinlich ein gedeckelter Schätzwert und kein echter Wert.';
+$string['import_warning_invalid_itemparams'] = 'Item „{$a->label}“: Die Itemparameter sind für das Modell „{$a->model}“ nicht verwendbar ({$a->reason}). Das Item wurde als Pilotitem statt als produktives Item importiert.';
+$string['import_warning_nonpositive_discrimination'] = 'Item „{$a->id}“: nicht-positive Trennschärfe ({$a->value}). Items mit einer Steigung von null oder kleiner sind für Modelle mit Trennschärfe degeneriert und kalibrieren nicht sinnvoll.';
 $string['importcolumnsinfos'] = 'Informationen zu Importfeldern:';
 $string['importcontextinfo'] = 'Die Kontextid sollte gesetzt werden, wenn bestehende Items bearbeitet werden, damit die eindeutige Zuordnung gelingt. Für den Import von neuen Items, empfiehlt es sich, den Kontext leer zu lassen. Es wird dann ein neuer Kontext automatisch generiert, welcher die Items aus dem Standardkontext plus die neu importierten enthält. Falls beim Import neuer Items ein Kontext angegeben wird, muss der Kontext der entsprechenden obersten Skala umgestellt werden (im CAT-Manager Dashboard, Skalen-Bereich), damit diese Items zum Einsatz kommen.';
 $string['importcsv'] = 'Import CSV';
@@ -428,12 +471,21 @@ $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Fragen aus untergeordneten Skalen einbeziehen';
 $string['intercepts'] = 'Intercepts';
+$string['invalidfeedbackname'] = 'Der Feedback-Bezeichner „{$a}" ist unbekannt.';
+$string['invalidquestionslot'] = 'Die angeforderte Frage wurde in diesem Versuch nicht gefunden.';
+$string['invalidrenderclass'] = 'Die Render-Klasse „{$a}" ist nicht zugelassen.';
+$string['invalidrenderparams'] = 'Die Parameter für die Render-Klasse sind ungültig.';
 $string['invisible'] = 'Unsichtbar';
 $string['itemassignedtoparentorsubscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in einer über- oder untergeordneten Skala von {$a->newscalename} eingeschrieben und wird nicht importiert.';
 $string['itemassignedtosecondscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in Skala {$a->scalelink} eingeschrieben und nun zusätzlich in {$a->newscalename}.';
 $string['itemdifficulties'] = 'Frage-Schwierigkeiten';
 $string['itemdifficultiesnodata'] = 'Es konnte keine Frage-Schwierigkeit berechnet werden.';
 $string['itemdifficulty'] = 'Schwierigkeit des Elements';
+$string['itemparams_noparams'] = 'Keine Parameter (Pilotitem)';
+$string['itemparams_unusable'] = 'Nicht verwendbar (wird als Pilotitem behandelt)';
+$string['itemparams_unusable_reason'] = 'Modell "{$a->model}": {$a->reason}';
+$string['itemparams_usable'] = 'Verwendbar';
+$string['itemparamvalidity'] = 'Parametergültigkeit';
 $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['itemstatus_-5'] = 'Manuell ausgeschlossen';
 $string['itemstatus_0'] = 'Noch nicht berechnet';
@@ -445,15 +497,9 @@ $string['label'] = 'Kennzeichen';
 $string['labelforrelativepersonabilitychart'] = 'Differenz';
 $string['labelidnotfound'] = 'Fragen-Label „{$a}“ wurde in der Fragenbank nicht gefunden.';
 $string['labelidnotunique'] = 'Fragen-Label „{$a}“ ist nicht eindeutig.';
-$string['csvimportwarnings'] = 'Warnungen';
-$string['csvimporterrors'] = 'Fehler';
-$string['csvimportgeneralerrors'] = 'Allgemeine Fehler';
-$string['csvimportmissingquestionlabels'] = 'Fehlende Fragen-Labels';
-$string['csvimportmissingquestionlabeldetail'] = 'Die folgenden Labels wurden in der Fragenbank nicht gefunden:';
-$string['csvimportremovedolderquestionversions'] = 'Ältere Versionen der Frage';
-$string['removedolderquestionversionsfromscale'] = 'Ältere Versionen der Frage "{$a->label}" wurden aus der Skala "{$a->scale}" entfernt.';
 $string['lang'] = 'Sprache';
 $string['lastattempttime'] = 'Letzter Testversuch';
+$string['lastcalculation'] = 'Letzte Nachberechnung';
 $string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeits-Wert über
     die letzten Versuche hin entwickelt? Haben Sie sich verbessert?<br/> Die
     folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
@@ -494,6 +540,8 @@ $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Ein
 $string['min'] = 'min:';
 $string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
 $string['minabilityscalevalue_help'] = 'Geben Sie die kleinstmögliche Personenfähigkeit dieser Skala als negativen Dezimalwert an. Der Mittelwert ist null.';
+$string['minpeersforcomparison_desc'] = 'Mindestanzahl unterschiedlicher Personen, bevor der Peer-Vergleich angezeigt wird. Kleine Gruppen werden in Diagrammen und Exporten gleichermassen unterdrueckt.';
+$string['minpeersforcomparison_name'] = 'Mindestanzahl Peers fuer den Vergleich';
 $string['minquestions_default_desc'] = 'Dieser Wert wird standardmässig gesetzt, kann jedoch in den Quizsettings überschrieben werden';
 $string['minquestions_default_name'] = 'Standardwert für die Mindestanzahl an Fragen pro Versuch';
 $string['minquestionsnotreached'] = 'Es kann kein Ergebnis berechnet werden, da die Mindestanzahl an Fragen nicht erreicht worden ist';
@@ -536,6 +584,7 @@ $string['noresult'] = 'kein Fähigkeits-Wert ermittelt';
 $string['noscaleselected'] = 'Keine CAT-Skala gewählt.';
 $string['noscalesfound'] = 'Für keine Skala konnte ein zuverlässiges Ergebnis ermittelt werden.';
 $string['noselection'] = 'Keine Auswahl';
+$string['nosubscalechosenforcopy'] = 'Es ist keine untergeordnete Skala zum Übertragen vorhanden.';
 $string['nothingtocompare'] = 'Für einen Vergleich liegen noch nicht genügend Ergebnisse vor.';
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
 Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
@@ -552,6 +601,7 @@ $string['numberofanswers'] = 'Antworten';
 $string['numberofanswerscorrect'] = 'Richtig';
 $string['numberofanswersincorrect'] = 'Falsch';
 $string['numberofanswerspartlycorrect'] = 'Teilweise richtig';
+$string['numberofanswersunanswered'] = 'Unbeantwortet';
 $string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl der Fähigkeits-Stufen';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
@@ -596,7 +646,32 @@ $string['pleasechoose'] = 'bitte auswählen';
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['previewquestion'] = 'Fragen Vorschau';
 $string['privacy:metadata:local_catquiz_attempts'] = 'Informationen über Benutzerversuche in adaptiven Quizzen.';
+$string['privacy:metadata:local_catquiz_attempts:attemptid'] = 'Die ID des Versuchs in der Komponente, in der der Test abgelegt wurde.';
+$string['privacy:metadata:local_catquiz_attempts:component'] = 'Die Komponente, zu der der Versuch gehört.';
+$string['privacy:metadata:local_catquiz_attempts:contextid'] = 'Der CAT-Kontext, in dem der Versuch abgelegt wurde.';
+$string['privacy:metadata:local_catquiz_attempts:courseid'] = 'Der Kurs, zu dem der Versuch gehört.';
+$string['privacy:metadata:local_catquiz_attempts:instanceid'] = 'Die Aktivitätsinstanz, zu der der Versuch gehört.';
+$string['privacy:metadata:local_catquiz_attempts:scaleid'] = 'Die CAT-Skala, für die der Versuch abgelegt wurde.';
+$string['privacy:metadata:local_catquiz_attempts:status'] = 'Der Status des Versuchs, etwa laufend oder abgeschlossen.';
+$string['privacy:metadata:local_catquiz_attempts:timecreated'] = 'Der Zeitpunkt, zu dem der Versuch begonnen wurde.';
+$string['privacy:metadata:local_catquiz_attempts:timemodified'] = 'Der Zeitpunkt der letzten Änderung des Versuchs.';
+$string['privacy:metadata:local_catquiz_attempts:userid'] = 'Die Person, zu der der Versuch gehört.';
 $string['privacy:metadata:local_catquiz_personparams'] = 'Benutzerdatenparameter in verschiedenen Kontexten.';
+$string['privacy:metadata:local_catquiz_personparams:ability'] = 'Die geschätzte Fähigkeit der Person auf einer CAT-Skala.';
+$string['privacy:metadata:local_catquiz_personparams:attemptid'] = 'Der Versuch, in dem die Schätzung entstanden ist.';
+$string['privacy:metadata:local_catquiz_personparams:catscaleid'] = 'Die CAT-Skala, zu der die Schätzung gehört.';
+$string['privacy:metadata:local_catquiz_personparams:contextid'] = 'Der CAT-Kontext, zu dem die Schätzung gehört.';
+$string['privacy:metadata:local_catquiz_personparams:standarderror'] = 'Der Standardfehler der geschätzten Fähigkeit.';
+$string['privacy:metadata:local_catquiz_personparams:timecreated'] = 'Der Zeitpunkt, zu dem die Schätzung gespeichert wurde.';
+$string['privacy:metadata:local_catquiz_personparams:timemodified'] = 'Der Zeitpunkt der letzten Änderung der Schätzung.';
+$string['privacy:metadata:local_catquiz_personparams:userid'] = 'Die Person, zu der die Schätzung gehört.';
+$string['privacy:metadata:local_catquiz_progress'] = 'Der Arbeitszustand eines Versuchs: gespielte Fragen, aktive Skalen, gegebene Antworten und Fähigkeitsschätzungen. Wie lange dies aufbewahrt wird und ob ein Schrittverlauf protokolliert wird, steuert die Einstellung zur Aufbewahrung.';
+$string['privacy:metadata:local_catquiz_progress:attemptid'] = 'Der Versuch, zu dem dieser Arbeitszustand gehört.';
+$string['privacy:metadata:local_catquiz_progress:component'] = 'Die Komponente, zu der der Versuch gehört.';
+$string['privacy:metadata:local_catquiz_progress:id'] = 'Die interne ID des Datensatzes.';
+$string['privacy:metadata:local_catquiz_progress:json'] = 'Der gespeicherte Arbeitszustand, einschließlich der gegebenen Antworten und, im Verlaufsmodus, der Fähigkeitsschätzung jedes Schritts.';
+$string['privacy:metadata:local_catquiz_progress:quizsettings'] = 'Die Testeinstellungen, die während des Versuchs galten.';
+$string['privacy:metadata:local_catquiz_progress:userid'] = 'Die Person, zu der der Versuch gehört.';
 $string['privacy:metadata:local_catquiz_subscriptions'] = 'Informationen über Benutzerabonnements im Catquiz-Plugin.';
 $string['privacy:metadata:local_catquiz_subscriptions:area'] = 'Der Bereich des abonnierten Elements.';
 $string['privacy:metadata:local_catquiz_subscriptions:itemid'] = 'Die ID des abonnierten Elements.';
@@ -605,6 +680,15 @@ $string['privacy:metadata:local_catquiz_subscriptions:timecreated'] = 'Der Zeitp
 $string['privacy:metadata:local_catquiz_subscriptions:timemodified'] = 'Der Zeitpunkt, zu dem das Abonnement geändert wurde.';
 $string['privacy:metadata:local_catquiz_subscriptions:userid'] = 'Die ID des Benutzers.';
 $string['progress'] = 'Entwicklung Fähigkeits-Wert in „{$a}“';
+$string['progressretention'] = 'Aufbewahrung des Attempt-Fortschritts';
+$string['progressretention_default'] = 'Standard der Website übernehmen';
+$string['progressretention_desc'] = 'Steuert, wie lange der Arbeitszustand eines Versuchs aufbewahrt wird und wie viel davon. „Datensparsam“ löscht ihn nach Abschluss und behält keine Antwortdaten. „Endzustand“ behält den letzten Wert je Skala. „Verlauf“ protokolliert zusätzlich die Fähigkeitsschätzung jedes Schritts – das ist von den dreien die personenbezogenste Stufe.';
+$string['progressretention_help'] = 'Steuert, wie lange der Arbeitszustand dieses Tests aufbewahrt wird. Die Einstellung der Website wirkt als Obergrenze: Optionen, die mehr aufbewahren würden als die Website erlaubt, werden hier nicht angeboten.';
+$string['progressretention_keep'] = 'Endzustand behalten';
+$string['progressretention_minimal'] = 'Datensparsam – nach dem Versuch löschen';
+$string['progressretention_trace'] = 'Schrittverlauf protokollieren';
+$string['progressretentiondays'] = 'Aufbewahrungsfrist in Tagen';
+$string['progressretentiondays_desc'] = 'Zahl der Tage, nach denen protokollierter Fortschritt vom geplanten Task entfernt wird. Null bedeutet unbegrenzt.';
 $string['questioncategories'] = 'Fragekategorien';
 $string['questioncontextattempts'] = '# Testversuche im ausgewählten Einsatz-Kontext';
 $string['questionfeedbackdisabled'] = 'Rückmeldung zu gegebener Antwort ist deaktiviert';
@@ -613,11 +697,15 @@ $string['questionfeedbackshow'] = 'Rückmeldung über gegebene Antworten anzeige
 $string['questionfeedbackshowcorrectresponse'] = 'Korrekte Antwort anzeigen';
 $string['questionfeedbackshowfeedback'] = 'Fragefeedback anzeigen';
 $string['questionfeedbackshowresponse'] = 'Indikator zur Korrektheit der gegebenen Antwort anzeigen';
+$string['questionnotfound'] = 'Frage wurde nicht gefunden';
 $string['questionpreview'] = 'Fragevorschau';
 $string['questionresults'] = 'Fragen Auswertung';
 $string['questions'] = 'Fragen';
 $string['questionssummary'] = 'Zusammenfassung';
 $string['questiontext'] = 'Fragentext';
+$string['questiontextsearch'] = 'In Fragetexten suchen';
+$string['questiontextsearch_help'] = 'Durchsucht den Text der Fragen. Die Fragetexte sind bewusst nicht Teil der Liste selbst, daher läuft diese Suche als eigener Schritt.';
+$string['questiontextsearch_toomany'] = 'Der Suchbegriff trifft auf zu viele Fragen zu, um die Liste zu filtern. Bitte einen genaueren Begriff verwenden.';
 $string['questiontype'] = 'Fragentyp';
 $string['quizattempts'] = 'Testversuche';
 $string['quizgraphicalsummary'] = 'Quizverlauf';
@@ -627,6 +715,7 @@ $string['recentevents'] = 'Letzte Bearbeitungen';
 $string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
 $string['remotecalcbutton'] = 'Mit zugesendeten Daten neu berechnen';
 $string['remotesubmitbutton'] = 'Neue Antworten mit Hub teilen';
+$string['removedolderquestionversionsfromscale'] = 'Ältere Versionen der Frage "{$a->label}" wurden aus der Skala "{$a->scale}" entfernt.';
 $string['removetestitem'] = 'Testitems entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
 $string['removetestitemsubmit'] = 'Entfernen';
@@ -675,6 +764,8 @@ $string['showlistofcatscalemanagers'] = 'CAT-Manager*innen';
 $string['showquestion'] = 'Frage anzeigen';
 $string['somethingwentwrong'] = 'Etwas ist schiefgelaufen. Melden Sie den Fehler ihrem Admin';
 $string['standarderror'] = 'Standardfehler';
+$string['startdisruptive'] = 'Neuberechnung starten';
+$string['startrecalculation'] = 'Nachberechnung starten';
 $string['starttime'] = 'Beginn';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['startwithdifficultquestion'] = 'mit einer schweren Frage';
@@ -714,6 +805,10 @@ $string['submission_success'] = '{$a->total} Antworten wurden erfolgreich überm
 $string['submitresponsescheduled'] = 'Antwort-Daten geplant';
 $string['subplugintype_catmodel'] = 'CAT Modell';
 $string['subplugintype_catmodel_plural'] = 'CAT Modelle';
+$string['subplugintype_catquizcentralhub'] = 'CAT-Quiz-Zentral-Hub-Plugin';
+$string['subplugintype_catquizcentralhub_plural'] = 'CAT-Quiz-Zentral-Hub-Plugins';
+$string['subplugintype_connectivity'] = 'Konnektivitäts-Plugin';
+$string['subplugintype_connectivity_plural'] = 'Konnektivitäts-Plugins';
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';
 $string['subscribedcatscalesheading'] = 'Eingeschriebene Skalen';
@@ -803,7 +898,7 @@ $string['validateform:onlyoneconfirmedstatusallowed'] = 'Dieser Status ist nur f
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
 $string['versionchosen'] = 'ausgewählte Versionierung:';
 $string['versioning'] = 'Versionierung';
+$string['viewrawdebuginfo'] = 'Rohe Debug-Info anzeigen';
 $string['warnings'] = 'Warnungen';
 $string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
 $string['yourscorein'] = 'Ihre durchschnittlichen „{$a}”-Ergebnisse';
-$string['questionnotfound'] = 'Frage wurde nicht gefunden';

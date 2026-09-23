@@ -39,6 +39,7 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
+use local_catquiz\teststrategy\context\loader\questions_loader;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -99,6 +100,31 @@ abstract class strategy {
      * @var result $result
      */
     private $result;
+
+    /**
+     * Candidate count after each pipeline stage, for issue #64.
+     *
+     * The pipeline narrows the pool step by step, and until now only the final
+     * outcome was visible. When an attempt ended with "no remaining questions"
+     * while items demonstrably existed, there was no way to tell which stage had
+     * emptied the pool - the report had to be reconstructed from outside the
+     * request, where the numbers no longer match.
+     *
+     * @var array
+     */
+    private array $stagecounts = [];
+
+    /**
+     * Milliseconds per stage, for the profiling issues #26 and #27 ask for.
+     * @var array
+     */
+    private array $stagetimings = [];
+
+    /**
+     * Start of the stage currently running, or null before the first one.
+     * @var float|null
+     */
+    private ?float $stagestarted = null;
 
     /**
      * These data provide the context for the selection of the next question.
@@ -169,12 +195,16 @@ abstract class strategy {
             // attempt time).
             $this->cache->set('endtime', $maxtime);
             $this->cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
+            $this->persist_stage_counts();
+
             return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
         }
 
         try {
             $this->check_item_params();
         } catch (Exception $e) {
+            $this->persist_stage_counts();
+
             return result::err(status::ERROR_GENERAL, $e->getMessage());
         }
 
@@ -182,15 +212,33 @@ abstract class strategy {
         // that we should display again after a page reload.
         $checkbreakres = $this->check_break();
         if ($checkbreakres->unwrap()) {
+            $this->persist_stage_counts();
+
             return $checkbreakres;
         }
 
         $res = $this->check_page_reload();
         if ($res->unwrap()) {
+            $this->persist_stage_counts();
+
             return $res;
         }
 
         // Core methods called in every strategy.
+        /* Issue #64: the pool is a precondition of the whole chain, not a by-product
+           of picking the first question. first_question_selector() used to be the
+           only place that filled $context['questions'], and it returns early on
+           three paths - not the first question, the classic strategy, and an
+           existing ability with firstquestion_use_existing_data. The chain then ran
+           with 'questions' unset, and noremainingquestions did count(null): in PHP 8
+           a TypeError, which is an Error and not caught by the Exception handler
+           around the chain. The attempt died after question one.
+           Loading it here means the chain always has the pool, whichever path the
+           selector takes. The loader has existed all along and was called nowhere. */
+        if (!isset($this->context['questions'])) {
+            $this->context = (new questions_loader())->load($this->context);
+        }
+
         $res = $this->update_personability()
             ->and_then(fn () => $this->first_question_selector())
             ->or_else(fn ($res) => $this->after_error($res));
@@ -200,18 +248,38 @@ abstract class strategy {
         // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
         // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
         if (is_object($val)) {
+            $this->persist_stage_counts();
+
             return $res;
         }
 
         try {
+            // Every stage now records the pool as it stands *after that
+            // stage ran*. The previous form passed the next filter as an argument -
+            // record_stage('add_scale_standarderror', $this->maximumquestionscheck()) -
+            // and PHP evaluates arguments before the call, so each count was filed
+            // under the name of the preceding stage.
+            //
+            // A trace shifted by one stage points the investigation at the wrong
+            // filter, which is the exact opposite of what this instrumentation exists
+            // for: it would have named add_scale_standarderror as the step that
+            // emptied the pool while maximumquestionscheck did it.
+            $this->record_stage('start');
             $this->add_scale_standarderror()
+                ->and_then(fn () => $this->record_stage('add_scale_standarderror'))
                 ->and_then(fn () => $this->maximumquestionscheck())
+                ->and_then(fn () => $this->record_stage('maximumquestionscheck'))
                 ->and_then(fn () => $this->removeplayedquestions())
+                ->and_then(fn () => $this->record_stage('removeplayedquestions'))
                 ->and_then(fn () => $this->noremainingquestions())
+                ->and_then(fn () => $this->record_stage('noremainingquestions'))
                 ->and_then(fn () => $this->fisherinformation())
                 ->or_else(fn($res) => $this->after_error($res))
                 ->expect();
+            $this->record_stage('fisherinformation');
         } catch (Exception $e) {
+            $this->persist_stage_counts();
+
             return $this->result ?? result::err(status::ERROR_GENERAL, $e->getMessage());
         }
 
@@ -219,6 +287,8 @@ abstract class strategy {
         $val = $res->unwrap();
         // If the value is an object, it is the pilot question that should be returned.
         if (is_object($val)) {
+            $this->persist_stage_counts();
+
             return $res;
         }
 
@@ -236,6 +306,7 @@ abstract class strategy {
                     function ($res) {
                         $this->progress->save();
                         $this->update_attemptfeedback($this->context);
+                        $this->persist_stage_counts();
                         return $res;
                     }
                 )
@@ -243,10 +314,14 @@ abstract class strategy {
                 ->expect()
                 ->unwrap();
         } catch (Exception $e) {
+            $this->persist_stage_counts();
+
             return $this->result ?? result::err(status::ERROR_GENERAL, $e->getMessage());
         }
 
         if (!$selectedquestion) {
+            $this->persist_stage_counts();
+
             return result::err();
         }
 
@@ -261,6 +336,8 @@ abstract class strategy {
             $context['includesubscales'],
             $context['progress']->get_selected_subscales()
         );
+        $this->persist_stage_counts();
+
         return result::ok($selectedquestion);
     }
 
@@ -276,6 +353,12 @@ abstract class strategy {
         $this->update_attemptfeedback($this->context);
         $this->cache->set('endtime', time());
         $this->cache->set('catquizerror', $result->get_status());
+
+        // The counts are written by persist_stage_counts(), which runs on
+        // every completed selection - not only here. The reported abort never reaches
+        // the error path at all: the selection reports no error, so after_error() does
+        // not run, and a diagnosis that only wrote here stayed empty for exactly the
+        // case it was built for.
         $this->result = $result;
         return $result;
     }
@@ -678,5 +761,91 @@ abstract class strategy {
      */
     protected function filterbyquestionsperscale(): result {
         return result::ok($this->context);
+    }
+    /**
+     * Notes how many candidates remain after a stage, and passes the result through.
+     *
+     * The count is taken before the next stage runs, so a stage that
+     * empties the pool can be named. Without this the only observable fact was that
+     * the pool ended up empty.
+     *
+     * @param string $stage Name of the stage that has just finished.
+     * @param result|null $result Result of the following stage, passed through.
+     * @return result
+     */
+    /**
+     * Writes the recorded counts to the attempt cache.
+     *
+     * Called at every exit of the selection, successful or not. The
+     * reported attempt ended without the selection reporting an error - the pool was
+     * simply empty - so writing only in the error path left no trace of the one thing
+     * worth knowing.
+     *
+     * @return void
+     */
+    private function persist_stage_counts(): void {
+        if (empty($this->stagecounts) || !isset($this->cache)) {
+            return;
+        }
+
+        $this->cache->set('catquizstagecounts', $this->stagecounts);
+        $this->cache->set('catquizstagetimings', $this->stagetimings);
+    }
+
+    /**
+     * Notes how many candidates remain after a stage, and passes the result through.
+     *
+     * The count is taken before the next stage runs, so a stage that empties the pool
+     * can be named. Without this the only observable fact was that the pool ended up
+     * empty.
+     *
+     * @param string $stage Name of the stage that has just finished.
+     * @param result|null $result Result of the following stage, passed through.
+     * @return result
+     */
+    private function record_stage(string $stage, ?result $result = null): result {
+        $now = microtime(true);
+
+        $this->stagecounts[$stage] = isset($this->context['questions'])
+            ? count($this->context['questions'])
+            : null;
+
+        // Issue #26/#27 ask for per-stage timing before any optimisation is
+        // attempted: the decision to rebuild the pool or the filters is only
+        // defensible once a stage is shown to carry the time. The counts alone say
+        // where candidates are lost, not where the time goes.
+        //
+        // Measured as the span since the previous stage, so the numbers add up to the
+        // selection rather than overlapping.
+        if ($this->stagestarted !== null) {
+            $this->stagetimings[$stage] = round(($now - $this->stagestarted) * 1000, 3);
+        }
+        $this->stagestarted = $now;
+
+        return $result ?? result::ok($this->context);
+    }
+
+    /**
+     * Returns the milliseconds each stage of the selection took.
+     *
+     * Empty until a selection has run. Intended for the profiling that issues #26 and
+     * #27 require as evidence; nothing in the selection depends on it.
+     *
+     * @return array
+     */
+    public function get_stage_timings(): array {
+        return $this->stagetimings;
+    }
+
+    /**
+     * Returns the candidate count after each stage of the selection pipeline.
+     *
+     * Empty until a selection has run. Intended for diagnosis and for the tests that
+     * pin the behaviour; nothing in the selection depends on it.
+     *
+     * @return array
+     */
+    public function get_stage_counts(): array {
+        return $this->stagecounts;
     }
 }

@@ -1,0 +1,12 @@
+{
+    "name": "local-catquiz-playwright",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Browser tests for the local_catquiz CAT manager UI",
+    "scripts": {
+        "test": "playwright test"
+    },
+    "devDependencies": {
+        "@playwright/test": "1.49.1"
+    }
+}

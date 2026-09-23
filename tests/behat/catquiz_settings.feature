@@ -31,7 +31,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1" using the activity chooser
     And I set the following fields to these values:
-      | catmodel                                              | empty |
+      | catmodel                                              |       |
     And I wait until the page is ready
     And I set the following fields to these values:
       | Name             | Adaptive CATquiz  |
@@ -53,7 +53,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I click on "Save and return to course" "button"
     And I log out
     And I am on the "adaptivecatquiz1" "Activity" page logged in as "student1"
-    Then "Start attempt" "button" should exist
+    Then "Start attempt" "link" should exist
 
   @javascript
   Scenario: CATquiz settings: teacher setup catscale usage in quiz and verify it
@@ -64,7 +64,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I follow "Settings"
     ## And I wait until the page is ready
     And I set the following fields to these values:
-      | catmodel                                              | empty |
+      | catmodel                                              |       |
     And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                              | Catquiz CAT model |
@@ -122,7 +122,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
     And the following "local_catquiz > testsettings" exist:
       | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy         | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
-      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 3                       |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | -2                          | 7                    | 0.4                       | 0.6                       | 3                       |
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
     And I click on "Feedback for “Simulation”" "text"
@@ -141,7 +141,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
     And I set the following fields to these values:
-      | catmodel                                              | empty |
+      | catmodel                                              |       |
     And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                   | Catquiz CAT model                |
@@ -241,7 +241,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I follow "Settings"
     ## And I wait until the page is ready
     And I set the following fields to these values:
-      | catmodel                                              | empty |
+      | catmodel                                              |       |
     And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                              | Catquiz CAT model |
@@ -255,6 +255,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I fill in the "input" element number "1" with the dynamic identifier "id_catquiz_scalereportcheckbox_" with "1"
     ## Update feedback defaults and chek it for root catscale, range 2
     And I fill in the "autocomplete" element number "2" with the dynamic identifier "fitem_id_catquiz_courses_" with "Course 1"
+    ## Checkpoint A: the value must be present in the native <select> that is
+    ## actually submitted, right after the selection.
+    And the autocomplete number "2" for "fitem_id_catquiz_courses_" has "Course 1" natively selected
     ## No lower limit for range 1 so index is 1
     And I fill in the "input" element number "1" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
     And I fill in the "input" element number "2" with the dynamic identifier "id_enrolment_message_checkbox_" with "1"
@@ -286,6 +289,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I wait until the page is ready
     ## Error "no gap" expected
     And I should see "No gap in the feedbackrange allowed. Please make sure that upper limit of former range is equivalent to lower limit of next range." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
+    ## Checkpoint B: after the intentional validation error the re-rendered form
+    ## must still carry the course in its native <select> (validation roundtrip).
+    And the autocomplete number "2" for "fitem_id_catquiz_courses_" has "Course 1" natively selected
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "-1"
     And I click on "Save and display" "button"
     And I follow "Settings"
@@ -299,10 +305,16 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ##And I should see "6" in the "(//div[contains(@id, 'fitem_id_wb_colourpicker_')])[2]//span[@class='colourselectnotify']" "xpath_element"
 
     ## Range 2 - autocomplete:
-    ## -direct xpath access
-    And I should see "Course 1" in the "(//div[contains(@id, 'fitem_id_catquiz_courses_')])[2]//div[contains(@id, 'form_autocomplete_selection-')]" "xpath_element"
-    ## -the data-attribute from form's custom 'div'-delimited group has been used
-    And I should see "Course 1" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[contains(@id, 'form_autocomplete_selection-')]" "xpath_element"
+    ## Checkpoint C: after save + reload the native <select> must still hold the
+    ## course (the value that persisted), checked before the visible chips.
+    And the autocomplete number "2" for "fitem_id_catquiz_courses_" has "Course 1" natively selected
+    ## -direct xpath access; target the real selection listbox (role='listbox'),
+    ## not the sibling '-announcer' div whose id also contains
+    ## 'form_autocomplete_selection-' and which Moodle empties again.
+    And I should see "Course 1" in the "(//div[contains(@id, 'fitem_id_catquiz_courses_')])[2]//div[@role='listbox' and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-selection ')]" "xpath_element"
+    ## -the data-attribute from form's custom 'div'-delimited group has been used;
+    ## assert the selected chip directly (span role='option' aria-selected='true').
+    And I should see "Course 1" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@role='listbox']//span[@role='option' and @aria-selected='true']" "xpath_element"
     ## -native selection does not work with autocomplete
     ##And the field "Subscription to a course" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Course 1"
 

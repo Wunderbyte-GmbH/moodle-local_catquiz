@@ -80,7 +80,9 @@ final class model_item_param_list_test extends advanced_testcase {
                         'componentname' => "question",
                     ],
                 'expected' => [
-                    'success' => 1,
+                    // The import still succeeds, but discrimination 5.92 is beyond
+                    // the 5.0 trusted bound, so it now returns success-with-warning.
+                    'success' => 2,
                 ],
                  // TODO: Mock DB to check if matching via scaleid and scaleimport works.
             ],
@@ -120,5 +122,54 @@ final class model_item_param_list_test extends advanced_testcase {
 
         $this->assertEquals('difficulty;model', $rows[0]);
         $this->assertEquals('A01;1.8;rasch', $rows[1]);
+    }
+
+    /**
+     * The calibration warnings flag degenerate or clamped item parameters on import.
+     *
+     * @covers \local_catquiz\local\model\model_item_param_list::calibration_warnings
+     */
+    public function test_calibration_warnings(): void {
+        $method = new \ReflectionMethod(model_item_param_list::class, 'calibration_warnings');
+        $method->setAccessible(true);
+        $warn = fn (array $record): array => $method->invoke(null, $record);
+
+        // Non-positive discrimination (the ALiSe pilots carry a = 0.00).
+        self::assertCount(1, $warn(['componentid' => 1, 'discrimination' => 0.0]));
+        self::assertCount(1, $warn(['componentid' => 1, 'discrimination' => -0.7]));
+
+        // Discrimination at or above the 5.0 cap.
+        self::assertCount(1, $warn(['componentid' => 1, 'discrimination' => 5.0]));
+        self::assertCount(1, $warn(['componentid' => 1, 'discrimination' => 6.2]));
+
+        // Healthy discrimination: no warning.
+        self::assertCount(0, $warn(['componentid' => 1, 'discrimination' => 1.3]));
+
+        // Difficulty at or beyond the +/-10 bound.
+        self::assertCount(1, $warn(['componentid' => 1, 'difficulty' => 10.0]));
+        self::assertCount(1, $warn(['componentid' => 1, 'difficulty' => -10.5]));
+
+        // Healthy difficulty: no warning.
+        self::assertCount(0, $warn(['componentid' => 1, 'difficulty' => 2.5]));
+
+        // Both a degenerate discrimination and a clamped difficulty -> two warnings.
+        self::assertCount(2, $warn(['componentid' => 1, 'discrimination' => 0.0, 'difficulty' => 10.0]));
+
+        // Missing or empty values are ignored.
+        self::assertCount(0, $warn(['componentid' => 1]));
+        self::assertCount(0, $warn(['componentid' => 1, 'discrimination' => '', 'difficulty' => '']));
+
+        // Polytomous difficulty is an array of thresholds; it must be skipped,
+        // not cast (casting used to raise an "Array to string conversion").
+        self::assertCount(0, $warn(['componentid' => 1, 'difficulty' => [1.0, 2.0, 3.0]]));
+        // A non-numeric discrimination is likewise ignored.
+        self::assertCount(0, $warn(['componentid' => 1, 'discrimination' => 'n/a']));
+        // A scalar discrimination on a polytomous item is still checked.
+        self::assertCount(1, $warn(['componentid' => 1, 'discrimination' => 0.0, 'difficulty' => [1.0, 2.0]]));
+
+        // The message carries the item identifier and the offending value.
+        $messages = $warn(['componentid' => 42, 'discrimination' => 0.0]);
+        self::assertStringContainsString('42', $messages[0]);
+        self::assertStringContainsString('0.00', $messages[0]);
     }
 }

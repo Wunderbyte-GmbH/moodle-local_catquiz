@@ -210,6 +210,16 @@ class fileparser {
                 foreach ($csvrecord as $columnname => $value) {
                     // Convert some columns always to float values.
                     if (in_array($columnname, ['difficulty', 'discrimination', 'guessing'])) {
+                        // Moodle's csv_import_reader stores the parsed rows through
+                        // csv_export_writer::print_array(), whose add_data() applies
+                        // \core\dataformat::escape_spreadsheet_formula(). That helper
+                        // prefixes every value starting with '=', '+', '-' or '@' with
+                        // an apostrophe to neutralise spreadsheet formulas. A negative
+                        // IRT difficulty therefore arrives here as "'-5.81", and
+                        // floatval("'-5.81") is 0.0 - which silently turned every
+                        // negative difficulty into 0 while positive ones survived.
+                        // Strip that guard character before converting to a number.
+                        $value = self::strip_formula_escape($value);
                         // Check if there's a comma and no dot, assuming comma is decimal separator.
                         if (strpos($value, ',') !== false && strpos($value, '.') === false) {
                             // Replace the comma with a dot.
@@ -392,10 +402,45 @@ class fileparser {
      * @param string $value
      * @return * either float or the given value (string)
      */
+    /**
+     * Removes the spreadsheet-formula guard apostrophe from a value.
+     *
+     * Moodle prefixes values starting with '=', '+', '-' or '@' with an apostrophe
+     * (see \core\dataformat::escape_spreadsheet_formula) so that spreadsheets do not
+     * interpret them as formulas. That guard must be removed again before a value is
+     * converted to a number - otherwise a negative difficulty like "-5.81" arrives as
+     * "'-5.81" and floatval() yields 0.0.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function strip_formula_escape(string $value): string {
+        $trimmed = ltrim($value);
+        if ($trimmed === '' || $trimmed[0] !== "'") {
+            return $value;
+        }
+        // Only strip the guard when what follows really is a formula character,
+        // so that genuine apostrophes in text are left untouched.
+        $rest = substr($trimmed, 1);
+        if ($rest === '' || !in_array($rest[0], ['=', '+', '-', '@'], true)) {
+            return $value;
+        }
+        return $rest;
+    }
+
+    /**
+     * Check if the given string is a valid float and if possible, cast to float.
+     *
+     * If separated via comma, replace by dot and - if possible -, cast to float.
+     *
+     * @param string $value
+     * @return * either float or the given value (string)
+     */
     protected function cast_string_to_float($value) {
 
         $floatstring = trim((string)$value);
         // Spreadsheet exports may wrap numbers or prefix them with apostrophes.
+        $floatstring = self::strip_formula_escape($floatstring);
         $floatstring = trim($floatstring, "\"'");
         $floatstring = preg_replace("/^'+/", '', $floatstring);
 

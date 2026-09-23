@@ -41,32 +41,48 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \catmodel_rasch\rasch
  */
 final class rasch_test extends TestCase {
+    use \local_catquiz\derivative_fd_trait;
+
     /**
-     * Tests that the model calculates the item parameters correctly.
+     * Verifies that calculate_params() recovers a known difficulty from a
+     * synthetic data set with many ability points.
      *
-     * @dataProvider calculate_params_returns_expected_values_provider
+     * A single observation does not identify an item parameter, so the previous
+     * exact-value assertion only recorded where Newton + trusted region happened
+     * to stop for an under-determined input and was sensitive to rounding. This
+     * test instead generates responses from a known generating difficulty across
+     * a wide ability range and asserts the parameter is recovered.
      *
-     * @param array $itemresponse
-     * @param array $expected
+     * @dataProvider calculate_params_recovery_provider
+     *
+     * @param float $truedifficulty the generating difficulty
      *
      * @return void
      */
-    public function test_calculate_params_returns_expected_values($itemresponse, array $expected): void {
-        $raschbirnbaum = $this->getmodel();
-        $result = $raschbirnbaum->calculate_params($itemresponse);
-        $this->assertEqualsWithDelta($expected['difficulty'], $result['difficulty'], 0.0001);
+    public function test_calculate_params_recovers_known_difficulty(float $truedifficulty): void {
+        $responses = [];
+        $i = 0;
+        for ($ability = -3.0; $ability <= 3.0; $ability += 0.25) {
+            $frac = rasch::logistic($ability - $truedifficulty);
+            $person = (new model_person_param((string) $i, 1))->set_ability($ability);
+            $responses[] = new model_item_response('Item1', $frac, $person);
+            $i++;
+        }
+        $result = $this->getmodel()->calculate_params($responses);
+        $this->assertEqualsWithDelta($truedifficulty, $result['difficulty'], 0.05);
     }
 
     /**
-     * Test that parameters are calculated correctly
+     * Generating difficulties for the recovery test.
+     *
      * @return array
      */
-    public static function calculate_params_returns_expected_values_provider(): array {
+    public static function calculate_params_recovery_provider(): array {
         return [
-                [
-                    'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param('1', 1))->set_ability(0.2))],
-                    'expected' => ['difficulty' => 5.0],
-                ],
+            'negative' => [-1.2],
+            'zero' => [0.0],
+            'positive' => [0.7],
+            'high' => [1.5],
         ];
     }
 
@@ -788,6 +804,331 @@ final class rasch_test extends TestCase {
                 'expected' => -0.1049936,
             ],
         ];
+    }
+
+    /**
+     * Verifies get_log_jacobian() against the numeric gradient of log_likelihood().
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response (0.0 or 1.0)
+     *
+     * @return void
+     */
+    public function test_get_log_jacobian_numeric(array $pp, array $ip, float $response): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $response, $keys) {
+            $ip = array_combine($keys, $v);
+            return rasch::log_likelihood($pp, $ip, $response);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = rasch::get_log_jacobian($pp, $ip, $response);
+        $this->assert_gradient_close($numeric, $analytic);
+    }
+
+    /**
+     * Verifies get_log_hessian() against the numeric Hessian of log_likelihood().
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response (0.0 or 1.0)
+     *
+     * @return void
+     */
+    public function test_get_log_hessian_numeric(array $pp, array $ip, float $response): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $response, $keys) {
+            $ip = array_combine($keys, $v);
+            return rasch::log_likelihood($pp, $ip, $response);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = rasch::get_log_hessian($pp, $ip, $response);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x response) grid.
+     *
+     * @return array
+     */
+    public static function derivative_cases_provider(): array {
+        $abilities = [-2.1, -0.35, 0.0, 0.8, 2.0];
+        $responses = [0.0, 1.0];
+        $items = self::derivative_item_sets();
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($responses as $response) {
+                    $name = sprintf('%s-a%d-y%d', $label, $ai, (int) $response);
+                    $cases[$name] = [
+                        'pp' => ['ability' => $ability],
+                        'ip' => $ip,
+                        'response' => $response,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+    /**
+     * Item parameter sets for the derivative grid.
+     *
+     * @return array
+     */
+    private static function derivative_item_sets(): array {
+        return [
+            'easy' => ['difficulty' => -1.3],
+            'mid' => ['difficulty' => 0.2],
+            'hard' => ['difficulty' => 1.7],
+        ];
+    }
+
+    /**
+     * Verifies least_mean_squares_1st_derivative_ip() against the numeric
+     * gradient of least_mean_squares() with respect to the item parameters.
+     *
+     * @dataProvider lms_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed fraction correct
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_1st_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $frac, $n) {
+            $ip = array_combine($keys, $v);
+            return rasch::least_mean_squares($pp, $ip, $frac, $n);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = rasch::least_mean_squares_1st_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_gradient_close($numeric, $analytic);
+    }
+
+    /**
+     * Verifies least_mean_squares_2nd_derivative_ip() against the numeric
+     * Hessian of least_mean_squares() with respect to the item parameters.
+     *
+     * @dataProvider lms_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $frac observed fraction correct
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lms_2nd_derivative_numeric(array $pp, array $ip, float $frac, float $n): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $frac, $n) {
+            $ip = array_combine($keys, $v);
+            return rasch::least_mean_squares($pp, $ip, $frac, $n);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = rasch::least_mean_squares_2nd_derivative_ip($pp, $ip, $frac, $n);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x fraction x n) grid for LMS.
+     *
+     * @return array
+     */
+    public static function lms_cases_provider(): array {
+        $abilities = [-1.5, 0.0, 1.2];
+        $fracs = [0.2, 0.5, 0.8];
+        $ns = [1.0, 4.0];
+        $items = self::derivative_item_sets();
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($fracs as $fi => $frac) {
+                    foreach ($ns as $ni => $n) {
+                        $name = sprintf('%s-a%d-f%d-n%d', $label, $ai, $fi, $ni);
+                        $cases[$name] = [
+                            'pp' => ['ability' => $ability],
+                            'ip' => $ip,
+                            'frac' => $frac,
+                            'n' => $n,
+                        ];
+                    }
+                }
+            }
+        }
+        return $cases;
+    }
+    /**
+     * Verifies lors_1st_derivative_ip() against the numeric gradient of
+     * lors_residuals() with respect to the item parameters.
+     *
+     * @dataProvider lors_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $or odds ratio
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_1st_derivative_numeric(array $pp, array $ip, float $or, float $n): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $or, $n) {
+            $ip = array_combine($keys, $v);
+            return rasch::lors_residuals($pp, $ip, $or, $n);
+        };
+        $numeric = $this->fd_gradient($f, $x);
+        $analytic = rasch::lors_1st_derivative_ip($pp, $ip, $or, $n);
+        $this->assert_gradient_close($numeric, $analytic);
+    }
+
+    /**
+     * Verifies lors_2nd_derivative_ip() against the numeric Hessian of
+     * lors_residuals() with respect to the item parameters.
+     *
+     * @dataProvider lors_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $or odds ratio
+     * @param float $n number of observations
+     *
+     * @return void
+     */
+    public function test_lors_2nd_derivative_numeric(array $pp, array $ip, float $or, float $n): void {
+        $keys = ['difficulty'];
+        $x = [];
+        foreach ($keys as $k) {
+            $x[$k] = $ip[$k];
+        }
+        $f = function (array $v) use ($pp, $keys, $or, $n) {
+            $ip = array_combine($keys, $v);
+            return rasch::lors_residuals($pp, $ip, $or, $n);
+        };
+        $numeric = $this->fd_hessian($f, $x);
+        $analytic = rasch::lors_2nd_derivative_ip($pp, $ip, $or, $n);
+        $this->assert_hessian_close($numeric, $analytic);
+    }
+
+    /**
+     * Dynamic but deterministic (item parameters x ability x odds ratio) grid for LORS.
+     *
+     * @return array
+     */
+    public static function lors_cases_provider(): array {
+        $abilities = [-1.5, 0.0, 1.2];
+        $ors = [0.4, 1.0, 2.5];
+        $items = self::derivative_item_sets();
+        $cases = [];
+        foreach ($items as $label => $ip) {
+            foreach ($abilities as $ai => $ability) {
+                foreach ($ors as $oi => $or) {
+                    $name = sprintf('%s-a%d-or%d', $label, $ai, $oi);
+                    $cases[$name] = [
+                        'pp' => ['ability' => $ability],
+                        'ip' => $ip,
+                        'or' => $or,
+                        'n' => 1.0,
+                    ];
+                }
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * Verifies log_likelihood_p() (person-ability score) against the numeric
+     * gradient of log_likelihood() with respect to theta.
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response
+     *
+     * @return void
+     */
+    public function test_log_likelihood_p_numeric(array $pp, array $ip, float $response): void {
+        $f = function (array $v) use ($ip, $response) {
+            return rasch::log_likelihood(['ability' => $v[0]], $ip, $response);
+        };
+        $numeric = $this->fd_gradient($f, [$pp['ability']]);
+        $analytic = rasch::log_likelihood_p($pp, $ip, $response);
+        $this->assert_close(array_values($numeric)[0], $analytic, $this->fd_atol(), $this->fd_atol());
+    }
+
+    /**
+     * Verifies log_likelihood_p_p() (person-ability curvature) against the
+     * numeric second derivative of log_likelihood() with respect to theta.
+     *
+     * @dataProvider derivative_cases_provider
+     *
+     * @param array $pp person ability parameter
+     * @param array $ip item parameters
+     * @param float $response observed response
+     *
+     * @return void
+     */
+    public function test_log_likelihood_p_p_numeric(array $pp, array $ip, float $response): void {
+        $f = function (array $v) use ($ip, $response) {
+            return rasch::log_likelihood(['ability' => $v[0]], $ip, $response);
+        };
+        $numeric = $this->fd_hessian($f, [$pp['ability']]);
+        $analytic = rasch::log_likelihood_p_p($pp, $ip, $response);
+        $this->assert_close(array_values($numeric)[0][0], $analytic, $this->fd_atol(), 10 * $this->fd_atol());
+    }
+
+    /**
+     * The combined get_ability_derivatives() must return exactly the same values
+     * as the separate log_likelihood_p()/log_likelihood_p_p() methods (this guards
+     * the memoised PP-Stufe-2 wiring in catcalc::estimate_person_ability()).
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     */
+    public function test_get_ability_derivatives_matches_separate(): void {
+        $ip = ['difficulty' => 0.3];
+        foreach ([0.0, 1.0] as $frac) {
+            foreach ([-2.5, -0.7, 0.0, 0.8, 2.5, 40.0, -40.0] as $theta) {
+                $pp = ['ability' => $theta];
+                $combined = rasch::get_ability_derivatives($pp, $ip, (float) $frac);
+                $this->assertEqualsWithDelta(
+                    rasch::log_likelihood_p($pp, $ip, (float) $frac),
+                    $combined['jacobian'],
+                    1e-9
+                );
+                $this->assertEqualsWithDelta(
+                    rasch::log_likelihood_p_p($pp, $ip, (float) $frac),
+                    $combined['hessian'],
+                    1e-9
+                );
+            }
+        }
     }
 
     /**

@@ -51,6 +51,16 @@ if ($hassiteconfig) {
         )
     );
 
+    $calclink = new moodle_url('/local/catquiz/manage_calculation.php');
+    $calcactionlink = new action_link($calclink, get_string('calculationmanagement', 'local_catquiz'));
+    $settings->add(
+        new admin_setting_heading(
+            'local_catquiz/calculationmanagement',
+            get_string('calculationmanagement', 'local_catquiz'),
+            $OUTPUT->render($calcactionlink),
+        )
+    );
+
     $settings->add(
         new admin_setting_heading(
             'local_catquiz/cattags',
@@ -116,6 +126,29 @@ if ($hassiteconfig) {
         '/^[1-9]\d*$/'
     ));
 
+    // Issue #14: optional measurement-uncertainty gating for categorical feedback.
+    // 0 disables it; a value like 1 requires the confidence interval
+    // [ability - k*SE, ability + k*SE] to lie fully within a single range before
+    // that range's feedback is shown.
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/feedback_uncertainty_factor',
+        get_string('feedback_uncertainty_factor_name', 'local_catquiz'),
+        get_string('feedback_uncertainty_factor_desc', 'local_catquiz'),
+        0,
+        '/^\d+(\.\d+)?$/'
+    ));
+
+    // Issue #15: minimum number of distinct peers required before the
+    // peer comparison is shown (small groups are suppressed identically in
+    // charts and exports).
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/minpeersforcomparison',
+        get_string('minpeersforcomparison_name', 'local_catquiz'),
+        get_string('minpeersforcomparison_desc', 'local_catquiz'),
+        3,
+        '/^[1-9]\d*$/'
+    ));
+
     $settings->add(
         new admin_setting_configcheckbox(
             'local_catquiz/store_debug_info',
@@ -125,6 +158,32 @@ if ($hassiteconfig) {
         )
     );
 
+    // Issue #56: how long the progress of an attempt is kept. The default is the
+    // data-sparing option on purpose - a plugin should not accumulate personal
+    // answer data because nobody decided otherwise.
+    $settings->add(new admin_setting_configselect(
+        'local_catquiz/progressretention',
+        get_string('progressretention', 'local_catquiz'),
+        get_string('progressretention_desc', 'local_catquiz'),
+        \local_catquiz\local\progress_retention::MINIMAL,
+        [
+            \local_catquiz\local\progress_retention::MINIMAL =>
+                get_string('progressretention_minimal', 'local_catquiz'),
+            \local_catquiz\local\progress_retention::KEEP =>
+                get_string('progressretention_keep', 'local_catquiz'),
+            \local_catquiz\local\progress_retention::TRACE =>
+                get_string('progressretention_trace', 'local_catquiz'),
+        ]
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/progressretentiondays',
+        get_string('progressretentiondays', 'local_catquiz'),
+        get_string('progressretentiondays_desc', 'local_catquiz'),
+        0,
+        PARAM_INT
+    ));
+
     // Add a setting for the default maximum attempt duration.
     $settings->add(new admin_setting_configtext(
         'local_catquiz/maximum_attempt_duration_hours',
@@ -133,5 +192,4 @@ if ($hassiteconfig) {
         24, // Default value.
         PARAM_INT // Expect integer type.
     ));
-
 }

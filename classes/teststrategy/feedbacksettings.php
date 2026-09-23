@@ -39,6 +39,20 @@ class feedbacksettings {
      */
     const FIELD_HIDDEN = 'hidden';
 
+    /**
+     * Marks a scale that is not to be REPORTED - a display decision, not a
+     * measurement problem.
+     *
+     * The generic 'excluded' flag used to carry both meanings, so every consumer
+     * had to inspect the accompanying error array to tell "the measurement is
+     * unusable" from "the author switched reporting off". Keeping the two apart
+     * lets a scale be statistically valid (and therefore persisted and available
+     * for carry-over) while simply not being shown (issue #7).
+     *
+     * @var string
+     */
+    const FIELD_NOTREPORTED = 'notreported';
+
     /** The id of the teststrategy.
      * @var int
      */
@@ -58,6 +72,20 @@ class feedbacksettings {
      * @var int
      */
     public int $sortorder;
+
+    /**
+     * The scale whose feedback is forced, or 0 for none (issue #10).
+     *
+     * @var int
+     */
+    public int $forcedscaleid = 0;
+
+    /**
+     * Whether feedback is restricted to the forced scale only (issue #10).
+     *
+     * @var bool
+     */
+    public bool $feedbackonlyfordefinedscaleid = false;
 
     /**
      * @var ?array
@@ -360,7 +388,10 @@ class feedbacksettings {
         foreach ($personabilities as $catscale => $array) {
             $propertyname = sprintf('catquiz_scalereportcheckbox_%s', $catscale);
             if (empty($quizsettings->$propertyname)) {
-                $personabilities[$catscale]['excluded'] = true;
+                /* Reporting switched off is a DISPLAY decision. It must not be
+                   reported as 'excluded', which every consumer reads as "the
+                   measurement is unusable". */
+                $personabilities[$catscale][self::FIELD_NOTREPORTED] = true;
                 $personabilities[$catscale]['error']['checkbox'] = [
                     'scalereportcheckboxinquizsettings' => false,
                 ];

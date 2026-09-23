@@ -140,6 +140,23 @@ final class attemptfeedback_test extends advanced_testcase {
                 ],
                 'quizsettings' => $quizsettings,
             ],
+            // Issue #10: a scale flagged toreport but excluded is not a valid
+            // result and must not trigger an automatic enrolment, even though its
+            // ability falls inside a feedback range with configured courses.
+            'Excluded scale must not enrol' => [
+                'expected' => [],
+                [
+                    'personabilities_abilities' => [
+                        1 => [
+                            'value' => 1.2,
+                            'name' => 'Simulation',
+                            'toreport' => true,
+                            'excluded' => true,
+                        ],
+                    ],
+                ],
+                'quizsettings' => $quizsettings,
+            ],
         ];
     }
 

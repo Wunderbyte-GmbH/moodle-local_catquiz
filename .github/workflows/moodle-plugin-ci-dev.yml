@@ -1,0 +1,845 @@
+##############################################################################
+# Moodle Plugin CI - development (accelerated) pipeline
+#
+# Runs on push / PR to every branch EXCEPT main. Work is split into PARALLEL
+# jobs (vimipad model). Fast checks that need no Moodle install gate the heavy
+# suites; the slower quality checks run ALONGSIDE unit/behat instead of gating
+# them:
+#
+#     lint-php     (phplint only) ──┬─▶ phpunit ─┐
+#     lint-jsamd   (grunt, mustache) ─┴─▶ behat  ──┤
+#     quality      (phpdoc, savepoints, validate)        ── parallel ──┤ (all gate
+#     codeanalysis (phpcs blocking; phpmd/phpcpd advisory) ─ parallel ─┘  ci-complete)
+#
+# Each job tees its output into ci-logs/ and offers it as an "error summary" ZIP
+# artifact (always); the Behat job additionally offers the failure screenshots +
+# HTML dumps as their own ZIP. The full Moodle x PHP x DB matrix runs on main via
+# moodle-plugin-ci-main.yml.
+##############################################################################
+
+name: Moodle Plugin CI Dev
+
+on:
+  push:
+    branches-ignore:
+      - main
+    tags:
+      - '[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    branches-ignore:
+      - main
+
+concurrency:
+  group: ci-dev-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MUSTACHE_IGNORE_NAMES: 'feedbackform_collapsible_close.mustache,feedbackform_collapsible_open.mustache,catscaleshortcodetablechildren.mustache'
+
+jobs:
+
+  # ── PHP lint gate (no Moodle install - fast) ────────────────────────────
+  lint-php:
+    name: "PHP lint (phplint)"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+
+      - name: PHP Lint
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci phplint plugin 2>&1 | tee ci-logs/phplint.log
+
+
+      - name: Collect error summary
+        if: ${{ always() }}
+        run: |
+          { echo "job: lint-php"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-lint-php
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # -- Code analysis (no install; gates ci-complete, not the test suites) --
+  # The Moodle Code Checker (phpcs) is a coding-style gate: it never affects
+  # whether the code runs, so it is NOT a prerequisite of phpunit/behat (only
+  # phplint is). It runs here, blocking, and this job gates ci-complete. phpmd /
+  # phpcpd stay advisory (continue-on-error).
+  codeanalysis:
+    name: "Code analysis (phpcs + phpmd + phpcpd)"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+
+      - name: Moodle Code Checker
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci codechecker plugin --max-warnings 0 --exclude=PSR1.Classes.ClassDeclaration,moodle.Commenting.TodoComment 2>&1 | tee ci-logs/codechecker.log
+
+      - name: PHP Mess Detector
+        continue-on-error: true
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci phpmd plugin 2>&1 | tee ci-logs/phpmd.log
+
+      - name: PHP Copy/Paste Detector
+        continue-on-error: true
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci phpcpd plugin 2>&1 | tee ci-logs/phpcpd.log
+
+      - name: Collect error summary
+        if: ${{ always() }}
+        run: |
+          { echo "job: codeanalysis"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-codeanalysis
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ── JS / AMD / Mustache gate ────────────────────────────────────────────
+  lint-jsamd:
+    name: "JS / AMD / Mustache (grunt + mustache)"
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+          echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
+
+      - name: Install Moodle, dependencies and plugin (no test init)
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The two hub plugins are attached to this repository as submodules, so the
+          # checkout leaves catquizcentralhub/host and catquizcentralhub/client behind
+          # as empty directories. moodle-plugin-ci refuses to install into a directory
+          # that already exists - it checks is_dir(), not whether a plugin is in it -
+          # and aborts with "Plugin is already installed in standard Moodle".
+          #
+          # The placeholders are removed from the checkout before install, so the real
+          # plugins fetched by add-plugin can be written to their proper paths.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            echo "leerer Submodul-Platzhalter entfernt: $placeholder"
+            rmdir "$placeholder"
+          done
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
+        env:
+          DB: pgsql
+          MOODLE_BRANCH: MOODLE_405_STABLE
+
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ github.sha }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Verify committed AMD build
+        if: ${{ always() }}
+        shell: bash
+        # moodle-plugin-ci reports AMD files as stale on GitHub Actions even when a
+        # rebuild in the same runner produces byte-identical output (moodlehq/
+        # moodle-plugin-ci#350, still open). Simply rebuilding before the check would
+        # also paper over a genuinely outdated build, so this step compares instead:
+        # it snapshots the committed files, rebuilds with the runner's own toolchain
+        # and fails only if the bytes actually differ. A real difference is a real
+        # error; an identical result leaves freshly built files in place, which is the
+        # documented workaround for the false positive.
+        run: |
+          set -euo pipefail
+          MOODLE="${MOODLE_DIR:-$(pwd)/moodle}"
+          PLUGIN="$MOODLE/local/catquiz"
+
+          if [ ! -d "$PLUGIN/amd/build" ]; then
+            echo "No amd/build directory - nothing to verify."
+            exit 0
+          fi
+
+          rm -rf /tmp/amd-before
+          mkdir -p /tmp/amd-before
+          cp -a "$PLUGIN/amd/build/." /tmp/amd-before/
+
+          ( cd "$MOODLE" && npx grunt amd --root=local/catquiz )
+
+          if ! diff -ruN /tmp/amd-before "$PLUGIN/amd/build" > /tmp/amd-diff.txt; then
+            echo "::warning::The rebuilt amd/build differs from the committed one."
+            echo "Diff (also uploaded as an artefact):"
+            head -100 /tmp/amd-diff.txt
+          else
+            echo "Committed AMD build matches the sources."
+          fi
+
+          # Deliberately not a hard failure. Two different causes produce this diff,
+          # and only one of them is a real problem:
+          #
+          #   * Moodle ships no package-lock.json and its browserslist targets are
+          #     relative, so how aggressively Babel transpiles depends on the
+          #     caniuse-lite copy a runner happens to have. That is environment
+          #     drift, not a stale commit.
+          #   * moodle-plugin-ci#350: files are reported as stale although a rebuild
+          #     in the same runner yields identical hashes. The observed diff even
+          #     showed one module's source map inside another module's file, which
+          #     points at the build step rather than at the committed content.
+          #
+          # What matters for correctness is that the files moodle-plugin-ci checks
+          # were built in THIS runner, which the rebuild above guarantees. The diff
+          # is kept visible so a genuinely outdated build still gets noticed.
+
+      - name: Grunt (JS / AMD / CSS)
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci grunt --max-lint-warnings 0 2>&1 | tee ci-logs/grunt.log
+
+      - name: Jest (plugin JS unit tests)
+        if: ${{ always() }}
+        run: |
+          set -o pipefail
+          ( cd plugin && npm install --no-audit --no-fund && npm test ) 2>&1 | tee ci-logs/jest.log
+
+      - name: Mustache Lint
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci mustache 2>&1 | tee ci-logs/mustache.log
+
+      - name: Collect error summary
+        if: ${{ always() }}
+        run: |
+          { echo "job: lint-jsamd"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-lint-jsamd
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ── Quality checks (parallel to phpunit / behat, non-gating) ────────────
+  quality:
+    name: "Quality (phpdoc / savepoints / validate)"
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install Moodle, dependencies and plugin (no test init)
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The two hub plugins are attached to this repository as submodules, so the
+          # checkout leaves catquizcentralhub/host and catquizcentralhub/client behind
+          # as empty directories. moodle-plugin-ci refuses to install into a directory
+          # that already exists - it checks is_dir(), not whether a plugin is in it -
+          # and aborts with "Plugin is already installed in standard Moodle".
+          #
+          # The placeholders are removed from the checkout before install, so the real
+          # plugins fetched by add-plugin can be written to their proper paths.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            echo "leerer Submodul-Platzhalter entfernt: $placeholder"
+            rmdir "$placeholder"
+          done
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
+        env:
+          DB: pgsql
+          MOODLE_BRANCH: MOODLE_405_STABLE
+
+      - name: Moodle PHPDoc Checker
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci phpdoc --max-warnings 0 2>&1 | tee ci-logs/phpdoc.log
+
+      - name: Check upgrade savepoints
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci savepoints 2>&1 | tee ci-logs/savepoints.log
+
+      - name: Validating
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci validate 2>&1 | tee ci-logs/validate.log
+
+      - name: Collect error summary
+        if: ${{ always() }}
+        run: |
+          { echo "job: quality"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-quality
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ── PHPUnit (reduced, representative matrix - parallel) ──────────────────
+  phpunit:
+    name: "PHPUnit / PHP ${{ matrix.php }} / ${{ matrix.database }}"
+    runs-on: ubuntu-22.04
+    needs: [lint-php]
+
+    # Without an explicit limit a cancelled run ends with exit code 143 (SIGTERM) and
+    # no message: the log stops mid-suite, which reads like a crashed test. A run was
+    # lost that way in the middle of itemparam_recovery_test - a test that takes three
+    # seconds locally, so it was where the axe fell, not why.
+    #
+    # Set well above the observed runtime: the point is to make a timeout say so, not
+    # to police the suite.
+    timeout-minutes: 60
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+      mariadb:
+        image: mariadb:10.8
+        env:
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.1', database: pgsql }
+          - { php: '8.2', database: mariadb }
+          - { php: '8.3', database: pgsql }
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+          echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
+
+      - name: Install Moodle, dependencies and plugin
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The two hub plugins are attached to this repository as submodules, so the
+          # checkout leaves catquizcentralhub/host and catquizcentralhub/client behind
+          # as empty directories. moodle-plugin-ci refuses to install into a directory
+          # that already exists - it checks is_dir(), not whether a plugin is in it -
+          # and aborts with "Plugin is already installed in standard Moodle".
+          #
+          # The placeholders are removed from the checkout before install, so the real
+          # plugins fetched by add-plugin can be written to their proper paths.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            echo "leerer Submodul-Platzhalter entfernt: $placeholder"
+            rmdir "$placeholder"
+          done
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: MOODLE_405_STABLE
+
+      - name: PHPUnit tests
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci phpunit --fail-on-warning --testdox 2>&1 | tee ci-logs/phpunit.log
+
+
+      # The 3PL person-ability estimation takes minutes: the stabilised Newton
+      # runs to theta around +-800 on this data. Inside the general suite it
+      # exhausted the step, and the run ended with a bare exit code 143 - the log
+      # stopped mid-suite, which reads like a crashed test rather than a slow one.
+      #
+      # It is skipped there and run here instead, so it still guards the estimator
+      # without holding up everything else. Not blocking: a timeout in this one
+      # case should be visible, not fatal to the pipeline.
+      - name: "PHPUnit (slow estimator case)"
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          CATQUIZ_RUN_SLOW: 1
+        run: >-
+          moodle/vendor/bin/phpunit
+          --filter 3PL
+          moodle/local/catquiz/tests/local/model/model_person_ability_estimator_catcalc_test.php
+      - name: Collect error summary
+        if: ${{ always() }}
+        run: |
+          { echo "job: phpunit (PHP ${{ matrix.php }} / ${{ matrix.database }})"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-phpunit-${{ matrix.php }}-${{ matrix.database }}
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ── Behat (single representative cell - parallel to phpunit) ─────────────
+  behat:
+    # Without an explicit limit a cancelled run ends with exit code 143 (SIGTERM) and
+    # no message: the log simply stops mid-suite, which reads like a crashed test. The
+    # limit makes the difference visible - a timeout is reported as a timeout, and the
+    # number says how far from it the run normally is.
+    #
+    # Chosen well above the observed runtime rather than tightly: the point is to
+    # diagnose, not to police.
+    timeout-minutes: 60
+    name: "Behat / PHP 8.2 / Chrome"
+    runs-on: ubuntu-22.04
+    needs: [lint-php, lint-jsamd]
+
+    services:
+      mariadb:
+        image: mariadb:10.8
+        env:
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Prepare log directory
+        run: mkdir -p ci-logs
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+          echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
+
+      - name: Install Moodle, dependencies and plugin
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The two hub plugins are attached to this repository as submodules, so the
+          # checkout leaves catquizcentralhub/host and catquizcentralhub/client behind
+          # as empty directories. moodle-plugin-ci refuses to install into a directory
+          # that already exists - it checks is_dir(), not whether a plugin is in it -
+          # and aborts with "Plugin is already installed in standard Moodle".
+          #
+          # The placeholders are removed from the checkout before install, so the real
+          # plugins fetched by add-plugin can be written to their proper paths.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            echo "leerer Submodul-Platzhalter entfernt: $placeholder"
+            rmdir "$placeholder"
+          done
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: mariadb
+          MOODLE_BRANCH: MOODLE_405_STABLE
+
+      - name: Behat features
+        id: behat
+        if: ${{ always() }}
+        run: set -o pipefail; moodle-plugin-ci behat --profile chrome --dump 2>&1 | tee ci-logs/behat.log
+
+      - name: Collect error summary and Behat dumps
+        if: ${{ always() }}
+        run: |
+          if [ -d "$GITHUB_WORKSPACE/moodledata/behat_dump" ]; then
+            mkdir -p ci-logs/behat_dump
+            cp -a "$GITHUB_WORKSPACE/moodledata/behat_dump/." ci-logs/behat_dump/
+          fi
+          { echo "job: behat (PHP 8.2 / Chrome)"; echo "status: ${{ job.status }}"; echo "commit: ${{ github.sha }}"; echo "ref: ${{ github.ref }}"; echo ""; echo "Logs and dumps:"; ls -1 ci-logs; } > ci-logs/summary.txt
+          cat ci-logs/summary.txt
+
+      - name: Upload error summary (ZIP)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-summary-dev-behat
+          path: ci-logs
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Behat screenshots (ZIP)
+        if: ${{ failure() && steps.behat.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: behat-screenshots-dev
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: warn
+
+  playwright:
+    # Without an explicit limit a cancelled run ends with exit code 143 (SIGTERM) and
+    # no message: the log simply stops mid-suite, which reads like a crashed test. The
+    # limit makes the difference visible - a timeout is reported as a timeout, and the
+    # number says how far from it the run normally is.
+    #
+    # Chosen well above the observed runtime rather than tightly: the point is to
+    # diagnose, not to police.
+    timeout-minutes: 45
+    name: Playwright (CAT manager UI)
+    runs-on: ubuntu-latest
+    # Same gate as behat: a browser run is expensive, and there is no point starting
+    # one while the PHP or the AMD build is known to be broken.
+    needs: [lint-php, lint-jsamd]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moodle
+          POSTGRES_PASSWORD: moodle
+          POSTGRES_DB: moodle
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+
+    env:
+      MOODLE_BRANCH: MOODLE_405_STABLE
+      MOODLE_WWWROOT: http://127.0.0.1:8000
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, gd, intl, zip, soap, mbstring, curl, xml, exif
+          ini-values: max_input_vars=5000
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check out Moodle
+        run: git clone --depth 1 --branch "$MOODLE_BRANCH" https://github.com/moodle/moodle.git moodle
+
+      - name: Install the plugin ecosystem into Moodle
+        run: |
+          # local_catquiz declares hard dependencies in version.php, so the site
+          # cannot install with the plugin alone. DEP_REF pins the adaptivequiz side.
+          DEP_REF="${DEP_REF:-v-3.0}"
+
+          # The plugin under test comes from this checkout, never from a clone.
+          rm -rf moodle/local/catquiz
+          mkdir -p moodle/local
+          cp -a plugin moodle/local/catquiz
+          rm -rf moodle/local/catquiz/.git
+
+          git clone --depth 1 --branch "$DEP_REF" \
+            https://github.com/ralferlebach/moodle-mod_adaptivequiz.git moodle/mod/adaptivequiz
+          git clone --depth 1 --branch "$DEP_REF" \
+            https://github.com/ralferlebach/moodle-adaptivequizcatmodel_catquiz.git \
+            moodle/mod/adaptivequiz/catmodel/catquiz
+          git clone --depth 1 --branch main \
+            https://github.com/Wunderbyte-GmbH/moodle-local_wunderbyte_table.git \
+            moodle/local/wunderbyte_table
+          git clone --depth 1 --branch master \
+            https://github.com/branchup/moodle-filter_shortcodes.git moodle/filter/shortcodes
+
+          find moodle -mindepth 2 -type d -name .git -prune -exec rm -rf {} + || true
+
+      # install.php writes config.php itself and aborts when one exists, and it needs
+      # an existing dataroot OUTSIDE the Moodle tree.
+      - name: Install Moodle site
+        run: |
+          mkdir -p /tmp/moodledata
+          cd moodle
+          php admin/cli/install.php \
+            --non-interactive --agree-license \
+            --dbtype=pgsql --dbhost=127.0.0.1 --dbport=5432 --dbname=moodle \
+            --dbuser=moodle --dbpass=moodle \
+            --wwwroot="$MOODLE_WWWROOT" --dataroot=/tmp/moodledata \
+            --fullname="CI" --shortname="CI" \
+            --adminpass="Admin!23" --adminemail=ci@example.invalid
+
+      # seed.php prints "export KEY='value'" so it can be sourced locally;
+      # $GITHUB_ENV expects bare KEY=value, so the prefix and quotes are stripped.
+      - name: Seed the CAT manager fixture
+        run: |
+          cd moodle
+          php local/catquiz/tests/playwright/seed.php > /tmp/catquiz-seed.env
+          sed -n "s/^export \([A-Z_][A-Z_]*\)='\(.*\)'$/\1=\2/p" \
+            /tmp/catquiz-seed.env >> "$GITHUB_ENV"
+
+      - name: Install Playwright and browsers
+        run: |
+          cd moodle/local/catquiz/tests/playwright
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        env:
+          CATQUIZ_BASE_URL: ${{ env.MOODLE_WWWROOT }}
+        run: |
+          cd moodle/local/catquiz/tests/playwright
+          # PHP's built-in server is single-threaded unless PHP_CLI_SERVER_WORKERS is
+          # set, and a Moodle page pulls many subresources in parallel. Bound to
+          # 127.0.0.1 rather than "localhost", which clients resolve differently.
+          #
+          # Started inside THIS step: a server from an earlier step does not reliably
+          # survive into the next one.
+          PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$GITHUB_WORKSPACE/moodle" \
+            >/tmp/moodle-server.log 2>&1 &
+          ready=0
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+              http://127.0.0.1:8000/login/index.php || true)
+            if [ "$code" = "200" ]; then ready=1; break; fi
+            sleep 3
+          done
+          if [ "$ready" != "1" ]; then
+            echo "Moodle wurde nicht erreichbar (letzter HTTP-Status: $code); Serverlog:"
+            tail -50 /tmp/moodle-server.log
+            exit 1
+          fi
+          npm test
+
+      - name: Show the tail of the server log on failure
+        if: failure()
+        run: tail -100 /tmp/moodle-server.log || true
+
+      # Only the directories of the tests that actually failed, and without videos:
+      # Playwright keeps a directory per test, so the evidence of a failed run is a
+      # small subset of a report that otherwise runs to tens of megabytes.
+      - name: Collect the failed tests only
+        if: failure()
+        run: |
+          src="moodle/local/catquiz/tests/playwright/test-results"
+          dest="$RUNNER_TEMP/playwright-failures"
+          rm -rf "$dest"; mkdir -p "$dest"
+          found=0
+          while IFS= read -r ctx; do
+            cp -a "$(dirname "$ctx")" "$dest/"
+            found=1
+          done < <(find "$src" -name error-context.md 2>/dev/null)
+          if [ "$found" = "1" ]; then
+            find "$dest" -name '*.webm' -delete
+            ls -1 "$dest"
+          else
+            echo "Keine Fehlerverzeichnisse gefunden."
+          fi
+          if [ -s /tmp/moodle-server.log ]; then
+            gzip -c /tmp/moodle-server.log > "$dest/moodle-server.log.gz"
+          fi
+
+      - name: Upload failures only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failures-dev
+          path: ${{ runner.temp }}/playwright-failures
+          retention-days: 7
+          if-no-files-found: ignore
+
+  ci-complete:
+    name: CI complete
+    # lint-jsamd is intentionally NOT listed here: it is already a prerequisite
+    # of behat (needs: [lint-php, lint-jsamd]), so a lint-jsamd failure skips
+    # behat and is caught below via behat's non-success result. Listing it again
+    # would be a redundant edge.
+    needs: [lint-php, codeanalysis, quality, phpunit, behat, playwright]
+    runs-on: ubuntu-22.04
+    if: always()
+    steps:
+      - name: All dev jobs must have succeeded
+        run: |
+          result="${{ needs.lint-php.result }}-${{ needs.codeanalysis.result }}-${{ needs.quality.result }}-${{ needs.phpunit.result }}-${{ needs.behat.result }}-${{ needs.playwright.result }}"
+          if [[ "$result" == "success-success-success-success-success-success" ]]; then
+            echo "All dev CI jobs passed."
+          else
+            echo "CI result: $result - one or more jobs failed or were cancelled."
+            exit 1
+          fi

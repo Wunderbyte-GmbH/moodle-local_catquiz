@@ -260,6 +260,25 @@ class matrix extends ArrayObject {
     }
 
     /**
+     * Returns an identity matrix with the same dimensions as this matrix.
+     *
+     * @return matrix Identity matrix.
+     * @throws MatrixException If this matrix is not square.
+     */
+    public function identity(): matrix {
+        if (!$this->isSquare()) {
+            throw new MatrixException('Cannot create identity matrix from a non-square matrix.');
+        }
+
+        $identity = new self($this->rows, $this->cols);
+        for ($index = 0; $index < $this->rows; $index++) {
+            $identity[$index][$index] = 1.0;
+        }
+
+        return $identity;
+    }
+
+    /**
      * Computes the matrix's determinant.
      *
      * @return float The matrix's determinant
@@ -458,5 +477,90 @@ class matrix extends ArrayObject {
      */
     public function issquare() {
         return $this->rows == $this->cols;
+    }
+
+    /**
+     * Returns an identity matrix of the given size as a nested array.
+     *
+     * Plain-array companion to {@see self::identity()} for numerical routines
+     * that operate on dense arrays rather than matrix instances.
+     *
+     * @param int $size Matrix dimension.
+     * @return array
+     */
+    public static function identity_array(int $size): array {
+        $matrix = array_fill(0, $size, array_fill(0, $size, 0.0));
+        for ($index = 0; $index < $size; $index++) {
+            $matrix[$index][$index] = 1.0;
+        }
+        return $matrix;
+    }
+
+    /**
+     * Multiplies a matrix (nested array) with a vector (flat array).
+     *
+     * @param array $matrix Matrix as a nested array.
+     * @param array $vector Vector as a flat array.
+     * @return array Resulting vector as a flat array.
+     */
+    public static function matrix_vector_product(array $matrix, array $vector): array {
+        $result = [];
+        for ($i = 0; $i < count($matrix); $i++) {
+            $result[$i] = 0;
+            for ($j = 0; $j < count($matrix[$i]); $j++) {
+                $result[$i] += $matrix[$i][$j] * $vector[$j];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Calculates the scalar product of two vectors.
+     *
+     * @param array $left First vector.
+     * @param array $right Second vector.
+     * @return float
+     */
+    public static function dot_product(array $left, array $right): float {
+        if (count($left) !== count($right)) {
+            throw new \InvalidArgumentException('Vector dimensions do not match.');
+        }
+        $result = 0.0;
+        foreach ($left as $index => $value) {
+            $result += $value * $right[$index];
+        }
+        return $result;
+    }
+
+    /**
+     * Subtracts the second vector from the first vector.
+     *
+     * @param array $left First vector.
+     * @param array $right Second vector.
+     * @return array
+     */
+    public static function vector_subtract(array $left, array $right): array {
+        if (count($left) !== count($right)) {
+            throw new \InvalidArgumentException('Vector dimensions do not match.');
+        }
+        $result = [];
+        foreach ($left as $index => $value) {
+            $result[$index] = $value - $right[$index];
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the largest absolute value in a vector.
+     *
+     * @param array $vector Vector to inspect.
+     * @return float
+     */
+    public static function max_absolute_value(array $vector): float {
+        $result = 0.0;
+        foreach ($vector as $value) {
+            $result = max($result, abs((float) $value));
+        }
+        return $result;
     }
 }

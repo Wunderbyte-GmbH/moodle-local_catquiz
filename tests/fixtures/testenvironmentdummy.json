@@ -19,7 +19,7 @@
     },
     "catquiz_standarderrorgroup": {
         "catquiz_standarderror_min": 0.35,
-        "catquiz_standarderror_max": 1.00
+        "catquiz_standarderror_max": 1.0
     },
     "catquiz_includetimelimit": "1",
     "catquiz_timelimitgroup": {
@@ -28,7 +28,7 @@
         "catquiz_maxtimeperitem": "300",
         "catquiz_timeselect_item": "sec"
     },
-    "catquiz_selectfirstquestion": "startwithcurrentability",
+    "catquiz_selectfirstquestion": "0",
     "catquiz_selectteststrategy": "5",
     "choosetemplate": "0",
     "cmidnumber": "",
@@ -73,5 +73,11 @@
     "timemodified": 1698918860,
     "update": 2,
     "visible": 1,
-    "visibleoncoursepage": 1
+    "visibleoncoursepage": 1,
+    "catquiz_showquestion": "1",
+    "catquiz_questionfeedbacksettings": {
+        "catquiz_showquestionresponse": "1",
+        "catquiz_showquestioncorrectresponse": "0",
+        "catquiz_showquestionfeedback": "0"
+    }
 }

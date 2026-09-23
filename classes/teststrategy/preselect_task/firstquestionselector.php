@@ -298,10 +298,17 @@ class firstquestionselector extends preselect_task {
             self::LEVEL_DIFFICULT,
             self::LEVEL_VERYDIFFICULT,
         ];
-        if (!in_array($option, $knownlevels)) {
-            throw new \Exception(sprintf("Unknown option to select first question: %s", $option));
+        // The stored value is an integer level (-2..2). A non-numeric legacy value
+        // (e.g. 'startwitheasiestquestion' from an older settings snapshot) used to
+        // coerce to 0 under PHP 7's loose comparison, but on PHP 8 the loose in_array
+        // no longer matches and this threw, aborting the whole attempt with
+        // 'attemptnofirstquestion'. Fall back to the normal level so a first question
+        // can still be selected instead of breaking the attempt.
+        $level = is_numeric($option) ? (int) $option : self::LEVEL_NORMAL;
+        if (!in_array($level, $knownlevels, true)) {
+            $level = self::LEVEL_NORMAL;
         }
-        return $mean + intval($option) * $se;
+        return $mean + $level * $se;
     }
 
     /**

@@ -1,0 +1,287 @@
+name: Playwright (CAT manager UI)
+
+# Browser tests for the CAT manager UI. These need a live Moodle site, so they run
+# separately from the moodle-plugin-ci static pipeline. Manual and scheduled by
+# default to keep PR runs fast.
+#
+# Why Playwright next to Behat: the UI areas of the performance work (pagination,
+# sorting, the "add question" dialog, the item parameter validity column) repeatedly
+# turned out to be hard to assert in Behat without depending on rendering details
+# rather than on the change under test. Playwright gives explicit waiting and
+# selectors that survive a table repaint.
+#
+# NOTE: workflow_dispatch only appears in the Actions UI once this file exists on
+# the repository's DEFAULT branch.
+on:
+  # Manual on any branch, so a development branch can be tried before it is merged:
+  # pick the branch in the "Run workflow" dialog. Scheduled runs stay on the default
+  # branch. Pushes to the development branch run it automatically, because that is
+  # where the UI work happens and a browser regression should surface there rather
+  # than after a merge.
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - develop
+      - development
+  schedule:
+    - cron: '0 4 * * 1'
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moodle
+          POSTGRES_PASSWORD: moodle
+          POSTGRES_DB: moodle
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+
+    env:
+      MOODLE_BRANCH: MOODLE_405_STABLE
+      DB: pgsql
+      MOODLE_WWWROOT: http://127.0.0.1:8000
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, gd, intl, zip, soap, mbstring, curl, xml, exif
+          ini-values: max_input_vars=5000
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check out Moodle
+        run: git clone --depth 1 --branch "$MOODLE_BRANCH" https://github.com/moodle/moodle.git moodle
+
+      - name: Install the plugin ecosystem into Moodle
+        run: |
+          # ONE installation routine, one ref. local_catquiz declares hard
+          # dependencies in version.php (local_wunderbyte_table, mod_adaptivequiz,
+          # adaptivequizcatmodel_catquiz), so the site cannot install with the
+          # plugin alone.
+          #
+          # DEP_REF pins the ref the adaptivequiz side is taken from; it defaults to
+          # the branch this workflow runs on, so a run always tests one coherent
+          # state.
+          DEP_REF="${DEP_REF:-v-3.0}"
+          echo "Abhaengigkeiten von Ref: $DEP_REF"
+
+          # The plugin under test comes from this checkout, never from a clone.
+          rm -rf moodle/local/catquiz
+          mkdir -p moodle/local
+          cp -a plugin moodle/local/catquiz
+          rm -rf moodle/local/catquiz/.git
+
+          git clone --depth 1 --branch "$DEP_REF" \
+            https://github.com/ralferlebach/moodle-mod_adaptivequiz.git moodle/mod/adaptivequiz
+          git clone --depth 1 --branch "$DEP_REF" \
+            https://github.com/ralferlebach/moodle-adaptivequizcatmodel_catquiz.git \
+            moodle/mod/adaptivequiz/catmodel/catquiz
+          git clone --depth 1 --branch main \
+            https://github.com/Wunderbyte-GmbH/moodle-local_wunderbyte_table.git \
+            moodle/local/wunderbyte_table
+          git clone --depth 1 --branch master \
+            https://github.com/branchup/moodle-filter_shortcodes.git moodle/filter/shortcodes
+
+          find moodle -mindepth 2 -type d -name .git -prune -exec rm -rf {} + || true
+
+      - name: Verify a clean plugin layout
+        run: |
+          # The guard exists to catch a repository copied into an existing plugin
+          # directory, which would mean the tested ecosystem is not the one this
+          # workflow claims to test.
+          #
+          # Counting version.php files was the wrong way to express that: local_catquiz
+          # legitimately contains subplugins - the seven catmodels and the two central
+          # hub plugins - each with its own version.php. The check reported exactly
+          # that legitimate layout as an error.
+          #
+          # What actually has to hold: a plugin root has its own version.php, and any
+          # further one lives inside a directory declared in db/subplugins.json.
+          rc=0
+          for dest in local/catquiz local/wunderbyte_table filter/shortcodes; do
+            if [ ! -f "moodle/$dest/version.php" ]; then
+              echo "moodle/$dest hat keine version.php im Wurzelverzeichnis"
+              rc=1
+              continue
+            fi
+
+            # Declared subplugin roots, read from the plugin itself rather than
+            # hardcoded here - otherwise this guard drifts away from the plugin.
+            allowed=""
+            if [ -f "moodle/$dest/db/subplugins.json" ]; then
+              allowed=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(' '.join(d.get('plugintypes', d.get('subplugintypes', {})).values()))" "moodle/$dest/db/subplugins.json")
+            fi
+
+            while read -r found; do
+              [ "$found" = "moodle/$dest/version.php" ] && continue
+              relative=${found#moodle/$dest/}
+              ok=0
+              for root in $allowed; do
+                base=$(basename "$root")
+                case "$relative" in "$base"/*) ok=1 ;; esac
+              done
+              if [ "$ok" -ne 1 ]; then
+                echo "Unerwartete version.php ausserhalb der deklarierten Subplugins: $found"
+                rc=1
+              fi
+            done < <(find "moodle/$dest" -name version.php)
+          done
+          if [ "$rc" -ne 0 ]; then
+            echo "Verschachtelte Plugin-Kopien gefunden - das getestete Oekosystem waere nicht reproduzierbar."
+            exit 1
+          fi
+          echo "Plugin-Layout ist sauber."
+
+      # install.php WRITES config.php itself and aborts when one already exists, so
+      # we must not pre-create one from config-dist.php. It also requires an
+      # existing, writable dataroot OUTSIDE the Moodle tree.
+      - name: Install Moodle site
+        run: |
+          mkdir -p /tmp/moodledata
+          cd moodle
+          php admin/cli/install.php \
+            --non-interactive --agree-license \
+            --dbtype=pgsql --dbhost=127.0.0.1 --dbport=5432 --dbname=moodle \
+            --dbuser=moodle --dbpass=moodle \
+            --wwwroot="$MOODLE_WWWROOT" --dataroot=/tmp/moodledata \
+            --fullname="CI" --shortname="CI" \
+            --adminpass="Admin!23" --adminemail=ci@example.invalid
+
+      # seed.php prints shell "export KEY='value'" lines so it can be sourced
+      # locally. $GITHUB_ENV expects bare KEY=value, so strip the "export " prefix
+      # and the surrounding quotes - otherwise every variable is lost and the tests
+      # throw on the first required one.
+      - name: Seed the CAT manager fixture
+        run: |
+          cd moodle
+          php local/catquiz/tests/playwright/seed.php > /tmp/catquiz-seed.env
+          echo "Seeded variables:"
+          sed -n "s/^export \([A-Z_][A-Z_]*\)=.*/  \1/p" /tmp/catquiz-seed.env
+          sed -n "s/^export \([A-Z_][A-Z_]*\)='\(.*\)'$/\1=\2/p" \
+            /tmp/catquiz-seed.env >> "$GITHUB_ENV"
+
+      - name: Install Playwright and browsers
+        run: |
+          cd moodle/local/catquiz/tests/playwright
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        env:
+          CATQUIZ_BASE_URL: ${{ env.MOODLE_WWWROOT }}
+        run: |
+          cd moodle/local/catquiz/tests/playwright
+          # PHP's built-in server is single-threaded unless PHP_CLI_SERVER_WORKERS is
+          # set. A Moodle page pulls many subresources in parallel, so one worker
+          # stalls as soon as a browser hits it.
+          #
+          # Bound to 127.0.0.1 rather than "localhost": the built-in server listens on
+          # a single address while clients resolve "localhost" differently.
+          #
+          # The server runs inside THIS step. One started in an earlier step does not
+          # reliably survive into the next one, which surfaces as a browser run
+          # against a target that has already gone away.
+          PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$GITHUB_WORKSPACE/moodle" \
+            >/tmp/moodle-server.log 2>&1 &
+          ready=0
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+              http://127.0.0.1:8000/login/index.php || true)
+            if [ "$code" = "200" ]; then ready=1; break; fi
+            sleep 3
+          done
+          if [ "$ready" != "1" ]; then
+            echo "Moodle wurde nicht erreichbar (letzter HTTP-Status: $code); Serverlog:"
+            tail -50 /tmp/moodle-server.log
+            exit 1
+          fi
+          npm test
+
+      - name: Show the tail of the server log on failure
+        if: failure()
+        run: tail -100 /tmp/moodle-server.log || true
+
+      # Two mutually exclusive artefacts, chosen by outcome.
+      #
+      # Green: the full report including videos - it documents the intended journey.
+      #
+      # Red: only the directories of the tests that actually failed, and without
+      # videos. Playwright keeps a directory per test, so a failed run's evidence is a
+      # small subset of a report that otherwise runs to tens of megabytes.
+      - name: Collect the failed tests only
+        if: failure()
+        run: |
+          src="moodle/local/catquiz/tests/playwright/test-results"
+          dest="$RUNNER_TEMP/playwright-failures"
+          rm -rf "$dest"
+          mkdir -p "$dest"
+          found=0
+          # error-context.md is written for failures only, so its presence marks the
+          # directory.
+          while IFS= read -r ctx; do
+            dir=$(dirname "$ctx")
+            cp -a "$dir" "$dest/"
+            found=1
+          done < <(find "$src" -name error-context.md 2>/dev/null)
+          if [ "$found" = "1" ]; then
+            find "$dest" -name '*.webm' -delete
+            echo "Fehlerhafte Tests eingesammelt:"
+            ls -1 "$dest"
+          else
+            echo "Keine Fehlerverzeichnisse gefunden."
+          fi
+
+      # The complete log goes into the failure bundle rather than the job output: a
+      # request log of a full browser run is long and only its end is readable inline.
+      # Compressed because such logs grow quickly.
+      #
+      # Placed AFTER the collecting step, which clears the directory first.
+      - name: Add the server log to the failure bundle
+        if: failure()
+        run: |
+          dest="$RUNNER_TEMP/playwright-failures"
+          mkdir -p "$dest"
+          if [ -s /tmp/moodle-server.log ]; then
+            gzip -c /tmp/moodle-server.log > "$dest/moodle-server.log.gz"
+            echo "Serverlog beigelegt ($(du -h /tmp/moodle-server.log | cut -f1) unkomprimiert)."
+          else
+            echo "Kein Serverlog vorhanden."
+          fi
+
+      - name: Upload failures only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failures
+          path: ${{ runner.temp }}/playwright-failures
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload full report with videos
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-with-videos
+          path: |
+            moodle/local/catquiz/tests/playwright/playwright-report
+            moodle/local/catquiz/tests/playwright/test-results
+          retention-days: 7
+          if-no-files-found: ignore

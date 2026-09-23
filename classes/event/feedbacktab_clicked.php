@@ -61,8 +61,11 @@ class feedbacktab_clicked extends catquiz_event_base {
     public function get_description() {
         $other = $this->get_other_data();
         $url = new moodle_url('manage_catscales.php', [
+            // The tab is a request parameter; the fragment used before
+            // pointed at a pane that is only rendered when it is the active one.
+            'tab' => 'quizattempts',
             'attemptid' => $other->attemptid,
-        ], 'lcq_quizattempts');
+        ]);
         $attemptlink = html_writer::link(
             $url,
             get_string('feedbacksheader', 'local_catquiz', $other->attemptid),
@@ -87,7 +90,10 @@ class feedbacktab_clicked extends catquiz_event_base {
      */
     public function get_url() {
         return new moodle_url('manage_catscales.php', [
+            // The tab is a request parameter; the fragment used before
+            // pointed at a pane that is only rendered when it is the active one.
+            'tab' => 'quizattempts',
             'attemptid' => $this->get_other_data()->attemptid,
-        ], 'lcq_quizattempts');
+        ]);
     }
 }

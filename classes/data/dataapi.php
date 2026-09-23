@@ -371,7 +371,9 @@ class dataapi {
 
         $oldrecord = $DB->get_record('local_catquiz_catscales', ['id' => $catscale->id]);
         // If the context of the scale was changed, we have to update the active item params.
-        if ($oldrecord->contextid != $catscale->contextid) {
+        // Only migrate when a (non-null) new context was actually supplied: a webservice
+        // update that does not carry a contextid must not trigger a context migration.
+        if (!empty($catscale->contextid) && $oldrecord->contextid != $catscale->contextid) {
             $repo = new catquiz();
             $repo->create_items_in_new_context($catscale->contextid, $oldrecord->contextid);
         }

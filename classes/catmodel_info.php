@@ -31,6 +31,8 @@ use local_catquiz\data\dataapi;
 use local_catquiz\event\calculation_executed;
 use local_catquiz\event\calculation_skipped;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_model;
+use local_catquiz\catcalc;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\model\model_strategy_factory;
@@ -93,12 +95,19 @@ class catmodel_info {
      * @param int $contextid
      * @param int $catscaleid
      * @param int $userid
+     * @param bool $inplace When true, item parameters are written into the given
+     *                      (existing) context and no new context is created or
+     *                      activated; person parameters are left unchanged. This
+     *                      is the context-preserving incremental path used by the
+     *                      scheduled recalculation (see issue #44). When false, a
+     *                      new context is created and item and person parameters
+     *                      are written into it (the disruptive path, see issue #43).
      *
-     * @return void
+     * @return array [models => summary keyed by model display name, targetcontextid => int]
      *
      */
-    public function update_params($contextid, $catscaleid, $userid = 0) {
-        global $USER;
+    public function update_params($contextid, $catscaleid, $userid = 0, bool $inplace = false) {
+        global $USER, $DB;
         if (!$userid) {
             $userid = $USER->id;
         }
@@ -108,7 +117,14 @@ class catmodel_info {
         $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
         $strategy->get_responses()->set_person_abilities($initialabilities);
         try {
-            [$itemdifficulties, $personabilities] = $strategy->run_estimation();
+            // The incremental (in-place) path performs exactly one
+            // item-parameter pass with the fixed person abilities; the disruptive
+            // path iterates person and item parameters.
+            if ($inplace) {
+                [$itemdifficulties, $personabilities] = $strategy->run_incremental_estimation();
+            } else {
+                [$itemdifficulties, $personabilities] = $strategy->run_disruptive_estimation();
+            }
         } catch (moodle_exception $e) {
             $errorcode = 'noresponsestoestimate';
             // Only handle our own exception.
@@ -127,18 +143,39 @@ class catmodel_info {
                 ],
             ]);
             $event->trigger();
-            return;
+            return ['models' => [], 'targetcontextid' => (int) $contextid, 'identifiability' => null];
         }
-        $newcontext = dataapi::create_new_context_for_updated_parameters($catscale);
+        // The incremental path keeps the existing context. It writes item
+        // parameters into that context (save_to_db upserts by componentid+model)
+        // and leaves person parameters untouched, so contextid before == after and
+        // historical statistics/exports stay visible. The disruptive path keeps
+        // its versioning behaviour (a new "updatedparams" context).
+        if ($inplace) {
+            $targetcontextid = $contextid;
+        } else {
+            $newcontext = dataapi::create_new_context_for_updated_parameters($catscale);
+            $targetcontextid = $newcontext->id;
+        }
         $updatedmodels = [];
-        foreach ($itemdifficulties as $modelname => $itemparamlist) {
-            $itemcounter = 0;
-            /** @var model_item_param_list $itemparamlist */
-            $itemparamlist->save_to_db($newcontext->id);
-            $personabilities->save_to_db($newcontext->id, $catscaleid);
-            $itemcounter += count($itemparamlist->itemparams);
-            $model = get_string('pluginname', 'catmodel_' . $modelname);
-            $updatedmodels[$model] = $itemcounter;
+        // Persist the item parameters atomically. A failure must not
+        // leave a half-updated item-parameter set in the context.
+        $transaction = $DB->start_delegated_transaction();
+        try {
+            foreach ($itemdifficulties as $modelname => $itemparamlist) {
+                $itemcounter = 0;
+                /** @var model_item_param_list $itemparamlist */
+                $itemparamlist->save_to_db($targetcontextid);
+                if (!$inplace) {
+                    $personabilities->save_to_db($targetcontextid, $catscaleid);
+                }
+                $itemcounter += count($itemparamlist->itemparams);
+                $model = get_string('pluginname', 'catmodel_' . $modelname);
+                $updatedmodels[$model] = $itemcounter;
+            }
+            $transaction->allow_commit();
+        } catch (\Throwable $e) {
+            $transaction->rollback($e);
+            throw $e;
         }
 
         $updatedmodelsjson = json_encode($updatedmodels);
@@ -157,6 +194,102 @@ class catmodel_info {
 
         catcontext::load_from_db($contextid)
             ->save_or_update((object)['timecalculated' => time()]);
+
+        $identifiability = self::identifiability_summary($strategy, $itemdifficulties);
+
+        // AIC/BIC/CAIC before (old params) and after (new params) over
+        // the same person abilities, plus the iteration/convergence metadata.
+        $criteriaafter = $strategy->aggregate_information_criteria($itemdifficulties, $personabilities);
+        $oldparams = $strategy->get_old_item_params();
+        $criteriabefore = !empty($oldparams)
+            ? $strategy->aggregate_information_criteria($oldparams, $personabilities)
+            : [];
+        $iterations = $strategy->get_iterations();
+        if ($inplace) {
+            $convergencereason = 'single in-place item-parameter pass (person parameters fixed)';
+        } else {
+            $convergencereason = $strategy->get_convergence_reason();
+            if ($strategy->used_initial_rasch()) {
+                $convergencereason .= '; seeded via initial 1PL/Rasch estimation';
+            }
+        }
+
+        $responses = $strategy->get_responses();
+        $itemresponsemap = $responses->get_item_response();
+        $numresponses = 0;
+        foreach ($itemresponsemap as $peritem) {
+            $numresponses += count($peritem);
+        }
+        $counts = [
+            'numresponses' => $numresponses,
+            'numpersons' => count($responses->get_person_ids()),
+            'numitems' => count($responses->get_item_ids()),
+        ];
+
+        return [
+            'models' => $updatedmodels,
+            'targetcontextid' => (int) $targetcontextid,
+            'identifiability' => $identifiability,
+            'counts' => $counts,
+            'criteriabefore' => $criteriabefore,
+            'criteriaafter' => $criteriaafter,
+            'iterations' => $iterations,
+            'convergencereason' => $convergencereason,
+        ];
+    }
+
+    /**
+     * Aggregate per-item identifiability over the estimated items (K5 wiring).
+     *
+     * Runs catcalc::item_identifiability_report() for every estimated item and
+     * returns counts plus a bounded list of human-readable warnings, so a
+     * calibration workflow (issue #43) can surface which items are weakly
+     * identified or sit at a trusted-region bound. Errors on individual items are
+     * ignored so the summary never breaks the calculation.
+     *
+     * @param model_strategy $strategy
+     * @param array $itemdifficulties modelname => model_item_param_list
+     * @return array {total:int, wellidentified:int, weaklyidentified:int, atbound:int, warnings:string[]}
+     */
+    private static function identifiability_summary($strategy, array $itemdifficulties): array {
+        $summary = ['total' => 0, 'wellidentified' => 0, 'weaklyidentified' => 0, 'atbound' => 0, 'warnings' => []];
+        $maxwarnings = 20;
+        try {
+            $itemresponses = $strategy->get_responses()->get_item_response();
+        } catch (\Throwable $e) {
+            return $summary;
+        }
+        foreach ($itemdifficulties as $modelname => $itemparamlist) {
+            $model = model_model::get_instance($modelname);
+            foreach ($itemparamlist as $itemparam) {
+                $componentid = $itemparam->get_componentid();
+                if (!isset($itemresponses[$componentid])) {
+                    continue;
+                }
+                $ip = $itemparam->get_params_array();
+                if (!is_array($ip)) {
+                    continue;
+                }
+                try {
+                    $report = catcalc::item_identifiability_report($itemresponses[$componentid], $model, $ip);
+                } catch (\Throwable $e) {
+                    continue;
+                }
+                $summary['total']++;
+                if ($report['wellidentified']) {
+                    $summary['wellidentified']++;
+                } else {
+                    $summary['weaklyidentified']++;
+                }
+                if ($report['atbound']) {
+                    $summary['atbound']++;
+                }
+                if (!empty($report['warnings']) && count($summary['warnings']) < $maxwarnings) {
+                    $summary['warnings'][] = "Item {$componentid} ({$modelname}): " . implode('; ', $report['warnings']);
+                }
+            }
+        }
+        return $summary;
     }
 
     /**
@@ -175,7 +308,11 @@ class catmodel_info {
             [$catscaleid, ...$subscales],
             $context->gettimecalculated()
         );
-        $newresponses = intval(($DB->get_record_sql($sql, $params))->count);
+        // Use count_records_sql for the COUNT(*) query: it reads the count portably.
+        // Accessing ->count on the raw record broke on MySQL/MariaDB, where the
+        // unaliased COUNT(*) column is named "COUNT(*)" rather than "count", which
+        // raised an "undefined property" warning (an exception under test debugging).
+        $newresponses = $DB->count_records_sql($sql, $params);
 
         return $newresponses > 0;
     }

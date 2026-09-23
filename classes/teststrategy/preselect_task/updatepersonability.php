@@ -413,28 +413,6 @@ class updatepersonability extends preselect_task {
     }
 
     /**
-     * If the last answer was correct, increase the ability to the halfway point
-     * between the current ability and the maximum value.
-     * If the last question is partly correct, e.g. the fraction is 0.6, then
-     * the change of the person ability is multiplied by that value.
-     *
-     * For incorrect answers, the change will update the ability towards the
-     * minimum value.
-     *
-     * @param mixed $catscaleid
-     *
-     * @return mixed
-     *
-     */
-    public function fallback_ability_update($catscaleid) {
-        $fraction = $this->userresponses->get_last_response($this->context['attemptid'])->get_response();
-        $max = ($fraction < 0.5)
-            ? -5 * (1 - $fraction)
-            : 5 * $fraction;
-        return ($this->context['person_ability'][$catscaleid] + $max) / 2;
-    }
-
-    /**
      * Returns the mean value that is used for the ability estimation.
      *
      * @return float
@@ -622,14 +600,27 @@ class updatepersonability extends preselect_task {
             return $originalability;
         }
 
-        $flippedresponses = $this->get_flipped_last_response();
+        [$flippedresponses, $allcorrect, $targetid] = $this->get_flipped_extreme_response($scaleid);
         if (!$flippedresponses) {
             return $originalability;
         }
 
+        // Standardise the flipped probe item's discrimination to 1, keeping its
+        // difficulty (and, for polytomous models, its remaining parameters). This
+        // makes the boundary probe's influence independent of the possibly extreme
+        // or capped discrimination of whichever item happened to be hardest/easiest.
+        $items = clone $this->get_item_param_list($scaleid);
+        if ($targetid !== null && isset($items[$targetid])) {
+            $probe = clone $items[$targetid];
+            $params = $probe->get_params_array() ?? [];
+            $params['discrimination'] = 1.0;
+            $probe->set_parameters($params);
+            $items[$targetid] = $probe;
+        }
+
         $alternativeability = catcalc::estimate_person_ability(
             $flippedresponses,
-            $this->get_item_param_list($scaleid),
+            $items,
             $startvalue,
             $this->parentability,
             $this->parentse,
@@ -637,39 +628,75 @@ class updatepersonability extends preselect_task {
             $this->get_max_ability_for_scale($scaleid),
             $this->use_tr_factor()
         );
-        // If both the real updated ability and the ability calculated
-        // with the flipped last response differ from the parent ability
-        // in the same direction, then take the value calculated by the
-        // flipped response as this should be closer to the parent.
-        if (($alternativeability <=> $originalability) == ($originalability <=> $this->parentability)) {
-            return $alternativeability;
+        // The regularised MAP estimate ($originalability) is shrunk toward the
+        // parent for a degenerate (all-correct/all-wrong) pattern. Breaking the
+        // degeneracy - by flipping the HARDEST answered item for an all-correct
+        // pattern, or the EASIEST for an all-wrong one - yields an estimate that
+        // is less regularised and oriented toward the scale end. Prefer it when
+        // it lies farther from the parent in the same direction as the MAP.
+        $selected = (($alternativeability <=> $originalability) == ($originalability <=> $this->parentability))
+            ? $alternativeability
+            : $originalability;
+
+        // Monotonicity guard: an all-correct pattern must never store a lower
+        // ability than the previous step's value, and an all-wrong pattern never
+        // a higher one. This removes residual boundary jitter while preserving
+        // the de-regularisation toward the scale end. get_abilities() still holds
+        // the previous step's value here, because set_ability() runs afterwards.
+        $previous = $this->progress->get_abilities()[$scaleid] ?? null;
+        if ($previous !== null && is_numeric($previous)) {
+            $selected = $allcorrect ? max($selected, (float) $previous) : min($selected, (float) $previous);
         }
 
-        return $originalability;
+        return $selected;
     }
 
     /**
-     * Returns the responses array with the last response flipped.
+     * Returns the responses for the scale with the extreme item's response
+     * flipped: the HARDEST answered item for an all-correct pattern, the EASIEST
+     * for an all-wrong one. Unlike flipping the last-administered item, this does
+     * not depend on which item happened to be shown last, so the resulting
+     * alternative ability is stable across steps.
      *
-     * @return array
+     * @param int $scaleid
+     * @return array [array $flippedresponses, bool $allcorrect, ?string $targetid];
+     *               $flippedresponses is empty when no answered item is available.
      */
-    private function get_flipped_last_response(): array {
-        if (isset($this->flippedresponses)) {
-            return $this->flippedresponses;
+    private function get_flipped_extreme_response(int $scaleid): array {
+        if (isset($this->flippedresponses[$scaleid])) {
+            return $this->flippedresponses[$scaleid];
         }
 
-        $lastquestion = $this->progress->get_last_question();
-        if (!$lastquestion || !isset($this->arrayresponses[$lastquestion->id])) {
-            return [];
+        $items = $this->get_item_param_list($scaleid);
+        $difficulties = [];
+        $fractionsum = 0.0;
+        foreach ($this->arrayresponses as $itemid => $response) {
+            if (!isset($items[$itemid])) {
+                continue;
+            }
+            $difficulties[$itemid] = $items[$itemid]->get_difficulty();
+            $fractionsum += floatval($response->get_response());
+        }
+        if (!$difficulties) {
+            return $this->flippedresponses[$scaleid] = [[], false, null];
         }
 
-        $this->flippedresponses = $this->arrayresponses;
-        $frac = floatval($this->flippedresponses[$lastquestion->id]->get_response());
-        $flipped = abs(1 - $frac);
-        $flippedlastquestion = clone $this->flippedresponses[$lastquestion->id];
-        $flippedlastquestion->set_response($flipped);
-        $this->flippedresponses[$lastquestion->id] = $flippedlastquestion;
-        return $this->flippedresponses;
+        $allcorrect = round($fractionsum / count($difficulties), 0) >= 1.0;
+        // Argmax (all-correct) or argmin (all-wrong) over item difficulty. A manual
+        // scan avoids float-precision pitfalls of array_keys(..., max(...)).
+        $targetid = array_key_first($difficulties);
+        foreach ($difficulties as $itemid => $difficulty) {
+            if ($allcorrect ? $difficulty > $difficulties[$targetid] : $difficulty < $difficulties[$targetid]) {
+                $targetid = $itemid;
+            }
+        }
+
+        $flipped = $this->arrayresponses;
+        $flippedresponse = clone $flipped[$targetid];
+        $flippedresponse->set_response(abs(1 - floatval($flipped[$targetid]->get_response())));
+        $flipped[$targetid] = $flippedresponse;
+
+        return $this->flippedresponses[$scaleid] = [$flipped, $allcorrect, $targetid];
     }
 
     /**

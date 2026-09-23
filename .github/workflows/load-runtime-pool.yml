@@ -1,0 +1,326 @@
+name: Load test (DB Engines)
+
+# Runs the load-test matrix that issue #26 makes binding: the runtime item pool at
+# 50k, 100k and 250k eligible items.
+#
+# It exists because the verification container cannot hold that much data - seeding
+# 50k already failed while writing the attempt steps, with 4.3 GB free. A hosted
+# runner has room, so the measurement happens where it is possible rather than being
+# estimated where it is not.
+#
+# Each size runs as its own job. They are deliberately not sequential steps in one
+# job: a failure at 250k then still leaves the 50k and 100k results, and each job
+# starts from a clean database, which is what makes the cold run meaningful.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sizes:
+        description: >-
+          Which pool sizes to measure. "all" runs 50k, 100k and 250k; a single size
+          is useful when checking one change without occupying the runners for an
+          hour.
+        type: choice
+        default: all
+        options:
+          - all
+          - '50000'
+          - '100000'
+          - '250000'
+      threshold:
+        description: >-
+          Milliseconds the add-questions dialog may take at p95 before the run is
+          reported as missing the target. 500 for interactive pools; 1000 is the
+          agreed limit for large ones.
+        default: '1000'
+      repeats:
+        description: 'Warm runs per size (median and p95 are taken from these)'
+        required: false
+        default: '7'
+
+jobs:
+  # Both engines always: MariaDB has produced defects PostgreSQL hid - a DECIMAL
+  # without precision rounding a value away, and a column-position clause only MySQL
+  # honours. The sizes are what the caller may narrow.
+  prepare:
+    name: "Select sizes"
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.build.outputs.matrix }}
+    steps:
+      - name: Build the matrix from the requested sizes
+        id: build
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+
+          sizes = {
+              '50000': 60000,
+              '100000': 120000,
+              '250000': 300000,
+          }
+
+          requested = os.environ.get('SIZES', 'all') or 'all'
+          chosen = sizes if requested == 'all' else {requested: sizes[requested]}
+
+          include = [
+              {'db': db, 'items': int(i), 'questions': q}
+              for i, q in chosen.items()
+              for db in ('pgsql', 'mariadb')
+          ]
+
+          print('matrix=' + json.dumps({'include': include}))
+          PY
+        env:
+          SIZES: ${{ github.event.inputs.sizes || 'all' }}
+
+  measure:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+
+      # Both services run in every job; moodle-plugin-ci picks the one named by DB.
+      # Running only the matching one would need conditional services, which GitHub
+      # does not offer - an idle container is the cheaper answer.
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+          MYSQL_CHARACTER_SET_SERVER: 'utf8mb4'
+          MYSQL_COLLATION_SERVER: 'utf8mb4_bin'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+
+    needs: prepare
+
+    strategy:
+      fail-fast: false
+      # Computed in the job above rather than written out here. A job-level `if` was
+      # tried first and is rejected by GitHub at startup: the matrix context does not
+      # exist yet when that condition is evaluated, so the whole workflow fails to
+      # start rather than skipping one size.
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+          submodules: false
+
+      - name: Report available disk
+        run: |
+          # Seeding 250k items is the point at which space runs out on smaller
+          # machines. Recording it makes an out-of-space failure readable as such
+          # rather than as a plugin defect.
+          df -h /
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, mbstring, sodium, zip, gd, xmlrpc, soap, intl
+          ini-values: max_input_vars=5000, memory_limit=4G
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist \
+            moodlehq/moodle-plugin-ci ci ^4
+          echo "$(cd ci/bin && pwd)" >> $GITHUB_PATH
+          echo "$(cd ci/vendor/bin && pwd)" >> $GITHUB_PATH
+
+          # Moodle's PHPUnit bootstrap refuses to run without en_AU.UTF-8, which the
+          # runner image does not ship. Without this the init step aborts with
+          # "Required locale 'en_AU.UTF-8' is not installed" - and the message reads
+          # like a missing language pack rather than a missing system locale.
+          # The parent plugin's workflow does the same thing at the same point.
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install Moodle and dependencies
+        run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
+          moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
+
+          # The hub plugins are submodules of the parent, so a checkout leaves empty
+          # directories behind that the installer refuses to write into.
+          for placeholder in $(find ./plugin/catquizcentralhub -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null); do
+            rmdir "$placeholder"
+          done
+
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
+        env:
+          DB: ${{ matrix.db }}
+          MOODLE_BRANCH: MOODLE_405_STABLE
+
+      - name: Install the site database
+        run: |
+          # --no-init installs the code but does not create the schema, so the plugin
+          # tables do not exist yet. The seeder then fails with "Table
+          # mdl_local_catquiz_catscales doesn't exist" - a message that points at the
+          # plugin while the cause is the missing site installation.
+          if [ "${{ matrix.db }}" = "pgsql" ]; then
+            dbtype=pgsql; dbuser=postgres; dbpass=postgres; dbport=5432
+          else
+            dbtype=mariadb; dbuser=root; dbpass=''; dbport=3306
+          fi
+
+          php moodle/admin/cli/install_database.php \
+            --agree-license --adminpass='Admin!23' \
+            --adminemail='admin@example.com' \
+            --fullname='CATquiz load' --shortname='catload' || true
+
+          # The plugin schema arrives with the upgrade, not with the install.
+          php moodle/admin/cli/upgrade.php --non-interactive
+          php moodle/admin/cli/purge_caches.php
+
+      - name: Verify the plugin schema exists
+        run: |
+          # Checking the live schema rather than trusting the previous step: a seeder
+          # run against a half-installed site fails deep inside the DML layer, where
+          # the message no longer names the cause.
+          php -r '
+            define("CLI_SCRIPT", true);
+            require "moodle/config.php";
+            $manager = $DB->get_manager();
+            foreach (["local_catquiz_catscales", "local_catquiz_items", "local_catquiz_itemparams"] as $table) {
+                if (!$manager->table_exists($table)) {
+                    fwrite(STDERR, "Tabelle $table fehlt - die Site ist nicht vollstaendig installiert\n");
+                    exit(1);
+                }
+            }
+            echo "Plugin-Schema vorhanden\n";
+          '
+
+      - name: Seed ${{ matrix.items }} items
+        run: |
+          cd moodle
+          php -d memory_limit=4G local/catquiz/cli/loadtest_seed.php --reset \
+            --questions=${{ matrix.questions }} \
+            --items=${{ matrix.items }} \
+            --users=500 --attempts=500 --steps=2
+
+      - name: Refresh table statistics
+        run: |
+          # Without this the plan is built from stale estimates and the cold run
+          # measures the planner rather than the query.
+          if [ "${{ matrix.db }}" = "pgsql" ]; then
+            PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d moodle -c 'ANALYZE;'
+          else
+            mysql -h 127.0.0.1 -u root -e 'ANALYZE TABLE moodle.mdl_local_catquiz_items;' || true
+          fi
+
+      - name: Verify the pool actually has the seeded size
+        id: pool
+        run: |
+          cd moodle
+          # A seeder that silently wrote less than asked would make the whole run
+          # report a smaller pool as if it were the target size.
+          # "read" returns non-zero when it reaches EOF without a trailing newline,
+          # and under "bash -e" that ends the step before a single line of output is
+          # produced - the failure then looks like the query broke, while the values
+          # were in fact read correctly. The php below prints a newline, and the read
+          # is allowed to report EOF without killing the step.
+          read -r scaleid contextid count < <(php -r '
+            define("CLI_SCRIPT", true);
+            require("config.php");
+            global $DB;
+            $r = $DB->get_record_sql(
+                "SELECT catscaleid, contextid, COUNT(*) c
+                   FROM {local_catquiz_items}
+               GROUP BY catscaleid, contextid
+               ORDER BY c DESC",
+                [], IGNORE_MULTIPLE);
+            echo $r->catscaleid, " ", $r->contextid, " ", $r->c, "\n";
+          ') || true
+
+          # An empty result means the query itself failed - process substitution hides
+          # a failing php from "bash -e", and the comparison below then aborts with an
+          # arithmetic error that says nothing about the cause.
+          if [ -z "$count" ]; then
+            echo "Die Abfrage lieferte kein Ergebnis - vermutlich fehlt das Schema."
+            php -r 'define("CLI_SCRIPT", true); require "config.php"; global $DB;
+              echo "Items gesamt: ", $DB->count_records("local_catquiz_items"), "\n";' || true
+            exit 1
+          fi
+
+          echo "Grösste Skala: $scaleid (Kontext $contextid) mit $count Items"
+          if [ "$count" -lt "$(( ${{ matrix.items }} * 9 / 10 ))" ]; then
+            echo "Seeding lieferte nur $count statt ${{ matrix.items }} Items."
+            exit 1
+          fi
+
+          echo "scaleid=$scaleid" >> $GITHUB_OUTPUT
+          echo "contextid=$contextid" >> $GITHUB_OUTPUT
+
+      - name: Measure
+        run: |
+          cd moodle
+          php -d memory_limit=4G local/catquiz/cli/measure_runtime_pool.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} \
+            --contextid=${{ steps.pool.outputs.contextid }} \
+            --repeats=${{ github.event.inputs.repeats || '7' }} \
+            --threshold=${{ github.event.inputs.threshold || '1000' }} \
+            --out=/tmp/pool-${{ matrix.items }}.md \
+            | tee /tmp/pool-${{ matrix.items }}.txt
+
+      - name: Verify the recalculation lock across two processes (issue #44)
+        run: |
+          cd moodle
+
+          # PHPUnit cannot show this: Moodle's database lock is re-entrant within one
+          # process, so a test that holds the lock and then calls the service is
+          # granted it again and the two runs never collide. Two processes do collide.
+          #
+          # The first call holds the lock in the background; the second has to be
+          # refused rather than wait, because a scheduled run that waits occupies the
+          # queue instead of reporting that the work is already under way.
+          php local/catquiz/cli/verify_recalculation_lock.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} --hold=15 &
+          holder=$!
+
+          sleep 4
+          php local/catquiz/cli/verify_recalculation_lock.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} --expect=refused
+
+          wait $holder
+
+          # And once it is released the next run may start again - otherwise the first
+          # check would also pass with a lock that is never given back.
+          php local/catquiz/cli/verify_recalculation_lock.php \
+            --scaleid=${{ steps.pool.outputs.scaleid }} --expect=granted
+
+      - name: Upload the measurement
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-pool-${{ matrix.db }}-${{ matrix.items }}
+          path: |
+            /tmp/pool-${{ matrix.items }}.txt
+            /tmp/pool-${{ matrix.items }}.md
+          if-no-files-found: warn

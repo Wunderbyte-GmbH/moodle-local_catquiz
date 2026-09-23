@@ -48,12 +48,19 @@ class local_catquiz_generator extends testing_module_generator {
         }
 
         $course = get_course($data['courseid']);
-        // Create a qbank module in the course and use its module context so
-        // question API functions that require a module context work correctly.
-        // Use the testing data generator to create the module so this works
-        // both in PHPUnit and Behat generator contexts.
-        $qbank = $this->datagenerator->create_module('qbank', ['course' => $course->id]);
-        $context = context_module::instance($qbank->cmid);
+        // Moodle 5.0+ moves the question bank into a dedicated mod_qbank activity, so
+        // questions live in that module context. Moodle 4.5 has no mod_qbank and
+        // questions belong to the course context. Choose whichever the running
+        // platform provides so the generator works on the 4.5 target and stays
+        // forward-compatible with the Moodle 5.x migration. Using a non-existent
+        // 'qbank' module makes get_plugin_generator() fail before any question is
+        // imported (this broke every Behat scenario on 4.5).
+        if (file_exists("{$CFG->dirroot}/mod/qbank/lib.php")) {
+            $qbank = $this->datagenerator->create_module('qbank', ['course' => $course->id]);
+            $context = context_module::instance($qbank->cmid);
+        } else {
+            $context = context_course::instance($course->id);
+        }
         $category = question_get_top_category($context->id, true);
 
         // Load data into class.
@@ -139,15 +146,32 @@ class local_catquiz_generator extends testing_module_generator {
         $jsondata->componentid = $adaptivequiz->adaptivecatquizid;
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $adaptivequiz->cateststrategyid;
-        $jsondata->catquiz_selectfirstquestion = $adaptivequiz->catquiz_selectfirstquestion ?? null;
-        $jsondata->maxquestionsgroup->catquiz_maxquestions = $adaptivequiz->catquiz_maxquestions ?? null;
-        $jsondata->maxquestionsgroup->catquiz_minquestions = $adaptivequiz->catquiz_minquestions ?? null;
-        $jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale = $adaptivequiz->catquiz_minquestionspersubscale ?? null;
-        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $adaptivequiz->catquiz_maxquestionspersubscale ?? null;
-        $jsondata->catquiz_standarderrorgroup->catquiz_standarderror_min = $adaptivequiz->catquiz_standarderror_min ?? null;
-        $jsondata->catquiz_standarderrorgroup->catquiz_standarderror_max = $adaptivequiz->catquiz_standarderror_max ?? null;
-        $jsondata->catquiz_includetimelimit = $adaptivequiz->catquiz_includetimelimit ?? null;
-        $jsondata->numberoffeedbackoptionsselect = $adaptivequiz->numberoffeedbackoptions ?? null;
+        // Only override the fixture defaults for settings that were actually
+        // supplied. Previously every optional setting was assigned "?? null",
+        // which destroyed the fixture default (e.g. catquiz_minquestionspersubscale
+        // "1" -> null -> intval() 0), making generated environments unrealistic
+        // and masking the configured minimum-question behaviour.
+        $optionaloverrides = [
+            [&$jsondata->catquiz_selectfirstquestion, 'catquiz_selectfirstquestion'],
+            [&$jsondata->maxquestionsgroup->catquiz_maxquestions, 'catquiz_maxquestions'],
+            [&$jsondata->maxquestionsgroup->catquiz_minquestions, 'catquiz_minquestions'],
+            [&$jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale, 'catquiz_minquestionspersubscale'],
+            [&$jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale, 'catquiz_maxquestionspersubscale'],
+            [&$jsondata->catquiz_standarderrorgroup->catquiz_standarderror_min, 'catquiz_standarderror_min'],
+            [&$jsondata->catquiz_standarderrorgroup->catquiz_standarderror_max, 'catquiz_standarderror_max'],
+            [&$jsondata->catquiz_includetimelimit, 'catquiz_includetimelimit'],
+            [&$jsondata->numberoffeedbackoptionsselect, 'numberoffeedbackoptions'],
+            [&$jsondata->catquiz_showquestion, 'catquiz_showquestion'],
+            [&$jsondata->catquiz_questionfeedbacksettings->catquiz_showquestionresponse,
+                'catquiz_showquestionresponse'],
+
+        ];
+        foreach ($optionaloverrides as [&$target, $field]) {
+            if (property_exists($adaptivequiz, $field)) {
+                $target = $adaptivequiz->$field;
+            }
+        }
+        unset($target);
         $jsondata->json = json_encode($jsondata);
 
         // Setup testenv finally.

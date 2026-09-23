@@ -44,7 +44,7 @@ class local_catquiz_observer {
     public static function purge_event_cache(base $event) {
 
         $classname = get_class($event);
-        if (strpos($classname, 'local_catquiz') >= 0) {
+        if (str_contains($classname, 'local_catquiz')) {
             cache_helper::purge_by_event('changesineventlog');
         };
     }

@@ -80,4 +80,21 @@ interface catcalc_ability_estimator {
      *
      */
     public static function log_likelihood_p_p(array $pp, array $itemparams, float $itemresponse);
+
+    /**
+     * Combined 1st and 2nd person-ability derivatives in a single call.
+     *
+     * Required by catcalc::estimate_person_ability(), which evaluates the gradient
+     * and the hessian at the same point each Newton iteration and shares one
+     * probability/moment computation between them. model_raschmodel provides a
+     * default implementation delegating to log_likelihood_p()/log_likelihood_p_p();
+     * models override it where a shared computation pays off.
+     *
+     * @param array $pp person ability parameter ('ability')
+     * @param array $itemparams item parameters
+     * @param float $itemresponse response fraction
+     *
+     * @return array ['jacobian' => 1st derivative, 'hessian' => 2nd derivative]
+     */
+    public static function get_ability_derivatives(array $pp, array $itemparams, float $itemresponse): array;
 }

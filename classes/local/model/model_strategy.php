@@ -96,6 +96,16 @@ class model_strategy {
     private int $iterations = 0;
 
     /**
+     * @var string reason the disruptive estimation loop stopped
+     */
+    private string $convergencereason = '';
+
+    /**
+     * @var bool whether the disruptive run seeded via an initial 1PL/Rasch step
+     */
+    private bool $usedinitialrasch = false;
+
+    /**
      * @var string|null modeloverride
      */
     private ?string $modeloverride;
@@ -205,6 +215,217 @@ class model_strategy {
         } else if ($maxiterations <= 0) {
             $errors['max_iterations'] = get_string('notpositive', 'local_catquiz');
         }
+    }
+
+    /**
+     * Minimum AIC improvement per iteration to count as "further improvement".
+     */
+    const CONVERGENCE_MIN_DELTA = 1e-6;
+
+    /**
+     * Disruptive recalculation: iterate PP/IP with explicit convergence handling.
+     *
+     * Issue #43 (disruptive): if no usable start parameters exist, an explicit
+     * initial 1PL/Rasch estimation seeds the start values. The loop then iterates
+     * person and item parameters and stops on the first of: no further improvement
+     * of the aggregate information criterion, or the maximum iteration limit. The
+     * chosen stop reason is recorded and retrievable via get_convergence_reason().
+     * run_estimation() is left untouched so the model regression stays bit-exact.
+     *
+     * @return array [model_item_param_list[] keyed by model, model_person_param_list]
+     */
+    public function run_disruptive_estimation(): array {
+        $personabilities = $this->responses->get_person_abilities();
+        $this->convergencereason = '';
+        $this->usedinitialrasch = false;
+
+        // Explicit initial 1PL/Rasch step when no usable start parameters exist.
+        if (!$this->has_start_parameters() && isset($this->models['rasch'])) {
+            $raschstart = $this->models['rasch']->estimate_item_params($this->responses, $personabilities, null);
+            $this->set_calculated_progress('rasch', $raschstart);
+            $this->usedinitialrasch = true;
+        }
+
+        /** @var array<model_item_param_list> $itemdifficulties */
+        $itemdifficulties = [];
+        $filtereddiffi = null;
+        $previouscriterion = null;
+        while ($this->iterations < $this->maxiterations) {
+            foreach ($this->models as $name => $model) {
+                $oldmodelparams = $this->olditemparams[$name] ?? null;
+                $startvalues = $this->get_startvalues_for_model($name) ?? null;
+                if ($startvalues && $oldmodelparams) {
+                    $startvalues->without($oldmodelparams->confirmed(), false);
+                }
+                $itemdifficulties[$name] = $model
+                    ->estimate_item_params($this->responses, $personabilities, $startvalues);
+                $this->set_calculated_progress($name, $itemdifficulties[$name]);
+            }
+            $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
+            $personabilities = $this->abilityestimator->get_person_abilities($filtereddiffi);
+            $this->set_calculated_abilities_progress($personabilities);
+            $this->responses->set_person_abilities($personabilities);
+            $this->iterations++;
+
+            // No-improvement convergence on the aggregate AIC (lower is better).
+            $criterion = $this->aggregate_information_criteria($itemdifficulties, $personabilities)['aic'];
+            $noimprovement = $previouscriterion !== null
+                && is_finite($criterion)
+                && $criterion >= $previouscriterion - self::CONVERGENCE_MIN_DELTA;
+            if ($noimprovement) {
+                $this->convergencereason = 'no further improvement';
+                break;
+            }
+            $previouscriterion = $criterion;
+        }
+        if ($this->convergencereason === '') {
+            $this->convergencereason = 'maximum iterations reached';
+        }
+
+        $itemdiffiwstatus = $this->set_status($itemdifficulties, $filtereddiffi);
+        return [$itemdiffiwstatus, $personabilities];
+    }
+
+    /**
+     * The names of the models the strategy will calibrate (productive model set).
+     *
+     * @return string[]
+     */
+    public function get_model_names(): array {
+        return array_keys($this->models);
+    }
+
+    /**
+     * Whether any usable (non-empty) start item parameters are available.
+     *
+     * @return bool
+     */
+    private function has_start_parameters(): bool {
+        foreach ($this->olditemparams as $list) {
+            if ($list !== null && count($list) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The reason the last disruptive estimation loop stopped.
+     *
+     * @return string
+     */
+    public function get_convergence_reason(): string {
+        return $this->convergencereason ?? '';
+    }
+
+    /**
+     * Whether the last disruptive run seeded start values via an initial 1PL/Rasch step.
+     *
+     * @return bool
+     */
+    public function used_initial_rasch(): bool {
+        return $this->usedinitialrasch ?? false;
+    }
+
+    /**
+     * Aggregate AIC/BIC/CAIC over a set of item parameters (issue #43 result).
+     *
+     * Uses the shared model_model::get_information_criterion() so both calculation
+     * modes report identical definitions. Items that cannot be evaluated are
+     * skipped so the aggregate never breaks the calculation.
+     *
+     * @param array $itemdifficulties modelname => model_item_param_list
+     * @param model_person_param_list $personabilities
+     * @return array {aic:float, bic:float, caic:float}
+     */
+    public function aggregate_information_criteria(array $itemdifficulties, $personabilities): array {
+        $totals = ['aic' => 0.0, 'bic' => 0.0, 'caic' => 0.0];
+        foreach ($itemdifficulties as $name => $itemparamlist) {
+            if (!isset($this->models[$name])) {
+                continue;
+            }
+            $model = $this->models[$name];
+            foreach ($itemparamlist as $itemparam) {
+                foreach (['aic', 'bic', 'caic'] as $criterion) {
+                    try {
+                        $value = $model->get_information_criterion(
+                            $criterion,
+                            $personabilities,
+                            $itemparam,
+                            $this->responses
+                        );
+                        if (is_finite($value)) {
+                            $totals[$criterion] += $value;
+                        }
+                    } catch (\Throwable $e) {
+                        continue;
+                    }
+                }
+            }
+        }
+        return $totals;
+    }
+
+    /**
+     * Get the old (pre-calculation) item parameters keyed by model name.
+     *
+     * @return array modelname => model_item_param_list
+     */
+    public function get_old_item_params(): array {
+        return $this->olditemparams;
+    }
+
+    /**
+     * Incremental recalculation: exactly one item-parameter pass with fixed PP.
+     *
+     * Issue #43 (incremental): the person abilities already present in the
+     * responses are treated as fixed. Item parameters are estimated exactly once
+     * per model, the best model is selected per item, and the person abilities are
+     * NOT re-estimated. This is the deliberate one-pass counterpart to
+     * run_estimation() (which iterates PP/IP).
+     *
+     * @return array [model_item_param_list[] keyed by model, model_person_param_list]
+     */
+    public function run_incremental_estimation(): array {
+        $personabilities = $this->responses->get_person_abilities();
+
+        /** @var array<model_item_param_list> $itemdifficulties */
+        $itemdifficulties = [];
+        foreach ($this->models as $name => $model) {
+            $oldmodelparams = $this->olditemparams[$name] ?? null;
+            $startvalues = $this->get_startvalues_for_model($name) ?? null;
+            if ($startvalues && $oldmodelparams) {
+                $startvalues->without($oldmodelparams->confirmed(), false);
+            }
+            $itemdifficulties[$name] = $this->models[$name]
+                ->estimate_item_params($this->responses, $personabilities, $startvalues);
+            $this->set_calculated_progress($name, $itemdifficulties[$name]);
+        }
+
+        // Model selection per item (AIC/BIC/CAIC). No person-ability re-estimation.
+        $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
+        $this->iterations = 1;
+
+        $itemdiffiwstatus = $this->set_status($itemdifficulties, $filtereddiffi);
+        return [$itemdiffiwstatus, $personabilities];
+    }
+
+    /**
+     * Number of PP/IP iterations performed by the last estimation run.
+     *
+     * @return int
+     */
+    public function get_iterations(): int {
+        return $this->iterations;
+    }
+
+    /**
+     * Maximum number of iterations configured for the disruptive estimation loop.
+     *
+     * @return int
+     */
+    public function get_max_iterations(): int {
+        return $this->maxiterations;
     }
 
     /**
@@ -416,6 +637,40 @@ class model_strategy {
      *
      * @return array<string>
      */
+    /**
+     * Validates the item parameters of a record against the contract of its model.
+     *
+     * Single entry point used both by the CSV importer and by the test runtime, so
+     * that an item is judged by exactly the same rules in both places.
+     *
+     * @param \stdClass $record The raw item parameter record (needs a `model` field).
+     * @return string[] Reasons the parameters are invalid; empty array if valid.
+     */
+    public static function validate_item_parameters(\stdClass $record): array {
+        $modelname = $record->model ?? '';
+        if ($modelname === '' || $modelname === null) {
+            // No model means there is nothing calibrated - the original rule applies:
+            // no usable item parameter, therefore a pilot item.
+            return ['no model is set'];
+        }
+
+        $models = self::get_installed_models();
+        if (!isset($models[$modelname])) {
+            return [sprintf('unknown model "%s"', $modelname)];
+        }
+
+        // Every model derives from model_model, which defines validate_parameters(),
+        // so the contract is guaranteed - no defensive method_exists() needed.
+        $class = $models[$modelname];
+
+        return $class::validate_parameters($record);
+    }
+
+    /**
+     * Returns all installed models.
+     *
+     * @return array
+     */
     public static function get_installed_models(): array {
         $pm = core_plugin_manager::instance();
         $models = [];
@@ -448,12 +703,8 @@ class model_strategy {
     private function create_installed_models(): array {
         /** @var array<model_model> $instances */
         $instances = [];
-        $ignorelist = ['grmgeneralized', 'grm', 'pcmgeneralized', 'pcm'];
 
         foreach (self::get_installed_models() as $name => $classname) {
-            if (in_array($name, $ignorelist)) {
-                continue;
-            }
             $instances[$name] = model_model::get_instance($name);
         }
         return $instances;
@@ -526,6 +777,18 @@ class model_strategy {
             case 'mixedraschbirnbaum':
                 return $this->get_last_calculated_for_model('mixedraschbirnbaum')
                     ?? $this->get_last_calculated_for_model('raschbirnbaum');
+            // Polytomous models: only re-use the model's own previous result. Cross-model
+            // seeding (as in the dichotomous chain) is unsafe here because the threshold
+            // parameter structures differ between families; a null return makes the model
+            // fall back to its empirical start values (get_start_ip).
+            case 'pcm':
+                return $this->get_last_calculated_for_model('pcm');
+            case 'pcmgeneralized':
+                return $this->get_last_calculated_for_model('pcmgeneralized');
+            case 'grm':
+                return $this->get_last_calculated_for_model('grm');
+            case 'grmgeneralized':
+                return $this->get_last_calculated_for_model('grmgeneralized');
             default:
                 throw new \Exception("Unknown model $modelname");
         }

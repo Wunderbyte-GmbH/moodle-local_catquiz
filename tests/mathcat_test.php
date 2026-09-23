@@ -44,14 +44,83 @@ final class mathcat_test extends basic_testcase {
      *
      * @return void
      */
-    public function test_newton_raphson_multi_stable(): void {
-        $result = mathcat::newton_raphson_multi_stable(
+    public function test_newton_raphson(): void {
+        $result = mathcat::newton_raphson(
             fn ($x) => [0],
             fn ($x) => [0],
             ['difficulty' => 0]
         );
         $expected = ['difficulty' => 0];
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Tests gradient ascent on a smooth two-dimensional objective.
+     *
+     * @return void
+     */
+    public function test_gradient_ascent(): void {
+        $objective = fn($x) => exp(-($x['x'] - 2) ** 2) - (($x['y'] - 1) ** 2);
+
+        $result = mathcat::gradient_ascent(
+            $objective,
+            fn($x) => [
+                2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
+                0,
+                0,
+            ],
+            ['x' => -pi() / 4, 'y' => 1.66, 'z' => -1.5],
+            6
+        );
+
+        $result = mathcat::gradient_ascent(
+            $objective,
+            fn($x) => [
+                0,
+                2 - 2 * $x['y'],
+                0,
+            ],
+            ['x' => $result['x'], 'y' => 1.66, 'z' => -1.5],
+            6
+        );
+
+        $result = mathcat::gradient_ascent(
+            $objective,
+            fn($x) => [
+                2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
+                2 - 2 * $x['y'],
+                0,
+            ],
+            ['x' => $result['x'], 'y' => $result['y'], 'z' => -1.5],
+            6
+        );
+
+        $this->assertEqualsWithDelta(2.0, $result['x'], 1e-5);
+        $this->assertEqualsWithDelta(1.0, $result['y'], 1e-5);
+        $this->assertEqualsWithDelta(-1.5, $result['z'], 1e-12);
+    }
+
+    /**
+     * Tests BFGS maximisation with an analytic gradient.
+     *
+     * @return void
+     */
+    public function test_bfgs(): void {
+        $result = mathcat::bfgs(
+            fn($x) => exp(-($x['x'] - 2) ** 2) - (($x['y'] - 1) ** 2),
+            fn($x) => [
+                2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
+                2 - 2 * $x['y'],
+                0,
+            ],
+            ['x' => -pi() / 4, 'y' => 1.66, 'z' => -1.5],
+            6,
+            200
+        );
+
+        $this->assertEqualsWithDelta(2.0, $result['x'], 1e-5);
+        $this->assertEqualsWithDelta(1.0, $result['y'], 1e-5);
+        $this->assertEqualsWithDelta(-1.5, $result['z'], 1e-12);
     }
 
     /**
@@ -162,6 +231,45 @@ final class mathcat_test extends basic_testcase {
                 'given' => ['test' => []],
                 'expected' => [],
                 'structure' => [],
+            ],
+        ];
+    }
+
+    /**
+     * The codec round-trips the nested item-parameter structures used by the
+     * polytomous models (GRM/GGRM/PCM/GPCM). This guards the assumption that
+     * BFGS and gradient ascent can flatten and restore those structures.
+     *
+     * @dataProvider polytomous_itemparam_provider
+     *
+     * @param array $ip Nested item parameters.
+     * @param int $dim Expected number of scalar components.
+     * @return void
+     */
+    public function test_codec_roundtrips_polytomous_itemparams(array $ip, int $dim): void {
+        $vector = $ip;
+        $structure = mathcat::array_to_vector($vector);
+
+        $this->assertCount($dim, $vector, 'Flattened vector length must equal the parameter dimension.');
+        $this->assertEquals($ip, mathcat::vector_to_array($vector, $structure));
+    }
+
+    /**
+     * Representative nested item-parameter structures per polytomous model.
+     *
+     * @return array
+     */
+    public static function polytomous_itemparam_provider(): array {
+        return [
+            'grm' => [['difficulty' => 0.7, 'difficulties' => [-1.2, 0.3, 1.5]], 4],
+            'ggrm' => [
+                ['discrimination' => 1.3, 'difficulties' => [-1.0, 0.0, 1.0, 2.0], 'difficulty' => 0.5],
+                6,
+            ],
+            'pcm' => [['intercepts' => [-0.8, 0.2, 0.9], 'difficulty' => 0.4], 4],
+            'gpcm' => [
+                ['intercepts' => [-0.5, 0.1, 0.6, 1.1], 'discrimination' => 1.1, 'difficulty' => 0.6],
+                6,
             ],
         ];
     }

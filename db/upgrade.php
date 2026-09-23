@@ -1193,5 +1193,473 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2026052700, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2026081714) {
+        // Issue #44: make the scheduled recalculation safe on existing installs.
+        // Disable it and switch it to a quarterly cadence, but only when the admin
+        // has not customised it (so deliberate admin settings are preserved).
+        $task = \core\task\manager::get_scheduled_task(
+            \local_catquiz\task\recalculate_cat_model_params::class
+        );
+        if ($task !== false && !$task->is_customised()) {
+            $task->set_disabled(true);
+            $task->set_minute('R');
+            $task->set_hour('0');
+            $task->set_day('1');
+            $task->set_month('*/3');
+            $task->set_day_of_week('*');
+            \core\task\manager::configure_scheduled_task($task);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2026081714, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026082100) {
+        // Issue #5: harden the identity of a local CAT attempt so that at most
+        // one row exists per adaptive quiz attempt. First repair historical
+        // duplicates (keep the most recent row per attemptid), then replace the
+        // non-unique index with a unique one.
+        $duplicates = $DB->get_records_sql(
+            "SELECT attemptid, MAX(id) AS keepid, COUNT(*) AS cnt
+               FROM {local_catquiz_attempts}
+              WHERE attemptid IS NOT NULL
+           GROUP BY attemptid
+             HAVING COUNT(*) > 1"
+        );
+        foreach ($duplicates as $dup) {
+            $DB->delete_records_select(
+                'local_catquiz_attempts',
+                'attemptid = :attemptid AND id <> :keepid',
+                ['attemptid' => $dup->attemptid, 'keepid' => $dup->keepid]
+            );
+        }
+
+        $table = new xmldb_table('local_catquiz_attempts');
+        $oldindex = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, ['attemptid']);
+        if ($dbman->index_exists($table, $oldindex)) {
+            $dbman->drop_index($table, $oldindex);
+        }
+        $newindex = new xmldb_index('attemptid', XMLDB_INDEX_UNIQUE, ['attemptid']);
+        if (!$dbman->index_exists($table, $newindex)) {
+            $dbman->add_index($table, $newindex);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2026082100, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026082104) {
+        // Issue #9: per-attempt, per-scale result history. One row per finalised
+        // attempt and successfully tested scale; written only by the finaliser
+        // after validation. Additive and idempotent.
+        $table = new xmldb_table('local_catquiz_attemptscale');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('catattemptid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('score', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null);
+            $table->add_field('standarderror', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null);
+            $table->add_field('n', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('fraction', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null);
+            $table->add_field('isprimary', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('isvalid', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('resultsource', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+            $table->add_field('validationstatus', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('catattemptid', XMLDB_KEY_FOREIGN, ['catattemptid'], 'local_catquiz_attempts', ['id']);
+            $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+            $table->add_key('catscaleid', XMLDB_KEY_FOREIGN, ['catscaleid'], 'local_catquiz_catscales', ['id']);
+            $table->add_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'local_catquiz_catcontext', ['id']);
+            $table->add_key('catattemptid_catscaleid', XMLDB_KEY_UNIQUE, ['catattemptid', 'catscaleid']);
+
+            $table->add_index('userid_contextid_catscaleid', XMLDB_INDEX_NOTUNIQUE, ['userid', 'contextid', 'catscaleid']);
+            $table->add_index('isvalid', XMLDB_INDEX_NOTUNIQUE, ['isvalid']);
+            $table->add_index('isprimary', XMLDB_INDEX_NOTUNIQUE, ['isprimary']);
+
+            $dbman->create_table($table);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2026082104, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026082803) {
+        // Issue #25: composite and unique indexes for the hot access patterns.
+        //
+        // Order matters: every unique index is preceded by a deduplication step,
+        // because adding a unique index to a table that already contains duplicates
+        // fails the whole upgrade. Each step reports what it removed via mtrace, so
+        // the cleanup is auditable rather than silent.
+
+        // 1. The index named "timecreated" actually indexed instanceid, which merely
+        // duplicated the separate instanceid index and left time-range filters
+        // unindexed. Drop the misnamed one and create it on the intended field.
+        $table = new xmldb_table('local_catquiz_attempts');
+        $wrongindex = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['instanceid']);
+        if ($dbman->index_exists($table, $wrongindex)) {
+            $dbman->drop_index($table, $wrongindex);
+        }
+        $rightindex = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
+        if (!$dbman->index_exists($table, $rightindex)) {
+            $dbman->add_index($table, $rightindex);
+        }
+
+        // 2. Statistics access pattern: context + scale + user.
+        $statsindex = new xmldb_index(
+            'contextid_scaleid_userid_attemptid',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['contextid', 'scaleid', 'userid', 'attemptid']
+        );
+        if (!$dbman->index_exists($table, $statsindex)) {
+            $dbman->add_index($table, $statsindex);
+        }
+
+        // 3. One person parameter per user, context and scale. The saving code in
+        // model_person_param_list keys existing rows by userid and therefore already
+        // assumed this; duplicates would silently make it update the wrong row.
+        local_catquiz_upgrade_remove_duplicates(
+            'local_catquiz_personparams',
+            ['userid', 'contextid', 'catscaleid']
+        );
+        $table = new xmldb_table('local_catquiz_personparams');
+        $ppindex = new xmldb_index('userid_contextid_catscaleid', XMLDB_INDEX_UNIQUE, ['userid', 'contextid', 'catscaleid']);
+        if (!$dbman->index_exists($table, $ppindex)) {
+            $dbman->add_index($table, $ppindex);
+        }
+
+        // 4. Exactly one progress row per attempt.
+        local_catquiz_upgrade_remove_duplicates('local_catquiz_progress', ['attemptid']);
+        $table = new xmldb_table('local_catquiz_progress');
+        $oldprogress = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, ['attemptid']);
+        if ($dbman->index_exists($table, $oldprogress)) {
+            $dbman->drop_index($table, $oldprogress);
+        }
+        $newprogress = new xmldb_index('attemptid', XMLDB_INDEX_UNIQUE, ['attemptid']);
+        if (!$dbman->index_exists($table, $newprogress)) {
+            $dbman->add_index($table, $newprogress);
+        }
+
+        // 5. Item lookup by scale and component, and the join to the active parameter.
+        $table = new xmldb_table('local_catquiz_items');
+        foreach (
+            [
+                'catscaleid_componentname_componentid' => ['catscaleid', 'componentname', 'componentid'],
+                'catscaleid_activeparamid' => ['catscaleid', 'activeparamid'],
+            ] as $name => $fields
+        ) {
+            $index = new xmldb_index($name, XMLDB_INDEX_NOTUNIQUE, $fields);
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2026082803, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026082805) {
+        // Issue #25: drop the index declarations that a foreign key already covers.
+        //
+        // XMLDB does not create real foreign key constraints here; it creates an
+        // index on the referencing column. Where install.xml additionally declared
+        // an <INDEX> on that same column, every row change had to maintain two
+        // physically identical indexes. That is pure write cost on exactly the
+        // tables written on every single answer (attempts, progress).
+        //
+        // The declarations are gone from install.xml, so new installations are
+        // already correct. Existing installations still carry both, and the
+        // duplicate must be dropped by name: $dbman->drop_index() resolves an index
+        // by its columns and would happily drop whichever it finds first, including
+        // the unique one we must keep on progress.attemptid.
+        $duplicates = [
+            ['local_catquiz_catscales', ['contextid'], false],
+            ['local_catquiz_subscriptions', ['itemid'], false],
+            ['local_catquiz_tests', ['catscaleid'], false],
+            ['local_catquiz_tests', ['courseid'], false],
+            ['local_catquiz_items', ['catscaleid'], false],
+            ['local_catquiz_items', ['contextid'], false],
+            ['local_catquiz_items', ['activeparamid'], false],
+            ['local_catquiz_itemparams', ['contextid'], false],
+            ['local_catquiz_personparams', ['userid'], false],
+            ['local_catquiz_personparams', ['catscaleid'], false],
+            ['local_catquiz_personparams', ['contextid'], false],
+            ['local_catquiz_personparams', ['attemptid'], false],
+            ['local_catquiz_attempts', ['userid'], false],
+            ['local_catquiz_attempts', ['scaleid'], false],
+            ['local_catquiz_attempts', ['contextid'], false],
+            ['local_catquiz_attempts', ['courseid'], false],
+            ['local_catquiz_progress', ['userid'], false],
+            // The attemptid column of progress carries a uniqueness guarantee, now
+            // expressed by a foreign-unique key. Keep the unique index, drop the
+            // plain one.
+            ['local_catquiz_progress', ['attemptid'], true],
+        ];
+
+        $dropped = 0;
+        foreach ($duplicates as [$tablename, $columns, $keepunique]) {
+            $dropped += local_catquiz_upgrade_drop_duplicate_indexes(
+                $tablename,
+                $columns,
+                $keepunique
+            );
+        }
+        if ($dropped > 0) {
+            mtrace("local_catquiz: removed $dropped redundant index(es).");
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2026082805, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026083000) {
+        // Issue #54: persist whether the stored parameters are usable for their
+        // model. Without a column the backend cannot filter or sort on the state -
+        // it is derived in PHP from the model contract, and an ORDER BY on something
+        // that does not exist in the database is not an option.
+        $table = new xmldb_table('local_catquiz_itemparams');
+        $field = new xmldb_field('usable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'status');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('contextid_usable', XMLDB_INDEX_NOTUNIQUE, ['contextid', 'usable']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Backfill from the same rule the runtime uses, in batches: the parameter
+        // table grows with items times contexts times models, so loading it whole
+        // would defeat the point of the exercise.
+        local_catquiz_upgrade_backfill_usable();
+
+        upgrade_plugin_savepoint(true, 2026083000, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026090207) {
+        // Issue #65: remove the second, unread copy of the hub credentials. The
+        // remote settings form used to write central_host and central_token under
+        // local_catquiz, while everything that contacts a hub reads them from
+        // catquizcentralhub_client. Nothing consumed the copy - it only kept a host
+        // and a token on disk outside the reach of the client plugin's kill-switch.
+        //
+        // Carried over rather than dropped, so an installation that only ever used
+        // the old form keeps working; then removed from the old place.
+        foreach (['central_host', 'central_token'] as $name) {
+            $legacy = get_config('local_catquiz', $name);
+            if ($legacy === false || $legacy === '') {
+                continue;
+            }
+            if (!get_config('catquizcentralhub_client', $name)) {
+                set_config($name, $legacy, 'catquizcentralhub_client');
+            }
+            unset_config($name, 'local_catquiz');
+        }
+
+        upgrade_plugin_savepoint(true, 2026090207, 'local', 'catquiz');
+    }
+
     return true;
+}
+
+/**
+ * Recomputes the usable flag for every stored item parameter.
+ *
+ * Used by the issue #54 upgrade and by the consistency check. Returns the number of
+ * rows whose stored flag did not match the rule - zero means backend and runtime
+ * agree.
+ *
+ * @param bool $dryrun When true, only count the mismatches instead of fixing them.
+ * @return int Number of mismatching rows.
+ */
+function local_catquiz_upgrade_backfill_usable(bool $dryrun = false): int {
+    global $DB;
+
+    $mismatches = 0;
+    $batch = 500;
+    $lastid = 0;
+
+    while (true) {
+        $records = $DB->get_records_select(
+            'local_catquiz_itemparams',
+            'id > :lastid',
+            ['lastid' => $lastid],
+            'id ASC',
+            'id, model, difficulty, discrimination, guessing, json, usable',
+            0,
+            $batch
+        );
+        if (empty($records)) {
+            break;
+        }
+
+        foreach ($records as $record) {
+            $lastid = (int) $record->id;
+            $expected = empty(\local_catquiz\local\model\model_strategy::validate_item_parameters($record)) ? 1 : 0;
+            if ((int) $record->usable === $expected) {
+                continue;
+            }
+            $mismatches++;
+            if (!$dryrun) {
+                $DB->set_field('local_catquiz_itemparams', 'usable', $expected, ['id' => $record->id]);
+            }
+        }
+    }
+
+    return $mismatches;
+}
+
+/**
+ * Drops physically identical indexes on a column, leaving exactly one.
+ *
+ * Issue #25: several columns were covered both by a foreign key (which XMLDB
+ * implements as an index) and by an explicit <INDEX> declaration, so two identical
+ * indexes existed and both had to be maintained on every write.
+ *
+ * Moodle's $dbman->drop_index() resolves an index by its columns only and returns
+ * the first match, which makes it unsafe here: on a column whose duplicates differ
+ * in uniqueness it might drop the unique one. This helper therefore resolves the
+ * concrete index names itself and drops all but the one to keep.
+ *
+ * @param string $tablename Table name without prefix.
+ * @param string[] $columns Columns the index covers.
+ * @param bool $keepunique Keep the unique index rather than an arbitrary one.
+ * @return int Number of dropped indexes.
+ */
+function local_catquiz_upgrade_drop_duplicate_indexes(
+    string $tablename,
+    array $columns,
+    bool $keepunique = false
+): int {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+    if (!$dbman->table_exists(new xmldb_table($tablename))) {
+        return 0;
+    }
+
+    $matching = [];
+    foreach ($DB->get_indexes($tablename) as $name => $info) {
+        $indexcolumns = array_values($info['columns']);
+        if ($indexcolumns === array_values($columns)) {
+            $matching[$name] = !empty($info['unique']);
+        }
+    }
+
+    if (count($matching) < 2) {
+        return 0;
+    }
+
+    // Decide which one survives before dropping anything.
+    $keep = null;
+    if ($keepunique) {
+        foreach ($matching as $name => $isunique) {
+            if ($isunique) {
+                $keep = $name;
+                break;
+            }
+        }
+        if ($keep === null) {
+            // No unique index present: the guarantee this column relies on is
+            // missing, so do not touch anything and say so.
+            mtrace(sprintf(
+                'local_catquiz: %s(%s) has no unique index - left untouched.',
+                $tablename,
+                implode(',', $columns)
+            ));
+            return 0;
+        }
+    } else {
+        $keep = array_key_first($matching);
+    }
+
+    $prefixed = $DB->get_prefix() . $tablename;
+    $mysql = $DB->get_dbfamily() === 'mysql';
+    $dropped = 0;
+    foreach (array_keys($matching) as $name) {
+        if ($name === $keep) {
+            continue;
+        }
+        $sql = $mysql
+            ? "DROP INDEX $name ON $prefixed"
+            : "DROP INDEX $name";
+        $DB->change_database_structure($sql);
+        $dropped++;
+    }
+
+    return $dropped;
+}
+
+/**
+ * Removes duplicate rows before a unique index is added, keeping the newest row.
+ *
+ * Issue #25: adding a unique index to a table that already holds duplicates aborts
+ * the whole upgrade with a database error that says nothing about which data caused
+ * it. This helper removes the duplicates first and reports per group what it deleted,
+ * so an administrator can trace the cleanup afterwards instead of guessing.
+ *
+ * The row with the highest id wins: for both affected tables the later row is the
+ * more recently written state.
+ *
+ * @param string $table Table name without prefix.
+ * @param string[] $fields Fields that together must be unique.
+ * @return int Number of deleted rows.
+ */
+function local_catquiz_upgrade_remove_duplicates(string $table, array $fields): int {
+    global $DB;
+
+    $fieldlist = implode(', ', $fields);
+
+    // GROUP BY treats two NULLs as the same value, a unique index does not: both
+    // PostgreSQL and MariaDB allow any number of rows that carry NULL in an indexed
+    // column. Grouping alone would therefore delete rows that the index would have
+    // accepted - real data loss for no gain, and contextid (personparams) as well as
+    // attemptid (progress) are nullable. Skip any group in which one of the fields
+    // is NULL; such rows can never violate the constraint.
+    $notnull = [];
+    foreach ($fields as $field) {
+        $notnull[] = "$field IS NOT NULL";
+    }
+    $where = implode(' AND ', $notnull);
+
+    $sql = "SELECT $fieldlist, COUNT(*) AS cnt, MAX(id) AS keepid
+              FROM {" . $table . "}
+             WHERE $where
+          GROUP BY $fieldlist
+            HAVING COUNT(*) > 1";
+
+    $groups = $DB->get_recordset_sql($sql);
+    $deleted = 0;
+    foreach ($groups as $group) {
+        // NULL groups were already excluded by the query above, so every field of a
+        // returned group carries a real value.
+        $conditions = [];
+        $params = [];
+        foreach ($fields as $field) {
+            $conditions[] = "$field = :$field";
+            $params[$field] = $group->{$field};
+        }
+        $params['keepid'] = $group->keepid;
+        $where = implode(' AND ', $conditions) . ' AND id <> :keepid';
+        $count = $DB->count_records_select($table, $where, $params);
+        if ($count > 0) {
+            $DB->delete_records_select($table, $where, $params);
+            $deleted += $count;
+            mtrace(sprintf(
+                'local_catquiz: removed %d duplicate row(s) from %s for %s, kept id %d.',
+                $count,
+                $table,
+                json_encode(array_intersect_key((array) $group, array_flip($fields))),
+                $group->keepid
+            ));
+        }
+    }
+    $groups->close();
+
+    // Nothing is reported when there is nothing to clean up; the caller decides
+    // whether the number matters.
+    return $deleted;
 }

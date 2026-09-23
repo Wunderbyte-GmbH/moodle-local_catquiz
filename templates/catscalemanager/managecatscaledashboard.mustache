@@ -28,66 +28,90 @@
 
 <h1>{{summaryheading}}</h1>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs" id="myTab">
   <li class="nav-item">
-    <a class="nav-link active" id="summary-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_summary" role="tab" aria-controls="lcq_summary" aria-selected="true">{{#str}}summary, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#issummary}}active{{/issummary}}" id="summary-tab" href="{{summaryurl}}" {{#issummary}}aria-current="page"{{/issummary}}>{{#str}}summary, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="catscales-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_catscales" role="tab" aria-controls="lcq_catscales" aria-selected="false">{{#str}} catscalesheading, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#iscatscales}}active{{/iscatscales}}" id="catscales-tab" href="{{catscalesurl}}" {{#iscatscales}}aria-current="page"{{/iscatscales}}>{{#str}} catscalesheading, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="questions-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_questions" role="tab" aria-controls="lcq_questions" aria-selected="false">{{#str}}questions, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isquestions}}active{{/isquestions}}" id="questions-tab" href="{{questionsurl}}" {{#isquestions}}aria-current="page"{{/isquestions}}>{{#str}}questions, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_testsandtemplates" role="tab" aria-controls="lcq_testsandtemplates" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#istestsandtemplates}}active{{/istestsandtemplates}}" id="testsandtemplates-tab" href="{{testsandtemplatesurl}}" {{#istestsandtemplates}}aria-current="page"{{/istestsandtemplates}}>{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="quizattempts-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_quizattempts" role="tab" aria-controls="lcq_quizattempts" aria-selected="false">{{#str}}quizattempts, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isquizattempts}}active{{/isquizattempts}}" id="quizattempts-tab" href="{{quizattemptsurl}}" {{#isquizattempts}}aria-current="page"{{/isquizattempts}}>{{#str}}quizattempts, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="calculations-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_calculations" role="tab" aria-controls="lcq_calculations" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#iscalculations}}active{{/iscalculations}}" id="calculations-tab" href="{{calculationsurl}}" {{#iscalculations}}aria-current="page"{{/iscalculations}}>{{#str}}calculations, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="versioning-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_versioning" role="tab" aria-controls="lcq_versioning" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isversioning}}active{{/isversioning}}" id="versioning-tab" href="{{versioningurl}}" {{#isversioning}}aria-current="page"{{/isversioning}}>{{#str}}versioning, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="importer-tab" data-toggle="tab" data-bs-toggle="tab" href="#lcq_importer" role="tab" aria-controls="lcq_importer" aria-selected="false">{{#str}} import, core{{/str}}</a>
+    <a class="nav-link {{#isimporter}}active{{/isimporter}}" id="importer-tab" href="{{importerurl}}" {{#isimporter}}aria-current="page"{{/isimporter}}>{{#str}} import, core{{/str}}</a>
   </li>
 </ul>
 
 <div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="lcq_summary" role="tabpanel" aria-labelledby="summary-tab">
+  {{#issummary}}
+  <div class="tab-pane fade show active" id="lcq_summary">
     {{> local_catquiz/catscalemanager/summary}}
   </div>
-  <div class="tab-pane fade" id="lcq_catscales" role="tabpanel" aria-labelledby="catscales-tab">
+{{/issummary}}
+  {{#iscatscales}}
+  <div class="tab-pane fade show active" id="lcq_catscales">
     {{> local_catquiz/catscalemanager/catscales}}
   </div>
-  <div class="tab-pane fade" id="lcq_questions" role="tabpanel" aria-labelledby="questions-tab">
+{{/iscatscales}}
+  {{#isquestions}}
+  <div class="tab-pane fade show active" id="lcq_questions">
     {{> local_catquiz/catscalemanager/questions/questionsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_testsandtemplates" role="tabpanel" aria-labelledby="testsandtemplates-tab">
+{{/isquestions}}
+  {{#istestsandtemplates}}
+  <div class="tab-pane fade show active" id="lcq_testsandtemplates">
     {{> local_catquiz/catscalemanager/testsandtemplates/testsandtemplatesdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_quizattempts" role="tabpanel" aria-labelledby="quizattempts-tab">
+{{/istestsandtemplates}}
+  {{#isquizattempts}}
+  <div class="tab-pane fade show active" id="lcq_quizattempts">
     {{> local_catquiz/catscalemanager/quizattempts/quizattemptsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_calculations" role="tabpanel" aria-labelledby="calculations-tab">
+{{/isquizattempts}}
+  {{#iscalculations}}
+  <div class="tab-pane fade show active" id="lcq_calculations">
     {{> local_catquiz/catscalemanager/calculations/calculationsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_versioning" role="tabpanel" aria-labelledby="versioning-tab">
+{{/iscalculations}}
+  {{#isversioning}}
+  <div class="tab-pane fade show active" id="lcq_versioning">
     {{> local_catquiz/catcontextdashboard}}
   </div>
-  <div class="tab-pane fade" id="lcq_importer" role="tabpanel" aria-labelledby="importer-tab">
+{{/isversioning}}
+  {{#isimporter}}
+  <div class="tab-pane fade show active" id="lcq_importer">
     {{{testitemsimporter}}}
     {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>
+{{/isimporter}}
 </div>
 
 {{#js}}
+    {{! Issue #29: only the active tab is rendered, so a module whose elements live on
+        another tab finds nothing. csvimport builds a dynamic form from the container
+        it queries; with a null container it throws, and a thrown module leaves the
+        page permanently "not ready" - which is how Behat scenarios started failing at
+        an unrelated step. It is loaded only where its form exists. }}
+    {{#isimporter}}
     require(['local_catquiz/csvimport'], function(init) {
       init.init();
-  });
-  require(['local_catquiz/scaleandcontextselector'], function(init) {
-    init.init();
-  });
+    });
+    {{/isimporter}}
+    {{! The context selector sits above the tabs and is present on every one. }}
+    require(['local_catquiz/scaleandcontextselector'], function(init) {
+      init.init();
+    });
 {{/js}}

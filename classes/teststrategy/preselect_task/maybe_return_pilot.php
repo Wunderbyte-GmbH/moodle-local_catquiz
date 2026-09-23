@@ -45,7 +45,19 @@ class maybe_return_pilot extends preselect_task {
      */
     public function run(array &$context): result {
         $this->context = $context;
-        if ($context['pilot_ratio'] === 0) {
+        // Pilots switched off. Returning early here used to leave the
+        // pilot-flagged items in the candidate pool, so they were still played -
+        // and then skipped by updatepersonability, which froze the estimate.
+        // "Deactivated" must mean "no pilot items at all", so filter them out.
+        // The comparison is deliberately loose: pilot_ratio arrives as int 0 when
+        // pilots are disabled but as float 0.0 via floatval() when they are
+        // enabled with a ratio of zero, and a strict === 0 missed the latter.
+        if (empty($context['pilot_ratio'])) {
+            $nonpilot = array_filter($context['questions'], fn($q) => empty($q->is_pilot));
+            // Only narrow the pool if that leaves something to choose from.
+            if (count($nonpilot) > 0) {
+                $context['questions'] = $nonpilot;
+            }
             return result::ok($context);
         }
 
