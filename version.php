@@ -34,7 +34,7 @@ $plugin->supported = [405, 405];
 // Issue #31: "supported" only informs; this keeps the 1.2 line off Moodle 5.0 and later (the 1.3 line is for 5.x).
 $plugin->incompatible = 500;
 $plugin->release = '1.2.1';
-$plugin->version = 2026102406;
+$plugin->version = 2026102407;
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [

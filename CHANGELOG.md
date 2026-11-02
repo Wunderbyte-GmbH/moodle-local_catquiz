@@ -2,6 +2,21 @@
 
 ## 1.2.1 (in Arbeit)
 
+- CI-Logs vom 02.11.2026 (2026102407): Playwright `itemparam-validity.spec.ts` („marks an item whose parameters cannot be
+  used“) war in beiden Linien rot. Die anderen roten Markierungen der Logs (phpcpd) sind beratend; die Code-Analyse
+  selbst war grün, phpcs ohne Befund (#158 erledigt).
+  - Ursache: Die erste Fassung der #157-Regel verlangte `lcip.componentid = lci.componentid`. Parameterzeilen ohne
+    Frage (`componentid` 0 oder NULL, so schreiben sie ältere Stände und die Seed-Werkzeuge) galten damit als nicht
+    auflösbarer Verweis. Kalibrierte Items fielen aus dem Pool, und der CAT-Manager zeigte statt „nicht verwendbar“ den
+    Integritätsfehler.
+  - Ebenso fiel ein Item mit `activeparamid = 0` statt NULL zur Laufzeit aus dem Pool, statt als Pilot zu gelten.
+  - Jetzt gilt: Eine Parameterzeile ohne Frage gehört über `itemid` zu ihrem Item. Ein Fehler ist nur eine Zeile, die
+    eine andere Frage nennt. `activeparamid` 0 wird wie NULL behandelt. Das gilt in Laufzeitpool, CAT-Manager,
+    Schätzliste, Integritätsprüfung und Audit.
+  - Upgrade-Schritt 2026102407 leert `runtimepool` und `catquiz_item_params`. Daten werden nicht geändert.
+  - Test: `context_item_pool_test::test_a_row_without_question_or_active_zero_is_not_broken`. Zahntests: Jede der drei
+    Lockerungen einzeln zurückgenommen macht ihn rot. Im Browser macht die alte Regel den Playwright-Test rot.
+
 - Nacharbeiten zu #150 (Auftrag mit Patch vom 28.10.2026) und zum Re-Audit-Stand vom 28.10.2026 (2026102406). Bericht:
   `doc/re-audit-2026-10-28.md`, Belege `doc/evidence/re-audit-2026-10-28/`.
   - #150, Defekt A (einzelner Root-Balken): Ein abgeschlossener Versuch ohne gespeicherte Ergebnisse galt immer als

@@ -524,7 +524,7 @@ class catquiz {
             -- does not resolve to parameters of the item in its context is an error, not a pilot.
             lci.contextid AS itemcontextid,
             lci.activeparamid AS activeparamid,
-            CASE WHEN lci.activeparamid IS NOT NULL AND lcip.id IS NULL THEN 1 ELSE 0 END AS invalidparamref,
+            CASE WHEN COALESCE(lci.activeparamid, 0) <> 0 AND lcip.id IS NULL THEN 1 ELSE 0 END AS invalidparamref,
             -- Issue #82: ready, draft or hidden - the status of the newest version of the question in the bank.
             qvl.status AS questionstatus{$statcolumns}
           FROM {local_catquiz_catscales} lccs
@@ -545,7 +545,7 @@ class catquiz {
           -- for its question.
             LEFT JOIN {local_catquiz_itemparams} lcip
               ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
-                AND lcip.contextid = lci.contextid AND lcip.componentid = lci.componentid
+                AND lcip.contextid = lci.contextid AND (lcip.componentid = lci.componentid OR COALESCE(lcip.componentid, 0) = 0)
 
           -- Get all information about the question from the questionbank itself
             JOIN {question} q ON q.id=lci.componentid $questionfilter
@@ -603,7 +603,7 @@ class catquiz {
         // out - local\integrity\item_param_integrity reports it -, the manager lists show it, marked
         // (invalidparamref), so that it can be repaired.
         if ($onlyavailable) {
-            $where .= sprintf(' AND (lcipcontextid = %d OR activeparamid IS NULL)', (int) $contextid);
+            $where .= sprintf(' AND (lcipcontextid = %d OR COALESCE(activeparamid, 0) = 0)', (int) $contextid);
         } else {
             $where .= sprintf(' AND (lcipcontextid = %d OR lcipcontextid IS NULL)', (int) $contextid);
         }
@@ -2018,7 +2018,7 @@ class catquiz {
             JOIN {local_catquiz_items} lci ON lci.catscaleid = lccs.id AND lci.contextid = :itemcontextid
             LEFT JOIN {local_catquiz_itemparams} lcip
               ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
-                AND lcip.contextid = lci.contextid AND lcip.componentid = lci.componentid
+                AND lcip.contextid = lci.contextid AND (lcip.componentid = lci.componentid OR COALESCE(lcip.componentid, 0) = 0)
             JOIN {question} q ON q.id = lci.componentid
             JOIN {question_versions} qv ON qv.questionid = q.id
             JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
@@ -2681,7 +2681,8 @@ class catquiz {
             "SELECT lci.id as uniqueid, lcip.*
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
-                ON lci.id = lcip.itemid AND lci.contextid = lcip.contextid AND lci.componentid = lcip.componentid
+                ON lci.id = lcip.itemid AND lci.contextid = lcip.contextid
+                    AND (lcip.componentid = lci.componentid OR COALESCE(lcip.componentid, 0) = 0)
             WHERE $where
             ",
             $params

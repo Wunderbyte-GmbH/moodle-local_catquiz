@@ -69,7 +69,7 @@ final class item_param_integrity {
                     lcip.componentid AS paramcomponentid
                FROM {local_catquiz_items} lci
           LEFT JOIN {local_catquiz_itemparams} lcip ON lcip.id = lci.activeparamid
-              WHERE lci.contextid = :ctx AND lci.activeparamid IS NOT NULL $scalesql",
+              WHERE lci.contextid = :ctx AND COALESCE(lci.activeparamid, 0) <> 0 $scalesql",
             $params
         );
         $bykind = [self::MISSING => 0, self::OTHER_ITEM => 0, self::OTHER_CONTEXT => 0, self::OTHER_QUESTION => 0];
@@ -116,7 +116,9 @@ final class item_param_integrity {
         if ((int) $row->paramcontextid !== (int) $row->contextid) {
             return self::OTHER_CONTEXT;
         }
-        if ((int) $row->paramcomponentid !== (int) $row->componentid) {
+        // A parameter row without a question (componentid 0 or null, as older rows and the seed tools write them) is
+        // bound to its item by itemid alone; only a row that names another question is an error.
+        if ((int) $row->paramcomponentid !== 0 && (int) $row->paramcomponentid !== (int) $row->componentid) {
             return self::OTHER_QUESTION;
         }
         return null;

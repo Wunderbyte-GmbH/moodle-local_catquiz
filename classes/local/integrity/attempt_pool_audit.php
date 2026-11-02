@@ -47,7 +47,7 @@ final class attempt_pool_audit {
             "SELECT lci.componentid, lcip.difficulty
                FROM {local_catquiz_items} lci
                JOIN {local_catquiz_itemparams} lcip ON lcip.id = lci.activeparamid AND lcip.itemid = lci.id
-                    AND lcip.contextid = lci.contextid AND lcip.componentid = lci.componentid
+                    AND lcip.contextid = lci.contextid AND (lcip.componentid = lci.componentid OR COALESCE(lcip.componentid, 0) = 0)
               WHERE lci.contextid = :ctx",
             ['ctx' => $contextid]
         );

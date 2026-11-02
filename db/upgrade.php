@@ -1587,6 +1587,15 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2026102406, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2026102407) {
+        /* Issue #157 (CI 02.11.2026): a parameter row without a question (componentid 0 or null) belongs to its item by
+           itemid, and an item with activeparamid 0 is a pilot like one with null. The first version of the rule took
+           both for broken references and left such items out of the pool; the pools are built again. No data change. */
+        \cache::make('local_catquiz', 'runtimepool')->purge();
+        \cache::make('local_catquiz', 'catquiz_item_params')->purge();
+        upgrade_plugin_savepoint(true, 2026102407, 'local', 'catquiz');
+    }
+
     return true;
 }
 

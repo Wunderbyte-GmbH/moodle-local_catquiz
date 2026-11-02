@@ -113,7 +113,7 @@ final class context_item_pool_test extends advanced_testcase {
      * @param string $scale S1, S2, S3
      * @param string $context A, B, C
      * @param array|null $param null: pilot; otherwise difficulty, model, and optionally 'broken' => missing |
-     *     otheritem | othercontext | otherquestion.
+     *     otheritem | othercontext | otherquestion | noquestion (componentid 0, as older rows and the seed tools write it).
      * @param int $status
      * @return int[] [itemid, paramid]
      */
@@ -135,7 +135,7 @@ final class context_item_pool_test extends advanced_testcase {
         $broken = $param['broken'] ?? null;
         $record = (object) [
             'itemid' => $broken === 'otheritem' ? $itemid + 100000 : $itemid,
-            'componentid' => $broken === 'otherquestion' ? $questionid + 100000 : $questionid,
+            'componentid' => $broken === 'otherquestion' ? $questionid + 100000 : ($broken === 'noquestion' ? 0 : $questionid),
             'componentname' => 'question',
             'contextid' => $this->contexts[$broken === 'othercontext' ? ($context === 'A' ? 'B' : 'A') : $context],
             'model' => $param['model'] ?? 'raschbirnbaum', 'difficulty' => $param['difficulty'],
@@ -191,7 +191,7 @@ final class context_item_pool_test extends advanced_testcase {
             $param = $DB->get_record('local_catquiz_itemparams', ['id' => $item->activeparamid], '*', MUST_EXIST);
             $this->assertSame((int) $item->id, (int) $param->itemid);
             $this->assertSame($contextid, (int) $param->contextid);
-            $this->assertSame((int) $item->componentid, (int) $param->componentid);
+            $this->assertContains((int) $param->componentid, [0, (int) $item->componentid], 'No other question.');
             $this->assertSame($param->model, $row->model);
             $this->assertEqualsWithDelta((float) $param->difficulty, (float) $row->difficulty, 1e-9);
             $this->assertSame($contextid, (int) $row->lcipcontextid);
@@ -443,6 +443,27 @@ final class context_item_pool_test extends advanced_testcase {
         $this->assertSame([$pilot], array_keys($b));
         $this->assertTrue($this->is_pilot($b[$pilot]));
         $this->assert_invariants($b, 'B');
+    }
+
+    /**
+     * CI 02.11.2026: parameters without a question (componentid 0) resolve through their item, and an item whose
+     * activeparamid is 0 instead of null is a pilot. Both are written by older code and by the seed tools; the first
+     * version of the #157 rule took them for broken references and dropped calibrated items and pilots from the pool.
+     */
+    public function test_a_row_without_question_or_active_zero_is_not_broken(): void {
+        global $DB;
+        $calibrated = $this->question();
+        $this->item($calibrated, 'S1', 'B', ['difficulty' => 0.7, 'broken' => 'noquestion']);
+        $pilot = $this->question();
+        [$pilotitem] = $this->item($pilot, 'S1', 'B', null);
+        $DB->set_field('local_catquiz_items', 'activeparamid', 0, ['id' => $pilotitem]);
+        $b = $this->pool('B');
+        $this->assertEqualsCanonicalizing([$calibrated, $pilot], array_keys($b));
+        $this->assertFalse($this->is_pilot($b[$calibrated]), 'Its parameters count.');
+        $this->assertEqualsWithDelta(0.7, (float) $b[$calibrated]->difficulty, 1e-9);
+        $this->assertTrue($this->is_pilot($b[$pilot]));
+        $this->assert_invariants($b, 'B');
+        $this->assertSame(0, item_param_integrity::check($this->contexts['B'])['count']);
     }
 
     /**
