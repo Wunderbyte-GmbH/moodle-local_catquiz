@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy;
 
+use local_catquiz\local\attempt\progress_integrity;
 use cache;
 use coding_exception;
 use JsonSerializable;
@@ -34,11 +35,6 @@ use Random\RandomException;
 use stdClass;
 use local_catquiz\local\progress_retention;
 
-defined('MOODLE_INTERNAL') || die();
-// No login check is expected here because this is already done in the
-// adaptivequiz attempt.php file. @codingStandardsIgnoreLine
-require_once(__DIR__ . '/../../../../config.php');
-
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
  *
@@ -47,6 +43,24 @@ require_once(__DIR__ . '/../../../../config.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class progress implements JsonSerializable {
+    /** @var string A scale became active (issue #133). */
+    public const SCALE_ACTIVATED = 'activated';
+
+    /** @var string A scale stopped being active. */
+    public const SCALE_DEACTIVATED = 'deactivated';
+
+    /** @var string A scale was locked: only a forced activation brings it back. */
+    public const SCALE_LOCKED = 'locked';
+
+    /** @var string A lock was lifted. */
+    public const SCALE_UNLOCKED = 'unlocked';
+
+    /** @var string A scale was removed for the rest of the attempt. */
+    public const SCALE_REMOVED = 'removed';
+
+    /** @var int JSON format that refers to played questions by id (issue #143). */
+    public const FORMAT_COMPACT = 2;
+
     /**
      * @var ?int $id The ID in the database.
      */
@@ -71,6 +85,15 @@ class progress implements JsonSerializable {
      * @var int $attemptid ID to identify the quiz attempt.
      */
     private int $attemptid;
+
+    /**
+     * @var int|null $catattemptid The CAT attempt this progress belongs to - local_catquiz_attempts.id.
+     *
+     * This is what local_catquiz_progress.attemptid holds. The property above keeps the id of the
+     * attempt of the component - for mod_adaptivequiz that is adaptivequiz_attempt.id - because the
+     * callers work with it; that one is never written to local_catquiz_progress.
+     */
+    private ?int $catattemptid = null;
 
     /**
      * @var ?int $usageid Used to find questions answered in the current attempt.
@@ -135,6 +158,12 @@ class progress implements JsonSerializable {
      * @var array
      */
     private array $abilitytrace = [];
+
+    /**
+     * Changes of the scales' state, recorded in trace mode only (issue #133): step, scaleid, event.
+     * @var array
+     */
+    private array $scalestatetrace = [];
 
     /**
      * @var array Holds the person abilities as they were BEFORE this attempt,
@@ -210,20 +239,123 @@ class progress implements JsonSerializable {
     private stdClass $quizsettings;
 
     /**
+     * Issue #159: rebuilt from what was stored with a finished attempt after its progress was removed - read only.
+     *
+     * @var bool
+     */
+    private bool $historical = false;
+
+    /**
+     * Files the CAT attempt for a test that is starting.
+     *
+     * Only what is known at the start is written: the person, the attempt of the component and a
+     * running status. Scale, context and course stay empty until the result page saves the attempt
+     * through catquiz::save_attempt_to_db(), which updates this very row - it looks the attempt up by
+     * its component id. Leaving them empty is deliberate: statistics select by scale, context or
+     * course, and a running attempt is excluded from them without every query having to know.
+     *
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
+     * @param string $component The component the attempt belongs to.
+     * @return int|null The id of the new row in local_catquiz_attempts, null if none can be filed.
+     */
+    private static function start_cat_attempt(int $adaptiveattemptid, string $component): ?int {
+        global $DB, $USER, $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
+        // The CAT attempt belongs to the person whose attempt it is - also when somebody else is the
+        // first to touch it (issue #95). For an activity attempt that is its user, not $USER.
+        $ownerid = (int) $USER->id;
+        if (in_array('mod_adaptivequiz', catquiz::component_names($component), true)) {
+            $owner = $DB->get_field('adaptivequiz_attempt', 'userid', ['id' => $adaptiveattemptid]);
+            if ($owner !== false) {
+                $ownerid = (int) $owner;
+            }
+        }
+
+        $existing = $DB->get_record('local_catquiz_attempts', ['attemptid' => $adaptiveattemptid]);
+        if (!$existing) {
+            $now = time();
+            try {
+                return (int) $DB->insert_record('local_catquiz_attempts', (object) [
+                    'userid' => $ownerid,
+                    'attemptid' => $adaptiveattemptid,
+                    'component' => $component,
+                    'status' => LOCAL_CATQUIZ_ATTEMPT_RUNNING,
+                    'json' => '{}',
+                    'timecreated' => $now,
+                    'timemodified' => $now,
+                ]);
+            } catch (\dml_write_exception $e) {
+                // Issue #95: a request in parallel was first - its row is taken over below. Before, the
+                // unique index failed the second request with an error page.
+                $existing = $DB->get_record('local_catquiz_attempts', ['attemptid' => $adaptiveattemptid]);
+                if (!$existing) {
+                    throw $e;
+                }
+            }
+        }
+
+        /* local_catquiz_attempts.attemptid is unique on its own (issue #5), not per component. A row of the
+           same component and the same person is this attempt's CAT attempt; another component or person
+           holding the number gets nothing of it - the progress then stays in the cache, as before issue #101,
+           and is never handed someone else's. Resolving the namespace properly is issue #105. */
+        if (
+            in_array((string) $existing->component, catquiz::component_names($component), true)
+            && (int) $existing->userid === $ownerid
+        ) {
+            return (int) $existing->id;
+        }
+        debugging(
+            "Attempt {$adaptiveattemptid} of {$component} shares its number with a CAT attempt of another "
+                . 'component or person; no CAT attempt was filed for it.',
+            DEBUG_DEVELOPER
+        );
+        return null;
+    }
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param string $component
      * @param int $contextid
      * @param ?stdClass $quizsettings
      * @return progress
      */
-    public static function load(int $attemptid, string $component, int $contextid, ?stdClass $quizsettings = null): self {
-        $instance = self::load_from_cache($attemptid)
-            ?: self::load_from_db($attemptid, $contextid)
-            ?: self::create_new($attemptid, $component, $contextid, $quizsettings);
+    public static function load(int $adaptiveattemptid, string $component, int $contextid, ?stdClass $quizsettings = null): self {
+        $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component);
+
+        /* Issue #101: the CAT attempt exists before the first progress access. Until now it was
+           written only by the result page at the end of a test, so during the whole attempt there
+           was nothing to attach the progress to - it lived in the cache only and was lost to anyone
+           else and to any cache flush. A caller that brings quiz settings is starting or continuing
+           a test; that is where the CAT attempt is filed. A caller without settings only reads, and
+           a reader never creates an attempt. */
+        if ($catattemptid === null && $quizsettings !== null) {
+            $catattemptid = self::start_cat_attempt($adaptiveattemptid, $component);
+        }
+
+        $instance = self::load_from_cache($catattemptid, $adaptiveattemptid, $component)
+            ?: self::load_from_db($catattemptid, $contextid, $quizsettings !== null);
+        if (!$instance) {
+            /* Issue #149: a reader - no settings - never creates a progress, a CAT attempt or a cache entry. It
+               used to go on to create_new() with settings null and ended in a TypeError on the result page. */
+            if ($quizsettings === null) {
+                throw new progress_missing_exception($adaptiveattemptid, $component);
+            }
+            $instance = self::create_new($adaptiveattemptid, $component, $contextid, $quizsettings);
+        }
+
+        // The CAT attempt may appear after this progress was first built - the component starts its
+        // attempt, the CAT model files its own right after. Pick it up when it does.
+        $instance->catattemptid = $catattemptid ?? $instance->catattemptid;
+        // Re-audit 28.10.2026 (#149): a reader leaves the cache as it is - the move to the key of the CAT attempt is a
+        // write, and only a writer makes it.
+        if ($quizsettings !== null) {
+            $instance->move_to_canonical_cache_key();
+        }
 
         $instance->hasnewresponse = false;
         $instance->ignorelastresponse = false;
@@ -265,37 +397,211 @@ class progress implements JsonSerializable {
     }
 
     /**
+     * The progress of a finished attempt whose progress was removed by the retention task, rebuilt read-only from
+     * what was stored with the attempt when it was finalised (issue #159).
+     *
+     * Nothing is played again, nothing is estimated again with today's item parameters, nothing is written: the
+     * questions in their order with the answer, scale and Fisher information they had, the abilities of the result,
+     * the context and the start of the attempt. The settings come as for any progress stored without them (the
+     * test's). What the stored data do not hold (the per-step trace, the state of the selection) stays empty; the
+     * sections that would need it say so.
+     *
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id.
+     * @param string $component
+     * @return self|null Null while the attempt is running, without stored data, or without a CAT attempt.
+     */
+    public static function load_historical(int $adaptiveattemptid, string $component): ?self {
+        global $DB;
+        $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component);
+        if ($catattemptid === null) {
+            return null;
+        }
+        $attempt = $DB->get_record('local_catquiz_attempts', ['id' => $catattemptid]);
+        if (!$attempt || empty($attempt->endtime)) {
+            return null;
+        }
+        $stored = json_decode((string) $attempt->json);
+        if (!is_object($stored) || empty($stored->personabilities)) {
+            return null;
+        }
+        $root = (int) ($stored->catscaleid ?? $attempt->scaleid);
+        $parents = $DB->get_records_menu('local_catquiz_catscales', null, '', 'id, parentid');
+        $played = [];
+        $byscale = [];
+        $responses = [];
+        foreach ((array) ($stored->graphicalsummary_data ?? []) as $row) {
+            $row = (object) $row;
+            if (empty($row->id)) {
+                continue;
+            }
+            $pilot = !empty($row->pilot);
+            $question = (object) [
+                'id' => (string) $row->id,
+                'componentid' => (string) $row->id,
+                'label' => (string) ($row->questionname ?? ''),
+                'idnumber' => (string) ($row->questionname ?? ''),
+                'name' => (string) ($row->questiontitle ?? ''),
+                'catscaleid' => (string) ($row->questionscale ?? ''),
+                'difficulty' => $row->difficulty ?? null,
+                'is_pilot' => $pilot,
+                'fisherinformation' => $pilot ? [] : [$root => (float) ($row->fisherinformation ?? 0)],
+            ];
+            $played[$question->id] = $question;
+            // As the progress files a question: under its scale and every ancestor.
+            for ($scaleid = (int) $question->catscaleid, $guard = 0; $scaleid > 0 && $guard < 50; $guard++) {
+                $byscale[$scaleid][] = $question->id;
+                $scaleid = (int) ($parents[$scaleid] ?? 0);
+            }
+            if (isset($row->lastresponse)) {
+                $responses[$question->id] = ['questionid' => $question->id, 'fraction' => (float) $row->lastresponse];
+            }
+        }
+        $abilities = [];
+        foreach ((array) ($stored->updated_personabilities ?? []) as $scaleid => $entry) {
+            if (is_object($entry) && isset($entry->value) && is_numeric($entry->value)) {
+                $abilities[$scaleid] = (float) $entry->value;
+            }
+        }
+        foreach ((array) $stored->personabilities as $scaleid => $value) {
+            if (is_numeric($value)) {
+                $abilities[$scaleid] = (float) $value;
+            }
+        }
+        $data = [
+            'progressformat' => self::FORMAT_COMPACT, 'playedquestions' => $played, 'playedquestionsbyscale' => $byscale,
+            'isfirstquestion' => false, 'lastquestion' => null, 'breakend' => null, 'activescales' => [],
+            'droppedscales' => [], 'contextid' => (int) $attempt->contextid, 'responses' => $responses,
+            'abilities' => $abilities, 'preattemptabilities' => [], 'forcedbreakend' => null, 'lockedscales' => [],
+            'usageid' => null, 'session' => null, 'excludedquestions' => [], 'gaveupquestions' => [],
+            'starttime' => (int) $attempt->starttime, 'abilitytrace' => [],
+        ];
+        $object = (object) [
+            'id' => null, 'userid' => (int) $attempt->userid, 'component' => $component, 'attemptid' => $catattemptid,
+            'json' => json_encode($data), 'quizsettings' => null,
+        ];
+        // Read only: populate_from_object() without the cache neither saves nor caches (issue #149).
+        $instance = self::populate_from_object($object, (int) $attempt->contextid, false);
+        $instance->historical = true;
+        $instance->hasnewresponse = false;
+        $instance->ignorelastresponse = false;
+        return $instance;
+    }
+
+    /**
+     * Whether this progress was rebuilt from a finished attempt after its own was removed (issue #159).
+     *
+     * @return bool
+     */
+    public function is_historical(): bool {
+        return $this->historical;
+    }
+
+    /**
      * Try to load a progress object from the cache.
      *
-     * @param int $attemptid
-     * @return progress
+     * Under the key of the CAT attempt; before it exists - or for a progress built just before it was
+     * filed - under the key of the component and its attempt (issue #95).
+     *
+     * @param int|null $catattemptid Id in local_catquiz_attempts, null while there is none.
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
+     * @param string $component Component asking; empty to skip the component check.
+     * @return progress|false
      * @throws coding_exception
      */
-    private static function load_from_cache($attemptid) {
+    private static function load_from_cache(?int $catattemptid, int $adaptiveattemptid, string $component = '') {
+        global $USER;
+
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = self::get_cache_key($attemptid);
-        return $attemptcache->get($cachekey);
+        $cachekey = self::get_cache_key($catattemptid, $adaptiveattemptid, $component);
+        $cached = $attemptcache->get($cachekey);
+        if (!$cached instanceof self && $catattemptid !== null) {
+            $cachekey = self::get_cache_key(null, $adaptiveattemptid, $component);
+            $cached = $attemptcache->get($cachekey);
+        }
+
+        if (!$cached instanceof self) {
+            return false;
+        }
+
+        /* A cached progress is taken over only after it has been shown to belong here. The cache
+           key carries the user, but a stale entry could still name another one, and the component
+           has never been part of the key at all. */
+        if (
+            (int) $cached->userid !== (int) $USER->id
+                || ($component !== '' && $cached->component !== $component)
+        ) {
+            $attemptcache->delete($cachekey);
+
+            return false;
+        }
+
+        return $cached;
+    }
+
+    /**
+     * Reads the stored progress of a CAT attempt, for looking at it only.
+     *
+     * No cache, no ownership check against the current user and nothing created: a monitor reads
+     * the progress of other people's running attempts, and a missing progress stays missing. The
+     * caller is responsible for deciding who may see it.
+     *
+     * @param int $catattemptid Id in local_catquiz_attempts.
+     * @return self|null
+     */
+    public static function load_for_reading(int $catattemptid): ?self {
+        global $DB;
+
+        $record = $DB->get_record('local_catquiz_progress', ['attemptid' => $catattemptid]);
+        if (!$record) {
+            return null;
+        }
+        $catattempt = $DB->get_record('local_catquiz_attempts', ['id' => $catattemptid]) ?: null;
+        $contextid = $catattempt ? (int) $catattempt->contextid : 0;
+        // Issue #96: a reader gets no progress rather than a foreign one; operations get an event.
+        $reason = progress_integrity::check($record, $catattempt);
+        if ($reason !== null) {
+            progress_integrity::report($record, $catattempt, $reason, $contextid);
+            return null;
+        }
+
+        return self::populate_from_object($record, $contextid, false);
     }
 
     /**
      * Try to load a progress object from the database.
      *
-     * @param int $attemptid
+     * @param int|null $catattemptid Id of the CAT attempt - local_catquiz_attempts.id.
      * @param int $contextid
+     * @param bool $cache Whether to keep it in the cache - not for a reader (issue #149).
      * @return progress|false
      */
-    private static function load_from_db(int $attemptid, int $contextid) {
+    private static function load_from_db(?int $catattemptid, int $contextid, bool $cache = true) {
         global $DB;
-        $record = $DB->get_record(
-            'local_catquiz_progress',
-            ['attemptid' => $attemptid],
-            '*'
-        );
-        if ($record) {
-            $instance = self::populate_from_object($record, $contextid);
-            return $instance;
+
+        if ($catattemptid === null) {
+            // No CAT attempt, so there cannot be progress belonging to one.
+            return false;
         }
-        return false;
+
+        // The attemptid of this table is the CAT attempt, not the attempt of the component.
+        $record = $DB->get_record('local_catquiz_progress', ['attemptid' => $catattemptid], '*');
+
+        if (!$record) {
+            return false;
+        }
+
+        /* Issue #96: progress is taken over only if it belongs to its CAT attempt - same person, same
+           component - and the CAT attempt exists. The comparison is against the owner of the CAT
+           attempt, not against whoever is looking: a teacher opening a student's result reads that
+           student's progress legitimately. A foreign row fails closed: the test stops with a generic
+           message, the row is neither used nor overwritten, and operations get an event. Going on
+           with a fresh progress instead would have collided with the foreign row on save. */
+        $catattempt = $DB->get_record('local_catquiz_attempts', ['id' => $catattemptid]) ?: null;
+        $reason = progress_integrity::check($record, $catattempt);
+        if ($reason !== null) {
+            progress_integrity::fail($record, $catattempt, $reason, $contextid);
+        }
+        return self::populate_from_object($record, $contextid, $cache);
     }
 
     /**
@@ -303,15 +609,24 @@ class progress implements JsonSerializable {
      *
      * @param stdClass $object
      * @param int $contextid Fallback used for old records saved before contextid was persisted.
+     * @param bool $cache Whether to keep it in the cache; a reader does not write the cache (issue #149).
      * @return self
      */
-    private static function populate_from_object(stdClass $object, int $contextid): self {
+    private static function populate_from_object(stdClass $object, int $contextid, bool $cache = true): self {
         global $DB;
         $instance = new self();
         $instance->id = $object->id;
         $instance->userid = $object->userid;
         $instance->component = $object->component;
-        $instance->attemptid = $object->attemptid;
+        $instance->catattemptid = isset($object->attemptid) ? (int) $object->attemptid : null;
+
+        // The external id is not stored here any more; it comes from the CAT attempt this progress
+        // belongs to.
+        $instance->attemptid = (int) $DB->get_field(
+            'local_catquiz_attempts',
+            'attemptid',
+            ['id' => $instance->catattemptid]
+        );
 
         // Set properties from json encoded data.
         $data = json_decode($object->json);
@@ -323,13 +638,21 @@ class progress implements JsonSerializable {
                 $pq->fisherinformation = (array) $pq->fisherinformation;
             }
         }
-        $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
-        $instance->isfirstquestion = $data->isfirstquestion;
-        $instance->lastquestion = $data->lastquestion;
-        if ($instance->playedquestions) {
-            if (!$instance->lastquestion->is_pilot) {
-                $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+        // Issue #143: entries by id point at the very same played question again.
+        $instance->playedquestionsbyscale = [];
+        foreach ((array) $data->playedquestionsbyscale as $scaleid => $entries) {
+            $instance->playedquestionsbyscale[$scaleid] = [];
+            foreach ((array) $entries as $entry) {
+                $question = self::resolve_played($entry, $instance->playedquestions);
+                if ($question !== null) {
+                    $instance->playedquestionsbyscale[$scaleid][] = $question;
+                }
             }
+        }
+        $instance->isfirstquestion = $data->isfirstquestion;
+        $instance->lastquestion = self::resolve_played($data->lastquestion ?? null, $instance->playedquestions);
+        if ($instance->lastquestion !== null && empty($instance->lastquestion->is_pilot)) {
+            $instance->lastquestion->fisherinformation = (array) ($instance->lastquestion->fisherinformation ?? []);
         }
 
         $instance->breakend = $data->breakend;
@@ -344,6 +667,10 @@ class progress implements JsonSerializable {
             // version removes it. This sits on the abilitytrace load path, so the
             // removal would turn a loadable attempt into a fatal.
             ? array_map([static::class, 'to_array'], (array) $data->abilitytrace)
+            : [];
+        // Issue #133: progress written before the scale state was traced has none.
+        $instance->scalestatetrace = property_exists($data, 'scalestatetrace')
+            ? array_values(array_map([static::class, 'to_array'], (array) $data->scalestatetrace))
             : [];
         $instance->responses = (array) $data->responses;
         foreach ($instance->responses as $id => $val) {
@@ -363,8 +690,9 @@ class progress implements JsonSerializable {
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
         if (!property_exists($object, 'quizsettings') || $object->quizsettings === null) {
-            $attemptjson = $DB->get_record('local_catquiz_attempts', ['attemptid' => $instance->attemptid], 'json')->json;
-            $attemptdata = json_decode($attemptjson);
+            // The CAT attempt of this progress, by its own id - its external number may be another component's.
+            $attemptjson = $DB->get_field('local_catquiz_attempts', 'json', ['id' => $instance->catattemptid]);
+            $attemptdata = $attemptjson ? json_decode($attemptjson) : null;
             $quizsettings = $attemptdata->quizsettings ?? false;
             // If not even the attempt has quizsettings, get them from the test table.
             if (!$quizsettings) {
@@ -376,15 +704,18 @@ class progress implements JsonSerializable {
             }
             $object->quizsettings = json_encode($quizsettings);
 
-            // Save the quiz settings so that in the future we do not have to use the fallback anymore.
+            /* Save the quiz settings so that in the future we do not have to use the fallback anymore - but only
+               for a writer: a reader (issue #149) writes nothing, it gets the settings for this request only. */
             $instance->quizsettings = $quizsettings;
-            $instance->save();
+            if ($cache) {
+                $instance->save();
+            }
         }
         $instance->quizsettings = json_decode($object->quizsettings);
 
-        // Save to the cache.
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cache->set(self::get_cache_key($instance->attemptid), $instance);
+        if ($cache) {
+            $instance->save_to_cache();
+        }
 
         return $instance;
     }
@@ -392,19 +723,26 @@ class progress implements JsonSerializable {
     /**
      * This sets default data for a new instance.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param string $component
      * @param int $contextid
      * @param stdClass $quizsettings
      * @return self
      */
-    private static function create_new(int $attemptid, string $component, int $contextid, stdClass $quizsettings): self {
-        global $USER;
+    private static function create_new(int $adaptiveattemptid, string $component, int $contextid, stdClass $quizsettings): self {
+        global $DB, $USER;
         $instance = new self();
         $instance->id = null;
-        $instance->userid = $USER->id;
         $instance->component = $component;
-        $instance->attemptid = $attemptid;
+        $instance->attemptid = $adaptiveattemptid;
+        $instance->catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component);
+        // The progress belongs to the person of its CAT attempt, as the CAT attempt itself - also when somebody
+        // else is the first to touch it (issue #95). Before, it was filed under that somebody, and the owner's
+        // next request was refused as somebody else's progress.
+        $owner = $instance->catattemptid !== null
+            ? $DB->get_field('local_catquiz_attempts', 'userid', ['id' => $instance->catattemptid])
+            : false;
+        $instance->userid = $owner !== false ? (int) $owner : $USER->id;
         $instance->contextid = $contextid;
 
         $instance->playedquestions = [];
@@ -436,11 +774,24 @@ class progress implements JsonSerializable {
      * 'json' column in the database.
      */
     public function jsonSerialize(): array {
-        return [
+        /* Issue #143: every administered question once. playedquestionsbyscale held the full
+           question again for its scale and every ancestor, lastquestion once more - in the JSON
+           written on every answer, three to five copies of each question. Both now refer to the
+           played questions by id; a question that is not among them (none should be) is still
+           written in full, so nothing is lost. */
+        $byscale = [];
+        foreach ($this->playedquestionsbyscale as $scaleid => $questions) {
+            $byscale[$scaleid] = [];
+            foreach ($questions as $question) {
+                $byscale[$scaleid][] = $this->played_reference($question);
+            }
+        }
+        $data = [
+            'progressformat' => self::FORMAT_COMPACT,
             'playedquestions' => $this->playedquestions,
-            'playedquestionsbyscale' => $this->playedquestionsbyscale,
+            'playedquestionsbyscale' => $byscale,
             'isfirstquestion' => $this->isfirstquestion,
-            'lastquestion' => $this->lastquestion,
+            'lastquestion' => $this->lastquestion === null ? null : $this->played_reference($this->lastquestion),
             'breakend' => $this->breakend,
             'activescales' => $this->activescales,
             'droppedscales' => $this->droppedscales,
@@ -462,23 +813,67 @@ class progress implements JsonSerializable {
             // history.
             'abilitytrace' => $this->abilitytrace,
         ];
+        // Issue #133: outside trace mode the stored JSON stays exactly as it was - not even an empty key.
+        if ($this->scalestatetrace) {
+            $data['scalestatetrace'] = $this->scalestatetrace;
+        }
+        return $data;
+    }
+
+    /**
+     * A played question as the JSON refers to it: its id when it is among the played questions.
+     *
+     * @param stdClass $question
+     * @return int|string|stdClass
+     */
+    private function played_reference(stdClass $question) {
+        if (isset($question->id) && isset($this->playedquestions[$question->id])) {
+            return $question->id;
+        }
+        return $question;
+    }
+
+    /**
+     * The played question an entry of the JSON stands for: by id, or written in full (issue #143).
+     *
+     * Older records hold full copies; those are taken as they are.
+     *
+     * @param mixed $entry
+     * @param array $played Played questions by id.
+     * @return stdClass|null
+     */
+    private static function resolve_played($entry, array $played): ?stdClass {
+        if (is_object($entry)) {
+            return $entry;
+        }
+        if ((is_int($entry) || is_string($entry)) && isset($played[$entry])) {
+            return $played[$entry];
+        }
+        return null;
     }
 
     /**
      * Deletes entries of this instance from the database and cache.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
+     * @param string $component Component asking; empty to skip the component check.
      * @return void
      */
-    public static function delete(int $attemptid): void {
-        // Delete cache.
-        $cachekey = self::get_cache_key($attemptid);
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cache->delete($cachekey);
-
-        // Remove the database entry.
+    public static function delete(int $adaptiveattemptid, string $component = 'mod_adaptivequiz'): void {
         global $DB;
-        $DB->delete_records('local_catquiz_progress', ['attemptid' => $attemptid]);
+
+        $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component);
+
+        // Delete cache - under both keys.
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->delete(self::get_cache_key(null, $adaptiveattemptid, $component));
+        if ($catattemptid !== null) {
+            $cache->delete(self::get_cache_key($catattemptid, $adaptiveattemptid, $component));
+        }
+
+        if ($catattemptid !== null) {
+            $DB->delete_records('local_catquiz_progress', ['attemptid' => $catattemptid]);
+        }
     }
 
     /**
@@ -488,31 +883,142 @@ class progress implements JsonSerializable {
     public function save(): void {
         global $DB;
 
+        // Issue #159: a progress rebuilt from a finished attempt is never written - neither to the table nor the cache.
+        if ($this->historical) {
+            return;
+        }
+
         // Save to the DB.
         $record = (object) [
-            'attemptid' => $this->attemptid,
+            // When this progress was last persisted (issue #122) - for live monitoring.
+            'timemodified' => time(),
+            'attemptid' => $this->catattemptid,
             'userid' => $this->userid,
             'component' => $this->component,
             'json' => json_encode($this),
         ];
+        /* The settings go along with every save, not only the first: a progress stored before they were kept with
+           it gets them on its next save (populate_from_object()), as intended - an update without them left the
+           fallback running on every load (issue #149). */
+        if (isset($this->quizsettings)) {
+            $record->quizsettings = json_encode($this->quizsettings);
+        }
+
+        if ($this->catattemptid === null) {
+            /* Without a CAT attempt there is nothing to attach the progress to, and guessing a
+               reference is what issue #95 is about. The state stays in the cache; the next save
+               once the CAT model has filed its attempt persists it. */
+            $this->save_to_cache();
+
+            return;
+        }
 
         // If it does not exist yet, insert a new record.
         if (! $this->id) {
             $record->quizsettings = json_encode($this->quizsettings);
-            $id = $DB->insert_record('local_catquiz_progress', $record);
+            try {
+                $id = $DB->insert_record('local_catquiz_progress', $record);
+            } catch (\dml_write_exception $e) {
+                // Issue #95: a request in parallel saved the first progress of this attempt - the unique index
+                // on attemptid let only one insert through. That row is this attempt's progress; it is updated
+                // instead of failing the request with an error page.
+                $id = $DB->get_field('local_catquiz_progress', 'id', ['attemptid' => $this->catattemptid]);
+                if ($id === false) {
+                    throw $e;
+                }
+                $id = (int) $id;
+                $this->refuse_a_foreign_row($id);
+                $record->id = $id;
+                $DB->update_record('local_catquiz_progress', $record);
+            }
             if (! is_int($id)) {
                 throw new \Exception(sprintf("Could not save quiz progress of attempt %d to the database", $this->attemptid));
             }
             $this->id = $id;
         } else {
-            // Otherwise, just update.
+            // Otherwise, just update - the row of this attempt, as long as it is still ours (issue #96).
+            $this->refuse_a_foreign_row((int) $this->id);
             $record->id = $this->id;
             $DB->update_record('local_catquiz_progress', $record);
         }
 
-        // Save to the cache.
+        $this->save_to_cache();
+    }
+
+    /**
+     * Stops a save that would overwrite a stored progress of somebody else (issue #96, re-audit 27.10.2026).
+     *
+     * The progress in the session cache is checked against the person when it is loaded, not against the row it is
+     * written back to. A row that belongs to another person or component by now - an id met by a foreign row, data
+     * moved by hand or by a migration - was overwritten with the state of the session, and its owner set back. Here
+     * the stored owner is compared first, with one read by primary key; on a mismatch nothing is written, the cached
+     * state is dropped, and the attempt stops with the integrity message, as a load from the database does.
+     *
+     * @param int $id local_catquiz_progress.id
+     * @return void
+     */
+    private function refuse_a_foreign_row(int $id): void {
+        global $DB;
+        $stored = $DB->get_record('local_catquiz_progress', ['id' => $id], 'id, attemptid, userid, component');
+        if (!$stored) {
+            return;
+        }
+        $samecomponent = in_array((string) $stored->component, catquiz::component_names((string) $this->component), true);
+        if ((int) $stored->userid === (int) $this->userid && $samecomponent) {
+            return;
+        }
+        cache::make('local_catquiz', 'adaptivequizattempt')
+            ->delete(self::get_cache_key($this->catattemptid, (int) $this->attemptid, (string) $this->component));
+        $catattempt = $DB->get_record('local_catquiz_attempts', ['id' => (int) $stored->attemptid]) ?: null;
+        $reason = progress_integrity::check($stored, $catattempt)
+            ?? ((int) $stored->userid !== (int) $this->userid
+                ? progress_integrity::USER_MISMATCH
+                : progress_integrity::COMPONENT_MISMATCH);
+        progress_integrity::fail($stored, $catattempt, $reason, (int) $this->contextid);
+    }
+
+    /**
+     * Writes this progress to the cache.
+     */
+    private function save_to_cache(): void {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cache->set($this->get_cache_key($this->attemptid), $this);
+        $cache->set(self::get_cache_key($this->catattemptid, (int) $this->attemptid, (string) $this->component), $this);
+    }
+
+    /**
+     * Moves a progress cached before its CAT attempt existed to the key of the CAT attempt.
+     */
+    private function move_to_canonical_cache_key(): void {
+        if ($this->catattemptid === null) {
+            return;
+        }
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $prekey = self::get_cache_key(null, (int) $this->attemptid, (string) $this->component);
+        if ($cache->get($prekey) !== false) {
+            $cache->delete($prekey);
+            $this->save_to_cache();
+        }
+    }
+
+    /**
+     * The CAT context the attempt plays in: the one of its scale when the progress was created (issue #157, T10).
+     *
+     * A running attempt stays in it, also when the scale moves to another context in between - its questions,
+     * parameters and estimates are of one calibration. 0 for a progress stored before the context was kept with it.
+     *
+     * @return int
+     */
+    public function get_contextid(): int {
+        return (int) ($this->contextid ?? 0);
+    }
+
+    /**
+     * Returns the id of the CAT attempt this progress belongs to.
+     *
+     * @return int|null
+     */
+    public function get_catattemptid(): ?int {
+        return $this->catattemptid;
     }
 
     /**
@@ -581,6 +1087,20 @@ class progress implements JsonSerializable {
         }
 
         return $this->playedquestionsbyscale[$scaleid];
+    }
+
+    /**
+     * Returns the number of ANSWERED questions of this attempt, pilot items included.
+     *
+     * The measure for the test's maximum (issue #141): the maximum limits every question a person
+     * is asked, productive or pilot, while the minimum - and every result - counts productive items
+     * only ({@see self::get_num_answered_productive_questions()}). Based on the responses, like the
+     * productive count, so a pending item after a resume does not count.
+     *
+     * @return int
+     */
+    public function get_num_answered_questions(): int {
+        return count($this->responses);
     }
 
     /**
@@ -806,8 +1326,12 @@ class progress implements JsonSerializable {
             !in_array($scaleid, $this->activescales)
             && (!array_key_exists($scaleid, $this->lockedscales) || $force)
         ) {
-            unset($this->lockedscales[$scaleid]);
+            if (array_key_exists($scaleid, $this->lockedscales)) {
+                unset($this->lockedscales[$scaleid]);
+                $this->trace_scale_state($scaleid, self::SCALE_UNLOCKED);
+            }
             $this->activescales[] = $scaleid;
+            $this->trace_scale_state($scaleid, self::SCALE_ACTIVATED);
         }
         return $this;
     }
@@ -834,13 +1358,15 @@ class progress implements JsonSerializable {
      * @return $this
      */
     public function deactivate_scale(int $scaleid, bool $lock = false) {
-        if ($lock) {
+        if ($lock && !array_key_exists($scaleid, $this->lockedscales)) {
             $this->lockedscales[$scaleid] = true;
+            $this->trace_scale_state($scaleid, self::SCALE_LOCKED);
         }
         if (!in_array($scaleid, $this->activescales)) {
             return $this;
         }
         unset($this->activescales[array_search($scaleid, $this->activescales)]);
+        $this->trace_scale_state($scaleid, self::SCALE_DEACTIVATED);
         return $this;
     }
 
@@ -852,7 +1378,10 @@ class progress implements JsonSerializable {
      */
     public function drop_scale(int $scaleid) {
         $this->deactivate_scale($scaleid);
-        $this->droppedscales[$scaleid] = $scaleid;
+        if (!isset($this->droppedscales[$scaleid])) {
+            $this->droppedscales[$scaleid] = $scaleid;
+            $this->trace_scale_state($scaleid, self::SCALE_REMOVED);
+        }
         return $this;
     }
 
@@ -876,8 +1405,79 @@ class progress implements JsonSerializable {
      * @return self
      */
     public function unlock_scale($scaleid): self {
-        unset($this->lockedscales[$scaleid]);
+        if (array_key_exists($scaleid, $this->lockedscales)) {
+            unset($this->lockedscales[$scaleid]);
+            $this->trace_scale_state((int) $scaleid, self::SCALE_UNLOCKED);
+        }
         return $this;
+    }
+
+    /**
+     * Records a change of a scale's state, in trace mode only (issue #133).
+     *
+     * The step is the one of the ability trace: the number of questions played so far.
+     *
+     * @param int $scaleid
+     * @param string $event One of the SCALE_* constants.
+     * @return void
+     */
+    private function trace_scale_state(int $scaleid, string $event): void {
+        if (!progress_retention::should_trace()) {
+            return;
+        }
+        $this->scalestatetrace[] = [
+            'step' => $this->get_num_playedquestions(),
+            'scaleid' => $scaleid,
+            'event' => $event,
+        ];
+    }
+
+    /**
+     * The recorded changes of the scales' state: step, scaleid, event. Empty unless in trace mode.
+     *
+     * @return array
+     */
+    public function get_scale_state_trace(): array {
+        return $this->scalestatetrace;
+    }
+
+    /**
+     * The state the scales are in after a trace: active, dropped and locked scale ids, sorted.
+     *
+     * @param array $trace As get_scale_state_trace() returns it.
+     * @return array active, dropped, locked
+     */
+    public static function replay_scale_state_trace(array $trace): array {
+        $active = [];
+        $dropped = [];
+        $locked = [];
+        foreach ($trace as $entry) {
+            $scaleid = (int) $entry['scaleid'];
+            switch ($entry['event']) {
+                case self::SCALE_ACTIVATED:
+                    $active[$scaleid] = $scaleid;
+                    break;
+                case self::SCALE_DEACTIVATED:
+                    unset($active[$scaleid]);
+                    break;
+                case self::SCALE_LOCKED:
+                    $locked[$scaleid] = $scaleid;
+                    break;
+                case self::SCALE_UNLOCKED:
+                    unset($locked[$scaleid]);
+                    break;
+                case self::SCALE_REMOVED:
+                    unset($active[$scaleid]);
+                    $dropped[$scaleid] = $scaleid;
+                    break;
+            }
+        }
+        foreach ([&$active, &$dropped, &$locked] as &$ids) {
+            $ids = array_values($ids);
+            sort($ids);
+        }
+        unset($ids);
+        return ['active' => $active, 'dropped' => $dropped, 'locked' => $locked];
     }
 
     /**
@@ -1313,14 +1913,23 @@ class progress implements JsonSerializable {
     }
 
     /**
-     * Returns the cache key.
+     * Returns the cache key (issue #95).
      *
-     * @param int $attemptid
+     * The canonical key is the CAT attempt - one id space, no collision between components. Before the
+     * CAT attempt exists the key is the component with its own attempt id: the same number of two
+     * components no longer pushes the other out. The cache is per session; whose progress it is, is
+     * still checked when an entry is taken.
+     *
+     * @param int|null $catattemptid Id in local_catquiz_attempts, null while there is none.
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
+     * @param string $component
      * @return string
      */
-    private static function get_cache_key(int $attemptid): string {
-        global $USER;
-        return sprintf('progress_user_%d_id_%d', $USER->id, $attemptid);
+    private static function get_cache_key(?int $catattemptid, int $adaptiveattemptid, string $component): string {
+        if ($catattemptid !== null) {
+            return 'progress_cat_' . $catattemptid;
+        }
+        return sprintf('progress_pre_%s_%d', preg_replace('/[^a-z0-9_]/', '', strtolower($component)), $adaptiveattemptid);
     }
     /**
      * Casts a decoded json branch back to a nested array.

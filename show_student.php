@@ -25,7 +25,7 @@
 
 use local_catquiz\output\studentdetails;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 global $USER;
 

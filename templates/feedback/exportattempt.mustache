@@ -32,30 +32,55 @@
         "questions": [{"id": 1, "score": 0.3}, {"id": 2, "score": 0.01}],
         "active_scales": ["scale1", "scale2", "scale3"],
         "lastquestion": {"id": 1, "score": 1.2},
-        "selectedscale": "Deutsch"
+        "selectedscale": "Deutsch",
+        "haspilots": true,
+        "statistics": [{"label": "Richtig", "value": 3, "pilotvalue": 1}, {"label": "Bearbeitungszeit", "value": "4:10 min", "pilotvalue": ""}]
     }
 }}
+{{#statistics.0}}
+<table class="table table-sm w-auto catquiz-attempt-statistics">
+    <caption class="sr-only">{{#str}}statistics_caption, local_catquiz{{/str}}</caption>
+    {{#haspilots}}
+    <thead>
+        <tr>
+            <td></td>
+            <th scope="col" class="text-right">{{#str}}statistics_scored, local_catquiz{{/str}}</th>
+            <th scope="col" class="text-right">{{#str}}statistics_pilots, local_catquiz{{/str}}</th>
+        </tr>
+    </thead>
+    {{/haspilots}}
+    <tbody>
+    {{#statistics}}
+        <tr>
+            <th scope="row" class="font-weight-normal">{{label}}</th>
+            <td class="text-right catquiz-statistics-scored">{{value}}</td>
+            {{#haspilots}}<td class="text-right catquiz-statistics-pilot">{{pilotvalue}}</td>{{/haspilots}}
+        </tr>
+    {{/statistics}}
+    </tbody>
+</table>
+{{/statistics.0}}
 <p>{{description}}</p>
 
 <div style="text-align: center;">
     {{#isteacher}}
-    <a class="btn btn-info" href="{{{cfg->root}}}/local/catquiz/export_feedback_csv.php?attemptid={{{attemptid}}}&cid={{{cid}}}">
+    <a class="btn btn-info" href="{{exportcsvurl}}">
         {{#str}}exportattemptcsv, local_catquiz{{/str}}
     </a>
     {{/isteacher}}
     {{#debugenabled}}
     {{#isteacher}}
     <a class="btn btn-secondary" download="CATQuiz-Export-Attempt{{{attemptid}}}.csv"
-    id="download-link" href="data:text/csv;charset=utf-8,{{{data}}}"
+    href="data:text/csv;charset=utf-8,{{{data}}}"
     target="_blank">{{#str}}exportattemptdebugcsv, local_catquiz{{/str}}
     </a>
     {{/isteacher}}
     {{#iscatmanager}}
-    <a class="btn btn-secondary" href="{{{cfg->root}}}/local/catquiz/export_debuginfo_pdf.php?attemptid={{{attemptid}}}&cid={{{cid}}}">
+    <a class="btn btn-secondary" href="{{exportpdfurl}}">
         {{#str}}exportdebuginfopdf, local_catquiz{{/str}}
     </a>
     <a class="btn btn-secondary" download="Debug_Info_Raw_{{{attemptid}}}.html"
-    id="download-link" href="data:text/html;charset=utf-8,{{{debuginfo_raw}}}"
+    href="data:text/html;charset=utf-8,{{{debuginfo_raw}}}"
     target="_blank">{{#str}}viewrawdebuginfo, local_catquiz{{/str}}
     </a>
     {{/iscatmanager}}

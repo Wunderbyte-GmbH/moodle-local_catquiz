@@ -1,1 +1,1 @@
-export default {appendNodeContents: jest.fn()};
+export default {appendNodeContents: jest.fn(), replaceNodeContents: jest.fn()};

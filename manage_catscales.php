@@ -27,7 +27,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
 $catscale = optional_param('scaleid', -1, PARAM_INT);

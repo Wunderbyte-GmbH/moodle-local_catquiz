@@ -30,6 +30,7 @@ use Exception;
 use context_course;
 use dml_missing_record_exception;
 use local_catquiz\data\dataapi;
+use local_catquiz\local\statistics\attempt_population;
 use local_catquiz\output\catquizstatistics;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedback_helper;
@@ -55,6 +56,10 @@ class shortcodes {
      * @return string
      */
     public static function allquizattempts($shortcode, $args, $content, $env, $next) {
+        // The attempts of the whole site, with names and abilities: for CAT managers only, as in the CAT manager.
+        if (!has_capability('local/catquiz:manage_catscales', \context_system::instance())) {
+            return '';
+        }
         return (new quizattemptsdisplay())->render_table();
     }
 
@@ -132,10 +137,16 @@ class shortcodes {
         $courseid = $populated['course'];
         $globalscale = $populated['globalscale'];
         $testid = $populated['testid'];
-        $endtime = $args['endtime'] ?? null;
-        $starttime = $args['starttime'] ?? null;
+        // The statistics show the results of other people: the rule of the statistics export applies (#17).
+        $statisticscontext = \local_catquiz\local\access\context_resolver::for_statistics($courseid, $testid);
+        if (!\local_catquiz\local\access\feedback_access::can_view_other_users($statisticscontext)) {
+            return '';
+        }
+        $endtime = isset($args['endtime']) ? (int) $args['endtime'] : null;
+        $starttime = isset($args['starttime']) ? (int) $args['starttime'] : null;
 
         try {
+            $selection = self::attempt_selection($args);
             $heading = self::get_heading($courseid, $globalscale, $testid, $starttime, $endtime);
         } catch (\Exception $e) {
             return $OUTPUT->render_from_template(
@@ -145,7 +156,7 @@ class shortcodes {
         }
 
         try {
-            $catquizstatistics = new catquizstatistics($courseid, $testid, $globalscale, $endtime, $starttime);
+            $catquizstatistics = new catquizstatistics($courseid, $testid, $globalscale, $endtime, $starttime, $selection);
         } catch (dml_missing_record_exception $e) {
             return $OUTPUT->render_from_template(
                 'local_catquiz/catscaleshortcodes/catscalestatistics',
@@ -174,18 +185,53 @@ class shortcodes {
 
         $data = [
             'heading' => $heading,
-            'abilityprofilechart' => $catquizstatistics->render_abilityprofilechart(),
-            'detectedscales' => $catquizstatistics->render_detected_scales_chart(),
-            'attemptspertimerangechart' => $catquizstatistics->render_attempts_per_timerange_chart(),
-            'attemptsperpersonchart' => $catquizstatistics->render_attempts_per_person_chart(),
-            'learningprogress' => $catquizstatistics->render_learning_progress(),
             'exportbutton' => $catquizstatistics->render_export_button() ?: false,
             // This ID will be appended to the navigation tab links, so that
             // those links are unique for shortcodes with different arguments.
             'shortcodeid' => implode('-', $args),
         ];
+        // Issue #85: with lazy loading, the page carries one empty region per chart; each chart is built
+        // when its tab is shown, through local_catquiz_render_statistics_chart - one chart that fails
+        // leaves the others standing. Without it, every chart is built with the page, as before.
+        $lazy = (bool) get_config('local_catquiz', 'lazyfeedbacktabs');
+        $scope = json_encode([
+            'courseid' => (int) $courseid,
+            'testid' => (int) $testid,
+            'scaleid' => (int) $globalscale,
+            'starttime' => (int) $starttime,
+            'endtime' => (int) $endtime,
+            'attempts' => $selection,
+        ]);
+        foreach (catquizstatistics::CHARTS as $chart => $templatekey) {
+            $data[$templatekey] = $lazy
+                ? ['lazy' => true, 'chartname' => $chart, 'scope' => $scope]
+                : self::render_statistics_chart($catquizstatistics, $chart);
+        }
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
+    }
+
+    /**
+     * One chart of the statistics, ready for the template; a chart that fails says so and leaves the rest.
+     *
+     * @param catquizstatistics $statistics
+     * @param string $chart One of catquizstatistics::CHARTS.
+     * @return array
+     */
+    public static function render_statistics_chart(catquizstatistics $statistics, string $chart): array {
+        global $CFG;
+        try {
+            $data = $statistics->render_chart($chart);
+        } catch (\Throwable $t) {
+            // Issue #85: one chart that cannot be built does not take the page with it.
+            $data = [
+                'charttitle' => '',
+                'chart' => get_string('statisticschartloadfailed', 'local_catquiz')
+                    . ($CFG->debug > 0 ? ' ' . s($t->getMessage()) : ''),
+            ];
+        }
+        $data['chartname'] = $chart;
+        return $data;
     }
 
     /**
@@ -203,7 +249,10 @@ class shortcodes {
             $testid = self::get_test_id($cmid);
             $test = catquiz::get_test_by_component_id($testid);
             $courseid = $test->courseid;
-            if ($args['course'] ?? null && $args['course'] != $courseid) {
+            // Issue #88: "$args['course'] ?? null && ..." bound as "?? (null && ...)" - any course given
+            // was a conflict, the matching one included. Both spellings of the argument are accepted.
+            $askedcourse = $args['courseid'] ?? $args['course'] ?? null;
+            if (!empty($askedcourse) && (int) $askedcourse !== (int) $courseid) {
                 throw new Exception(get_string('catquizstatistics_scale_course_conflict', 'local_catquiz'));
             }
             $globalscale = $test->catscaleid;
@@ -226,12 +275,30 @@ class shortcodes {
             $globalscale = self::get_global_scale($courseid);
         }
 
-        if ($courseid && ($args['scope'] ?? null != "all")) {
+        // Issue #88: "$args['scope'] ?? null != 'all'" bound as "?? (null != 'all')" - scope="all" kept
+        // the course, and only a missing scope compared at all.
+        if ($courseid && ($args['scope'] ?? '') !== 'all') {
             return ['course' => $courseid, 'globalscale' => $globalscale, 'testid' => null];
         }
-        if (!$courseid || ($courseid && $args['scope'] == "all")) {
-            return ['course' => null, 'globalscale' => $globalscale, 'testid' => null];
+        return ['course' => null, 'globalscale' => $globalscale, 'testid' => null];
+    }
+
+    /**
+     * The attempts the statistics count: all, or the first or last completed attempt of each person (issue #88).
+     *
+     * Shortcode argument attempts="first" (or "last", "all"; the default is all).
+     *
+     * @param array $args
+     * @return string attempt_population::ALL, FIRST or LAST.
+     * @throws Exception For any other value.
+     */
+    private static function attempt_selection(array $args): string {
+        $selection = strtolower(trim((string) ($args['attempts'] ?? attempt_population::ALL)));
+        $allowed = [attempt_population::ALL, attempt_population::FIRST, attempt_population::LAST];
+        if (!in_array($selection, $allowed, true)) {
+            throw new Exception(get_string('catquizstatistics_invalidattempts', 'local_catquiz', implode(', ', $allowed)));
         }
+        return $selection;
     }
 
     /**

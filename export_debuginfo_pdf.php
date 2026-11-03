@@ -25,7 +25,7 @@
 
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 $attemptid = required_param('attemptid', PARAM_INT);
 
@@ -56,5 +56,21 @@ $attemptinfo = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemp
 
 $pdfexport->AddPage('P', "A4");
 $pdfexport->writeHTML("<h1>Attempt Info, Attempt $attemptid</h1>" . nl2br(var_export(json_decode($attemptinfo->json), true)));
+
+// Issue #125: every administration, one row per slot, a repeated question marked with the slot it
+// first appeared in. The progress above is keyed by question id and cannot show a repetition.
+$history = \local_catquiz\local\attempt\administration_history::for_attempt($attemptid);
+$rows = '';
+foreach ($history as $entry) {
+    $rows .= '<tr><td>' . $entry->slot . '</td><td>' . $entry->questionid . '</td><td>'
+        . $entry->questionattemptid . '</td><td>' . s((string) $entry->state) . '</td><td>'
+        . ($entry->fraction === null ? '-' : format_float($entry->fraction, 2)) . '</td><td>'
+        . ($entry->technicalduplicate ? 'TECHNICAL DUPLICATE of slot ' . $entry->duplicateofslot : '')
+        . '</td></tr>';
+}
+$pdfexport->AddPage('P', "A4");
+$pdfexport->writeHTML("<h1>Administration history, Attempt $attemptid</h1>"
+    . '<table border="1" cellpadding="2"><tr><th>Slot</th><th>Question</th><th>Question attempt</th>'
+    . '<th>State</th><th>Fraction</th><th>Note</th></tr>' . $rows . '</table>');
 
 $pdfexport->Output($downloadfilename, 'D');

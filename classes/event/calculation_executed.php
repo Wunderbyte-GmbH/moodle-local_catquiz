@@ -68,11 +68,10 @@ class calculation_executed extends catquiz_event_base {
      */
     public function get_description() {
         $data = $this->data;
-        $other = $this->get_other_data();
+        // Issue #79: older log rows lack fields, the scale or the user may be deleted since.
+        $other = $this->get_other_data() ?? new \stdClass();
 
-        $catscaleid = $other->catscaleid;
-        $catscale = catscale::return_catscale_object($catscaleid);
-        $catscalename = $catscale->name ?? get_string('deletedcatscale', 'local_catquiz');
+        $catscalename = self::scale_name((int) ($other->catscaleid ?? 0));
         $data['catscalename'] = $catscalename;
 
         // Handle the counter for items updated
@@ -97,11 +96,13 @@ class calculation_executed extends catquiz_event_base {
         }
 
         $data['updatedmodels'] = $updatedmodelstring ?? '';
+        $data += ['catscaleid' => '', 'contextid' => '', 'numberofitemsupdated' => ''];
 
         // Find the username corresponding to the ID for display.
-        if ($other->userid != 0) {
-            $user = catquiz::get_user_by_id($other->userid);
-            $data['user'] = $user->firstname . " " . $user->lastname;
+        $userid = (int) ($other->userid ?? 0);
+        if ($userid !== 0) {
+            $user = catquiz::get_user_by_id($userid);
+            $data['user'] = $user ? fullname($user) : get_string('deleteduser', 'local_catquiz');
         } else {
             $data['user'] = get_string('automaticallygeneratedbycron', 'local_catquiz');
         }
@@ -110,6 +111,18 @@ class calculation_executed extends catquiz_event_base {
             $data[$key] = $value;
         }
         return get_string('executed_calculation_description', 'local_catquiz', $data);
+    }
+
+    /**
+     * The name of a scale, also once it is deleted.
+     *
+     * @param int $scaleid
+     * @return string
+     */
+    private static function scale_name(int $scaleid): string {
+        global $DB;
+        $name = $scaleid ? $DB->get_field('local_catquiz_catscales', 'name', ['id' => $scaleid]) : false;
+        return $name !== false ? (string) $name : get_string('deletedcatscale', 'local_catquiz');
     }
 
     /**

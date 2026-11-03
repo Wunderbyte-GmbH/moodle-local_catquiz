@@ -25,7 +25,8 @@ const SELECTORS = {
     CONTEXTFORM: "div[id='lcq_select_context_form']",
     CHECKBOXSELECTOR: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
-    SCALECONTAINER: "[id='catmanagerquestions-scaleselectors']", // Make sure to change in the code below.
+    // Issue #30: a data-region, not an id - the selector is a partial of more than one tab.
+    SCALECONTAINER: "[data-region='local_catquiz-scaleselectors']",
     SELECTS: '[id*="select_scale_form_scaleid"]',
     CONTAINERCLASSSELECTOR: '.catscales-dashboard',
 };

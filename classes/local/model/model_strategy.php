@@ -685,6 +685,26 @@ class model_strategy {
     }
 
     /**
+     * Leaves out the rows whose model is not installed (issue #153).
+     *
+     * Parameters name their model. When the subplugin of a model is uninstalled, or parameters were imported for a
+     * model this site does not have, nobody can compute with them: model_model::get_instance() returns null, and
+     * the first item of such a model ended the attempt with an error. Such an item is left out like an item without
+     * parameters of an installed model - silently for the person taking the test; the CAT manager says why
+     * (catscale::item_availability()). A row without a model - a pilot item - is kept.
+     *
+     * @param array $rows Rows with a property model, keyed as the caller needs.
+     * @return array The rows of installed models, keys kept.
+     */
+    public static function rows_of_installed_models(array $rows): array {
+        $models = self::get_installed_models();
+        return array_filter($rows, function ($row) use ($models): bool {
+            $model = $row->model ?? null;
+            return $model === null || $model === '' || isset($models[$model]);
+        });
+    }
+
+    /**
      * Sets the max-iterations value.
      *
      * @param int $maxiterations

@@ -28,10 +28,19 @@ test.describe('CAT statistics charts', () => {
         // Without this the shortcode would render its "no data" state and every
         // other assertion here would pass without exercising the aggregation.
         //
+        // The aggregated charts - attempts per time range and per person - are on the tab
+        // "Testusage". The tab "Overview" shown first holds the ability profile, which
+        // has nothing to draw for the seeded attempts without abilities. With lazy loading
+        // (#85, on by default) a chart is built only when its tab is shown, so the tab is
+        // opened and the chart looked for inside it, not anywhere on the page.
+        await page.locator('a[id$="-testusage-tab"]').first().click();
+        const pane = page.locator('div.tab-pane[id$="-testusage"]').first();
+        await expect(pane).toBeVisible({timeout: 30_000});
+        //
         // Moodle's chart API emits a .chart-area container and fills the canvas from
         // JavaScript, so waiting for the canvas alone would race the script. The
         // container is what the server produced; the canvas proves the script ran.
-        const area = page.locator('.chart-area').first();
+        const area = pane.locator('.chart-area').first();
         await expect(area).toBeVisible({timeout: 30_000});
         await expect(area.locator('canvas')).toBeVisible({timeout: 30_000});
     });

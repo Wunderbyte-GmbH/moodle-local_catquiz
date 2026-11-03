@@ -242,6 +242,17 @@ stellt, nicht nur „kein Absturz".
   bestehenden privaten Methode eingefügt, kann deren Docblock verwaisen
   (phpcs: „Missing docblock"). Nach solchen Einfügungen immer phpcs laufen lassen
   und die Docblock-Zuordnung visuell prüfen.
+- **Behat-Falle Gherkin-Cache:** Behat speichert geparste Features unter
+  `/tmp/behat_gherkin_cache` und hält einen Eintrag für frisch, solange er jünger ist als
+  die Feature-Datei. `cp -a` und `tar` erhalten die alte mtime der Quelle. Eine geänderte
+  Feature-Datei kann dann *älter* sein als ihr Cacheeintrag, und Behat führt den alten
+  Stand aus, ohne Warnung. Nach jedem Spiegeln mit erhaltenen Zeitstempeln
+  `rm -rf /tmp/behat_gherkin_cache` – aber nie, während ein Behat-Lauf läuft, sonst bricht
+  dieser beim Schreiben in den Cache ab. Ein neues Feature braucht `admin/tool/behat/cli/init.php`
+  (oder einen Eintrag in der generierten `behat.yml`), sonst findet Behat es nicht.
+- **Per AJAX geliefertes JavaScript** (`$PAGE->requires->get_end_code()`) steckt in
+  `<script>`-Tags. Vor `Templates.*NodeContents()` mit `core/fragment`
+  `processCollectedJavascript()` auspacken, sonst läuft es doppelt (#139).
 
 ---
 
@@ -338,6 +349,13 @@ Begleitmaterial separat ausliefern.
 
 ---
 
+### Behat: nach einem Klick auf die neue Seite warten
+
+`document.readyState === "complete"` gilt auch für die alte Seite. Ein Schritt, der nach `pressButton()` sofort
+liest, prüft je nach Timing die Seite vor dem Absenden (sporadisch rot, im Rerun grün; 28.10.2026,
+`catquiz_id_namespaces.feature`). Vor dem Klick die alte Seite markieren (`window.<marker> = true`) und warten,
+bis der Marker verschwunden und die neue Seite fertig ist; ohne Seitenwechsel fehlschlagen.
+
 ## 7. Checkliste vor Auslieferung
 
 1. Alle 7 Modell-Suiten grün (erwartete Test-/Skip-Zahlen unverändert).
@@ -346,7 +364,12 @@ Begleitmaterial separat ausliefern.
 3. FD-Abgleich neuer Item-Ableitungen; Bitgenau-Abgleich bei Refactorings.
 4. Sättigungs-Stresstest: 0 nicht-endliche Werte.
 5. Neue Fixes/Guards zahn-getestet (Rücknahme → rot).
-6. phpcs plugin-weit Exit 0.
+6. phpcs plugin-weit Exit 0: ganzer Baum mit `make phpcs` (Ausschlüsse und Warnschwelle wie die CI,
+   `--max-warnings 0`), nie nur die Dateien, die man für geändert hält. Am 28.10.2026 rutschten so neun
+   Fehler in `tests/behat/behat_catquiz.php` bis in die CI.
+   Und **im Moodle-Baum** (`make phpcs` tut das seit 02.11.2026): Nur dort kennt moodle-cs die Moodle-Version
+   (auf 4.5 verstecken Attribute zwischen Docblock und Klasse die `@covers`-Angaben) und prüft die Sortierung der
+   Sprachstrings. Aus dem Arbeitsbaum gemessen war beides unsichtbar; die Main-CI von 1.2 wurde rot.
 7. Interne Version erhöht; CHANGELOG + Session-Doku aktualisiert.
 8. Beide ZIPs gebaut, Datei-/Ausschlusszahlen geprüft, präsentiert. Dabei
    sichergestellt, dass **kein** `.git`-Verzeichnis (auch kein verschachteltes)

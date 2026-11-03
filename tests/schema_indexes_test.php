@@ -67,11 +67,13 @@ final class schema_indexes_test extends advanced_testcase {
                 ['contextid', 'scaleid', 'userid', 'attemptid'],
                 false,
             ],
-            'personparams: one parameter per user, context and scale' => [
+            // Not unique any more: the table keeps one row per estimate. The index still has to
+            // exist, because every read filters on exactly these three columns.
+            'personparams: lookups by user, context and scale' => [
                 'local_catquiz_personparams',
                 'userid_contextid_catscaleid',
                 ['userid', 'contextid', 'catscaleid'],
-                true,
+                false,
             ],
             'progress: one row per attempt' => [
                 'local_catquiz_progress',
@@ -179,11 +181,16 @@ final class schema_indexes_test extends advanced_testcase {
     }
 
     /**
-     * The database rejects a second person parameter for the same user, context and scale.
+     * A person may have several estimates for the same scale, and the newest valid one wins.
+     *
+     * Issue #25 once required exactly one row per user, context and scale. That rule gave way when
+     * the per-attempt table was merged in: the table keeps the history of what was estimated, so a
+     * second row is not a duplicate but the next measurement. What has to hold instead is that
+     * reading returns the newest valid one.
      *
      * @return void
      */
-    public function test_personparams_uniqueness_is_enforced(): void {
+    public function test_personparams_keep_a_history_and_read_the_newest_valid(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -193,13 +200,35 @@ final class schema_indexes_test extends advanced_testcase {
             'contextid' => 7,
             'catscaleid' => 3,
             'ability' => 0.5,
+            'isvalid' => 1,
+            'resultsource' => 'current',
             'timecreated' => time(),
             'timemodified' => time(),
         ];
         $DB->insert_record('local_catquiz_personparams', $row);
 
-        $this->expectException(dml_exception::class);
-        $DB->insert_record('local_catquiz_personparams', $row);
+        $second = clone($row);
+        $second->ability = 0.9;
+        $DB->insert_record('local_catquiz_personparams', $second);
+
+        $this->assertEquals(
+            2,
+            $DB->count_records('local_catquiz_personparams', ['userid' => 42, 'catscaleid' => 3]),
+            'A second estimate must be kept, not rejected.'
+        );
+        $this->assertEquals(
+            0.9,
+            (float) catquiz::get_current_person_param(42, 7, 3)->ability,
+            'Reading must return the newest valid estimate.'
+        );
+
+        // An invalid row does not become the current value.
+        $third = clone($row);
+        $third->ability = 9.9;
+        $third->isvalid = 0;
+        $DB->insert_record('local_catquiz_personparams', $third);
+
+        $this->assertEquals(0.9, (float) catquiz::get_current_person_param(42, 7, 3)->ability);
     }
 
     /**

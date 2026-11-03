@@ -1,0 +1,82 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz/feedback/feedbackform_collapsible
+
+    The collapsible of a scale in the feedback part of the test settings form.
+
+    Issue #32: one template instead of an opening and a closing fragment in two files, which the
+    template lint could only see as broken HTML. The form puts its own elements between the opening
+    and the closing part and nests the collapsibles by depth, so it renders the template twice: once
+    with "open", once with "close". Rendered with both, the template is complete - the example below
+    is checked that way - and another template that includes it as a parent with open and close can
+    fill the body through the block "body".
+
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * data-toggle, data-target (Bootstrap 4 collapse; Moodle 4.5) and their data-bs-* twins, data-name,
+      data-depth (quizsettingsexpandcollapsible)
+    Context variables required for this template:
+    * open - emit the opening part
+    * close - emit the closing part
+    * headerid, collapseid, accordionid - ids of the header, the collapse and the accordion
+    * headername - the title of the collapsible
+    * dataname, datadepth - name and depth of the scale for the scripts
+
+    Example context (json):
+    {
+      "open": true,
+      "close": true,
+      "headerid": "catquiz_feedback_header_2",
+      "collapseid": "catquiz_feedback_collapse_2",
+      "accordionid": "accordion_header_scaleid_2",
+      "datadepth": "0",
+      "dataname": "Mathematik",
+      "headername": "Mathematik"
+    }
+}}
+{{#open}}
+<div id="{{accordionid}}">
+    <div class="card">
+        <div class="card-header" id="{{headerid}}">
+            <h5 class="mb-0">
+                <button type="button" class="btn btn-link"
+                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
+                    data-target="#{{collapseid}}"
+                    data-bs-target="#{{collapseid}}"
+                    aria-expanded="false"
+                    aria-controls="{{collapseid}}">
+                    {{headername}}
+                </button>
+            </h5>
+        </div>
+        <div id="{{collapseid}}"
+            class="collapse"
+            role="region"
+            aria-labelledby="{{headerid}}"
+            data-parent="#{{accordionid}}"
+            data-bs-parent="#{{accordionid}}"
+            data-name="{{dataname}}"
+            data-depth="{{datadepth}}">
+            <div class="card-body">
+{{/open}}
+{{$body}}{{/body}}
+{{#close}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/close}}

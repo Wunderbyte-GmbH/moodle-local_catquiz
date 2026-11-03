@@ -35,12 +35,14 @@ use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
+use local_catquiz\local\attempt_cache;
 use context_system;
 use Exception;
 use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\monitoring\timeline;
 use local_catquiz\output\catscales;
 use moodle_exception;
 use moodle_url;
@@ -59,6 +61,9 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale {
+    /** @var string Session key of the generation of the question statistics of a person (issue #146). */
+    private const STATS_GENERATION_KEY = 'userquestionstatsgeneration';
+
     /**
      *
      * @var stdClass $catscale.
@@ -174,6 +179,16 @@ class catscale {
     }
 
     /**
+     * Whether a stored bound is set: a number, 0 included.
+     *
+     * @param mixed $bound
+     * @return bool
+     */
+    private static function is_set($bound): bool {
+        return is_numeric($bound);
+    }
+
+    /**
      * Returns the minscalevalue and maxscalevalue of ability associated with a catscale.
      *
      * This returns the values of the main ancestor scale.
@@ -186,7 +201,12 @@ class catscale {
             $catscaleid = $this->catscaleid;
         }
         $catscale = self::return_catscale_object($catscaleid);
-        if ($catscale->minscalevalue && $catscale->maxscalevalue && $catscale->parentid == 0) {
+        // A bound of 0 is a bound (mod_adaptivequiz issue #14): the check used to be a truthiness
+        // test, which sent a numeric 0 to the default range. Only bounds that are not set fall
+        // back. Bounds that are set but form no range (upper <= lower) are returned as they are:
+        // replacing them with the default would hide a configuration error that has to stop
+        // grading, not be graded on a range nobody chose.
+        if ($catscale->parentid == 0 && self::is_set($catscale->minscalevalue) && self::is_set($catscale->maxscalevalue)) {
             return [
                 'minscalevalue' => $catscale->minscalevalue,
                 'maxscalevalue' => $catscale->maxscalevalue,
@@ -247,12 +267,19 @@ class catscale {
         // We need the default context for the events that will be triggered.
         $catcontext = catquiz::get_default_context_id();
 
+        // The item belongs to the context of its scale. Without, the item of the scale was not found in it: the
+        // page of the item failed, and a context change of the scale passed over it (issues #82, #148).
+        $scalecontextid = (int) self::get_context_id($catscaleid);
+
         if ($record = $DB->get_record('local_catquiz_items', $searchparams)) {
             // Right now, there is nothing to do, as we don't have more data.
             $id = $record->id;
             $data['id'] = $id;
             if ($overridecatscale) {
                 $data['catscaleid'] = $catscaleid;
+            }
+            if (empty($record->contextid) && $scalecontextid) {
+                $data['contextid'] = $scalecontextid;
             }
             $DB->update_record('local_catquiz_items', (object)$data);
 
@@ -296,6 +323,9 @@ class catscale {
             $now = time();
             $data['timemodified'] = $now;
             $data['timecreated'] = $now;
+            if ($scalecontextid) {
+                $data['contextid'] = $scalecontextid;
+            }
             $id = $DB->insert_record('local_catquiz_items', (object)$data);
 
             // Trigger event.
@@ -432,14 +462,113 @@ class catscale {
             return [];
         }
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $selectedscaleshash = hash('crc32', implode('_', $selectedsubscales));
-        $cachekey = sprintf('testitems_%s_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id, $selectedscaleshash);
-        if ($testitems = $cache->get($cachekey)) {
+        /* Issue #146: the pool is the same for everybody - items, parameters, usage in the CAT context - and
+           is kept in an application cache of its own, invalidated by the events of items, parameters and
+           scales. What depends on the person - when they last saw a question, how often - is added from a
+           small table per person in the session ({@see self::user_question_stats()}). Before, the hydrated
+           pool sat in the session cache, was written back whole for every question, and every attempt
+           start purged it - with the progress and feedback of any other open attempt of the session. */
+        $poolkey = self::pool_key($contextid, $includesubscales, (int) $this->catscale->id, $selectedsubscales);
+        $poolcache = cache::make('local_catquiz', 'runtimepool');
+        // Issue #136: whether the pool came from the cache, and what a miss costs.
+        timeline::start('pool:cache_lookup');
+        $testitems = $poolcache->get($poolkey);
+        timeline::stop('pool:cache_lookup', [
+            'pool_cache' => $testitems !== false ? 'hit' : 'miss',
+            'pool_items' => $testitems !== false ? count($testitems) : 0,
+        ]);
+
+        if ($testitems === false) {
+            // Issue #147: the cached pool is canonical - by question id - whatever order the first caller asked
+            // for; the order is applied below, on every return. Before, the key held no order, and the order of
+            // whoever filled the cache was the order of everybody after.
+            $testitems = $this->load_pool($contextid, $includesubscales, null, $selectedsubscales);
+            ksort($testitems, SORT_NUMERIC);
+            timeline::span('pool:cache_write', fn() => $poolcache->set($poolkey, $testitems), ['pool_items' => count($testitems)]);
+        }
+        $testitems = self::order_pool($testitems, $orderby);
+
+        global $USER;
+        $stats = self::user_question_stats((int) $USER->id);
+        foreach ($testitems as $id => $item) {
+            $seen = $stats[$id] ?? null;
+            $item->userid = $seen ? (int) $USER->id : null;
+            $item->userattempts = $seen ? $seen[0] : null;
+            $item->userlastattempttime = $seen ? $seen[1] : null;
+        }
+        return $testitems;
+    }
+
+    /**
+     * A pool in the order asked for (issue #147), the same with a cold and a warm cache.
+     *
+     * Without an order: by question id. With one: by that field ascending - numbers as numbers -, rows without
+     * a value (a pilot without difficulty) last, equal values by question id. The SQL order it replaces put
+     * NULL last on PostgreSQL and first on MariaDB, and left ties to the database.
+     *
+     * @param array $testitems Keyed by question id.
+     * @param string|null $orderby A field of the rows, e.g. difficulty.
+     * @return array Keyed by question id.
+     */
+    public static function order_pool(array $testitems, ?string $orderby): array {
+        if ($orderby === null || $orderby === '') {
+            ksort($testitems, SORT_NUMERIC);
             return $testitems;
         }
+        $field = trim(preg_replace('/\s+(ASC|DESC)$/i', '', $orderby));
+        uksort($testitems, function ($a, $b) use ($testitems, $field): int {
+            $va = $testitems[$a]->$field ?? null;
+            $vb = $testitems[$b]->$field ?? null;
+            $nulla = $va === null || $va === '';
+            $nullb = $vb === null || $vb === '';
+            if ($nulla !== $nullb) {
+                return $nulla ? 1 : -1;
+            }
+            if (!$nulla) {
+                $cmp = is_numeric($va) && is_numeric($vb) ? ((float) $va <=> (float) $vb) : strcmp((string) $va, (string) $vb);
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+            }
+            return (int) $a <=> (int) $b;
+        });
+        return $testitems;
+    }
 
-        global $DB, $USER;
+    /**
+     * The key of a runtime pool (issue #146): CAT context, scale, whether with subscales, which subscales.
+     *
+     * Nothing of a person or a session is part of the pool - it is the same for everybody who plays it.
+     *
+     * @param int $contextid
+     * @param bool $includesubscales
+     * @param int $catscaleid
+     * @param array $selectedsubscales
+     * @return string
+     */
+    public static function pool_key(int $contextid, bool $includesubscales, int $catscaleid, array $selectedsubscales): string {
+        $selected = array_map('intval', $selectedsubscales);
+        sort($selected);
+        return sprintf(
+            'pool_%d_%d_%d_%s',
+            $contextid,
+            $includesubscales ? 1 : 0,
+            $catscaleid,
+            $selected ? hash('crc32b', implode('_', $selected)) : 'all'
+        );
+    }
+
+    /**
+     * Reads a runtime pool from the database, without the statistics of a person.
+     *
+     * @param int $contextid
+     * @param bool $includesubscales
+     * @param string|null $orderby
+     * @param array $selectedsubscales
+     * @return array Rows keyed by question id.
+     */
+    private function load_pool(int $contextid, bool $includesubscales, ?string $orderby, array $selectedsubscales): array {
+        global $DB;
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
             // Subscales ids for checked subscale boxes.
@@ -452,28 +581,203 @@ class catscale {
         // and scale names; the selection does not - it works on ids, scale ids and
         // item parameters. Leaving them out of this path takes 36 % off a payload
         // that measured 206 MB at 250.000 items.
+        // Issue #146: without a person (user id 0) - their statistics are added per request.
         [$select, $from, $where, , $params] = catquiz::return_sql_for_catscalequestions(
             $scaleids,
             $contextid,
             [],
-            $USER->id,
+            0,
             $orderby,
             null,
+            true,
+            // Issue #82: hidden and draft questions and items deactivated in their scale are not played.
             true
         );
 
         $sql = "SELECT $select FROM $from WHERE $where";
 
-        $testitems = $DB->get_records_sql($sql, $params) ?? [];
-        $cache->set($cachekey, $testitems);
-        return $testitems;
+        // Issue #104: one entry per question, by a fixed rule. A question can be in two sibling scales;
+        // the query then has a row per scale, both with the question id first, and get_records_sql()
+        // kept one of them at random (and reported the duplicate). The selection plays a question once,
+        // so it gets one row - the one of the scale the question was assigned to first, the lowest item id.
+        $pool = timeline::span(
+            'pool:query',
+            fn() => self::one_row_per_question($DB->get_recordset_sql($sql, $params)),
+            ['pool_scales' => count($scaleids)]
+        );
+        // Issue #157: items of the context whose reference to active parameters does not resolve were left out by the
+        // query - they are neither pilots nor calibrated. Say so, once per pool built.
+        \local_catquiz\local\integrity\item_param_integrity::report($contextid, $scaleids);
+        // Issue #153: an item whose model is not installed cannot be selected or scored; the manager says why
+        // (item_availability()).
+        return model_strategy::rows_of_installed_models($pool);
     }
 
     /**
-     * Update testitem.
+     * When a person last saw each question, and how often (issue #146).
+     *
+     * Kept in the session per person, in one small table for all pools: question id => [times seen, last
+     * time]. Read from the database once per generation - a new attempt starts a new one - and kept up to
+     * date with every question handed out ({@see self::update_testitem()}).
+     *
+     * @param int $userid
+     * @return array
+     */
+    public static function user_question_stats(int $userid): array {
+        $cache = attempt_cache::cache();
+        $key = self::user_stats_key($userid);
+        $stats = $cache->get($key);
+        if ($stats === false) {
+            $stats = timeline::span('pool:user_stats', fn() => catquiz::get_user_question_stats($userid));
+            $cache->set($key, $stats);
+        }
+        return $stats;
+    }
+
+    /**
+     * The session key of the question statistics of a person, in the current generation.
+     *
+     * @param int $userid
+     * @return string
+     */
+    private static function user_stats_key(int $userid): string {
+        return sprintf('userquestionstats_%d_%d', $userid, (int) attempt_cache::cache()->get(self::STATS_GENERATION_KEY));
+    }
+
+    /**
+     * A new generation of the question statistics of a person: read anew from the database at their next use.
+     *
+     * At the start of an attempt - what other attempts showed since, also on other devices, is taken in.
+     * The other open attempts of the session lose nothing: their state is not in these statistics.
+     *
+     * @param int $userid
+     */
+    public static function renew_user_question_stats(int $userid): void {
+        $cache = attempt_cache::cache();
+        $cache->delete(self::user_stats_key($userid));
+        $cache->set(self::STATS_GENERATION_KEY, (int) $cache->get(self::STATS_GENERATION_KEY) + 1);
+    }
+
+    /** @var string Issue #82: the question is played in this scale. */
+    public const AVAILABILITY_ACTIVE = 'active';
+
+    /** @var string Issue #82: deactivated in this scale only; other scales may play it. */
+    public const AVAILABILITY_SCALEINACTIVE = 'scaleinactive';
+
+    /** @var string Issue #82: hidden in the question bank - no test plays it, whatever the scale says. */
+    public const AVAILABILITY_GLOBALHIDDEN = 'globalhidden';
+
+    /** @var string Issue #82: a draft in the question bank - no test plays it until it is ready. */
+    public const AVAILABILITY_GLOBALDRAFT = 'globaldraft';
+
+    /** @var string Issue #153: the model of its parameters is not installed - no test can select or score it. */
+    public const AVAILABILITY_MODELNOTINSTALLED = 'modelnotinstalled';
+
+    /**
+     * Whether a test may play a question in a scale, from both levels that hide it (issue #82).
+     *
+     * The question bank comes first: a hidden or draft newest version keeps the question out of every test,
+     * and no scale can bring it back. The scale can only narrow further.
+     *
+     * Issue #153: an item whose parameters name a model that is not installed is left out of the runtime pool; the
+     * manager reads why here.
+     *
+     * @param string|null $questionstatus Status of the newest version in the question bank.
+     * @param int|string|null $testitemstatus local_catquiz_items.status in the scale.
+     * @param string|null $model The model of the active parameters of the item, if it has any.
+     * @return string One of the AVAILABILITY_* constants.
+     */
+    public static function item_availability(?string $questionstatus, $testitemstatus, ?string $model = null): string {
+        if ($questionstatus === \core_question\local\bank\question_version_status::QUESTION_STATUS_DRAFT) {
+            return self::AVAILABILITY_GLOBALDRAFT;
+        }
+        if ($questionstatus !== \core_question\local\bank\question_version_status::QUESTION_STATUS_READY) {
+            return self::AVAILABILITY_GLOBALHIDDEN;
+        }
+        if ($model !== null && $model !== '' && !array_key_exists($model, model_strategy::get_installed_models())) {
+            return self::AVAILABILITY_MODELNOTINSTALLED;
+        }
+        if ((int) $testitemstatus === LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE) {
+            return self::AVAILABILITY_SCALEINACTIVE;
+        }
+        return self::AVAILABILITY_ACTIVE;
+    }
+
+    /**
+     * The questions of a list that no test may hand out now (issue #82).
+     *
+     * A question is out when the newest version of its bank entry is not ready - hidden or a draft - or when
+     * it is gone. The runtime pool is cached, and the question bank can hide a question without any event:
+     * question_delete_question() on a question in use only sets the status of its versions. So the selection
+     * asks this for the question it is about to hand out - one query - and drops what it names.
+     *
+     * @param int[] $questionids
+     * @return int[] The ids that are not available.
+     */
+    public static function unavailable_question_ids(array $questionids): array {
+        global $DB;
+        $ids = array_values(array_unique(array_filter(array_map('intval', $questionids))));
+        $unavailable = [];
+        foreach (array_chunk($ids, 1000) as $chunk) {
+            [$insql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'availq');
+            $params['availready'] = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
+            $ready = $DB->get_fieldset_sql(
+                "SELECT qv.questionid
+                   FROM {question_versions} qv
+                   JOIN {question_versions} qvl ON qvl.questionbankentryid = qv.questionbankentryid
+                    AND qvl.version = (SELECT MAX(qvm.version) FROM {question_versions} qvm
+                                        WHERE qvm.questionbankentryid = qv.questionbankentryid)
+                  WHERE qv.questionid $insql AND qvl.status = :availready",
+                $params
+            );
+            $unavailable = array_merge($unavailable, array_diff($chunk, array_map('intval', $ready)));
+        }
+        return array_values($unavailable);
+    }
+
+    /**
+     * The rows of the runtime pool, one per question: the row with the active parameters of the CAT context
+     * (local_catquiz_items.activeparamid); without such a row, the row without parameters.
+     *
+     * The order of the rows is kept - the position of a question is that of its first row.
+     *
+     * Issue #150 (re-audit 28.10.2026): the pool of a context also holds the rows of items of other contexts that
+     * have no parameters (piloting, catquiz::return_sql_for_catscalequestions()). An item of an earlier context,
+     * created first, has the lower id: its row without parameters won over the row with the parameters of this
+     * context, and the question counted as a pilot - in the selection and in the test information. A row with
+     * parameters always has them in this context (lcipcontextid; the query admits no other), so it is taken. Only
+     * between rows alike - a question in two sibling scales, both calibrated or both without parameters - the lowest
+     * item id decides, so that the choice is fixed (issue #104). The selection excludes a question played once by
+     * its question id (removeplayedquestions), so with every item it has.
+     *
+     * @param \moodle_recordset $rows Rows with the question id first and the item id as itemid.
+     * @return array Rows keyed by question id.
+     */
+    public static function one_row_per_question(\moodle_recordset $rows): array {
+        $items = [];
+        $calibrated = fn($row): bool => isset($row->lcipcontextid) && $row->lcipcontextid !== '';
+        foreach ($rows as $row) {
+            $id = $row->id;
+            if (
+                !isset($items[$id])
+                || ($calibrated($row) && !$calibrated($items[$id]))
+                || ($calibrated($row) === $calibrated($items[$id]) && (int) $row->itemid < (int) $items[$id]->itemid)
+            ) {
+                $items[$id] = $row;
+            }
+        }
+        $rows->close();
+        return $items;
+    }
+
+    /**
+     * Records that a question was handed out to a person: in their question statistics (issue #146).
+     *
+     * The pool itself is the same for everybody and is not changed. The parameters of the pool are no
+     * longer needed and kept for the callers.
      *
      * @param int $contextid
-     * @param mixed $question
+     * @param mixed $question The question, with the time it was handed out as userlastattempttime.
      * @param mixed $catscaleid
      * @param bool $includesubscales
      * @param array $selectedsubscales
@@ -488,20 +792,17 @@ class catscale {
         $includesubscales = false,
         array $selectedsubscales = []
     ) {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $selectedscaleshash = hash('crc32', implode('_', $selectedsubscales));
-        $cachekey = sprintf('testitems_%s_%s_%s_%s', $contextid, $includesubscales, $catscaleid, $selectedscaleshash);
-        // This should never happen...
-        if (!$testitems = $cache->get($cachekey)) {
-            throw new moodle_exception(
-                sprintf(
-                    "Can not update question in questions cache: cache with key %s is empty",
-                    $cachekey
-                )
-            );
-        }
-        $testitems[$question->id] = $question;
-        $cache->set($cachekey, $testitems);
+        global $USER;
+        /* Issue #146: only what changes - the person has seen the question now. Before, the whole hydrated
+           pool was read and written back to the session for every question handed out. */
+        $userid = (int) ($question->userid ?? 0) ?: (int) $USER->id;
+        $stats = self::user_question_stats($userid);
+        $seen = $stats[(int) $question->id] ?? [0, 0];
+        $stats[(int) $question->id] = [
+            (int) $seen[0] + 1,
+            (int) ($question->userlastattempttime ?? time()),
+        ];
+        attempt_cache::cache()->set(self::user_stats_key($userid), $stats);
     }
 
     /**
@@ -671,7 +972,8 @@ class catscale {
         $url->param('contextid', $context);
         $url->param('scaleid', $catscaleid);
         $url->param('component', $component);
-        $url->set_anchor("questions");
+        // Issue #32: the tab is a request parameter since #29; the anchor landed on the default tab.
+        $url->param('tab', 'questions');
 
         $linktoscale = html_writer::link($url, $linktext);
 

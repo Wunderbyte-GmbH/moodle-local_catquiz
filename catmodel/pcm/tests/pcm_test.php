@@ -111,7 +111,6 @@ final class pcm_test extends TestCase {
         return $cases;
     }
 
-
     /**
      * Verifies lors_1st_derivative_ip() against the numeric gradient of lors_residuals().
      *
@@ -182,7 +181,6 @@ final class pcm_test extends TestCase {
         }
         return $cases;
     }
-
 
     /**
      * Verifies get_log_jacobian() against the numeric gradient of log_likelihood()
@@ -261,7 +259,6 @@ final class pcm_test extends TestCase {
         );
     }
 
-
     /**
      * End-to-end: recover known PCM step intercepts from a synthetic data set.
      *
@@ -287,7 +284,6 @@ final class pcm_test extends TestCase {
         $this->assertEqualsWithDelta(-0.6, $result['intercepts']['0.5'], 0.15);
         $this->assertEqualsWithDelta(0.8, $result['intercepts']['1'], 0.15);
     }
-
 
     /**
      * Deterministic grid of (item, ability, response) for the FD checks.
@@ -316,44 +312,6 @@ final class pcm_test extends TestCase {
         }
         return $cases;
     }
-
-
-    /**
-     * This test calls the get_log_jacobain function with the model and test its output with verified data.
-     *
-     * @dataProvider get_log_jacobian_provider
-     *
-     * @param array $pp
-     * @param float $frac
-     * @param array $ip
-     * @param array $expected
-     *
-     * @return void
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     *
-     */
-    public function test_get_log_jacobian(array $pp, float $frac, array $ip, array $expected): void {
-    }
-
-    /**
-     * This test calls the get_log_jacobain function with the model and test its output with verified data.
-     *
-     * @dataProvider get_log_hessian_provider
-     *
-     * @param array $pp
-     * @param float $frac
-     * @param array $ip
-     * @param array $expected
-     *
-     * @return void
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     *
-     */
-    public function test_get_log_hessian(array $pp, float $frac, array $ip, array $expected): void {
-    }
-
 
     /**
      * Test likelihood function.
@@ -410,48 +368,6 @@ final class pcm_test extends TestCase {
         $result = (float)sprintf("%.6f", $result);
 
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * Test least_mean_squares_1st_derivative_ip function.
-     * @dataProvider least_mean_squares_1st_derivative_ip_provider
-     * @param int $n
-     * @param array $pp
-     * @param float $frac
-     * @param array $ip
-     * @param array $expected
-     * @return void
-     */
-    public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $frac, array $ip, array $expected): void {
-    }
-
-    /**
-     * Test least_mean_squares_1st_derivative_ip function.
-     * @dataProvider least_mean_squares_2nd_derivative_ip_provider
-     * @param int $n
-     * @param array $pp
-     * @param float $frac
-     * @param array $ip
-     * @param array $expected
-     * @return void
-     */
-    public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $frac, array $ip, array $expected): void {
-    }
-
-    /**
-     * Provider function for least_mean_squares_1st_derivative_ip
-     * @return array
-     */
-    public static function least_mean_squares_1st_derivative_ip_provider(): array {
-        return [];
-    }
-
-    /**
-     * Provider function for least_mean_squares_1st_derivative_ip
-     * @return array
-     */
-    public static function least_mean_squares_2nd_derivative_ip_provider(): array {
-        return [];
     }
 
     /**
@@ -590,23 +506,6 @@ final class pcm_test extends TestCase {
         }
 
         return $providedarray;
-    }
-
-    /**
-     * Return Data for log jacobian test
-     * @return array
-     */
-    public static function get_log_jacobian_provider(): array {
-        return [];
-    }
-
-     /**
-      * Return Data for log hessian test
-      * @return array
-      */
-    public static function get_log_hessian_provider(): array {
-
-        return [];
     }
 
     /**

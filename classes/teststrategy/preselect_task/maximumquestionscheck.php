@@ -50,7 +50,7 @@ final class maximumquestionscheck extends preselect_task {
             return result::ok($context);
         }
 
-        /* The configured test length means ANSWERED productive items. Neither of
+        /* The configured test length means ANSWERED items. Neither of
            the two counters used before is authoritative for that:
            - `questionsattempted` lives on the adaptivequiz attempt record and can
              drift across a resume (the pending item is re-rendered uncounted);
@@ -58,8 +58,11 @@ final class maximumquestionscheck extends preselect_task {
              the still unanswered last question from it on a resume.
            Counting the responses avoids both special cases, so the attempt stops
            after exactly the configured number of answers - never one item later. */
+        /* The maximum limits every question asked, pilot items included (issue #141): with a pilot
+           share of about a quarter, a test configured for 25 questions asked 33. The minimum and
+           the result count productive items only. */
         if (isset($context['progress'])) {
-            $answered = $context['progress']->get_num_answered_productive_questions();
+            $answered = $context['progress']->get_num_answered_questions();
         } else {
             // Legacy fallback for contexts that carry no progress.
             $answered = (int) $context['questionsattempted'];

@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = '3PL Mixed Rasch-Birnbaum Modell';
+$string['privacy:metadata'] = 'Das Modell speichert keine personenbezogenen Daten; es rechnet mit den Daten, die local_catquiz hält.';
 $string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';

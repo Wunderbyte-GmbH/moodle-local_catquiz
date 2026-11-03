@@ -27,6 +27,7 @@
                 "standarderror": 3.21,
                 "name": "Mathematics",
                 "isselectedscale": 1,
+                "tooltiptitle": "Your weakest scale Mathematics",
                 "catscaleid": 3,
                 "numberofitemsplayed": [
                     {
@@ -73,7 +74,9 @@
         {{^is_global}}
         <tr>
             <td>{{pseudo_index}}</td>
-            <td>{{name}}</td>
+            {{! The scale the strategy selected stays recognisable among the other valid ones (issue #118). }}
+            <td>{{#isselectedscale}}<strong title="{{tooltiptitle}}">{{name}}</strong>
+                <span class="badge badge-primary bg-primary">{{#str}} detected_scales_selected, local_catquiz {{/str}}</span>{{/isselectedscale}}{{^isselectedscale}}{{name}}{{/isselectedscale}}</td>
             <td>{{abilityscore}}</td>
             <td>{{#numberofitemsplayed}}{{itemsplayed}}{{noplayed}}{{/numberofitemsplayed}}</td>
         </tr>

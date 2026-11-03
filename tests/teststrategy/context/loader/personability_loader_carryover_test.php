@@ -65,16 +65,18 @@ final class personability_loader_carryover_test extends advanced_testcase {
     ): void {
         global $DB;
         $row = new stdClass();
-        $row->catattemptid = $catscaleid * 100 + $contextid;
+        $row->attemptid = $catscaleid * 100 + $contextid;
         $row->userid = $userid;
         $row->contextid = $contextid;
         $row->catscaleid = $catscaleid;
-        $row->score = $ability;
+        $row->ability = $ability;
         $row->standarderror = 0.3;
         $row->isvalid = $isvalid;
         $row->isprimary = $isprimary;
         $row->timecreated = time();
-        $DB->insert_record('local_catquiz_attemptscale', $row);
+        $row->resultsource = 'current';
+        $row->timemodified = $row->timecreated ?? time();
+        $DB->insert_record('local_catquiz_personparams', $row);
     }
 
     /**
@@ -95,6 +97,9 @@ final class personability_loader_carryover_test extends advanced_testcase {
         $row->contextid = $contextid;
         $row->ability = $ability;
         $row->standarderror = 0.5;
+        // Reads take the newest valid row, so a fixture row has to say that it is one.
+        $row->isvalid = 1;
+        $row->resultsource = 'legacy';
         $row->timecreated = time();
         $row->timemodified = time();
         $DB->insert_record('local_catquiz_personparams', $row);

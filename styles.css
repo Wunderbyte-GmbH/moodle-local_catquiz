@@ -5,9 +5,11 @@
     grid-gap: 10px;
     margin-bottom: 50px;
     margin-top: 50px;
-    .likelihood {
-        grid-column: span 2;
-    }
+}
+
+/* Issue #32: no CSS nesting - written out flat. */
+.catscales-dashboard.grid .likelihood {
+    grid-column: span 2;
 }
 
 #page-local-catquiz-manage_catscales .tab-content {
@@ -30,17 +32,24 @@
     margin-top: 50px;
 }
 
-canvas {
+/* Issue #32: only the charts of CATquiz, not every canvas on every page. */
+.catquiz_feedback canvas,
+.local-catquiz-statistics canvas,
+body[id^="page-local-catquiz-"] canvas {
     max-width: 60%;
+}
+
+/* The link "Show chart data" of a core chart is 19px high in Moodle 4.5 - below the 24px of WCAG 2.5.8 (axe target-size). */
+.catquiz_feedback .chart-table-expand > a,
+.local-catquiz-statistics .chart-table-expand > a,
+body[id^="page-local-catquiz-"] .chart-table-expand > a {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
 }
 
 .modal-content.preview-question .text_to_html {
     margin: 40px;
-}
-
-#page-local-catquiz-edit_testitem #testitemdashboard_contextselector .felement {
-    flex: inherit;
-    width: inherit;
 }
 
 .catquiz-legend {
@@ -64,7 +73,9 @@ canvas {
     position: relative;
     width: 100%;
     height: 60px;
-    border: 4px solid black;
+    /* Issue #32: theme colours with the old value as fallback - Moodle 4.5 (Bootstrap 4) has no --bs-*
+       variables and keeps its look; in a dark theme the frame turns light instead of vanishing. */
+    border: 4px solid var(--bs-emphasis-color, black);
 }
 
 .catquiz-feedbackbar-uppertext {
@@ -81,44 +92,42 @@ canvas {
     text-align: center;
 }
 
-span.wb_colourpick .colourpickercircle,
 span.wb_colourpick .colourpickercircle {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     display: inline-block;
     margin: 0 5px 0 5px;
-    border: 1px solid black;
+    border: 1px solid var(--bs-emphasis-color, black);
 }
 
-span.wb_colourpick .colourpickercircle:hover,
-span.wb_colourpick.colourpickercircle:hover {
-    border-color: orange;
+span.wb_colourpick .colourpickercircle:hover {
+    border-color: var(--bs-warning, orange);
 }
-span.wb_colourpick .colourpickercircle.selected,
-span.wb_colourpick.colourpickercircle.selected {
-    border: 3px solid white;
-    outline: 5px solid black;
+span.wb_colourpick .colourpickercircle.selected {
+    border: 3px solid var(--bs-body-bg, white);
+    outline: 5px solid var(--bs-emphasis-color, black);
 }
 
 .catquiz_feedback {
     text-align: left;
 }
 
-input.disabled {
+/* Issue #32: the scale feedback of the test settings form, not every input, card and editor of a page. */
+#id_catquiz_feedback input.disabled {
     cursor: not-allowed;
-    background-color: #e9ecef;
+    background-color: var(--bs-secondary-bg, #e9ecef);
     opacity: 1;
     pointer-events: none;
 }
-.card-body,
-.card-header {
+#id_catquiz_feedback .card-body,
+#id_catquiz_feedback .card-header {
     cursor: initial;
 }
-.card-body-disabled,
-div[contenteditable="false"] {
+#id_catquiz_feedback .card-body-disabled,
+#id_catquiz_feedback div[contenteditable="false"] {
     cursor: not-allowed;
-    background-color: #e9ecef;
+    background-color: var(--bs-secondary-bg, #e9ecef);
     opacity: 1;
 }
 
@@ -126,17 +135,18 @@ div[contenteditable="false"] {
     margin: 1em 0;
     padding: 1em;
     border-radius: 0.4em;
-    /*
-     * Select the second child of the parent (the first is a hidden div)
-     * and remove top border and margin to make it align with other cards.
-     */
-    &:nth-of-type(2) {
-        margin-top: 0;
-    }
+}
+
+/*
+ * Select the second child of the parent (the first is a hidden div)
+ * and remove top border and margin to make it align with other cards.
+ */
+#lcq_model_override_form .itemparam:nth-of-type(2) {
+    margin-top: 0;
 }
 
 #lcq_model_override_form .activeparam {
-    background-color: #d4edda;
+    background-color: var(--bs-success-bg-subtle, #d4edda);
 }
 
 #lcq_model_override_form .param-group .accesshide {
@@ -173,17 +183,18 @@ div[contenteditable="false"] {
     margin-left: auto;
 }
 
-#feedbackcontent-graphicalsummary .questionbutton {
+/* Issue #32: a class - the markup has no such id, the rules below never applied. */
+.feedbackcontent-graphicalsummary .questionbutton {
     text-align: center;
 }
 
 /* Result table: readable and responsive without breaking words mid-character. */
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table-wrapper {
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table-wrapper {
     width: 100%;
     overflow-x: auto;
 }
 
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table {
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table {
     /* Never exceed the container. A min-width here (previously 55rem) forced the
        table wider than its parent and pushed the whole feedback tab into a
        horizontal scroll. */
@@ -192,26 +203,26 @@ div[contenteditable="false"] {
     table-layout: auto;
 }
 
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table th,
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table td {
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table th,
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table td {
     vertical-align: top;
     word-break: normal;
     overflow-wrap: break-word;
 }
 
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-number,
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-correctness,
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-ability,
-#feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-action {
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-number,
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-correctness,
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-ability,
+.feedbackcontent-graphicalsummary .catquiz-graphicalsummary-table .catquiz-col-action {
     width: 1%;
     white-space: nowrap;
 }
 
-#feedbackcontent-graphicalsummary .catquiz-response-icon {
+.feedbackcontent-graphicalsummary .catquiz-response-icon {
     font-size: 1.1em;
 }
 
-#feedbackcontent-graphicalsummary .catquiz-question-label {
+.feedbackcontent-graphicalsummary .catquiz-question-label {
     font-size: 0.85em;
 }
 

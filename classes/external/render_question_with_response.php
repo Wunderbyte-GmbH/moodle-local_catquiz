@@ -34,6 +34,7 @@ use dml_exception;
 use core_external\external_api;
 use core_external\external_value;
 use core_external\external_single_structure;
+use local_catquiz\local\access\question_review;
 use local_catquiz\testenvironment;
 use moodle_exception;
 use question_display_options;
@@ -74,16 +75,16 @@ class render_question_with_response extends external_api {
      * Webservice for the local catquiz plugin to update context parameters
      *
      * @param int $slot
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param int $questionattemptid Optional question attempt id to verify the slot mapping.
      *
      * @return array
      */
-    public static function execute(int $slot, int $attemptid, int $questionattemptid = 0): array {
+    public static function execute(int $slot, int $adaptiveattemptid, int $questionattemptid = 0): array {
         global $PAGE, $OUTPUT;
         self::validate_parameters(self::execute_parameters(), [
             'slot' => $slot,
-            'attemptid' => $attemptid,
+            'attemptid' => $adaptiveattemptid,
             'questionattemptid' => $questionattemptid,
         ]);
 
@@ -102,7 +103,7 @@ class render_question_with_response extends external_api {
         $OUTPUT->doctype();
 
         $PAGE->start_collecting_javascript_requirements();
-        $questionhtml = self::render_question($slot, $attemptid, $questionattemptid);
+        $questionhtml = self::render_question($slot, $adaptiveattemptid, $questionattemptid);
         $jsfooter = $PAGE->requires->get_end_code();
 
         return [
@@ -127,7 +128,7 @@ class render_question_with_response extends external_api {
      * Returns an array with the rendered question HTML.
      *
      * @param int $slot
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param int $questionattemptid Expected question attempt id (0 = skip check).
      * @return array
      * @throws dml_exception
@@ -135,15 +136,17 @@ class render_question_with_response extends external_api {
      * @throws require_login_exception
      * @throws moodle_exception
      */
-    private static function render_question(int $slot, int $attemptid, int $questionattemptid = 0): array {
+    private static function render_question(int $slot, int $adaptiveattemptid, int $questionattemptid = 0): array {
         global $DB, $PAGE, $USER;
-        $attempt = $DB->get_record('adaptivequiz_attempt', ['id' => $attemptid], '*', MUST_EXIST);
+        $attempt = $DB->get_record('adaptivequiz_attempt', ['id' => $adaptiveattemptid], '*', MUST_EXIST);
         $instanceid = $attempt->instance;
 
+        // Login for the review (mod_adaptivequiz issue #18): a finished attempt is reviewed in the course,
+        // so an activity hidden afterwards no longer stops the modal - validating the module context
+        // ran require_login() with the activity and failed for every participant once it was hidden.
+        self::validate_context(question_review::login_context($attempt));
         $cm = get_coursemodule_from_instance('adaptivequiz', $instanceid, 0, false, MUST_EXIST);
         $context = context_module::instance($cm->id);
-        // Moodle-compliant context validation (also enforces login for the context).
-        self::validate_context($context);
         $PAGE->set_context($context);
 
         // Enforce access before revealing anything about the attempt.
@@ -164,6 +167,11 @@ class render_question_with_response extends external_api {
 
         // Get the question attempt.
         $uniqueid = $attempt->uniqueid;
+        // A usage that no longer exists - deleted questions, a restored course - gets a message the
+        // modal can show, not a database error (mod_adaptivequiz issue #18).
+        if (empty($uniqueid) || !$DB->record_exists('question_usages', ['id' => $uniqueid])) {
+            throw new moodle_exception('reviewquestionunavailable', 'local_catquiz');
+        }
         $quba = question_engine::load_questions_usage_by_activity($uniqueid);
 
         // Validate that the slot really exists in this usage and, when
@@ -183,6 +191,9 @@ class render_question_with_response extends external_api {
         $displayoptions = new question_display_options();
         $displayoptions->readonly = true; // Set to false if you want the question to be interactive.
         $displayoptions->marks = question_display_options::MARK_AND_MAX;
+        // A review shows the question; it does not offer to flag it (issue #139). The flag of the
+        // question engine needs the attempt page around it and would be a dead control in the modal.
+        $displayoptions->flags = question_display_options::HIDDEN;
         // Show an indicator if the given response was correct or wrong.
         $showresponse = boolval($testsettings->catquiz_questionfeedbacksettings->catquiz_showquestionresponse)
             ? question_display_options::VISIBLE

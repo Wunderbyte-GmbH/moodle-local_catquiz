@@ -66,6 +66,8 @@ class item_model_override_selector extends dynamic_form {
 
         $mform->addElement('hidden', 'testitemid');
         $mform->setType('testitemid', PARAM_INT);
+        $mform->addElement('hidden', 'scaleid');
+        $mform->setType('scaleid', PARAM_INT);
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
         $mform->addElement('hidden', 'componentname');
@@ -338,8 +340,19 @@ class item_model_override_selector extends dynamic_form {
         if (empty($data->componentname)) {
             $data->componentname = optional_param('component', 'question', PARAM_TEXT);
         }
+        // Issue #104, H3: the item of the scale shown - the same question can be an item of several scales,
+        // each with parameters of its own.
+        if (empty($data->scaleid)) {
+            $data->scaleid = optional_param('scaleid', 0, PARAM_INT);
+        }
+        $data->item = catquiz::get_item(
+            (int) $data->contextid,
+            (int) $data->testitemid,
+            (string) $data->componentname,
+            (int) $data->scaleid ?: null
+        );
         // Get data from db.
-        $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
+        $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid, $data->item->id ?? null);
         foreach (array_keys($models) as $model) {
             $field = sprintf('override_%s', $model);
             $modelparams = [];
@@ -394,9 +407,6 @@ class item_model_override_selector extends dynamic_form {
 
             $data->$field = $dataarray;
         }
-        if (!isset($data->itemid)) {
-            $data->item = catquiz::get_item($data->contextid, $data->testitemid, $data->componentname);
-        }
         $data->active_model = null;
         foreach (array_keys($models) as $model) {
             $field = sprintf('override_%s', $model);
@@ -408,7 +418,7 @@ class item_model_override_selector extends dynamic_form {
             $data->$field = array_merge($data->$field, $param->get_parameter_fields());
             $selectfield = sprintf('%s_select', $field);
             $data->$selectfield = $param->get_status();
-            if ($param->get_id() == $data->item->activeparamid) {
+            if ($data->item && $param->get_id() == $data->item->activeparamid) {
                 $data->active_model = $param->get_model_name();
             }
         }
@@ -450,12 +460,13 @@ class item_model_override_selector extends dynamic_form {
      *
      * @param mixed $testitemid
      * @param mixed $contextid
+     * @param int|null $itemid The item of the question in the scale shown.
      *
-     * @return array
+     * @return model_item_param_list
      *
      */
-    private function get_item_params($testitemid, $contextid) {
-        return model_item_param_list::get_by_questionid($contextid, $testitemid);
+    private function get_item_params($testitemid, $contextid, ?int $itemid = null) {
+        return model_item_param_list::get_by_questionid((int) $contextid, $testitemid, $itemid);
     }
 
     /**

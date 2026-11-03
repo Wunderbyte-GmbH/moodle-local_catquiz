@@ -28,71 +28,73 @@
 
 <h1>{{summaryheading}}</h1>
 
-<ul class="nav nav-tabs" id="myTab">
+{{! Issue #30: the manager is one per page, so its ids are fixed - but carry the plugin prefix, as
+    myTab or lcq_questions could clash with the theme, a block or another plugin on the same page. }}
+<ul class="nav nav-tabs" id="local-catquiz-manager-tabs">
   <li class="nav-item">
-    <a class="nav-link {{#issummary}}active{{/issummary}}" id="summary-tab" href="{{summaryurl}}" {{#issummary}}aria-current="page"{{/issummary}}>{{#str}}summary, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#issummary}}active{{/issummary}}" id="local-catquiz-manager-summary-tab" href="{{summaryurl}}" {{#issummary}}aria-current="page"{{/issummary}}>{{#str}}summary, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#iscatscales}}active{{/iscatscales}}" id="catscales-tab" href="{{catscalesurl}}" {{#iscatscales}}aria-current="page"{{/iscatscales}}>{{#str}} catscalesheading, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#iscatscales}}active{{/iscatscales}}" id="local-catquiz-manager-catscales-tab" href="{{catscalesurl}}" {{#iscatscales}}aria-current="page"{{/iscatscales}}>{{#str}} catscalesheading, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#isquestions}}active{{/isquestions}}" id="questions-tab" href="{{questionsurl}}" {{#isquestions}}aria-current="page"{{/isquestions}}>{{#str}}questions, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isquestions}}active{{/isquestions}}" id="local-catquiz-manager-questions-tab" href="{{questionsurl}}" {{#isquestions}}aria-current="page"{{/isquestions}}>{{#str}}questions, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#istestsandtemplates}}active{{/istestsandtemplates}}" id="testsandtemplates-tab" href="{{testsandtemplatesurl}}" {{#istestsandtemplates}}aria-current="page"{{/istestsandtemplates}}>{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#istestsandtemplates}}active{{/istestsandtemplates}}" id="local-catquiz-manager-testsandtemplates-tab" href="{{testsandtemplatesurl}}" {{#istestsandtemplates}}aria-current="page"{{/istestsandtemplates}}>{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#isquizattempts}}active{{/isquizattempts}}" id="quizattempts-tab" href="{{quizattemptsurl}}" {{#isquizattempts}}aria-current="page"{{/isquizattempts}}>{{#str}}quizattempts, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isquizattempts}}active{{/isquizattempts}}" id="local-catquiz-manager-quizattempts-tab" href="{{quizattemptsurl}}" {{#isquizattempts}}aria-current="page"{{/isquizattempts}}>{{#str}}quizattempts, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#iscalculations}}active{{/iscalculations}}" id="calculations-tab" href="{{calculationsurl}}" {{#iscalculations}}aria-current="page"{{/iscalculations}}>{{#str}}calculations, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#iscalculations}}active{{/iscalculations}}" id="local-catquiz-manager-calculations-tab" href="{{calculationsurl}}" {{#iscalculations}}aria-current="page"{{/iscalculations}}>{{#str}}calculations, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#isversioning}}active{{/isversioning}}" id="versioning-tab" href="{{versioningurl}}" {{#isversioning}}aria-current="page"{{/isversioning}}>{{#str}}versioning, local_catquiz{{/str}}</a>
+    <a class="nav-link {{#isversioning}}active{{/isversioning}}" id="local-catquiz-manager-versioning-tab" href="{{versioningurl}}" {{#isversioning}}aria-current="page"{{/isversioning}}>{{#str}}versioning, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link {{#isimporter}}active{{/isimporter}}" id="importer-tab" href="{{importerurl}}" {{#isimporter}}aria-current="page"{{/isimporter}}>{{#str}} import, core{{/str}}</a>
+    <a class="nav-link {{#isimporter}}active{{/isimporter}}" id="local-catquiz-manager-importer-tab" href="{{importerurl}}" {{#isimporter}}aria-current="page"{{/isimporter}}>{{#str}} import, core{{/str}}</a>
   </li>
 </ul>
 
-<div class="tab-content" id="myTabContent">
+<div class="tab-content" id="local-catquiz-manager-tabcontent">
   {{#issummary}}
-  <div class="tab-pane fade show active" id="lcq_summary">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-summary">
     {{> local_catquiz/catscalemanager/summary}}
   </div>
 {{/issummary}}
   {{#iscatscales}}
-  <div class="tab-pane fade show active" id="lcq_catscales">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-catscales">
     {{> local_catquiz/catscalemanager/catscales}}
   </div>
 {{/iscatscales}}
   {{#isquestions}}
-  <div class="tab-pane fade show active" id="lcq_questions">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-questions">
     {{> local_catquiz/catscalemanager/questions/questionsdisplay}}
   </div>
 {{/isquestions}}
   {{#istestsandtemplates}}
-  <div class="tab-pane fade show active" id="lcq_testsandtemplates">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-testsandtemplates">
     {{> local_catquiz/catscalemanager/testsandtemplates/testsandtemplatesdisplay}}
   </div>
 {{/istestsandtemplates}}
   {{#isquizattempts}}
-  <div class="tab-pane fade show active" id="lcq_quizattempts">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-quizattempts">
     {{> local_catquiz/catscalemanager/quizattempts/quizattemptsdisplay}}
   </div>
 {{/isquizattempts}}
   {{#iscalculations}}
-  <div class="tab-pane fade show active" id="lcq_calculations">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-calculations">
     {{> local_catquiz/catscalemanager/calculations/calculationsdisplay}}
   </div>
 {{/iscalculations}}
   {{#isversioning}}
-  <div class="tab-pane fade show active" id="lcq_versioning">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-versioning">
     {{> local_catquiz/catcontextdashboard}}
   </div>
 {{/isversioning}}
   {{#isimporter}}
-  <div class="tab-pane fade show active" id="lcq_importer">
+  <div class="tab-pane fade show active" id="local-catquiz-manager-importer">
     {{{testitemsimporter}}}
     {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>

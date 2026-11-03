@@ -52,10 +52,14 @@
                 {{#warnings}}
                 <li>
                     <strong>{{message}}:</strong> {{count}} {{#str}}occurrences, local_catquiz{{/str}}
-                    <button class="btn btn-link p-0 ml-2 text-warning" data-toggle="collapse" data-target="#items-{{index}}">
-                        <i class="fa fa-info-circle"></i>
+                    {{! Issue #30: ids of this render - a second result on the page had the same items-N. }}
+                    <button type="button" class="btn btn-link p-0 ml-2 text-warning" data-toggle="collapse"
+                            data-target="#local-catquiz-fetchparams-{{uniqid}}-items-{{index}}" aria-expanded="false"
+                            aria-controls="local-catquiz-fetchparams-{{uniqid}}-items-{{index}}" title="{{#str}}details, core{{/str}}">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}details, core{{/str}}</span>
                     </button>
-                    <div class="collapse" id="items-{{index}}">
+                    <div class="collapse" id="local-catquiz-fetchparams-{{uniqid}}-items-{{index}}">
                         <small class="text-muted">
                             {{#items}}
                             {{.}}{{#multipleItems}}{{^@last}}, {{/@last}}{{/multipleItems}}

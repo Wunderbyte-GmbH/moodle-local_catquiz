@@ -50,6 +50,25 @@ class filterbystandarderror extends preselect_task {
     private progress $progress;
 
     /**
+     * Returns the CAT attempt the running test belongs to.
+     *
+     * The selection context carries the id of the attempt of the component; what is stored with a
+     * person parameter is the internal one.
+     *
+     * @return int|null
+     */
+    private function cat_attempt_id(): ?int {
+        if (empty($this->context['attemptid'])) {
+            return null;
+        }
+
+        return catquiz::get_cat_attempt_id(
+            (int) $this->context['attemptid'],
+            $this->context['component'] ?? 'mod_adaptivequiz'
+        );
+    }
+
+    /**
      * Run method.
      *
      * @param array $context
@@ -73,12 +92,17 @@ class filterbystandarderror extends preselect_task {
             return result::ok($context);
         }
 
+        // Issue #135: a strategy without scale dropping (FASTEST) only knows the global precision stop.
+        // The flag comes from the strategy's capabilities; without it, FASTEST is recognised by its id.
+        $globalonly = $context['global_precision_only']
+            ?? ((int) $context['teststrategy'] === LOCAL_CATQUIZ_STRATEGY_FASTEST);
+        if ($globalonly) {
+            return $this->filter_for_global_precision();
+        }
+
         $lastquestion = $this->progress->get_last_question();
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
-        if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
-            return $this->filter_for_cat($updatedscales);
-        }
         foreach ($updatedscales as $scaleid) {
             $drop = $this->check_scale_should_be_dropped($scaleid);
 
@@ -112,7 +136,8 @@ class filterbystandarderror extends preselect_task {
                         $this->context['userid'],
                         $this->context['contextid'],
                         $subscaleid,
-                        $inheritval
+                        $inheritval,
+                        $this->cat_attempt_id()
                     );
                     getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                         "%d: [SE] inhere %s - pp: %.5f\n",
@@ -159,33 +184,30 @@ class filterbystandarderror extends preselect_task {
     }
 
     /**
-     * Contains the filtering logic for the CAT test strategy
+     * The only stop a globally choosing strategy knows besides the maximum and an empty pool (issue #135).
      *
-     * @param array $updatedscales
+     * The root scale - the one the test measures - ends the test when the minimum number of productive
+     * questions is reached, its standard error is at or below the target and its ability changed by
+     * no more than the minimum increment. Nothing else is looked at: no subscale is dropped, no
+     * per-scale maximum or minimum applies, and a subscale that is measured well enough leaves the
+     * pool untouched. Ending on such a local condition stopped attempts after 5 to 14 items with a
+     * minimum of 15 (issue #134).
+     *
      * @return result
-     * @throws UnexpectedValueException
      */
-    private function filter_for_cat(array $updatedscales): result {
-        $drop = false;
-        foreach (array_reverse($updatedscales) as $scaleid) {
-            if (!$this->check_scale_should_be_dropped($scaleid)) {
-                continue;
-            }
-            $drop = true;
-            $inheritval = $this->context['person_ability'][$scaleid];
-            $inheritscales = $this->get_scale_heirs($scaleid);
-            foreach ($inheritscales as $subscaleid) {
-                catquiz::update_person_param(
-                    $this->context['userid'],
-                    $this->context['contextid'],
-                    $subscaleid,
-                    $inheritval
-                );
-                $this->context['person_ability'][$subscaleid] = $inheritval;
-            }
+    private function filter_for_global_precision(): result {
+        $rootid = (int) $this->context['catscaleid'];
+        if ($this->progress->get_num_answered_productive_questions() < (int) $this->context['minimumquestions']) {
+            return result::ok($this->context);
         }
-        if ($drop) {
-            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+        $se = $this->context['se'][$rootid] ?? INF;
+        $precise = $se <= $this->context['se_min'];
+        $stable = isset($this->context['prev_ability'][$rootid], $this->context['person_ability'][$rootid])
+            && abs($this->context['prev_ability'][$rootid] - $this->context['person_ability'][$rootid])
+                <= $this->context['pp_min_inc'];
+        if ($precise && $stable) {
+            // Precise enough - not out of questions (mod_adaptivequiz #20).
+            return result::err(status::STOP_TARGET_PRECISION);
         }
         return result::ok($this->context);
     }

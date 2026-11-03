@@ -27,7 +27,7 @@ use local_catquiz\data\catquiz_base;
 use local_catquiz\event\catscale_updated;
 use local_catquiz\subscription;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 global $USER;
 

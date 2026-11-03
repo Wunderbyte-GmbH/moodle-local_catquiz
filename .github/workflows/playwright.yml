@@ -1,8 +1,9 @@
 name: Playwright (CAT manager UI)
 
 # Browser tests for the CAT manager UI. These need a live Moodle site, so they run
-# separately from the moodle-plugin-ci static pipeline. Manual and scheduled by
-# default to keep PR runs fast.
+# separately from the moodle-plugin-ci static pipeline. Manual, and on push to the
+# development branches; no scheduled runs (decided 02.11.2026: CI only on request,
+# push or merge).
 #
 # Why Playwright next to Behat: the UI areas of the performance work (pagination,
 # sorting, the "add question" dialog, the item parameter validity column) repeatedly
@@ -14,8 +15,8 @@ name: Playwright (CAT manager UI)
 # the repository's DEFAULT branch.
 on:
   # Manual on any branch, so a development branch can be tried before it is merged:
-  # pick the branch in the "Run workflow" dialog. Scheduled runs stay on the default
-  # branch. Pushes to the development branch run it automatically, because that is
+  # pick the branch in the "Run workflow" dialog. Pushes to the development branch
+  # run it automatically, because that is
   # where the UI work happens and a browser regression should surface there rather
   # than after a merge.
   workflow_dispatch:
@@ -24,8 +25,6 @@ on:
       - dev
       - develop
       - development
-  schedule:
-    - cron: '0 4 * * 1'
 
 jobs:
   playwright:
@@ -33,7 +32,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: mirror.gcr.io/library/postgres:16
         env:
           POSTGRES_USER: moodle
           POSTGRES_PASSWORD: moodle
@@ -80,7 +79,9 @@ jobs:
           # DEP_REF pins the ref the adaptivequiz side is taken from; it defaults to
           # the branch this workflow runs on, so a run always tests one coherent
           # state.
-          DEP_REF="${DEP_REF:-v-3.0}"
+          # The 4.5 line needs the 4.5 line of host and adapter; v-3.0 requires Moodle 5.1 and
+          # failed the dependency check of the site install.
+          DEP_REF="${DEP_REF:-ALiSe-v-1.2.0-legacy}"
           echo "Abhaengigkeiten von Ref: $DEP_REF"
 
           # The plugin under test comes from this checkout, never from a clone.
@@ -149,6 +150,47 @@ jobs:
             exit 1
           fi
           echo "Plugin-Layout ist sauber."
+
+      # The installer reports a failed dependency check without the plugin and the version behind it. This
+      # step names both, before the installation: an older state of mod_adaptivequiz or of the adapter on the
+      # branch this run takes is the usual cause.
+      - name: Check the versions of the dependencies
+        run: |
+          root=moodle; [ -d moodle/public ] && root=moodle/public
+          php -- "$root" <<'PHP'
+          <?php
+          // Read version.php files without Moodle: the constants they may use, and $plugin in its own scope.
+          define('MOODLE_INTERNAL', true);
+          foreach (['MATURITY_ALPHA' => 50, 'MATURITY_BETA' => 100, 'MATURITY_RC' => 150, 'MATURITY_STABLE' => 200,
+              'ANY_VERSION' => 'any'] as $name => $value) {
+              defined($name) || define($name, $value);
+          }
+          $root = $argv[1];
+          $read = static function (string $file): stdClass {
+              $plugin = new stdClass();
+              include($file);
+              return $plugin;
+          };
+          $dirs = [
+              'local_wunderbyte_table' => 'local/wunderbyte_table',
+              'mod_adaptivequiz' => 'mod/adaptivequiz',
+              'adaptivequizcatmodel_catquiz' => 'mod/adaptivequiz/catmodel/catquiz',
+              'filter_shortcodes' => 'filter/shortcodes',
+          ];
+          $rc = 0;
+          foreach ($read("$root/local/catquiz/version.php")->dependencies ?? [] as $component => $required) {
+              $file = isset($dirs[$component]) ? "$root/{$dirs[$component]}/version.php" : '';
+              $found = $file !== '' && is_file($file) ? $read($file)->version : null;
+              $ok = $found !== null && ($required === ANY_VERSION || $found >= $required);
+              printf("%-30s requires %-12s found %s\n", $component, $required, $found ?? 'nothing');
+              if (!$ok) {
+                  echo "::error::local_catquiz requires $component $required, the checkout has " . ($found ?? 'nothing')
+                      . ": push that state to the branch of $component this run takes, or pin its ref.\n";
+                  $rc = 1;
+              }
+          }
+          exit($rc);
+          PHP
 
       # install.php WRITES config.php itself and aborts when one already exists, so
       # we must not pre-create one from config-dist.php. It also requires an

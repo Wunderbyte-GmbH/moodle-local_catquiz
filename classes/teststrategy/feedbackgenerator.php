@@ -45,6 +45,27 @@ abstract class feedbackgenerator {
      */
     protected const PRECISION = 2;
 
+    /** @var string Needs a valid result: peer comparison, learning progress, scale feedback (issue #120). */
+    public const DEPENDS_ON_RESULT = 'result';
+
+    /**
+     * @var string Needs a valid global scale, not a reported scale: the result of the global scale ("Your
+     *      result"). Shown when the strategy reached no target but the global scale is valid (2026-10-14).
+     */
+    public const DEPENDS_ON_GLOBAL = 'global';
+
+    /** @var string Shows what happened in the attempt, valid result or not: quiz history, learning progress. */
+    public const DEPENDS_ON_ATTEMPT = 'attempt';
+
+    /** @var string Diagnosis and export for authorised users, valid result or not. */
+    public const DIAGNOSTIC = 'diagnostic';
+
+    /** @var string Feedback for the participant (issue #85). */
+    public const AUDIENCE_STUDENT = 'student';
+
+    /** @var string Feedback for teachers (issue #85). */
+    public const AUDIENCE_TEACHER = 'teacher';
+
     /**
      * Attempt ID
      *
@@ -113,7 +134,15 @@ abstract class feedbackgenerator {
             return $this->progress;
         }
 
-        $this->progress = progress::load($this->attemptid, $this->component, $this->contextid);
+        try {
+            $this->progress = progress::load($this->attemptid, $this->component, $this->contextid);
+        } catch (progress_missing_exception $e) {
+            // Issue #159: a finished attempt after the retention task - read from what was stored with it.
+            $this->progress = progress::load_historical((int) $this->attemptid, (string) $this->component);
+            if ($this->progress === null) {
+                throw $e;
+            }
+        }
         return $this->progress;
     }
 
@@ -156,28 +185,76 @@ abstract class feedbackgenerator {
     abstract public function get_generatorname(): string;
 
     /**
+     * What this feedback depends on (issue #120).
+     *
+     * An attempt without a valid result shows no feedback that reads the result - but what the
+     * attempt contained, and the export for authorised users, do not depend on it. Each generator
+     * says which kind it is; the default is the safe one, so a generator that does not declare
+     * itself stays hidden for an invalid result.
+     *
+     * @return string One of DEPENDS_ON_RESULT, DEPENDS_ON_ATTEMPT, DIAGNOSTIC.
+     */
+    public function get_result_dependency(): string {
+        return self::DEPENDS_ON_RESULT;
+    }
+
+    /**
+     * For whom this generator writes feedback (issue #85).
+     *
+     * A tab loaded on demand is offered before its content exists; this says which tabs to offer.
+     * Most generators write for the participant only.
+     *
+     * @return string[] AUDIENCE_STUDENT and/or AUDIENCE_TEACHER.
+     */
+    public function get_audiences(): array {
+        return [self::AUDIENCE_STUDENT];
+    }
+
+    /**
+     * Whether the attempt data carry what this generator needs - without building the feedback.
+     *
+     * @param array $feedbackdata
+     * @return bool
+     */
+    public function has_data_for(array $feedbackdata): bool {
+        return $this->has_required_context_keys($feedbackdata);
+    }
+
+    /**
+     * Whether the current user may see the teacher feedback of this attempt.
+     *
+     * @param array $feedbackdata
+     * @return bool
+     */
+    public function may_show_teacher_feedback(array $feedbackdata): bool {
+        $this->attemptid = $feedbackdata['attemptid'];
+        $this->contextid = $feedbackdata['contextid'];
+        return $this->has_teacherfeedbackpermission();
+    }
+
+    /**
      * Update the feedback data that is stored in the DB to render the feedback
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      * @return null|array
      */
-    public function update_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $this->attemptid = $attemptid;
+    public function update_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
+        $this->attemptid = $adaptiveattemptid;
         $this->contextid = $newdata['contextid'];
-        return $this->load_data($attemptid, $existingdata, $newdata);
+        return $this->load_data($adaptiveattemptid, $existingdata, $newdata);
     }
 
     /**
      * Loads the data required to render the feedback.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata Data from the last attempt
      * @return ?array
      */
-    abstract public function load_data(int $attemptid, array $existingdata, array $newdata): ?array;
+    abstract public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array;
 
     /**
      * To update feedbackdata (that will be rendered later)...

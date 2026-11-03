@@ -64,7 +64,8 @@ class studentdetails implements renderable, templatable {
 
         global $DB;
 
-        $users = user_get_users_by_id([$this->studentid]);
+        // Not user_get_users_by_id(): deprecated in Moodle 5.3, and it only ever read this record.
+        $users = $DB->get_records_list('user', 'id', [$this->studentid]);
         $user = reset($users);
 
         $courses = enrol_get_all_users_courses($user->id);

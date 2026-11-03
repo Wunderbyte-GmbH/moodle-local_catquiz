@@ -24,6 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026081900;
-$plugin->requires  = 2022041900;
+// Issue #31: the subplugins of a line ask for the Moodle of that line, like local_catquiz itself. The
+// version of the 1.3 line is above the one of the 1.2 line, so that an upgrade from 1.2 to 1.3 runs.
+$plugin->version   = 2026101700;
+$plugin->requires  = 2024100700;
+$plugin->supported = [405, 405];
+$plugin->incompatible = 500;
+$plugin->release   = '1.2.1';
+$plugin->maturity  = MATURITY_STABLE;
 $plugin->component = 'catmodel_rasch';

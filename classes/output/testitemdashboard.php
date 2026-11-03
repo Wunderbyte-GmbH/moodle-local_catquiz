@@ -109,6 +109,9 @@ class testitemdashboard implements renderable, templatable {
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
+        // An item without parameters - newly added to a scale, or in piloting - has no model card to head.
+        $heading = '';
+        $status = '';
         foreach ($modelitemparams as $modelname => $itemparamlist) {
             $item = $itemparamlist[$this->testitemid];
             if (! $item) {

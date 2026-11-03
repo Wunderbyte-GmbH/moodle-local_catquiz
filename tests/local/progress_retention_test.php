@@ -46,6 +46,25 @@ final class progress_retention_test extends advanced_testcase {
      *
      * @return void
      */
+
+    /**
+     * Returns the internal CAT attempt id for an attempt of mod_adaptivequiz.
+     *
+     * Progress is filed under local_catquiz_attempts.id since issue #95; the tests work with the
+     * external id of the component and resolve it the same way production does.
+     *
+     * @param int $attemptid Id of the attempt of the component.
+     * @return int
+     */
+    private static function catattemptid(int $attemptid): int {
+        global $DB;
+
+        return (int) $DB->get_field('local_catquiz_attempts', 'id', [
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+        ]);
+    }
+
     public function test_default_is_minimal(): void {
         $this->resetAfterTest();
 
@@ -141,7 +160,7 @@ final class progress_retention_test extends advanced_testcase {
             ['attemptid' => 9003, 'endtime' => null],
         ];
         foreach ($cases as $case) {
-            $DB->insert_record('local_catquiz_attempts', (object) [
+            $catattemptid = $DB->insert_record('local_catquiz_attempts', (object) [
                 'userid' => 2,
                 'scaleid' => 1,
                 'contextid' => 1,
@@ -155,7 +174,8 @@ final class progress_retention_test extends advanced_testcase {
                 'endtime' => $case['endtime'],
             ]);
             $DB->insert_record('local_catquiz_progress', (object) [
-                'attemptid' => $case['attemptid'],
+                'attemptid' => $catattemptid,
+                'component' => 'mod_adaptivequiz',
                 'contextid' => 1,
                 'json' => '{}',
                 'timecreated' => $old,
@@ -171,15 +191,15 @@ final class progress_retention_test extends advanced_testcase {
 
         $this->assertStringContainsString('removed 1', $output);
         $this->assertFalse(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => 9001]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9001)]),
             'An attempt beyond the retention period must be removed.'
         );
         $this->assertTrue(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => 9002]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9002)]),
             'A recent attempt must be kept.'
         );
         $this->assertTrue(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => 9003]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9003)]),
             'A running attempt must never lose its progress.'
         );
     }
@@ -212,7 +232,8 @@ final class progress_retention_test extends advanced_testcase {
             'endtime' => $old,
         ]);
         $DB->insert_record('local_catquiz_progress', (object) [
-            'attemptid' => 9101,
+            'attemptid' => self::catattemptid(9101),
+            'component' => 'mod_adaptivequiz',
             'contextid' => 1,
             'json' => '{}',
             'timecreated' => $old,
@@ -224,19 +245,19 @@ final class progress_retention_test extends advanced_testcase {
         ob_start();
         (new cleanup_attempt_progress())->execute();
         ob_end_clean();
-        $this->assertTrue($DB->record_exists('local_catquiz_progress', ['attemptid' => 9101]));
+        $this->assertTrue($DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9101)]));
 
         set_config('progressretentiondays', 30, 'local_catquiz');
         ob_start();
         (new cleanup_attempt_progress())->execute();
         ob_end_clean();
-        $this->assertFalse($DB->record_exists('local_catquiz_progress', ['attemptid' => 9101]));
+        $this->assertFalse($DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9101)]));
 
         // Running again finds nothing left and must not fail.
         ob_start();
         (new cleanup_attempt_progress())->execute();
         ob_end_clean();
-        $this->assertFalse($DB->record_exists('local_catquiz_progress', ['attemptid' => 9101]));
+        $this->assertFalse($DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9101)]));
     }
     /**
      * Only the levels the site permits are offered in the activity form.
@@ -310,7 +331,7 @@ final class progress_retention_test extends advanced_testcase {
 
         $now = time();
         foreach ([['id' => 9201, 'endtime' => $now - 60], ['id' => 9202, 'endtime' => null]] as $case) {
-            $DB->insert_record('local_catquiz_attempts', (object) [
+            $catattemptid = $DB->insert_record('local_catquiz_attempts', (object) [
                 'userid' => 2,
                 'scaleid' => 1,
                 'contextid' => 1,
@@ -324,7 +345,8 @@ final class progress_retention_test extends advanced_testcase {
                 'endtime' => $case['endtime'],
             ]);
             $DB->insert_record('local_catquiz_progress', (object) [
-                'attemptid' => $case['id'],
+                'attemptid' => self::catattemptid($case['id']),
+                'component' => 'mod_adaptivequiz',
                 'contextid' => 1,
                 'json' => '{}',
                 'timecreated' => $now - 120,
@@ -337,11 +359,11 @@ final class progress_retention_test extends advanced_testcase {
         ob_end_clean();
 
         $this->assertFalse(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => 9201]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9201)]),
             'A finished attempt must be swept in the data-sparing mode.'
         );
         $this->assertTrue(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => 9202]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid(9202)]),
             'A running attempt must keep its progress even in the data-sparing mode.'
         );
     }

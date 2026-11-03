@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\local\access\context_resolver;
+use local_catquiz\local\attempt\attempt_statistics;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
 
@@ -94,7 +95,7 @@ class debuginfo extends feedbackgenerator {
      *
      */
     protected function get_teacherfeedback(array $data): array {
-        global $OUTPUT, $DB, $CFG;
+        global $OUTPUT, $DB;
 
         // The export tab is always available to users with the feedback
         // permission. The raw debug exports below are added only when debug
@@ -135,15 +136,60 @@ class debuginfo extends feedbackgenerator {
 
         $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
         $description = get_string('debuginfo_desc', 'local_catquiz');
+        // Decision of 2026-10-14: the figures of the attempt for teachers, above the exports. With pilot
+        // questions switched on, a second column counts the pilot items, which are not scored.
+        $pilotids = array_keys($this->get_progress()->get_played_pilot_questions());
+        $figures = attempt_statistics::for_attempt((int) $attemptid, $pilotids);
+        $haspilots = !empty($this->get_progress()->get_quiz_settings()->catquiz_includepilotquestions)
+            || $figures->pilots > 0;
+        $statistics = [];
+        foreach (
+            [
+                'right' => 'numberofanswerscorrect',
+                'wrong' => 'numberofanswersincorrect',
+                'partial' => 'numberofanswerspartlycorrect',
+                'unanswered' => 'numberofanswersunanswered',
+            ] as $key => $label
+        ) {
+            $statistics[] = [
+                'label' => get_string($label, 'local_catquiz'),
+                'value' => $figures->$key,
+                'pilotvalue' => $figures->pilot[$key],
+            ];
+        }
+        $statistics[] = [
+            'label' => get_string('statistics_duration', 'local_catquiz'),
+            'value' => attempt_statistics::format_seconds($figures->duration),
+            'pilotvalue' => '',
+        ];
+        $statistics[] = [
+            'label' => get_string('statistics_timeperitem', 'local_catquiz', $figures->itemcount),
+            'value' => $figures->itemsd === null
+                ? attempt_statistics::format_seconds($figures->itemmean)
+                : attempt_statistics::format_seconds($figures->itemmean) . ' ± '
+                    . attempt_statistics::format_seconds($figures->itemsd),
+            'pilotvalue' => '',
+        ];
+
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/exportattempt',
             [
+                'statistics' => $statistics,
+                'haspilots' => $haspilots,
                 'data' => rawurlencode($csvstring),
                 'cid' => $contextid,
                 'attemptid' => $attemptid,
                 'description' => $description,
                 'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", var_export($data, true)))),
-                'cfg->root' => $CFG->wwwroot,
+                // Issue #32: full addresses instead of a root to glue paths to.
+                'exportcsvurl' => (new \moodle_url(
+                    '/local/catquiz/export_attempt_csv.php',
+                    ['attemptid' => $attemptid]
+                ))->out(false),
+                'exportpdfurl' => (new \moodle_url(
+                    '/local/catquiz/export_debuginfo_pdf.php',
+                    ['attemptid' => $attemptid, 'cid' => $contextid]
+                ))->out(false),
                 'isteacher' => true,
                 'debugenabled' => $debugenabled,
                 'iscatmanager' => $debugenabled && has_capability(
@@ -253,7 +299,25 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return 'Export';
+        return get_string('statisticsexport', 'local_catquiz');
+    }
+
+    /**
+     * The export tab for authorised users; it marks an invalid result, it does not need a valid one. (issue #120)
+     *
+     * @return string
+     */
+    public function get_result_dependency(): string {
+        return self::DIAGNOSTIC;
+    }
+
+    /**
+     * Teacher feedback only (issue #85).
+     *
+     * @return string[]
+     */
+    public function get_audiences(): array {
+        return [self::AUDIENCE_TEACHER];
     }
 
     /**
@@ -273,7 +337,10 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function get_required_context_keys(): array {
-        return ['debuginfo'];
+        // The export of the attempt needs nothing but the attempt (issue #120). The rows of the debug
+        // storage are an addition when it is switched on; requiring them hid the export tab - also for
+        // invalid attempts, the ones most in need of it - wherever debug storage was off.
+        return [];
     }
 
     /**
@@ -291,14 +358,14 @@ class debuginfo extends feedbackgenerator {
     /**
      * Load data.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+    public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
 
         // Note: This has to be redone as well.
         if (!get_config('local_catquiz', 'store_debug_info')) {
@@ -338,7 +405,7 @@ class debuginfo extends feedbackgenerator {
         $lastresponse = $this->get_progress()->get_last_response();
         $debuginfo[] = [
             'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
-            'attemptid' => $attemptid,
+            'attemptid' => $adaptiveattemptid,
             'questionsattempted' => count($this->get_progress()->get_playedquestions()),
             'timestamp' => time(),
             'personabilities' => $personabilities,

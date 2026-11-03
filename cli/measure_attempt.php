@@ -24,9 +24,14 @@
  * directions, and a pool number alone would hide it.
  *
  * Five questions, fixed rather than "up to five", so both versions do the same amount
- * of work. The answers are fixed too - right, wrong, right, right, wrong - because an
- * adaptive test that receives different answers takes a different path and then the
- * two runs are not measuring the same thing.
+ * of work. The answers are fixed too - right, wrong, right, right, wrong, then again from
+ * the start - because an adaptive test that receives different answers takes a different
+ * path and then the two runs are not measuring the same thing. Each question is put into
+ * the attempt's question usage and answered there, as the activity does it, so the next
+ * selection reads the answer (adapter #6: the answers were defined but never given).
+ *
+ * Each selection is a request of its own for the CATquiz timeline: with the trace on, its
+ * trace is written after the step and the timeline starts afresh (flush(), reset()).
  *
  * The fingerprint distinguishes two kinds of agreement, and the difference matters
  * here:
@@ -48,6 +53,9 @@ define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
+require_once($CFG->libdir . '/questionlib.php');
+
+use local_catquiz\local\monitoring\timeline;
 
 [$options] = cli_get_params([
     'help' => false,
@@ -130,11 +138,11 @@ function run_attempt(int $cmid, stdClass $cm, int $questions, array $answers): a
 
     $start = microtime(true);
 
-    $uniqueid = (int) $DB->insert_record('question_usages', (object) [
-        'contextid' => \context_module::instance($cm->id)->id,
-        'component' => 'mod_adaptivequiz',
-        'preferredbehaviour' => 'deferredfeedback',
-    ]);
+    // The usage the answers are given in; the selection reads them from it.
+    $quba = question_engine::make_questions_usage_by_activity('mod_adaptivequiz', \context_module::instance($cm->id));
+    $quba->set_preferred_behaviour('deferredfeedback');
+    question_engine::save_questions_usage_by_activity($quba);
+    $uniqueid = (int) $quba->get_id();
 
     $attemptid = (int) $DB->insert_record('adaptivequiz_attempt', (object) [
         'instance' => $cm->instance,
@@ -172,6 +180,9 @@ function run_attempt(int $cmid, stdClass $cm, int $questions, array $answers): a
 
         $steps[sprintf('q%d_select_ms', $i + 1)] = (microtime(true) - $start) * 1000;
         $path[] = $questionid;
+        // The step was a request of its own: its trace, then a fresh timeline.
+        timeline::flush();
+        timeline::reset();
 
         if (empty($questionid)) {
             $steps['stopped_after'] = $i;
@@ -179,8 +190,21 @@ function run_attempt(int $cmid, stdClass $cm, int $questions, array $answers): a
             break;
         }
 
-        // The response, recorded the way the module records it: the attempt row
-        // carries the count the next selection reads.
+        // The response, given in the usage and recorded the way the module records it: the
+        // attempt row carries the count the next selection reads.
+        $slot = $quba->add_question(question_bank::load_question($questionid));
+        $quba->start_question($slot);
+        $right = (float) $answers[$i % count($answers)] >= 1.0;
+        $correct = $quba->get_correct_response($slot);
+        if (isset($correct['answer']) && is_numeric($correct['answer'])) {
+            // A single choice: the right one, or another valid one.
+            $choice = (int) $correct['answer'];
+            $quba->process_action($slot, ['answer' => $right ? $choice : ($choice >= 1 ? $choice - 1 : $choice + 1)]);
+        } else if ($right && $correct) {
+            $quba->process_action($slot, $correct);
+        }
+        $quba->finish_question($slot, time());
+        question_engine::save_questions_usage_by_activity($quba);
         $DB->set_field('adaptivequiz_attempt', 'questionsattempted', $i + 1, ['id' => $attemptid]);
     }
 
@@ -195,8 +219,13 @@ function run_attempt(int $cmid, stdClass $cm, int $questions, array $answers): a
     $steps['path'] = $path;
 
     // Cleaning up keeps repeated attempts from making the pool smaller as they run.
+    timeline::flush();
+    timeline::reset();
+    question_engine::delete_questions_usage_by_activity($uniqueid);
     $DB->delete_records('adaptivequiz_attempt', ['id' => $attemptid]);
     $DB->delete_records('local_catquiz_attempts', ['attemptid' => $attemptid]);
+    // The traces stay for export_trace.php --attemptid=N; the retention task removes them.
+    $steps['attemptid'] = $attemptid;
 
     return $steps;
 }

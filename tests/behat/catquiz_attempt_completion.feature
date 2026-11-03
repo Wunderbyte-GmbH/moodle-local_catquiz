@@ -75,12 +75,12 @@ Feature: A CAT attempt is finalised authoritatively on completion.
     And I click on "richtige Antwort" "text" in the "Question 1" "question"
     And I click on "Submit answer" "button"
     And I should see "Question 2"
-    ## Interrupt: navigate away, then come back to the activity. Resuming an
-    ## in-progress attempt uses the same "Start attempt" link, which continues
-    ## the existing attempt rather than starting a new one.
+    ## Interrupt: navigate away, then come back to the activity. The activity page offers the
+    ## attempt in progress (mod_adaptivequiz #5): continuing it goes on with the same attempt.
     And I am on the "adaptivecatquiz1" Activity page
     And I wait until the page is ready
-    And I click on "Start attempt" "link"
+    And I should see "You have an attempt in progress"
+    And I click on "Continue attempt" "button"
     And I wait until the page is ready
     And I should see "Question 2"
     And I click on "falsche Antwort 1" "text" in the "Question 2" "question"

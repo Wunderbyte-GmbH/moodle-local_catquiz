@@ -40,7 +40,7 @@ function loadresponsesforperson($filename, $person = 0): array {
 
     $row = 0;
     $questionids = [];
-    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+    while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
         $row++;
         if ($row == 1) {
             // The first row contains the question labels.
@@ -80,7 +80,7 @@ function loadresponsesforitem(string $filename, model_person_param_list $initial
     $row = 0;
     $labels = [];
     $mr = new model_responses();
-    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+    while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
         $row++;
         if ($row == 1) {
             $labels = array_slice($data, 1);
@@ -115,7 +115,7 @@ function loadpersonparams(string $filename, string $scale): model_person_param_l
     $row = 0;
     $personparams = new model_person_param_list();
     $labelindex = null;
-    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+    while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
         $row++;
         if ($row === 1) {
             $labelindex = array_search($scale, $data);

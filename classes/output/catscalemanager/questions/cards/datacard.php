@@ -17,6 +17,7 @@
 namespace local_catquiz\output\catscalemanager\questions\cards;
 
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use renderable;
 
 defined('MOODLE_INTERNAL') || die();
@@ -183,6 +184,20 @@ class datacard implements renderable {
         $body['closedeye'] = $closedeye;
         $body['statuscircle'] = $statuscircleclass;
         $body['statustitle'] = $modelstatus;
+        // Issue #82: whether the question bank or the scale keeps the question out of the tests.
+        $availability = catscale::item_availability(
+            $record->questionstatus ?? null,
+            $record->testitemstatus ?? 0,
+            isset($record->model) ? (string) $record->model : null
+        );
+        $body['availabilitykey'] = $availability;
+        $body['availability'] = get_string('itemavailability_' . $availability, 'local_catquiz');
+        $body['globallyout'] = in_array(
+            $availability,
+            [catscale::AVAILABILITY_GLOBALHIDDEN, catscale::AVAILABILITY_GLOBALDRAFT],
+            true
+        );
+        $body['globallocked'] = get_string('itemavailability_globallocked', 'local_catquiz');
 
         return [
             'title' => $title,

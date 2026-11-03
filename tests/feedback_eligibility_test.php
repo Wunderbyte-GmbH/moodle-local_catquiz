@@ -211,7 +211,9 @@ final class feedback_eligibility_test extends advanced_testcase {
 
         // Static calls to a bare class name: Foo::bar(). Names that are fully
         // qualified (a leading backslash) resolve on their own.
-        preg_match_all('/(?<![\\\w$>])([a-z_][a-z0-9_]*)::/i', $source, $calls);
+        // The class [\\\w$>] excludes a backslash and word characters before the name: without the word
+        // characters, \ns\context_resolver:: matched as "ontext_resolver".
+        preg_match_all('/(?<![\\\\\w$>])([a-z_][a-z0-9_]*)::/i', $source, $calls);
 
         $ownclass = 'feedback_helper';
         $builtin = ['self', 'static', 'parent'];

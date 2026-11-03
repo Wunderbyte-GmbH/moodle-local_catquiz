@@ -31,12 +31,16 @@ $plugin->component = 'local_catquiz';
 // was never tested is a promise to administrators that the code does not keep.
 // Moodle 5.x is a work package of its own.
 $plugin->supported = [405, 405];
-$plugin->release = '1.2.0';
-$plugin->version = 2026090553;
+// Issue #31: "supported" only informs; this keeps the 1.2 line off Moodle 5.0 and later (the 1.3 line is for 5.x).
+$plugin->incompatible = 500;
+$plugin->release = '1.2.1';
+$plugin->version = 2026102408;
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_wunderbyte_table' => 2024040200,
-    'mod_adaptivequiz' => 2026081900,
-    'adaptivequizcatmodel_catquiz' => 2026081900,
+    // Issue #31: what this line needs and is delivered with - the host with the stop reasons and the
+    // reason of a refused start (#60), the adapter with the attempt ids and the timeline (#146, adapter #6).
+    'mod_adaptivequiz' => 2026101800,
+    'adaptivequizcatmodel_catquiz' => 2026101800,
 ];

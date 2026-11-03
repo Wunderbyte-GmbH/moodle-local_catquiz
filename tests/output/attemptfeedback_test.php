@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use advanced_testcase;
 use local_catquiz\output\attemptfeedback;
+use local_catquiz\teststrategy\feedback_helper;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -62,11 +63,19 @@ final class attemptfeedback_test extends advanced_testcase {
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['load_feedbackdata', 'get_quiz_settings'])
+            ->onlyMethods(['load_feedbackdata', 'get_quiz_settings', 'get_routing_scores'])
             ->getMock();
         $attemptfeedback
             ->method('load_feedbackdata')
             ->willReturn($feedbackdata);
+        // Since issue #129 the candidates come from the final result of the attempt
+        // (enrolment_routing_test). Here they are derived from the data set, so these cases keep
+        // testing what they are about: which range and which courses or groups a score leads to.
+        $abilities = $feedbackdata['personabilities_abilities'] ?? [];
+        $reportable = feedback_helper::get_reportable_scales($abilities, array_fill_keys(array_keys($abilities), 1));
+        $attemptfeedback
+            ->method('get_routing_scores')
+            ->willReturn(array_map(fn($a) => (float) $a['value'], $reportable));
         $attemptfeedback
             ->method('get_quiz_settings')
             ->willReturn($quizsettings);
@@ -182,11 +191,19 @@ final class attemptfeedback_test extends advanced_testcase {
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['load_feedbackdata', 'get_quiz_settings'])
+            ->onlyMethods(['load_feedbackdata', 'get_quiz_settings', 'get_routing_scores'])
             ->getMock();
         $attemptfeedback
             ->method('load_feedbackdata')
             ->willReturn($feedbackdata);
+        // Since issue #129 the candidates come from the final result of the attempt
+        // (enrolment_routing_test). Here they are derived from the data set, so these cases keep
+        // testing what they are about: which range and which courses or groups a score leads to.
+        $abilities = $feedbackdata['personabilities_abilities'] ?? [];
+        $reportable = feedback_helper::get_reportable_scales($abilities, array_fill_keys(array_keys($abilities), 1));
+        $attemptfeedback
+            ->method('get_routing_scores')
+            ->willReturn(array_map(fn($a) => (float) $a['value'], $reportable));
         $attemptfeedback
             ->method('get_quiz_settings')
             ->willReturn($quizsettings);

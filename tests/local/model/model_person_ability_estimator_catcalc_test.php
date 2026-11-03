@@ -213,7 +213,7 @@ final class model_person_ability_estimator_catcalc_test extends basic_testcase {
         $row = 0;
         $responses = [];
         $columnames = [];
-        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
             $row++;
             if ($row == 1) {
                 // Skip the header row.

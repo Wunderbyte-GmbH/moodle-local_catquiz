@@ -18,7 +18,7 @@ namespace local_catquiz\local\attempt;
 
 use local_catquiz\catquiz;
 use local_catquiz\local\result\attempt_result_validator;
-use local_catquiz\local\result\attemptscale_repository;
+use local_catquiz\local\result\personparam_repository;
 use local_catquiz\teststrategy\progress;
 
 /**
@@ -53,7 +53,8 @@ final class attempt_finalizer {
      * @return bool True if this call performed the finalisation, false if it was a no-op.
      */
     public static function finalize(int $adaptiveattemptid, int $finishedat, string $stopreason = ''): bool {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         // Locate the local CAT attempt row created during the attempt. If none
         // exists (for example an attempt that never produced a CAT row), there
@@ -62,6 +63,14 @@ final class attempt_finalizer {
         if (!$catattempt) {
             return false;
         }
+
+        /* A CAT attempt still marked running (issue #101) is one whose test ended before a single
+           answer was processed - by the time limit, after too long a break, or by leaving right
+           after the start. It is finalised like any other: a test that has ended is announced as
+           ended, whether or not it produced a result. Finalisation needs the authoritative end
+           time of the activity's attempt, which exists only once that attempt is complete, so a
+           test that is still running never gets this far. */
+        $endedwithoutanswer = (int) $catattempt->status === LOCAL_CATQUIZ_ATTEMPT_RUNNING;
 
         // Idempotency guard: a finalised attempt carries a non-empty endtime.
         // Re-running finalisation must not change the stored result. Removing
@@ -103,6 +112,10 @@ final class attempt_finalizer {
         if ($questionsattempted !== false) {
             $catattempt->number_of_testitems_used = (int) $questionsattempted;
         }
+        if ($endedwithoutanswer) {
+            // Ended without any processed answer: there is no result, and the row says so.
+            $catattempt->status = LOCAL_CATQUIZ_ATTEMPT_ABORTED;
+        }
         $catattempt->timemodified = time();
         $DB->update_record('local_catquiz_attempts', $catattempt);
 
@@ -113,7 +126,7 @@ final class attempt_finalizer {
         // Completed -> Validated -> Persisted atomically.
         $result = attempt_result_validator::validate($adaptiveattemptid);
         $contextid = ($catattempt->contextid !== null) ? (int) $catattempt->contextid : null;
-        attemptscale_repository::save_attempt_result(
+        personparam_repository::save_attempt_result(
             (int) $catattempt->id,
             (int) $catattempt->userid,
             $contextid,
@@ -141,7 +154,11 @@ final class attempt_finalizer {
             // question before any during-attempt estimate was written. Lets us
             // restore a non-validly-measured scale to its exact prior state.
             $preattempt = [];
-            if ($DB->record_exists('local_catquiz_progress', ['attemptid' => $adaptiveattemptid])) {
+            $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, 'mod_adaptivequiz');
+            if (
+                $catattemptid !== null
+                    && $DB->record_exists('local_catquiz_progress', ['attemptid' => $catattemptid])
+            ) {
                 try {
                     $preattempt = progress::load($adaptiveattemptid, 'mod_adaptivequiz', $contextid)
                         ->get_preattempt_abilities();
@@ -162,7 +179,10 @@ final class attempt_finalizer {
             foreach ($result->get_scale_results() as $scaleresult) {
                 $scaleid = $scaleresult->scaleid;
                 if ($scaleresult->valid && $scaleresult->score !== null) {
-                    catquiz::update_person_param($userid, $contextid, $scaleid, (float) $scaleresult->score);
+                    /* Nothing to write here: personparam_repository::save_attempt_result() above
+                       has already filed this scale, with the standard error, the item count and
+                       the validation status that only it knows. A second write would append a
+                       poorer duplicate of the same estimate. */
                     continue;
                 }
 
@@ -173,13 +193,30 @@ final class attempt_finalizer {
                 // (Phase 2); fall back to the last valid history value (Phase 1);
                 // otherwise leave it untouched.
                 if (array_key_exists($scaleid, $preattempt)) {
-                    catquiz::update_person_param($userid, $contextid, $scaleid, (float) $preattempt[$scaleid]);
+                    // Carried over, not measured in this attempt - hence 'prior'.
+                    catquiz::update_person_param(
+                        $userid,
+                        $contextid,
+                        $scaleid,
+                        (float) $preattempt[$scaleid],
+                        (int) $catattempt->id,
+                        true,
+                        'prior'
+                    );
                     continue;
                 }
 
-                $lastvalid = attemptscale_repository::get_latest_valid($userid, $contextid, $scaleid);
-                if ($lastvalid !== null && $lastvalid->score !== null) {
-                    catquiz::update_person_param($userid, $contextid, $scaleid, (float) $lastvalid->score);
+                $lastvalid = personparam_repository::get_latest_valid($userid, $contextid, $scaleid);
+                if ($lastvalid !== null && $lastvalid->ability !== null) {
+                    catquiz::update_person_param(
+                        $userid,
+                        $contextid,
+                        $scaleid,
+                        (float) $lastvalid->ability,
+                        (int) $catattempt->id,
+                        true,
+                        'prior'
+                    );
                 }
             }
         }
@@ -190,6 +227,70 @@ final class attempt_finalizer {
 
         $transaction->allow_commit();
 
+        // Issue #122: the CAT attempt is finalised - announce it, and only now. After the commit,
+        // so no listener sees a half-written result; here, and not on the result page, so it
+        // happens whether or not anyone ever opens that page. The endtime guard above makes a
+        // second finalize() return early, so an attempt is announced once.
+        self::announce_completion($catattempt, $adaptiveattemptid, $finishedat, $result->is_valid());
+
+        // Issue #129: enrolment on every way a test ends, once - not when the result page is built,
+        // which may never happen. Only scales that route (valid, measured, selected) enrol anyone;
+        // an invalid result enrols nobody.
+        try {
+            attempt_enrolment::enrol($adaptiveattemptid);
+        } catch (\Throwable $e) {
+            debugging('Enrolment after the attempt failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+
         return true;
+    }
+
+    /**
+     * Triggers the attempt_completed event for a finalised CAT attempt.
+     *
+     * @param \stdClass $catattempt The finalised row of local_catquiz_attempts.
+     * @param int $adaptiveattemptid Id of the attempt in adaptivequiz_attempt.
+     * @param int $finishedat When the attempt was finalised.
+     * @param bool $isvalid Whether the result is valid.
+     */
+    private static function announce_completion(
+        \stdClass $catattempt,
+        int $adaptiveattemptid,
+        int $finishedat,
+        bool $isvalid
+    ): void {
+        global $DB;
+
+        /* The module context of the activity, taken from the activity's attempt itself - not from
+           local_catquiz_attempts through the context resolver. A CAT attempt is filed when the test
+           starts, before course and instance are known; the resolver falls back to the system
+           context for it and keeps that for the rest of the request. */
+        $instanceid = (int) $DB->get_field('adaptivequiz_attempt', 'instance', ['id' => $adaptiveattemptid]);
+        $cm = $instanceid ? get_coursemodule_from_instance('adaptivequiz', $instanceid, 0, false, IGNORE_MISSING) : false;
+        $context = $cm ? \context_module::instance($cm->id) : \context_system::instance();
+
+        try {
+            \local_catquiz\event\attempt_completed::create([
+                'objectid' => (int) $catattempt->id,
+                'context' => $context,
+                'userid' => (int) $catattempt->userid,
+                'relateduserid' => (int) $catattempt->userid,
+                'other' => [
+                    'catattemptid' => (int) $catattempt->id,
+                    'adaptiveattemptid' => $adaptiveattemptid,
+                    'instanceid' => $instanceid,
+                    'courseid' => $cm ? (int) $cm->course : (int) ($catattempt->courseid ?? 0),
+                    'catscaleid' => (int) ($catattempt->scaleid ?? 0),
+                    'teststrategy' => (int) ($catattempt->teststrategy ?? 0),
+                    'resultvalid' => $isvalid ? 1 : 0,
+                    'resultstatus' => $isvalid ? 'valid' : 'invalid',
+                    'finishedat' => $finishedat,
+                ],
+            ])->trigger();
+        } catch (\Throwable $e) {
+            // The attempt is finalised and committed; a failing announcement must not turn that
+            // into an error for the person who just finished the test.
+            debugging('attempt_completed could not be triggered: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
     }
 }

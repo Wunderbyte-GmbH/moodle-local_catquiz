@@ -31,8 +31,6 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
-use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
-use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\strategystrengthscore;
@@ -91,10 +89,8 @@ class infergreateststrength extends strategy {
         return [
             new customscalefeedback($this->feedbacksettings, $feedbackhelper),
             new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
-            new questionssummary($this->feedbacksettings, $feedbackhelper),
             new personabilities($this->feedbacksettings, $feedbackhelper),
             new learningprogress($this->feedbacksettings, $feedbackhelper),
-            new pilotquestions($this->feedbacksettings, $feedbackhelper),
             new graphicalsummary($this->feedbacksettings, $feedbackhelper),
             new debuginfo($this->feedbacksettings, $feedbackhelper),
         ];
@@ -127,22 +123,11 @@ class infergreateststrength extends strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
     ): array {
-        // Fraction can not be 1 (all answers correct).
-        if ($feedbacksettings->fraction <= 0) {
-            $returnarray = [];
-            foreach ($personabilities as $scaleid => $array) {
-                $returnarray[$scaleid] = [
-                    'value' => $array['value'],
-                    'excluded' => true,
-                ];
-                $returnarray[$scaleid]['error']['fraction'] = [
-                    'fraction' => $feedbacksettings->fraction,
-                    'expected' => '> 0',
-                ];
-            }
-            return $returnarray;
-        }
         // Exclude scales that don't meet minimum of items required in quizsettings.
+        // Only measured scales take part in the choice (issue #128).
+        $personabilities = $feedbacksettings->filter_unmeasured($personabilities, $feedbackdata);
+        // Neither all productive items of a scale wrong nor all right (issue #140).
+        $personabilities = $feedbacksettings->filter_fraction($personabilities, $feedbackdata);
         $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
         // Exclude scales where standarderror is not in range.
         $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);

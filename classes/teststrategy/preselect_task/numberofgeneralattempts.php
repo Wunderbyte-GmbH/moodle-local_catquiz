@@ -63,16 +63,25 @@ class numberofgeneralattempts extends preselect_task {
     }
 
     /**
-     * Can be overwritten in the _testing class to prevent access to the DB.
+     * Number of answers per question, keyed by question id.
+     *
+     * Issue #136: this used to count every question attempt on the whole site - quizzes,
+     * previews and other CAT contexts included, answered or not - and read the whole
+     * question_attempts table on every pilot decision. The balancing it feeds is about
+     * calibration data, and the calibration only uses answers from the same CAT context
+     * and global scale. That is the number the pool already carries as "attempts" (the
+     * same one the pilot rule uses), so it is taken from there.
+     *
+     * Can be overwritten in the _testing class.
+     *
      * @param mixed $context
      * @return array
      */
     protected function getquestionswithattemptscount($context): array {
-        global $DB;
-        $sql = "SELECT questionid, COUNT(*) AS count
-                FROM {question_attempts}
-                GROUP BY questionid";
-
-        return $DB->get_records_sql($sql);
+        $records = [];
+        foreach ($context['questions'] as $id => $question) {
+            $records[$id] = (object) ['count' => (int) ($question->attempts ?? 0)];
+        }
+        return $records;
     }
 }

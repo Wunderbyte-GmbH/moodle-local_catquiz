@@ -21,8 +21,9 @@
 
 
 var SELECTORS = {
-    BACKBUTTON: '#backtotablelink',
-    TABCONTAINER: '#lcq_questions',
+    // Issue #30: the ids carry the plugin prefix.
+    BACKBUTTON: '#local-catquiz-testitem-backtotable',
+    TABCONTAINER: '#local-catquiz-manager-questions',
 };
 
 export const init = () => {

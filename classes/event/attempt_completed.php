@@ -36,22 +36,23 @@ use moodle_url;
  */
 class attempt_completed extends catquiz_event_base {
     /**
-     * Init parameters.
+     * Init method.
+     *
+     * The event describes an attempt, so its object is the CAT attempt - not a CAT scale as it
+     * used to be (issue #122).
      *
      * @return void
-     *
      */
     protected function init() {
-        $this->data['crud'] = 'c'; // Meaning: c = create.
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'local_catquiz_catscales';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'local_catquiz_attempts';
     }
 
     /**
      * Get name.
      *
      * @return string
-     *
      */
     public static function get_name() {
         return get_string('attempt_completed', 'local_catquiz');
@@ -61,33 +62,35 @@ class attempt_completed extends catquiz_event_base {
      * Get description.
      *
      * @return string
-     *
      */
     public function get_description() {
-        $data = $this->data;
         $other = $this->get_other_data();
-
         if (!$other) {
             return '';
         }
 
-        $catscaleid = $other->catscaleid;
-        $linktoscale = catscale::get_link_to_catscale($catscaleid);
-        $data['catscalelink'] = $linktoscale;
+        $data = [
+            'attemptid' => $other->adaptiveattemptid ?? $this->objectid,
+            'userid' => $this->relateduserid ?? $this->userid,
+            'catscalelink' => !empty($other->catscaleid) ? catscale::get_link_to_catscale((int) $other->catscaleid) : '',
+        ];
 
-        $data['attemptid'] = $other->attemptid;
-        $data['userid'] = $other->userid;
-        $data['catscalelink'] = $linktoscale;
         return get_string('complete_attempt_description', 'local_catquiz', $data);
     }
 
     /**
-     * Get url.
+     * Returns the review page of the attempt.
      *
-     * @return object
+     * The page checks the reviewer's capability itself; the link grants nothing.
      *
+     * @return moodle_url|null
      */
     public function get_url() {
-        return new moodle_url('');
+        $other = $this->get_other_data();
+        if (!$other || empty($other->adaptiveattemptid)) {
+            return null;
+        }
+
+        return new moodle_url('/local/catquiz/show_attemptfeedback.php', ['attemptid' => $other->adaptiveattemptid]);
     }
 }

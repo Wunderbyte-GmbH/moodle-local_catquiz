@@ -42,7 +42,8 @@
                 }
             ]
         },
-        "attemptid" : "111"
+        "attemptid" : "111",
+        "noresult" : ""
     }
 }}
 
@@ -51,76 +52,93 @@
 {{#nofeedback}}
     {{#str}} minquestionsnotreached, local_catquiz{{/str}}
 {{/nofeedback}}
+{{#noresult}}
+    <div class="alert alert-info" role="status">{{noresult}}</div>
+{{/noresult}}
 {{#feedback}}
 <div class="catquiz_feedback">
   {{#studentfeedback}}
       {{#frontpage}}
-          <h5 id= "feedback-generator-heading-frontpage-{{generatorname}}"> {{{heading}}} </h5>
-          <i id= "feedback-generator-comment-frontpage-{{generatorname}}"> {{{comment}}} </i>
-          <div id= "feedback-generator-content-frontpage-{{generatorname}}"> {{{content}}} </div>
+          <h5 id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-frontpage-heading"> {{{heading}}} </h5>
+          <div class="font-italic" id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-frontpage-comment"> {{{comment}}} </div>
+          <div id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-frontpage-content"> {{{content}}} </div>
       {{/frontpage}}
   {{/studentfeedback}}
-      <ul class="nav nav-tabs" id="myTab" role="tablist" style="list-style: none">
+      {{! No tab is open when the page is rendered: every tab aria-selected="false", each list item a presentation, so the
+          tab list holds only tabs - also for a feedback whose tabs Bootstrap has not set up yet (axe aria-required-children). }}
+      {{! Ids carry the render and the attempt (issue #30): several feedbacks on one page - attempts in
+          a list, a shortcode next to the result page - must not share tabs or panes. }}
+      <ul class="nav nav-tabs" id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-tabs" role="tablist" style="list-style: none">
   {{#studentfeedback}}
       {{#othertabs}}
-      <li class="nav-item">
+      <li class="nav-item" role="presentation">
           <a class="nav-link feedbacktab"
-              id="{{generatorname}}-othertabs"
+              id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-student-tab"
               data-toggle="tab"
               data-attemptid="{{attemptid}}"
-              data-feedbackname={{generatorname}}
+              data-feedbackname="{{generatorname}}"
               data-feedbackname-translated="{{heading}}"
-              href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+              href="#local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-student"
               role="tab"
-              aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
-              aria-selected="true">{{heading}}
+              aria-controls="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-student"
+              aria-selected="false">{{heading}}
           </a>
       </li>
       {{/othertabs}}
   {{/studentfeedback}}
   {{#teacherfeedback}}
-          <li class="nav-item">
+          <li class="nav-item" role="presentation">
               <a class="nav-link feedbacktab"
-                  id="{{generatorname}}-teacherfeedback"
+                  id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-teacher-tab"
                   data-toggle="tab"
                   data-attemptid="{{attemptid}}"
                   data-feedbackname="{{generatorname}}"
                   data-feedbackname-translated="{{heading}}"
-                  href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+                  href="#local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-teacher"
                   role="tab"
-                  aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
+                  aria-controls="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-teacher"
                   aria-selected="false">{{heading}}
               </a>
           </li>
   {{/teacherfeedback}}
-  {{#studentfeedback.0}}
+  {{! Issue #32: closed and opened whether or not there is student feedback - a teacher-only feedback left the list open. }}
       </ul>
-      <div class="tab-content" id="myTabContent" style="margin:20px">
-  {{/studentfeedback.0}}
+      <div class="tab-content" id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-panes" style="margin:20px">
 
   {{#studentfeedback}}
       {{#othertabs}}
-          <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-othertabs">
-              <div id="feedbackcontent-{{generatorname}}">
-                  <h5 id= "feedback-generator-heading-othertabs-{{generatorname}}"> {{{heading}}} </h5>
-                  <i id= "feedback-generator-comment-othertabs-{{generatorname}}"> {{{comment}}} </i>
-                  <div id= "feedback-generator-content-othertabs-{{generatorname}}"> {{{content}}} </div>
+          <div class="tab-pane fade" id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-student" role="tabpanel" aria-labelledby="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-student-tab">
+              <div class="feedbackcontent-{{generatorname}}">
+                  <h5> {{{heading}}} </h5>
+                  {{#lazy}}
+                  {{! Issue #85: filled when the tab is opened. }}
+                  <div data-region="local_catquiz-lazyfeedback" data-attemptid="{{attemptid}}"
+                       data-generatorname="{{generatorname}}" data-audience="student"></div>
+                  {{/lazy}}
+                  {{^lazy}}
+                  <div class="font-italic"> {{{comment}}} </div>
+                  <div> {{{content}}} </div>
+                  {{/lazy}}
               </div>
           </div>
       {{/othertabs}}
   {{/studentfeedback}}
   {{#teacherfeedback}}
-          <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-teacherfeedback">
-              <div id="feedbackcontent-{{generatorname}}">
-                  <h5 id= "feedback-generator-heading-teacherfb-{{generatorname}}"> {{{heading}}} </h5>
-                  <i id= "feedback-generator-comment-teacherfb-{{generatorname}}"> {{{comment}}} </i>
-                  <div id= "feedback-generator-content-teacherfb-{{generatorname}}"> {{{content}}} </div>
+          <div class="tab-pane fade" id="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-teacher" role="tabpanel" aria-labelledby="local-catquiz-feedback-{{uniqid}}-{{attemptid}}-{{generatorname}}-teacher-tab">
+              <div class="feedbackcontent-{{generatorname}}">
+                  <h5> {{{heading}}} </h5>
+                  {{#lazy}}
+                  <div data-region="local_catquiz-lazyfeedback" data-attemptid="{{attemptid}}"
+                       data-generatorname="{{generatorname}}" data-audience="teacher"></div>
+                  {{/lazy}}
+                  {{^lazy}}
+                  <div class="font-italic"> {{{comment}}} </div>
+                  <div> {{{content}}} </div>
+                  {{/lazy}}
               </div>
           </div>
   {{/teacherfeedback}}
-  {{#studentfeedback.0}}
       </div>
-  {{/studentfeedback.0}}
 </div>
 {{/feedback}}
 </div>

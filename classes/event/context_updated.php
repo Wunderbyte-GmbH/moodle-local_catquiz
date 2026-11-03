@@ -66,7 +66,7 @@ class context_updated extends catquiz_event_base {
     public function get_description() {
         $data = $this->data;
         $other = $this->get_other_data();
-        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $other->contextname);
+        $contextnamelink = html_writer::link(new \moodle_url('/local/catquiz/manage_catcontexts.php'), $other->contextname);
         return get_string('update_context_description', 'local_catquiz', $contextnamelink);
     }
 

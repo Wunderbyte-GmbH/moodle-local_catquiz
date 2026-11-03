@@ -32,10 +32,8 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
-use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\preselect_task\filterbyquestionsperscale;
 use local_catquiz\teststrategy\preselect_task\inferallsubscalesscore;
 use local_catquiz\teststrategy\strategy;
 
@@ -90,7 +88,6 @@ class inferallsubscales extends strategy {
             new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
             new personabilities($this->feedbacksettings, $feedbackhelper),
             new learningprogress($this->feedbacksettings, $feedbackhelper),
-            new questionssummary($this->feedbacksettings, $feedbackhelper),
             new graphicalsummary($this->feedbacksettings, $feedbackhelper),
             new debuginfo($this->feedbacksettings, $feedbackhelper),
         ];
@@ -133,6 +130,8 @@ class inferallsubscales extends strategy {
         // Filter scales, but instead of excluding a scale, mark it as hidden.
         $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata, true);
         $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata, true);
+        // Neither all productive items of a scale wrong nor all right (issue #140).
+        $personabilities = $feedbacksettings->filter_fraction($personabilities, $feedbackdata, true);
         foreach ($personabilities as $scaleid => $abilitiesarray) {
             $personabilities[$scaleid]['toreport'] = true;
             if ($estimated) {
@@ -148,13 +147,14 @@ class inferallsubscales extends strategy {
     }
 
     /**
-     * Filter by questions per scale
+     * ALLSUBS plays every scale up to its minimum before it goes on (issue #135).
      *
-     * @return result
+     * Scales that reached it are deactivated for a while and come back once every scale has; this
+     * coverage is what the strategy is for and stays as it is.
+     *
+     * @return bool
      */
-    protected function filterbyquestionsperscale(): result {
-        $filterbyquestionsperscale = new filterbyquestionsperscale();
-        $result = $filterbyquestionsperscale->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+    public function requires_scale_coverage(): bool {
+        return true;
     }
 }

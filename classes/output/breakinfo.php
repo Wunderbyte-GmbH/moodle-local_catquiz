@@ -64,6 +64,8 @@ class breakinfo implements renderable, templatable {
     public function export_for_template(\renderer_base $output): array {
         return [
             'cmid' => $this->cmid,
+            // Issue #32: a full address - a root-relative one breaks below a wwwroot with a path.
+            'viewurl' => (new \moodle_url('/mod/adaptivequiz/view.php', ['id' => $this->cmid]))->out(false),
             'breakend' => date('H:i:s', $this->breakend),
         ];
     }

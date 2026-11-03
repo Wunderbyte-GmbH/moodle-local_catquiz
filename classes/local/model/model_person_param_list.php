@@ -229,17 +229,10 @@ class model_person_param_list implements ArrayAccess, Countable, IteratorAggrega
     public function save_to_db(int $contextid, int $catscaleid) {
         global $DB;
         // Get existing records for the given contextid and model.
-        $existingparamsrows = $DB->get_records(
-            'local_catquiz_personparams',
-            [
-                'contextid' => $contextid,
-                'catscaleid' => $catscaleid,
-            ]
-        );
-        $existingparams = [];
-        foreach ($existingparamsrows as $r) {
-            $existingparams[$r->userid] = $r;
-        };
+        /* The table keeps the history of what was estimated, so there can be several rows per
+           person. A recalibration appends its own row rather than overwriting an earlier one -
+           the previous code kept whichever row came last out of the database, which was the newest
+           only by accident. */
 
         $records = array_map(
             function ($param) use ($contextid, $catscaleid) {
@@ -263,29 +256,19 @@ class model_person_param_list implements ArrayAccess, Countable, IteratorAggrega
             $this->personparams
         );
 
-        $updatedrecords = [];
         $newrecords = [];
         $now = time();
         foreach ($records as $record) {
-            $isexistingparam = array_key_exists($record['userid'], $existingparams);
-            // If record already exists, update it. Otherwise, insert a new record to the DB.
-            if ($isexistingparam) {
-                $record['id'] = $existingparams[$record['userid']]->id;
-                $record['timemodified'] = $now;
-                $updatedrecords[] = $record;
-            } else {
-                $record['timecreated'] = $now;
-                $record['timemodified'] = $now;
-                $newrecords[] = $record;
-            }
+            // Always a new row: the table is appended to, see above.
+            $record['timecreated'] = $now;
+            $record['timemodified'] = $now;
+            $record['isvalid'] = 1;
+            $record['resultsource'] = 'recalibration';
+            $newrecords[] = $record;
         }
 
         if (!empty($newrecords)) {
             $DB->insert_records('local_catquiz_personparams', $newrecords);
-        }
-
-        foreach ($updatedrecords as $r) {
-            $DB->update_record('local_catquiz_personparams', $r, true);
         }
     }
 

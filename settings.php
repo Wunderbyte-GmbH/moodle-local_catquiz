@@ -184,6 +184,30 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // Issue #85: the tabs of the result page beyond the main feedback load when opened.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_catquiz/lazyfeedbacktabs',
+        get_string('lazyfeedbacktabs', 'local_catquiz'),
+        get_string('lazyfeedbacktabs_desc', 'local_catquiz'),
+        1
+    ));
+
+    // Issue #136: timeline of attempt requests, to find where the time to a question goes. Off by
+    // default; it writes one row per request of an attempt while it is on.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_catquiz/attempttrace',
+        get_string('attempttrace', 'local_catquiz'),
+        get_string('attempttrace_desc', 'local_catquiz'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/attempttraceretentiondays',
+        get_string('attempttraceretentiondays', 'local_catquiz'),
+        get_string('attempttraceretentiondays_desc', 'local_catquiz'),
+        14,
+        PARAM_INT
+    ));
+
     // Add a setting for the default maximum attempt duration.
     $settings->add(new admin_setting_configtext(
         'local_catquiz/maximum_attempt_duration_hours',

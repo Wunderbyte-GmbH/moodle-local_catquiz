@@ -45,6 +45,7 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      */
     public const PRECISION = 3;
 
+
     /**
      * Likelihood 1pl.
      *
@@ -730,6 +731,8 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
       * @return float 1st derivative of TR function with respect to $pp
       */
     public static function get_ability_tr_jacobian(array $pp, float $mean = 0, float $sd = 1): float {
+        // Issue #116: never a division by zero, never an unbounded curvature.
+        $sd = self::sanitize_trusted_region_sd($sd);
         return
             (($mean - $pp['ability']) / ($sd ** 2)); // The d/dpp .
     }
@@ -743,9 +746,32 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
      * @return float 2nd derivative of TR function with respect to $ip
      */
     public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): float {
-
+        // Issue #116: never a division by zero, never an unbounded curvature.
+        $sd = self::sanitize_trusted_region_sd($sd);
         return
             (- 1 / ($sd ** 2)); // Calculate d/dpp d/dpp.
+    }
+
+    /**
+     * The standard deviation of the trusted-region prior, never below 10^-PRECISION (issue #116).
+     *
+     * The single place where this is decided, for every model. The prior is needed wherever the
+     * estimate leaves the trusted region, so it is never left out; its spread is forced away from
+     * zero instead: max(sd, 10^-PRECISION). A spread of zero - every person parameter the same, a
+     * single one, a sample collapsed by clamping or filtering -, a negative one and NaN all become
+     * that minimum. An infinite spread stays: its prior has no curvature, and dividing by it is
+     * defined. Any spread at or above the minimum is returned unchanged: the regular case does not
+     * move.
+     *
+     * @param mixed $sd Standard deviation (or standard error) of the distribution.
+     * @return float
+     */
+    public static function sanitize_trusted_region_sd($sd): float {
+        $minimum = 10 ** -self::PRECISION;
+        if (!is_numeric($sd) || is_nan((float) $sd)) {
+            return $minimum;
+        }
+        return max((float) $sd, $minimum);
     }
 
     /**
@@ -769,6 +795,8 @@ abstract class model_raschmodel extends model_model implements catcalc_ability_e
         float $sd = 1,
         bool $usetrfactor = false
     ): array {
+        // The same spread as the prior's derivatives (issue #116).
+        $sd = self::sanitize_trusted_region_sd($sd);
         if (!$usetrfactor) {
             if ($pp['ability'] < $ppmin) {
                 $pp['ability'] = $ppmin;

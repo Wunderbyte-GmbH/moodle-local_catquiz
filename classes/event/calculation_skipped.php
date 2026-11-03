@@ -67,14 +67,15 @@ class calculation_skipped extends catquiz_event_base {
      *
      */
     public function get_description() {
-        $other = $this->get_other_data();
-        $scaleid = $other->catscaleid;
-        $catscale = catscale::return_catscale_object($scaleid);
-        $context = catcontext::load_from_db($other->contextid);
+        global $DB;
+        // Issue #79: the scale or the context may be deleted since the row was written.
+        $other = $this->get_other_data() ?? new \stdClass();
+        $scalename = $DB->get_field('local_catquiz_catscales', 'name', ['id' => (int) ($other->catscaleid ?? 0)]);
+        $contextname = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => (int) ($other->contextid ?? 0)]);
         $data = (object) [
-            'reason' => $other->reason,
-            'scalename' => $catscale->name,
-            'contextname' => $context->name,
+            'reason' => $other->reason ?? '',
+            'scalename' => $scalename !== false ? $scalename : get_string('deletedcatscale', 'local_catquiz'),
+            'contextname' => $contextname !== false ? $contextname : '-',
         ];
         return get_string('noresponsestoestimatedesc', 'local_catquiz', $data);
     }

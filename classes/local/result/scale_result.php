@@ -45,6 +45,12 @@ final class scale_result {
     /** @var string Rejection: fraction rule not met (e.g. all-correct/all-wrong). */
     public const REASON_FRACTION = 'fraction';
 
+    /** @var string Rejection: every productive item of the scale answered wrongly (fraction 0, issue #140). */
+    public const REASON_FRACTION_ALL_INCORRECT = 'fraction_all_incorrect';
+
+    /** @var string Rejection: every productive item of the scale answered correctly (fraction 1, issue #140). */
+    public const REASON_FRACTION_ALL_CORRECT = 'fraction_all_correct';
+
     /** @var string Rejection: only the root scale, no reportable subscale. */
     public const REASON_ROOTONLY = 'rootonly';
 
@@ -59,6 +65,15 @@ final class scale_result {
 
     /** @var string Rejection: the value was not measured in the current attempt (carry-over only). */
     public const REASON_NOT_MEASURED = 'not_measured_in_current_attempt';
+
+    /** @var string Rejection: the attempt ended with fewer answered productive items than the test's minimum (#141). */
+    public const REASON_MIN_QUESTIONS = 'min_questions_not_reached';
+
+    /**
+     * @var string Rejection: the attempt administered more items than the test's maximum - the
+     *      production case of 33 slots at a maximum of 25 (adaptivequizcatmodel_catquiz #8).
+     */
+    public const REASON_MAX_QUESTIONS_EXCEEDED = 'max_questions_exceeded';
 
     /**
      * Constructor.
@@ -99,5 +114,69 @@ final class scale_result {
         /** @var string[] Machine-readable rejection reason codes. */
         public readonly array $rejectionreasons
     ) {
+    }
+
+    /**
+     * The reasons that say nothing about the measurement, only about how it is used: not the reported scale of the
+     * attempt, reporting switched off, hidden. In the order the validator appends them (attempt_result_validator).
+     *
+     * @return string[]
+     */
+    public static function display_only_reasons(): array {
+        return [self::REASON_REPORTING_DISABLED, self::REASON_HIDDEN, self::REASON_NOT_PRIMARY];
+    }
+
+    /**
+     * Whether a stored row is a valid measurement of its scale (issue #150, re-audit 27.10.2026).
+     *
+     * isvalid is the verdict on the result of the attempt: primary, statistically valid and measured in it. A scale
+     * that is measured validly but is not the reported one - the root scale under "lowest skill gap", every subscale
+     * but one - is stored with isvalid = 0 and the reason not_primary. For the ability of the persons in a scale
+     * (histograms, the peer comparison, the learning progress) such a value counts: the measurement is valid. A
+     * statistical reason (SE, N, fraction, minimum or maximum of questions, root only) or a scale not measured in the
+     * attempt keeps it out. A row without reasons that is not valid was written before the reasons were stored and
+     * stays out.
+     *
+     * @param int $isvalid
+     * @param string|null $validationstatus Comma-separated reasons (local_catquiz_personparams.validationstatus).
+     * @return bool
+     */
+    public static function is_valid_measurement(int $isvalid, ?string $validationstatus): bool {
+        if ($isvalid === 1) {
+            return true;
+        }
+        $reasons = array_filter(array_map('trim', explode(',', (string) $validationstatus)), fn($r) => $r !== '');
+        if (!$reasons) {
+            return false;
+        }
+        return !array_diff($reasons, self::display_only_reasons());
+    }
+
+    /**
+     * The same rule as is_valid_measurement(), as an SQL condition on a row of local_catquiz_personparams.
+     *
+     * The validator writes the reasons in a fixed order, so the stored strings of display reasons only are the
+     * non-empty subsequences of display_only_reasons().
+     *
+     * @param string $alias Alias of local_catquiz_personparams.
+     * @param string $prefix Prefix of the parameter names.
+     * @return array [sql, params]
+     */
+    public static function valid_measurement_sql(string $alias, string $prefix): array {
+        global $DB;
+        $reasons = self::display_only_reasons();
+        $strings = [];
+        $count = count($reasons);
+        for ($mask = 1; $mask < (1 << $count); $mask++) {
+            $subset = [];
+            foreach ($reasons as $i => $reason) {
+                if ($mask & (1 << $i)) {
+                    $subset[] = $reason;
+                }
+            }
+            $strings[] = implode(',', $subset);
+        }
+        [$insql, $params] = $DB->get_in_or_equal($strings, SQL_PARAMS_NAMED, $prefix . 'vm');
+        return ["($alias.isvalid = 1 OR $alias.validationstatus $insql)", $params];
     }
 }

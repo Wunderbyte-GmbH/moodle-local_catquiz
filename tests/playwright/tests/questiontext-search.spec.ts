@@ -42,7 +42,7 @@ test.describe('CAT manager question text search', () => {
 
         // The form is a GET form; without carrying the page parameters over, the user
         // would silently end up looking at a different scale than before.
-        await expect(page.locator('#catquiz-qtsearch')).toHaveValue(matchingTerm());
+        await expect(page.locator('#local-catquiz-qtsearch')).toHaveValue(matchingTerm());
         await expect(page.getByText(matchingQuestion())).toBeVisible();
     });
 

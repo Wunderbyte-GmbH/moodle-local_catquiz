@@ -161,9 +161,10 @@ class info {
 
         $teststrategiesoptions = [];
         $strategieswithoutpilotquestions = [LOCAL_CATQUIZ_STRATEGY_CLASSIC];
+        // Issue #135: CLASSIC keeps the minimum per scale - it decides whether a scale is reported as
+        // valid - while the maximum per scale plays no part in it (see the note below).
         $strategieswithoutquestionsperscale = [
             LOCAL_CATQUIZ_STRATEGY_FASTEST,
-            LOCAL_CATQUIZ_STRATEGY_CLASSIC,
         ];
         $strategyhasstandarderrorperscale = [];
         foreach ($teststrategies as $ts) {
@@ -177,6 +178,8 @@ class info {
                     LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                     LOCAL_CATQUIZ_STRATEGY_FASTEST,
                     LOCAL_CATQUIZ_STRATEGY_RELSUBS,
+                    // Issue #135: the maximum standard error decides whether a scale is reported as valid.
+                    LOCAL_CATQUIZ_STRATEGY_CLASSIC,
                     ])
             ) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
@@ -373,6 +376,16 @@ class info {
             'in',
             $strategyhasstandarderrorperscale
         );
+
+        // Issue #135: in CLASSIC these thresholds only decide what is reported as valid; the fixed form
+        // is played as it is. Said where the values are set, so nobody expects them to shorten a test.
+        $elements[] = $mform->addElement(
+            'static',
+            'catquiz_classicreportingnote',
+            '',
+            get_string('classicreportingnote', 'local_catquiz')
+        );
+        $mform->hideIf('catquiz_classicreportingnote', 'catquiz_selectteststrategy', 'neq', LOCAL_CATQUIZ_STRATEGY_CLASSIC);
 
         $elements[] = $mform->addElement(
             'advcheckbox',

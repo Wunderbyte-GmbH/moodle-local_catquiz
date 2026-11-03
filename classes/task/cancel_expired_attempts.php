@@ -112,34 +112,19 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
 
         $completed = 0;
         $statusmessage = get_string('attemptclosedbytimelimit', 'local_catquiz');
+        require_once($CFG->dirroot . '/mod/adaptivequiz/locallib.php');
         foreach ($records as $record) {
             if (!$this->exceeds_maxtime($record)) {
                 continue;
             }
-            $quiz = $this->get_adaptivequiz($record->instance);
-            $cm = get_coursemodule_from_instance('adaptivequiz', $record->instance);
-            $context = context_module::instance($cm->id);
-            /* Use the SAME authoritative completion path as a normal
-               finish. The task used to call local_catquiz\local\attempt\attempt
-               ::complete(), which only flips attemptstate/attemptstopcriteria and
-               saves - it never sets the immutable timefinished and never invokes
-               the CAT model's post_complete_attempt_callback. A cron-closed attempt
-               therefore skipped attempt_finalizer::finalize() entirely, so neither
-               the endtime nor the result (and with it resultvalid) were persisted.
-               adaptivequiz_complete_attempt() sets timefinished exactly once, calls
-               the catmodel callback and triggers the event, which keeps browser,
-               administrative and cron completion consistent. */
-            require_once($CFG->dirroot . '/mod/adaptivequiz/locallib.php');
-            adaptivequiz_complete_attempt(
-                (int) $record->uniqueid,
-                $quiz,
-                $context,
-                (int) $record->userid,
-                $statusmessage
-            );
-            catquiz::set_final_attempt_status($record->id, status::CLOSED_BY_TIMELIMIT);
-            cache_helper::purge_by_event('changesinquizattempts');
-            $completed++;
+            // One attempt that cannot be closed - a broken record, a missing course module - does not stop the
+            // others (mod_adaptivequiz #5).
+            try {
+                $this->complete($record, $statusmessage);
+                $completed++;
+            } catch (\Throwable $e) {
+                mtrace(sprintf('Attempt %d could not be closed: %s', (int) $record->id, $e->getMessage()));
+            }
         }
         $duration = time() - $this->currenttime;
         mtrace(sprintf(
@@ -148,6 +133,37 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
             $duration,
             $completed
         ));
+    }
+
+    /**
+     * Closes one attempt with the completion every other end uses.
+     *
+     * By its id where the activity offers that (mod_adaptivequiz #5): an attempt without a question has
+     * uniqueid 0, and several of those cannot be told apart by it.
+     *
+     * @param stdClass $record adaptivequiz_attempt record.
+     * @param string $statusmessage
+     */
+    private function complete(stdClass $record, string $statusmessage): void {
+        $quiz = $this->get_adaptivequiz($record->instance);
+        $cm = get_coursemodule_from_instance('adaptivequiz', $record->instance, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        // The code of mod_adaptivequiz's stop_reason::TIMELIMIT (issue #20), written out: an older activity has
+        // neither the class nor the parameter and ignores it.
+        if (function_exists('adaptivequiz_complete_attempt_by_id')) {
+            adaptivequiz_complete_attempt_by_id((int) $record->id, $quiz, $context, $statusmessage, 'timelimit');
+        } else {
+            adaptivequiz_complete_attempt(
+                (int) $record->uniqueid,
+                $quiz,
+                $context,
+                (int) $record->userid,
+                $statusmessage,
+                'timelimit'
+            );
+        }
+        catquiz::set_final_attempt_status($record->id, status::CLOSED_BY_TIMELIMIT);
+        cache_helper::purge_by_event('changesinquizattempts');
     }
 
     /**
@@ -168,24 +184,25 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
         $records = $DB->get_records('adaptivequiz', ['catmodel' => 'catquiz']);
         $openinstances = array_map(fn($r) => $r->id, $records);
 
-        foreach ($DB->get_records_list('local_catquiz_tests', 'componentid', $openinstances) as $tr) {
-            $settings = json_decode($tr->json);
-            if (
-                !property_exists($settings, 'catquiz_timelimitgroup')
-                || !$settings->catquiz_timelimitgroup
-            ) {
-                $this->maxtimepertest[$tr->componentid] = null;
-                continue;
-            }
-
-            $maxtimeperattempt = floatval($settings->catquiz_timelimitgroup->catquiz_maxtimeperattempt ?: 60) * 60;
-            if ($settings->catquiz_timelimitgroup->catquiz_timeselect_attempt == 'h') {
-                $maxtimeperattempt *= 60;
-            }
-            $this->maxtimepertest[$tr->componentid] = $maxtimeperattempt;
+        if (!$openinstances) {
+            return;
+        }
+        // The test rows of the activity component only (both spellings), the newest per instance: another
+        // component's test with the same id lent its limit before (issue #104).
+        [$insql, $params] = $DB->get_in_or_equal($openinstances, SQL_PARAMS_NAMED);
+        $tests = $DB->get_records_select(
+            'local_catquiz_tests',
+            "componentid $insql AND component IN ('mod_adaptivequiz', 'adaptivequiz')",
+            $params,
+            'id ASC'
+        );
+        foreach ($tests as $tr) {
+            // The same reading as the selection and the host (mod_adaptivequiz #5): an empty limit is none - it
+            // used to become 60 minutes - and seconds are a unit, too.
+            $limit = \local_catquiz\catquiz_handler::time_limits(json_decode((string) $tr->json) ?: null)['attempt'];
+            $this->maxtimepertest[$tr->componentid] = $limit;
         }
     }
-
 
     /**
      * Checks whether the given attempt exceeds the max attempt time
@@ -194,17 +211,21 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
      * @return bool
      */
     public function exceeds_maxtime(stdClass $record): bool {
-        $quizmaxtime = $this->maxtimepertest[$record->instance];
-
-        // If the maximum attempt time is set to 0, it means it has no limit.
-        if ($quizmaxtime === 0) {
-            return false;
+        // An activity without a limit of its own - no CAT settings, or none set - falls back to the default.
+        $quizmaxtime = $this->maxtimepertest[$record->instance] ?? null;
+        if ($quizmaxtime !== null) {
+            // A limit of 0 is no limit.
+            if ((int) $quizmaxtime === 0) {
+                return false;
+            }
+            // The test's own limit, with a buffer for the last answer - not the default when that is longer: a
+            // 30 minute test was closed only after a day (mod_adaptivequiz #5).
+            return $this->currenttime - $record->timecreated > $quizmaxtime * self::BUFFER_TIME_FACTOR;
         }
         if ($this->defaultmaxtime === 0) {
             return false;
         }
-        $maxtime = max($quizmaxtime * self::BUFFER_TIME_FACTOR, $this->defaultmaxtime);
-        return $this->currenttime - $record->timecreated > $maxtime;
+        return $this->currenttime - $record->timecreated > $this->defaultmaxtime;
     }
 
     /**

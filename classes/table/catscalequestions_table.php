@@ -97,7 +97,28 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_action($values) {
         global $OUTPUT;
 
-        $url = new moodle_url('manage_catscales.php', [
+        // Issue #82: both levels that hide a question, in words - not by the eye icon alone.
+        $availability = catscale::item_availability(
+            $values->questionstatus ?? null,
+            $values->testitemstatus ?? 0,
+            isset($values->model) ? (string) $values->model : null
+        );
+        $globallyout = in_array(
+            $availability,
+            [catscale::AVAILABILITY_GLOBALHIDDEN, catscale::AVAILABILITY_GLOBALDRAFT],
+            true
+        );
+        $label = html_writer::span(
+            get_string('itemavailability_' . $availability, 'local_catquiz'),
+            'catquiz-itemavailability badge '
+                . ($availability === catscale::AVAILABILITY_ACTIVE ? 'badge-success' : 'badge-secondary'),
+            [
+                'data-availability' => $availability,
+                'title' => $globallyout ? get_string('itemavailability_globallocked', 'local_catquiz') : '',
+            ]
+        );
+
+        $url = new moodle_url('/local/catquiz/manage_catscales.php', [
             'id' => $values->id,
             'contextid' => $this->contextid,
             'scaleid' => $values->catscaleid ?? 0,
@@ -108,10 +129,13 @@ class catscalequestions_table extends wunderbyte_table {
         ]);
 
         $data['showactionbuttons'][] = [
-            'class' => 'btn btn-plain btn-smaller',
+            'class' => 'btn btn-plain btn-smaller' . ($globallyout ? ' disabled' : ''),
             'iclass' => empty($values->testitemstatus) ? 'fa fa-eye' : 'fa fa-eye-slash',
             'arialabel' => empty($values->testitemstatus) ? 'eye icon' : 'eye icon slashed',
-            'title' => get_string('eyeicontitle', 'local_catquiz'),
+            // Issue #82: a question the bank hides cannot be brought back in a scale; the server refuses as well.
+            'title' => $globallyout
+                ? get_string('itemavailability_globallocked', 'local_catquiz')
+                : get_string('eyeicontitle', 'local_catquiz'),
             'href' => '#',
             'id' => $values->id,
             'methodname' => 'togglestatus', // The method needs to be added to your child of wunderbyte_table class.
@@ -157,7 +181,7 @@ class catscalequestions_table extends wunderbyte_table {
             ],
         ];
         table::transform_actionbuttons_array($data['showactionbuttons']);
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+        return $label . $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
 
@@ -173,7 +197,7 @@ class catscalequestions_table extends wunderbyte_table {
 
         global $OUTPUT;
 
-        $url = new moodle_url('manage_catscales.php', [
+        $url = new moodle_url('/local/catquiz/manage_catscales.php', [
             'id' => $values->id,
             'contextid' => $this->contextid,
             'scaleid' => $values->catscaleid ?? $this->catscaleid,
@@ -246,8 +270,11 @@ class catscalequestions_table extends wunderbyte_table {
 
         $labelstring = "itemstatus_" . $status;
 
+        // An icon that carries the status: role="img" - an aria-label on an <i> without a role is not allowed
+        // (axe aria-prohibited-attr, found by catquiz_addtestitems_modal.feature) and not read out.
         return html_writer::tag('i', "", [
             "class" => "fa fa-circle $bootstrapclass",
+            "role" => "img",
             "aria-label" => get_string($labelstring, 'local_catquiz'),
             "title" => get_string($labelstring, 'local_catquiz'),
         ]);
@@ -711,19 +738,42 @@ class catscalequestions_table extends wunderbyte_table {
 
     /**
      * Toggle status to set item active / inactive.
+     *
+     * Issue #82: the scale comes from the client and is checked - only an item of that scale is toggled, none is
+     * created in another; the current state is read from the database, not taken from the client; and a question
+     * the question bank hides or keeps as a draft is not activated - no test would play it.
+     *
      * @param int $id
      * @param string $data
      * @return array
      */
     public function action_togglestatus(int $id, string $data) {
+        global $DB;
+        require_capability('local/catquiz:manage_catscales', context_system::instance());
 
         $jsonobject = json_decode($data);
+        $catscaleid = (int) ($jsonobject->catscaleid ?? 0);
+        $item = $DB->get_record(
+            'local_catquiz_items',
+            ['componentid' => $id, 'componentname' => 'question', 'catscaleid' => $catscaleid]
+        );
+        if (!$item) {
+            return [
+                'success' => 0,
+                'message' => get_string('itemnotinscale', 'local_catquiz'),
+            ];
+        }
+        $status = (int) $item->status === LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE
+            ? LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE
+            : LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE;
+        if ($status === LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE && catscale::unavailable_question_ids([$id])) {
+            return [
+                'success' => 0,
+                'message' => get_string('itemavailability_globallocked', 'local_catquiz'),
+            ];
+        }
 
-        $catscaleid = $jsonobject->catscaleid;
-        $status = empty($jsonobject->testitemstatus) ?
-        LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE : LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
-
-        catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status);
+        catscale::add_or_update_testitem_to_scale($catscaleid, $id, $status);
 
         return [
             'success' => 1,

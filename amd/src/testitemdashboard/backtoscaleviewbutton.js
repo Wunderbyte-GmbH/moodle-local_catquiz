@@ -22,7 +22,8 @@
 
 var SELECTORS = {
     BACKBUTTON: "[data-id='backtoscaleview']",
-    TABCONTAINER: '#lcq_catscales',
+    // Issue #30: the id carries the plugin prefix.
+    TABCONTAINER: '#local-catquiz-manager-catscales',
 };
 
 export const init = () => {

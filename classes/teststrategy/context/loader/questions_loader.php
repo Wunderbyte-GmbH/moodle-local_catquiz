@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\context\loader;
 
+use local_catquiz\local\attempt_cache;
 use cache;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextloaderinterface;
@@ -95,6 +96,8 @@ class questions_loader implements contextloaderinterface {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($this->progress->is_first_question()) {
             $cache->set('totalnumberoftestitems', count($context['questions']));
+            // Issue #146: also under the attempt's own key - another attempt of the session does not overwrite it.
+            attempt_cache::set('totalnumberoftestitems', (int) $this->progress->get_attemptid(), count($context['questions']));
         }
 
         // Store for each scaleid the questions associated with that scale or

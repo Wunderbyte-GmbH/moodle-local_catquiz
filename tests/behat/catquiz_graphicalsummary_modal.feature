@@ -60,10 +60,11 @@ Feature: The quiz progress summary shows readable question and answer data and
     And I click on "richtige Antwort" "text" in the "Question 4" "question"
     And I click on "Submit answer" "button"
     And I wait until the page is ready
+    ## Issue #85: the tab loads its content when it is opened.
+    And I click on "Quiz progress summary" "link" in the "#region-main" "css_element"
+    And I wait until ".catquiz-graphicalsummary-table" "css_element" exists
     ## The quiz-progress-summary feedback renders the answered-question table with
-    ## per-question response data. It lives in a feedback tab that is inactive
-    ## until the learner opens it, so the rows are present in the DOM but not
-    ## visible: assert on DOM presence to secure the end-to-end data mapping - the
+    ## per-question response data. Assert on DOM presence to secure the end-to-end data mapping - the
     ## responsive result table, the "Given answer:" label span, and the chosen
     ## answer value carried in the response-summary span. The magnifier button and
     ## its modal open/close behaviour - including the "no hanging spinner"
@@ -78,3 +79,90 @@ Feature: The quiz progress summary shows readable question and answer data and
     ## rendered as an icon in the column right after the question number.
     And ".catquiz-col-correctness" "css_element" should exist
     And ".catquiz-response-icon" "css_element" should exist
+
+  @javascript @accessibility
+  Scenario: The question dialogue of the progress summary is opened, used and left with the keyboard (issue #30)
+    ## The magnifier needs catquiz_showquestion, which the generator does not carry through the
+    ## round trip - the teacher sets it in the form, as in a course.
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
+    And I follow "Settings"
+    And I wait until the page is ready
+    And I expand all fieldsets
+    And I set the field "Show feedback for given responses" to "1"
+    And I click on "Save and return to course" "button"
+    And I log out
+    And I am on the "adaptivecatquiz1" Activity page logged in as student1
+    And I click on "Start attempt" "link"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "text" in the "Question 3" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "richtige Antwort" "text" in the "Question 4" "question"
+    And I click on "Submit answer" "button"
+    And I wait until the page is ready
+    When I click on "Quiz progress summary" "link" in the "#region-main" "css_element"
+    And I wait until ".catquiz-graphicalsummary-table" "css_element" exists
+    Then the page has no duplicate ids
+    And the ".feedbackcontent-graphicalsummary" "css_element" should meet accessibility standards with "wcag131, wcag141, wcag412" extra tests
+    ## Open: the dialogue takes the focus and passes axe-core.
+    When I click on "(//table[contains(@class, 'catquiz-graphicalsummary-table')]//button[@aria-label='Show question'])[1]" "xpath_element"
+    And I wait until ".modal.show .modal-dialog" "css_element" exists
+    Then the focus is inside the open dialogue
+    And the ".modal.show .modal-dialog" "css_element" should meet accessibility standards with "wcag131, wcag141, wcag412" extra tests
+    And the page has no duplicate ids
+    ## Tab stays in the dialogue.
+    When I press the tab key
+    Then the focus is inside the open dialogue
+    When I press the tab key
+    Then the focus is inside the open dialogue
+    ## Escape closes it and gives the focus back to the button that opened it.
+    When I press the escape key
+    Then ".modal.show" "css_element" should not exist
+    And the focused element is "(//table[contains(@class, 'catquiz-graphicalsummary-table')]//button[@aria-label='Show question'])[1]" "xpath_element"
+    ## A second dialogue from the next button: the same behaviour, no ids of the first left behind twice.
+    When I click on "(//table[contains(@class, 'catquiz-graphicalsummary-table')]//button[@aria-label='Show question'])[2]" "xpath_element"
+    And I wait until ".modal.show .modal-dialog" "css_element" exists
+    Then the focus is inside the open dialogue
+    And the page has no duplicate ids
+    When I press the escape key
+    Then ".modal.show" "css_element" should not exist
+    And the focused element is "(//table[contains(@class, 'catquiz-graphicalsummary-table')]//button[@aria-label='Show question'])[2]" "xpath_element"
+
+  @javascript
+  Scenario: The quiz history of an attempt stored in the older format is drawn (issue #152)
+    Given I am on the "adaptivecatquiz1" Activity page logged in as student1
+    And I click on "Start attempt" "link"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "text" in the "Question 3" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "richtige Antwort" "text" in the "Question 4" "question"
+    And I click on "Submit answer" "button"
+    And I wait until the page is ready
+    And I log out
+    ## The rows carry the ability as personability, as before personability_after existed.
+    And the quiz history of the last CAT attempt of "student1" is stored in the older format
+    When I log in as "student1"
+    And I open the result page of the last attempt of "student1"
+    And I click on "Quiz progress summary" "link" in the "#region-main" "css_element"
+    And I wait until ".catquiz-graphicalsummary-table" "css_element" exists
+    Then ".feedbackcontent-graphicalsummary .chart-image canvas" "css_element" should exist
+    And "[data-region='local_catquiz-feedbackarea-notice']" "css_element" should not exist
+    And I should not see "could not be loaded"
+    ## The ability of every answered question is shown, none as an empty cell.
+    And "//table[contains(@class, 'catquiz-graphicalsummary-table')]//tbody/tr[td[contains(@class, 'catquiz-col-ability')][normalize-space(.)='']]" "xpath_element" should not exist
+    And "//table[contains(@class, 'catquiz-graphicalsummary-table')]//tbody/tr[4]" "xpath_element" should exist

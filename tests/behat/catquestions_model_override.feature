@@ -36,8 +36,8 @@ Feature: As an admin I perfrom model settings customizations over an imported of
     ## Edit 1st question
     And I should see "0.3100" in the "//tr[contains(@id, 'questionstable_r1')]" "xpath_element"
     And I click on "managedetails-" "link" in the "//div[contains(@class, 'questionstable')]//tr[contains(@id, 'questionstable_r1')]" "xpath_element"
-    And I should see "Schwierigkeit: 1.36" in the "#questiondetailview .questionpreview" "css_element"
-    And I should see "Skala: B/B02" in the "#questiondetailview .questionpreview" "css_element"
+    And I should see "Schwierigkeit: 1.36" in the "#local-catquiz-testitem-detailview .questionpreview" "css_element"
+    And I should see "Skala: B/B02" in the "#local-catquiz-testitem-detailview .questionpreview" "css_element"
     And I click on "Edit" "button" in the "#lcq_model_override_form" "css_element"
     ## Verify default settings
     And the following fields match these values:

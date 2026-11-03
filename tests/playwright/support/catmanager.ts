@@ -46,12 +46,12 @@ export const openQuestionsTab = async(
     // The questions table lives in a Bootstrap tab pane that starts hidden. Clicking
     // the tab is what makes it visible; asserting on the pane before that would pass
     // against markup nobody can see.
-    await page.click('#questions-tab');
-    await expect(page.locator('#lcq_questions')).toBeVisible();
+    await page.click('#local-catquiz-manager-questions-tab');
+    await expect(page.locator('#local-catquiz-manager-questions')).toBeVisible();
 
     // The table renders its rows through an AJAX reload, so waiting for the table
     // element alone is not enough.
-    await expect(page.locator('#lcq_questions table')).toBeVisible();
+    await expect(page.locator('#local-catquiz-manager-questions table')).toBeVisible();
     await waitForTableSettled(page);
 };
 
@@ -66,14 +66,14 @@ export const openQuestionsTab = async(
  * @param page The Playwright page.
  */
 export const waitForTableSettled = async(page: Page): Promise<void> => {
-    const spinner = page.locator('#lcq_questions .wb-table-call-spinner');
+    const spinner = page.locator('#local-catquiz-manager-questions .wb-table-call-spinner');
     if (await spinner.count() > 0) {
         await expect(spinner.first()).toBeHidden();
     }
     // Either rows or the explicit "no records" message must be present. Waiting for
     // one of the two is what distinguishes "finished and empty" from "still loading".
     await expect(
-        page.locator('#lcq_questions table tbody tr, #lcq_questions .norecordsfound').first()
+        page.locator('#local-catquiz-manager-questions table tbody tr, #local-catquiz-manager-questions .norecordsfound').first()
     ).toBeVisible();
 };
 
@@ -82,14 +82,14 @@ export const waitForTableSettled = async(page: Page): Promise<void> => {
  *
  * @param page The Playwright page.
  */
-export const questionRows = (page: Page) => page.locator('#lcq_questions table tbody tr');
+export const questionRows = (page: Page) => page.locator('#local-catquiz-manager-questions table tbody tr');
 
 /**
  * Returns the locator for the "no records found" message.
  *
  * @param page The Playwright page.
  */
-export const noRecordsMessage = (page: Page) => page.locator('#lcq_questions .norecordsfound');
+export const noRecordsMessage = (page: Page) => page.locator('#local-catquiz-manager-questions .norecordsfound');
 
 /**
  * Submits the question text search and waits for the list to settle.
@@ -98,8 +98,8 @@ export const noRecordsMessage = (page: Page) => page.locator('#lcq_questions .no
  * @param term The search term.
  */
 export const searchQuestionText = async(page: Page, term: string): Promise<void> => {
-    await page.fill('#catquiz-qtsearch', term);
-    await page.click('#catquiz-questiontext-search button[type="submit"]');
-    await expect(page.locator('#lcq_questions')).toBeVisible();
+    await page.fill('#local-catquiz-qtsearch', term);
+    await page.click('#local-catquiz-questiontext-search button[type="submit"]');
+    await expect(page.locator('#local-catquiz-manager-questions')).toBeVisible();
     await waitForTableSettled(page);
 };

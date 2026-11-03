@@ -146,6 +146,10 @@ final class feedback_gating_test extends advanced_testcase {
      * @return array
      */
     private function assemble(array $generators, array $feedbackdata): array {
+        // The scales of these fixtures stand for scales measured in the attempt. Since issue #128 that
+        // has to be said: without a count, no scale counts as measured.
+        $feedbackdata['nbyscale'] = $feedbackdata['nbyscale']
+            ?? array_fill_keys(array_keys($feedbackdata['customscalefeedback_abilities'] ?? []), 3);
         $af = (new \ReflectionClass(attemptfeedback::class))->newInstanceWithoutConstructor();
         $method = new ReflectionMethod(attemptfeedback::class, 'generate_feedback');
         $method->setAccessible(true);
@@ -212,10 +216,13 @@ final class feedback_gating_test extends advanced_testcase {
         $this->assertCount(1, $context['studentfeedback'], 'Exactly one central notice must be shown.');
         $notice = $context['studentfeedback'][0];
         $this->assertSame('novalidresult', $notice['generatorname']);
+        // Since 2026100919 the notice names the one reason (decision of 2026-10-14);
+        // its fixed opening is the part before the first placeholder.
+        $raw = get_string('feedbacknoglobalresult', 'local_catquiz');
         $this->assertStringContainsString(
-            get_string('feedbacknovalidresult', 'local_catquiz'),
+            trim(substr($raw, 0, strpos($raw, '{'))),
             $notice['content'],
-            'The notice must state that no valid result could be determined.'
+            'The notice must state that no overall result could be determined.'
         );
         $this->assertStringNotContainsString(
             'Scale feedback',
@@ -352,7 +359,9 @@ final class feedback_gating_test extends advanced_testcase {
      * @return void
      */
     public function test_reportable_helper(): void {
-        $this->assertTrue(feedback_helper::has_reportable_result(['5' => ['toreport' => true]]));
+        $this->assertTrue(feedback_helper::has_reportable_result(['5' => ['toreport' => true]], [5 => 1]));
+        // Issue #128: an unknown N is not 'measured'.
+        $this->assertFalse(feedback_helper::has_reportable_result(['5' => ['toreport' => true]]));
         $this->assertFalse(feedback_helper::has_reportable_result(['5' => ['toreport' => true, 'excluded' => true]]));
         $this->assertFalse(feedback_helper::has_reportable_result(['5' => ['toreport' => true, 'hidden' => true]]));
         $this->assertFalse(feedback_helper::has_reportable_result(['5' => ['value' => 0.1]]));

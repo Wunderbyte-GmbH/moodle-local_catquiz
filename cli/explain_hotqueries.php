@@ -80,28 +80,11 @@ Options:
  * @return string
  */
 function catquiz_explain(string $sql, array $params): string {
-    global $DB;
-
-    $family = $DB->get_dbfamily();
     // ANALYZE executes the query and reports what really happened, rather than what
     // the optimiser guessed. That is the difference between an estimate and a
     // measurement, and estimates are what mislead people about index usage.
-    $prefixed = $family === 'postgres'
-        ? "EXPLAIN (ANALYZE, BUFFERS) $sql"
-        : "ANALYZE FORMAT=JSON $sql";
-
-    try {
-        $rows = $DB->get_records_sql($prefixed, $params);
-    } catch (Throwable $e) {
-        return 'EXPLAIN failed: ' . $e->getMessage();
-    }
-
-    $lines = [];
-    foreach ($rows as $row) {
-        $lines[] = implode(' ', array_map('strval', (array) $row));
-    }
-
-    return implode("\n", $lines);
+    // Every row of the plan, in order (issue #104, K5): identical plan lines no longer collapse.
+    return \local_catquiz\local\diagnostics\query_plan::explain($sql, $params, true);
 }
 
 /**

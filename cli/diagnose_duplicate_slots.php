@@ -22,48 +22,54 @@
  * be reconstructed unambiguously, so this script only reports them; it performs
  * no repair. Use it to size the problem and to decide on a manual clean-up.
  *
+ * Since issue #125 it reports every administration of the question - slots, question attempts and
+ * their states - through local\attempt\administration_history, the same view the review page of an
+ * attempt shows. Output is CSV, one line per attempt and question.
+ *
  * Usage:
- *   php local/catquiz/cli/diagnose_duplicate_slots.php
+ *   php local/catquiz/cli/diagnose_duplicate_slots.php [--instance=ID]
  *
  * @package    local_catquiz
  * @copyright  2026 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\local\attempt\administration_history;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
-// Attempts (by question usage) that hold the same question in more than one slot.
-$sql = "SELECT qa.questionusageid AS uniqueid,
-               qa.questionid,
-               COUNT(*) AS slotcount
-          FROM {question_attempts} qa
-          JOIN {adaptivequiz_attempt} aa ON aa.uniqueid = qa.questionusageid
-      GROUP BY qa.questionusageid, qa.questionid
-        HAVING COUNT(*) > 1
-      ORDER BY qa.questionusageid, qa.questionid";
+[$options, $unrecognised] = cli_get_params(
+    ['instance' => null, 'help' => false],
+    ['i' => 'instance', 'h' => 'help']
+);
 
-$duplicates = $DB->get_records_sql($sql);
-
-if (empty($duplicates)) {
-    cli_writeln('No duplicate question slots found.');
-    exit(0);
+if ($options['help'] || $unrecognised) {
+    cli_writeln('Lists attempts in which a question was administered more than once. Read-only.');
+    cli_writeln('');
+    cli_writeln('Options:');
+    cli_writeln('  -i, --instance=ID  Only attempts of this adaptive quiz instance.');
+    cli_writeln('  -h, --help         This help.');
+    exit($unrecognised ? 1 : 0);
 }
 
-cli_writeln('Found duplicate question slots (question usage id / question id / slot count):');
-$affectedusages = [];
-foreach ($duplicates as $row) {
-    $affectedusages[$row->uniqueid] = true;
-    cli_writeln(sprintf('  uniqueid=%d  questionid=%d  slots=%d', $row->uniqueid, $row->questionid, $row->slotcount));
+$instanceid = $options['instance'] === null ? null : (int) $options['instance'];
+$found = administration_history::find_duplicate_administrations($instanceid);
+
+cli_writeln('attemptid,userid,instance,usageid,questionid,slots,questionattemptids,states');
+foreach ($found as $row) {
+    cli_writeln(implode(',', [
+        $row->attemptid,
+        $row->userid,
+        $row->instance,
+        $row->usageid,
+        $row->questionid,
+        '"' . implode(' ', $row->slots) . '"',
+        '"' . implode(' ', $row->questionattemptids) . '"',
+        '"' . implode(' ', $row->states) . '"',
+    ]));
 }
-
-cli_writeln(sprintf(
-    'Total: %d duplicate (usage, question) pairs across %d affected attempts.',
-    count($duplicates),
-    count($affectedusages)
-));
-cli_writeln('This is a read-only diagnostic; no changes were made.');
-
-exit(0);
+cli_writeln('');
+cli_writeln(count($found) . ' attempt(s) and question(s) with more than one administration.');

@@ -32,9 +32,9 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
-use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\strategyclassicscore;
 use local_catquiz\teststrategy\strategy;
 
@@ -83,7 +83,6 @@ class classicalcat extends strategy {
             new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
             new personabilities($this->feedbacksettings, $feedbackhelper),
             new learningprogress($this->feedbacksettings, $feedbackhelper),
-            new questionssummary($this->feedbacksettings, $feedbackhelper),
             new graphicalsummary($this->feedbacksettings, $feedbackhelper),
             new debuginfo($this->feedbacksettings, $feedbackhelper),
         ];
@@ -119,6 +118,14 @@ class classicalcat extends strategy {
         // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
         $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
         $rootscaleid = $feedbackdata['catscaleid'];
+        // Minimum N and maximum standard error are prerequisites of a valid result, here as in every
+        // other strategy; a scale that misses them is excluded. Maximum N and minimum standard error
+        // are stopping criteria of the test and play no part in validity. Without a configured
+        // limit both filters leave every scale as it is.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
+        $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
+        // Neither all productive items of a scale wrong nor all right (issue #140).
+        $personabilities = $feedbacksettings->filter_fraction($personabilities, $feedbackdata);
         foreach ($personabilities as $scaleid => $abilitiesarray) {
             $personabilities[$scaleid]['toreport'] = true;
             if ($estimated) {
@@ -143,6 +150,37 @@ class classicalcat extends strategy {
     }
 
     /**
+     * No fisher information over the whole pool: CLASSIC chooses by item id, not by information (issue #144).
+     *
+     * Every remaining item got its information for every scale on every answer, for a choice that
+     * never looks at it. The item that is handed out gets it in select_question(), with the same
+     * abilities, so the progress and the feedback keep their values. Pilot items are chosen by a
+     * score that does use the information; with pilots switched on the pool is annotated as before.
+     *
+     * @return result
+     */
+    protected function fisherinformation(): result {
+        if (!empty($this->context['pilot_ratio'])) {
+            return parent::fisherinformation();
+        }
+        return result::ok($this->context);
+    }
+
+    /**
+     * The next item in fixed order, with its fisher information.
+     *
+     * @return result
+     */
+    public function select_question(): result {
+        $result = parent::select_question();
+        $question = $result->unwrap();
+        if (is_object($question)) {
+            (new fisherinformation())->annotate($question, $this->context);
+        }
+        return $result;
+    }
+
+    /**
      * In this strategy, we do not need to calculate this.
      *
      * @return result
@@ -152,20 +190,32 @@ class classicalcat extends strategy {
     }
 
     /**
-     * In this strategy, we do not need to calculate this.
+     * CLASSIC plays a fixed form: no scale is dropped, and no precision ends it (issue #135).
      *
-     * @return result
+     * Minimum questions and maximum standard error per scale only decide whether a scale is
+     * reported as valid (select_scales_for_report()); they never change which questions are asked.
+     *
+     * @return bool
      */
-    protected function filterbystandarderror(): result {
-        return result::ok($this->context);
+    public function uses_scale_dropping(): bool {
+        return false;
     }
 
     /**
-     * In this strategy, we do not need to calculate this.
+     * No per-scale maximum shortens the fixed form (issue #135).
      *
-     * @return result
+     * @return bool
      */
-    protected function filterbytestinfo(): result {
-        return result::ok($this->context);
+    public function uses_per_scale_selection_limits(): bool {
+        return false;
+    }
+
+    /**
+     * The test information of a scale deactivates nothing (issue #135).
+     *
+     * @return bool
+     */
+    public function uses_testinfo_filter(): bool {
+        return false;
     }
 }

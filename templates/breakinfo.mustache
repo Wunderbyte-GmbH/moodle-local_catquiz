@@ -21,11 +21,12 @@
     Context variables required for this template:
     Example context (json):
     {
-        "cmid": 22
+        "cmid": 22,
+        "viewurl": "https://example.com/mod/adaptivequiz/view.php?id=22"
     }
 }}
 
 {{#cmid}}
 {{#str}}breakinfo_continue, local_catquiz, {{breakend}}{{/str}}<br>
-<a href="/mod/adaptivequiz/view.php?id={{cmid}}">{{#str}}breakinfo_backtotest, local_catquiz{{/str}}</a>
+<a href="{{viewurl}}">{{#str}}breakinfo_backtotest, local_catquiz{{/str}}</a>
 {{/cmid}}

@@ -29,9 +29,8 @@ use local_catquiz\local\access\context_resolver;
 use local_catquiz\local\access\feedback_access;
 use local_catquiz\output\catquizstatistics;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
-$scaleid = required_param('scaleid', PARAM_INT);
 $cid = required_param('cid', PARAM_INT);
 
 $courseid = optional_param('courseid', 0, PARAM_INT) ?: null;
@@ -55,6 +54,8 @@ if (!feedback_access::can_view_other_users($exportcontext)) {
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
 
+// Issue #141: without a scale the export takes the one of the test or course, if there is exactly one.
+$scaleid = catquizstatistics::resolve_scale_id(optional_param('scaleid', 0, PARAM_INT), $courseid ?: $cid, $testid);
 $catquizstatistics = new catquizstatistics($courseid, $testid, $scaleid, $endtime, $starttime);
 
 $filename = date("Ymd Hi-") . "export_attempts_scale_$scaleid";

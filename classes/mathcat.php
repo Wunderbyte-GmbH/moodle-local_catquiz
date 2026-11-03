@@ -25,6 +25,8 @@
 
 namespace local_catquiz;
 
+use local_catquiz\local\model\model_raschmodel;
+
 /**
  * Class for math functions.
  *
@@ -45,6 +47,8 @@ class mathcat {
      *
      */
     public static function gaussian_density($x, $mean, $stddeviation) {
+        // Issue #106: the same lower bound for the spread as in the trusted-region prior.
+        $stddeviation = model_raschmodel::sanitize_trusted_region_sd($stddeviation);
         $factor1 = 1 / sqrt(2 * M_PI * pow($stddeviation, 2));
         $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stddeviation, 2)));
         return $factor1 * $factor2;
@@ -61,7 +65,7 @@ class mathcat {
      *
      */
     public static function gaussian_density_derivative1($x, $m, $std) {
-
+        $std = model_raschmodel::sanitize_trusted_region_sd($std);
         return (exp(-(($m - $x) ** 2 / (2 * $std ** 2))) * ($m - $x)) / (sqrt(2 * M_PI) * $std ** 3);
     }
 
@@ -76,6 +80,7 @@ class mathcat {
      *
      */
     public static function gaussian_density_derivative2($x, $m, $std) {
+        $std = model_raschmodel::sanitize_trusted_region_sd($std);
         return (exp(-(($m - $x) ** 2 / (2 * $std ** 2)))
             * ($m ** 2 - $std ** 2 - 2 * $m * $x + $x ** 2)) / (sqrt(2 * M_PI) * $std ** 5);
     }
@@ -593,44 +598,6 @@ class mathcat {
         return self::vector_to_array($parameter, $parameterstructure);
     }
 
-
-    /**
-     * Returns add gauss der1 callable.
-     *
-     * @param callable $func
-     * @param mixed $mean
-     * @param mixed $std
-     *
-     * @return callable
-     *
-     */
-    private static function add_gauss_der1(callable $func, $mean, $std) {
-
-        $gaussian = function ($x) use ($mean, $std) {
-            return 1 * self::gaussian_density_derivative1($x, $mean, $std);
-        };
-        $newfunc = self::compose_plus($func, $gaussian);
-        return $newfunc;
-    }
-
-    /**
-     * Returns add gauss der1 callable.
-     *
-     * @param callable $func
-     * @param mixed $mean
-     * @param mixed $std
-     *
-     * @return callable
-     *
-     */
-    private static function add_gauss_der2(callable $func, $mean, $std) {
-
-        $gaussian = function ($x) use ($mean, $std) {
-            return 1 * self::gaussian_density_derivative2($x, $mean, $std);
-        };
-        $newfunc = self::compose_plus($func, $gaussian);
-        return $newfunc;
-    }
 
     /**
      * REturns compose plus (functions).

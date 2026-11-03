@@ -166,7 +166,12 @@ final class attempt_result_validator_test extends advanced_testcase {
             fn ($a) => is_array($a) && !empty($a['toreport']) && empty($a['excluded']) && empty($a['hidden'])
         ));
 
-        $result = attempt_result_validator::from_personabilities($personabilities);
+        $result = attempt_result_validator::from_personabilities(
+            $personabilities,
+            [],
+            // Every scale measured: the historical definition knew nothing of counts (issue #128).
+            array_fill_keys(array_keys($personabilities), 1)
+        );
 
         $this->assertEquals($historical, $result->get_reportable_scale_ids());
         $this->assertEquals([1], $result->get_reportable_scale_ids());
@@ -223,6 +228,28 @@ final class attempt_result_validator_test extends advanced_testcase {
             'userid' => 2, 'attemptid' => $adaptiveattemptid, 'component' => 'mod_adaptivequiz',
             'status' => 0, 'endtime' => $now, 'json' => $json, 'timecreated' => $now, 'timemodified' => $now,
         ]);
+
+        // The progress of the attempt: three answered items in scale 5. Without it N is unknown and
+        // no scale counts as measured (issue #128).
+        $this->setAdminUser();
+        $progress = \local_catquiz\teststrategy\progress::load((int) $adaptiveattemptid, 'mod_adaptivequiz', 9, (object) []);
+        $played = [];
+        foreach ([8101, 8102, 8103] as $qid) {
+            $played[$qid] = (object) ['id' => $qid, 'catscaleid' => 5, 'is_pilot' => false, 'fisherinformation' => []];
+        }
+        $state = [
+            'responses' => array_map(fn($q) => ['questionid' => $q->id, 'fraction' => 0.5], $played),
+            'playedquestions' => $played,
+            // A progress with played questions always has a last one.
+            'lastquestion' => end($played) ?: null,
+            'playedquestionsbyscale' => [5 => $played],
+        ];
+        foreach ($state as $name => $value) {
+            $property = new \ReflectionProperty($progress, $name);
+            $property->setAccessible(true);
+            $property->setValue($progress, $value);
+        }
+        $progress->save();
 
         $result = attempt_result_validator::validate($adaptiveattemptid);
 

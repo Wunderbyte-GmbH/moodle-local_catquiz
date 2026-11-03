@@ -60,17 +60,17 @@ class feedback_tab_clicked extends external_api {
     /**
      * Webservice for the local catquiz plugin to update context parameters
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param string $feedback
      * @param string $translatedfeedback
      *
      * @return array
      */
-    public static function execute(int $attemptid, string $feedback, string $translatedfeedback): array {
+    public static function execute(int $adaptiveattemptid, string $feedback, string $translatedfeedback): array {
         global $DB, $USER;
 
         self::validate_parameters(self::execute_parameters(), [
-            'attemptid' => $attemptid,
+            'attemptid' => $adaptiveattemptid,
             'feedback' => $feedback,
             'feedbacktranslated' => $translatedfeedback,
         ]);
@@ -78,7 +78,7 @@ class feedback_tab_clicked extends external_api {
         // AJAX endpoints must resolve and validate the context of the
         // attempt they act on, so that they apply exactly the same rules as a
         // normal page request instead of judging everything in the system context.
-        $ctx = context_resolver::for_attempt($attemptid);
+        $ctx = context_resolver::for_attempt($adaptiveattemptid);
         self::validate_context($ctx);
 
         // Review finding: every non-manager was logged as "student", so a teacher
@@ -90,7 +90,7 @@ class feedback_tab_clicked extends external_api {
         // matched no attempt still produced an event - a log entry about something
         // that never happened. Loading it first makes every role fail closed on an
         // unknown object.
-        $attempt = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid]);
+        $attempt = $DB->get_record('local_catquiz_attempts', ['attemptid' => $adaptiveattemptid]);
         if (!$attempt) {
             throw new moodle_exception('norighttoaccess', 'local_catquiz');
         }
@@ -126,7 +126,7 @@ class feedback_tab_clicked extends external_api {
         $event = feedbacktab_clicked::create([
             'context' => $ctx,
             'other' => [
-                'attemptid' => $attemptid,
+                'attemptid' => $adaptiveattemptid,
                 'feedback' => $feedback,
                 'feedback_translated' => $translatedfeedback,
                 'userid' => $USER->id,

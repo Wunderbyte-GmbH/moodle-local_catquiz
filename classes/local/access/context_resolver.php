@@ -64,18 +64,18 @@ class context_resolver {
      * Resolution order: module context of the quiz instance, then the course
      * context, then the system context as last resort.
      *
-     * @param int $attemptid The attempt id as used by the component (e.g. adaptivequiz attempt id).
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param string $component The component the attempt belongs to.
      * @return context
      */
-    public static function for_attempt(int $attemptid, string $component = 'mod_adaptivequiz'): context {
+    public static function for_attempt(int $adaptiveattemptid, string $component = 'mod_adaptivequiz'): context {
         global $DB;
 
-        if ($attemptid <= 0) {
+        if ($adaptiveattemptid <= 0) {
             return context_system::instance();
         }
 
-        $cachekey = $component . '|' . $attemptid;
+        $cachekey = $component . '|' . $adaptiveattemptid;
         if (isset(self::$attemptcontextcache[$cachekey])) {
             return self::$attemptcontextcache[$cachekey];
         }
@@ -101,7 +101,7 @@ class context_resolver {
             SQL_PARAMS_NAMED,
             'component'
         );
-        $inparams['attemptid'] = $attemptid;
+        $inparams['attemptid'] = $adaptiveattemptid;
 
         $record = $DB->get_record_select(
             'local_catquiz_attempts',

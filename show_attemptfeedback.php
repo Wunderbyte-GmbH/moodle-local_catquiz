@@ -27,9 +27,9 @@ use local_catquiz\local\access\context_resolver;
 use local_catquiz\local\access\feedback_access;
 use local_catquiz\output\attemptfeedback;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
-global $USER, $OUTPUT, $COURSE;
+global $DB, $USER, $OUTPUT, $COURSE;
 
 $attemptid = optional_param('attemptid', 0, PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
@@ -83,6 +83,12 @@ $PAGE->set_context($context);
 if (!feedback_access::can_view_other_users($context)) {
     throw new moodle_exception('error:noreviewpermission', 'local_catquiz');
 }
+// Issue #85: in separate groups, a teacher without moodle/site:accessallgroups reviews the attempts of
+// their own groups only - the same rule as the tabs that load later.
+$owner = $DB->get_field('adaptivequiz_attempt', 'userid', ['id' => $attemptid]);
+if ($owner !== false && !feedback_access::can_view_user_in_groups($context, (int) $owner)) {
+    throw new moodle_exception('error:noreviewpermission', 'local_catquiz');
+}
 
 $courseid = $course ? $course->id : $COURSE->id;
 
@@ -95,5 +101,10 @@ echo $OUTPUT->header();
 $data = $attemptfeedback->export_for_template($OUTPUT);
 
 echo $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
+// Issue #125: a question the system administered more than once is named here, for reviewers only.
+echo $OUTPUT->render_from_template(
+    'local_catquiz/administration_notice',
+    (new \local_catquiz\output\administration_notice($attemptid))->export_for_template($OUTPUT)
+);
 
 echo $OUTPUT->footer();

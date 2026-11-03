@@ -1,0 +1,42 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz/administration_notice
+
+    Tells teachers which questions an attempt administered more than once.
+
+    Example context (json):
+    {
+        "hasduplicates": true,
+        "items": [
+            {"text": "Question MA.v1.D08-12 (ID 4751): original slot 7, duplicate slot 9",
+             "questionid": 4751, "originalslot": 7, "duplicateslot": 9}
+        ]
+    }
+}}
+{{#hasduplicates}}
+<div class="alert alert-warning local_catquiz-administration-notice" role="note" data-region="technical-duplicates">
+    <h4 class="alert-heading">{{#str}} technicalduplicate_heading, local_catquiz {{/str}}</h4>
+    <p>{{#str}} technicalduplicate_intro, local_catquiz {{/str}}</p>
+    <ul>
+        {{#items}}
+        <li data-questionid="{{questionid}}" data-originalslot="{{originalslot}}" data-duplicateslot="{{duplicateslot}}">{{text}}</li>
+        {{/items}}
+    </ul>
+    <p class="mb-0">{{#str}} technicalduplicate_explanation, local_catquiz {{/str}}</p>
+</div>
+{{/hasduplicates}}

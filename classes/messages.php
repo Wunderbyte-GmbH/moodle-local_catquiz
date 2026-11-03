@@ -54,10 +54,10 @@ class messages {
      */
     public static function send_message(int $recepientid, string $messagesubject, string $messagetext, string $messagename) {
 
-        global $CFG;
-        require_once($CFG->dirroot . '/user/lib.php');
+        global $DB;
 
-        $users = user_get_users_by_id([$recepientid]);
+        // Not user_get_users_by_id(): deprecated in Moodle 5.3, and it only ever read these records.
+        $users = $DB->get_records_list('user', 'id', [$recepientid]);
 
         $user = reset($users);
 
@@ -88,10 +88,10 @@ class messages {
      */
     public static function send_html_message(int $recepientid, string $messagesubject, string $messagetext, string $messagename) {
 
-        global $CFG;
-        require_once($CFG->dirroot . '/user/lib.php');
+        global $DB;
 
-        $users = user_get_users_by_id([$recepientid]);
+        // Not user_get_users_by_id(): deprecated in Moodle 5.3, and it only ever read these records.
+        $users = $DB->get_records_list('user', 'id', [$recepientid]);
 
         $user = reset($users);
 
@@ -135,14 +135,15 @@ class messages {
 
         $usermodified = $DB->get_record('user', ['id' => $usermodified]);
 
-        $users = user_get_users_by_id($userids);
+        // Not user_get_users_by_id(): deprecated in Moodle 5.3, and it only ever read these records.
+        $users = $userids ? $DB->get_records_list('user', 'id', $userids) : [];
 
         foreach ($users as $user) {
             $data = (object)[
                 'firstname' => $user->firstname,
                 'lastname' => $user->lastname,
                 'editorname' => $usermodified->firstname . ' ' . $usermodified->lastname,
-                'instancename' => '<a href="' . $CFG->wwwroot . '">' . $CFG->wwwroot . '</a>',
+                'instancename' => \html_writer::link(new \moodle_url('/'), $CFG->wwwroot),
                 'catscalename' => $catscale->name,
                 'linkonscale' => '<a href="' . $urltoscale . '">' . $urltoscale . '</a>',
                 'changedescription' => '',

@@ -75,27 +75,30 @@ class cleanup_attempt_progress extends scheduled_task {
         // right afterwards, so a row removed there breaks the attempt.
         $cutoff = $minimal ? time() : time() - ($days * DAYSECS);
 
-        $sql = "SELECT p.attemptid
+        /* The join is over the internal id now: the attemptid of local_catquiz_progress points at
+           local_catquiz_attempts.id. The external attempt id of the component is read from the CAT
+           attempt, because progress::delete() works from the component's point of view. */
+        $sql = "SELECT a.id AS catattemptid, a.attemptid AS componentattemptid, a.component
                   FROM {local_catquiz_progress} p
-                  JOIN {local_catquiz_attempts} a ON a.attemptid = p.attemptid
+                  JOIN {local_catquiz_attempts} a ON a.id = p.attemptid
                  WHERE a.endtime IS NOT NULL
                    AND a.endtime < :cutoff";
 
         $removed = 0;
         while (true) {
-            $attemptids = $DB->get_fieldset_sql($sql, ['cutoff' => $cutoff]);
-            if (empty($attemptids)) {
+            $rows = $DB->get_records_sql($sql, ['cutoff' => $cutoff]);
+            if (empty($rows)) {
                 break;
             }
 
-            foreach (array_slice($attemptids, 0, self::BATCH) as $attemptid) {
+            foreach (array_slice($rows, 0, self::BATCH) as $row) {
                 // Through progress::delete() so the cache is cleared as well; a row
                 // removed behind the cache's back would come back on the next read.
-                progress::delete((int) $attemptid);
+                progress::delete((int) $row->componentattemptid, $row->component);
                 $removed++;
             }
 
-            if (count($attemptids) <= self::BATCH) {
+            if (count($rows) <= self::BATCH) {
                 break;
             }
         }

@@ -50,9 +50,10 @@ abstract class model_model {
      * Return an instance of the model with the given name
      *
      * @param string $name
-     * @return self
+     * @return ?self Null when the model is not installed (follow-up C of issue #150; the declared type said
+     *     otherwise, and the null became a TypeError here).
      */
-    public static function get_instance(string $name): model_model {
+    public static function get_instance(string $name): ?model_model {
         if (!array_key_exists($name, self::$models)) {
             $classname = sprintf('catmodel_%s\%s', $name, $name);
             if (!class_exists($classname)) {

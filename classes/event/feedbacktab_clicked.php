@@ -60,7 +60,7 @@ class feedbacktab_clicked extends catquiz_event_base {
      */
     public function get_description() {
         $other = $this->get_other_data();
-        $url = new moodle_url('manage_catscales.php', [
+        $url = new moodle_url('/local/catquiz/manage_catscales.php', [
             // The tab is a request parameter; the fragment used before
             // pointed at a pane that is only rendered when it is the active one.
             'tab' => 'quizattempts',
@@ -89,7 +89,7 @@ class feedbacktab_clicked extends catquiz_event_base {
      * @return object
      */
     public function get_url() {
-        return new moodle_url('manage_catscales.php', [
+        return new moodle_url('/local/catquiz/manage_catscales.php', [
             // The tab is a request parameter; the fragment used before
             // pointed at a pane that is only rendered when it is the active one.
             'tab' => 'quizattempts',

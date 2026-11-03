@@ -52,9 +52,16 @@ final class attempt_result_validator {
      * @param array $nbyscale Optional map scaleid => number of graded, non-pilot
      *        items in this attempt. When given, a scale counts as measured in the
      *        current attempt only when its N is greater than zero.
-     * @param array $fractionbyscale Optional map scaleid => fraction.
+     * @param array $fractionbyscale Optional map scaleid => mean fraction of the productive items
+     *        answered in this attempt. For a scale measured in this attempt a fraction of 0 or 1
+     *        makes the result statistically invalid (issue #140); a missing fraction applies no
+     *        fraction rule.
      * @param int|null $primaryscaleid When given, only this scale is primary;
      *        otherwise every 'toreport' scale is primary.
+     * @param int|null $answeredtotal Productive items answered in the whole attempt; null when unknown.
+     * @param int $minquestions The test's minimum number of questions; 0 for none (issue #141).
+     * @param int|null $administered Items administered in the attempt (question slots); null when unknown.
+     * @param int $maxquestions The test's maximum number of questions; 0 for none.
      * @return attempt_result
      */
     public static function from_personabilities(
@@ -62,8 +69,22 @@ final class attempt_result_validator {
         array $sebyscale = [],
         array $nbyscale = [],
         array $fractionbyscale = [],
-        ?int $primaryscaleid = null
+        ?int $primaryscaleid = null,
+        ?int $answeredtotal = null,
+        int $minquestions = 0,
+        ?int $administered = null,
+        int $maxquestions = 0
     ): attempt_result {
+        /* The minimum number of questions (issue #141), for the attempt as a whole. A test that
+           ended before its minimum - after 3 of at least 12 items, say - has a running estimate,
+           but no final result: every scale is invalid, whatever its own numbers look like. The
+           estimate stays for diagnostics and the export. */
+        $belowminimum = $minquestions > 0 && $answeredtotal !== null && $answeredtotal < $minquestions;
+        /* The maximum (adaptivequizcatmodel_catquiz #8). Reaching it is a regular end; administering
+           more is not - it happened before the host refused a slot beyond the maximum (33 slots at a
+           maximum of 25: repetitions after pilot items). Such an attempt has no valid result. */
+        $abovemaximum = $maxquestions > 0 && $administered !== null && $administered > $maxquestions;
+
         $results = [];
 
         foreach ($personabilities as $scaleid => $entry) {
@@ -73,6 +94,15 @@ final class attempt_result_validator {
             $scaleid = (int) $scaleid;
             $error = $entry['error'] ?? [];
             $reasons = [];
+
+            // First: an attempt below the minimum has no result at all, and its reason is the one
+            // to tell - not, say, "all answers correct" after three items.
+            if ($belowminimum) {
+                $reasons[] = scale_result::REASON_MIN_QUESTIONS;
+            }
+            if ($abovemaximum) {
+                $reasons[] = scale_result::REASON_MAX_QUESTIONS_EXCEEDED;
+            }
 
             // Measurement-quality (statistical) reasons.
             if (isset($error['se'])) {
@@ -88,6 +118,32 @@ final class attempt_result_validator {
             }
             if (isset($error['rootonly'])) {
                 $reasons[] = scale_result::REASON_ROOTONLY;
+            }
+
+            // Measured in the current attempt (vs. carry-over only).
+            $n = array_key_exists($scaleid, $nbyscale) ? (int) $nbyscale[$scaleid] : null;
+            // Measured only when this attempt's N is known and positive (issue #128). An unknown N
+            // used to count as measured, so a caller that passed no counts made every scale -
+            // a value carried over from an earlier attempt included - look measured.
+            $measured = $n !== null && $n > 0;
+            $fraction = array_key_exists($scaleid, $fractionbyscale) && $fractionbyscale[$scaleid] !== null
+                ? (float) $fractionbyscale[$scaleid]
+                : null;
+
+            /* The fraction rule (issue #140), here and nowhere else. With every productive item
+               of a scale answered wrongly or every one answered correctly, the ability estimate
+               sits at the edge of the range and says nothing reliable: the scale keeps its score,
+               SE, N and fraction for the report but is statistically invalid. The strategies used
+               to apply this rule on the fraction of the whole test, each in its own way, so a
+               subscale answered entirely correctly inside a mixed test passed. The rule applies
+               to measured scales only - with N = 0 the scale is "not measured" instead, and with
+               no fraction at all no fraction rule applies. */
+            if ($measured && $fraction !== null) {
+                if ($fraction <= 0.0) {
+                    $reasons[] = scale_result::REASON_FRACTION_ALL_INCORRECT;
+                } else if ($fraction >= 1.0) {
+                    $reasons[] = scale_result::REASON_FRACTION_ALL_CORRECT;
+                }
             }
 
             /* 'excluded' now means exactly one thing: the measurement is unusable.
@@ -124,9 +180,6 @@ final class attempt_result_validator {
                 $reasons[] = scale_result::REASON_NOT_PRIMARY;
             }
 
-            // Measured in the current attempt (vs. carry-over only).
-            $n = array_key_exists($scaleid, $nbyscale) ? (int) $nbyscale[$scaleid] : null;
-            $measured = $n === null ? true : ($n > 0);
             if (!$measured) {
                 $reasons[] = scale_result::REASON_NOT_MEASURED;
             }
@@ -136,7 +189,6 @@ final class attempt_result_validator {
 
             $score = isset($entry['value']) ? (float) $entry['value'] : null;
             $se = array_key_exists($scaleid, $sebyscale) ? (float) $sebyscale[$scaleid] : null;
-            $fraction = array_key_exists($scaleid, $fractionbyscale) ? (float) $fractionbyscale[$scaleid] : null;
 
             $results[$scaleid] = new scale_result(
                 $scaleid,
@@ -180,10 +232,19 @@ final class attempt_result_validator {
             return new attempt_result([]);
         }
 
-        $personabilities = $data['personabilities_abilities']
-            ?? $data['customscalefeedback_abilities']
-            ?? [];
-        if (!is_array($personabilities) || $personabilities === []) {
+        /* The scales of the attempt: those the strategy reports, else every scale the feedback knows. An empty list of
+           reported scales is no reason to persist nothing - all right or all wrong leaves every scale with an error,
+           and the strategy then reports none (issue #106, E2E 27.10.2026). Before, `??` took the empty list, the
+           attempt got no result row at all, and the estimates written during the attempt stayed the latest valid
+           value of the person. */
+        $personabilities = [];
+        foreach (['personabilities_abilities', 'customscalefeedback_abilities'] as $key) {
+            if (!empty($data[$key]) && is_array($data[$key])) {
+                $personabilities = $data[$key];
+                break;
+            }
+        }
+        if ($personabilities === []) {
             return new attempt_result([]);
         }
 
@@ -197,15 +258,18 @@ final class attempt_result_validator {
            authoritative counter on progress now enforces both filters (Issue #7). */
         $nbyscale = [];
         $fractionbyscale = [];
-        if (!empty($catattempt->contextid)) {
+        // Read without cache, ownership check or a context id (issue #128): finalisation may run in a
+        // scheduled task, and a CAT attempt filed at the start has no context id yet. Without the
+        // progress, N stays unknown and no scale counts as measured.
+        $progress = progress::load_for_reading((int) $catattempt->id);
+        if ($progress !== null) {
             try {
-                $progress = progress::load($adaptiveattemptid, 'mod_adaptivequiz', (int) $catattempt->contextid);
                 foreach (array_keys($personabilities) as $scaleid) {
                     $nbyscale[(int) $scaleid] = $progress->get_num_answered_productive_questions((int) $scaleid);
 
                     // The share of points on the same population as N. It was never
                     // filled - validate() passed an empty array - so the fraction
-                    // column of local_catquiz_attemptscale stayed null on every row
+                    // column of the attempt scale results stayed null on every row
                     // while the value was available all along.
                     $fraction = $progress->get_fraction_for_scale((int) $scaleid);
                     if ($fraction !== null) {
@@ -231,7 +295,64 @@ final class attempt_result_validator {
             $sebyscale,
             $nbyscale,
             $fractionbyscale,
-            $primaryscaleid
+            $primaryscaleid,
+            $progress !== null ? $progress->get_num_answered_productive_questions() : null,
+            $progress !== null ? self::min_questions($progress) : 0,
+            self::administered_items($adaptiveattemptid),
+            self::max_questions($progress, $adaptiveattemptid)
         );
+    }
+
+    /**
+     * The items administered in an attempt: the question slots of its question usage.
+     *
+     * @param int $adaptiveattemptid
+     * @return int|null null when the attempt has no question usage.
+     */
+    public static function administered_items(int $adaptiveattemptid): ?int {
+        global $DB;
+        $uniqueid = $DB->get_field('adaptivequiz_attempt', 'uniqueid', ['id' => $adaptiveattemptid]);
+        if (empty($uniqueid)) {
+            return null;
+        }
+        return $DB->count_records('question_attempts', ['questionusageid' => $uniqueid]);
+    }
+
+    /**
+     * The test's maximum number of questions: the CAT maximum the progress carries, else the activity's.
+     *
+     * @param progress|null $progress
+     * @param int $adaptiveattemptid
+     * @return int 0 when neither sets one.
+     */
+    public static function max_questions(?progress $progress, int $adaptiveattemptid): int {
+        global $DB;
+        if ($progress !== null) {
+            $group = $progress->get_quiz_settings()->maxquestionsgroup ?? null;
+            $max = is_array($group) ? ($group['catquiz_maxquestions'] ?? 0) : ($group->catquiz_maxquestions ?? 0);
+            if ((int) $max > 0) {
+                return (int) $max;
+            }
+        }
+        $max = $DB->get_field_sql(
+            'SELECT q.maximumquestions
+               FROM {adaptivequiz_attempt} a
+               JOIN {adaptivequiz} q ON q.id = a.instance
+              WHERE a.id = :id',
+            ['id' => $adaptiveattemptid]
+        );
+        return max(0, (int) $max);
+    }
+
+    /**
+     * The test's minimum number of questions, as the progress of the attempt carries it.
+     *
+     * @param progress $progress
+     * @return int 0 when the test sets none.
+     */
+    public static function min_questions(progress $progress): int {
+        $group = $progress->get_quiz_settings()->maxquestionsgroup ?? null;
+        $min = is_array($group) ? ($group['catquiz_minquestions'] ?? 0) : ($group->catquiz_minquestions ?? 0);
+        return max(0, (int) $min);
     }
 }

@@ -17,8 +17,14 @@
 namespace local_catquiz\local\attempt;
 
 use advanced_testcase;
+use local_catquiz\catquiz;
 use local_catquiz\teststrategy\progress;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/local/catquiz/tests/fixtures/measured_progress.php');
 
 /**
  * Tests the authoritative, idempotent attempt finaliser (Issue #5).
@@ -150,12 +156,15 @@ final class attempt_finalizer_test extends advanced_testcase {
             'component' => 'mod_adaptivequiz', 'status' => 0, 'number_of_testitems_used' => 6,
             'endtime' => null, 'json' => $json, 'timecreated' => $now, 'timemodified' => $now,
         ]);
+        // Issue #128: the attempt's progress - without it no scale counts as measured.
+        $this->setAdminUser();
+        local_catquiz_measured_progress((int) $adaptiveattemptid, [5 => 3, 6 => 1]);
 
         // Without progress data N per scale is unknown, so measuredincurrentattempt
         // defaults to true and both reported scales are historised.
         $this->assertTrue(attempt_finalizer::finalize($adaptiveattemptid, $now + 5, 'reason'));
 
-        $rows = $DB->get_records('local_catquiz_attemptscale', ['catattemptid' => $catid]);
+        $rows = $DB->get_records('local_catquiz_personparams', ['attemptid' => $catid]);
         $byscale = [];
         foreach ($rows as $row) {
             $byscale[(int) $row->catscaleid] = $row;
@@ -211,10 +220,13 @@ final class attempt_finalizer_test extends advanced_testcase {
             'component' => 'mod_adaptivequiz', 'status' => 0, 'number_of_testitems_used' => 6,
             'endtime' => null, 'json' => $json, 'timecreated' => $now, 'timemodified' => $now,
         ]);
+        // Issue #128: the attempt's progress - without it no scale counts as measured.
+        $this->setAdminUser();
+        local_catquiz_measured_progress((int) $adaptiveattemptid, [5 => 3, 6 => 3]);
 
         $this->assertTrue(attempt_finalizer::finalize($adaptiveattemptid, $now + 5, 'reason'));
 
-        $rows = $DB->get_records('local_catquiz_attemptscale', ['catattemptid' => $catid]);
+        $rows = $DB->get_records('local_catquiz_personparams', ['attemptid' => $catid]);
         $byscale = [];
         foreach ($rows as $row) {
             $byscale[(int) $row->catscaleid] = $row;
@@ -247,9 +259,9 @@ final class attempt_finalizer_test extends advanced_testcase {
         // Prior valid history for scale 5 (score 0.7) from an earlier attempt,
         // and an intermediate estimate currently sitting in personparams (0.15,
         // as a during-attempt task would have written).
-        $DB->insert_record('local_catquiz_attemptscale', (object) [
-            'catattemptid' => 111, 'userid' => $userid, 'contextid' => $contextid, 'catscaleid' => 5,
-            'score' => 0.7, 'standarderror' => 0.2, 'n' => 8, 'fraction' => 0.6,
+        $DB->insert_record('local_catquiz_personparams', (object) [
+            'attemptid' => 111, 'userid' => $userid, 'contextid' => $contextid, 'catscaleid' => 5,
+            'ability' => 0.7, 'standarderror' => 0.2, 'n' => 8, 'fraction' => 0.6,
             'isprimary' => 1, 'isvalid' => 1, 'resultsource' => 'current', 'validationstatus' => '',
             'timecreated' => $now - 1000,
         ]);
@@ -276,15 +288,17 @@ final class attempt_finalizer_test extends advanced_testcase {
             'component' => 'mod_adaptivequiz', 'status' => 0, 'endtime' => null, 'json' => $json,
             'timecreated' => $now, 'timemodified' => $now,
         ]);
+        // Issue #128: the attempt's progress - without it no scale counts as measured.
+        $this->setAdminUser();
+        local_catquiz_measured_progress((int) $adaptiveattemptid, [5 => 1]);
 
         $this->assertTrue(attempt_finalizer::finalize($adaptiveattemptid, $now + 5, 'reason'));
 
         // The invalid scale's snapshot is reset to the last valid value (0.7),
         // not left at the intermediate 0.15.
-        $snapshot = $DB->get_record(
-            'local_catquiz_personparams',
-            ['userid' => $userid, 'contextid' => $contextid, 'catscaleid' => 5]
-        );
+        // The newest valid row, not the only one: the table keeps the history.
+        $snapshot = catquiz::get_current_person_param($userid, $contextid, 5);
+
         $this->assertEquals(0.7, (float) $snapshot->ability);
     }
 
@@ -326,6 +340,9 @@ final class attempt_finalizer_test extends advanced_testcase {
             'component' => 'mod_adaptivequiz', 'status' => 0, 'endtime' => null, 'json' => $json,
             'timecreated' => $now, 'timemodified' => $now,
         ]);
+        // Issue #128: the attempt's progress - without it no scale counts as measured.
+        $this->setAdminUser();
+        local_catquiz_measured_progress((int) $adaptiveattemptid, [5 => 1]);
 
         // Capture the pre-attempt value (0.55) on the attempt's progress. No
         // valid attempt-scale history exists for the scale.
@@ -335,11 +352,15 @@ final class attempt_finalizer_test extends advanced_testcase {
 
         $this->assertTrue(attempt_finalizer::finalize($adaptiveattemptid, $now + 5, 'reason'));
 
-        $snapshot = $DB->get_record(
-            'local_catquiz_personparams',
-            ['userid' => $userid, 'contextid' => $contextid, 'catscaleid' => 5]
-        );
+        // The table is appended to, so the current value is the newest valid row, not the only one.
+        $snapshot = catquiz::get_current_person_param($userid, $contextid, 5);
+
         $this->assertEquals(0.55, (float) $snapshot->ability);
+        $this->assertEquals(
+            'prior',
+            $snapshot->resultsource,
+            'A carried-over value must say that it was not measured in this attempt.'
+        );
     }
 
     /**

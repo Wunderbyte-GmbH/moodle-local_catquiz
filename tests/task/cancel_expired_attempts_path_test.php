@@ -89,7 +89,10 @@ final class cancel_expired_attempts_path_test extends advanced_testcase {
             'mod_adaptivequiz must provide the authoritative completion function.'
         );
 
-        $reflection = new \ReflectionFunction('adaptivequiz_complete_attempt');
+        // Mod_adaptivequiz #5: the shared part of every completion - by question usage or by id - is its own function.
+        $function = function_exists('adaptivequiz_complete_attempt_record')
+            ? 'adaptivequiz_complete_attempt_record' : 'adaptivequiz_complete_attempt';
+        $reflection = new \ReflectionFunction($function);
         $source = implode(
             '',
             array_slice(

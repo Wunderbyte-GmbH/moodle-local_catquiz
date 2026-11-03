@@ -1,0 +1,9 @@
+componentid;status;qtype;model;difficulty;discrimination;guessing;label;catscalename;parentscalenames;componentname
+0;4;Multiple-Choice;raschbirnbaum;-1.10;1.2;0.0000;SIMA01-10;ZweitA;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;-1.11;1.2;0.0000;SIMA01-11;ZweitA;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;-1.12;1.2;0.0000;SIMA01-12;ZweitA;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;-1.13;1.2;0.0000;SIMA01-13;ZweitA;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;0.10;1.1;0.0000;SIMB02-10;ZweitB;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;0.11;1.1;0.0000;SIMB02-11;ZweitB;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;0.12;1.1;0.0000;SIMB02-12;ZweitB;Zweitskala;question
+0;4;Multiple-Choice;raschbirnbaum;0.13;1.1;0.0000;SIMB02-13;ZweitB;Zweitskala;question

@@ -15,6 +15,18 @@
 name: Moodle Plugin CI Main
 
 on:
+  # Cross-repo pinning (re-audit G3): the other plugins are taken from their branch heads, which may
+  # not yet carry the commits this one was made for. A manual run can pin them to known SHAs.
+  workflow_dispatch:
+    inputs:
+      host_ref:
+        description: 'mod_adaptivequiz: commit SHA or branch (empty = branch head)'
+        required: false
+        default: ''
+      adapter_ref:
+        description: 'adaptivequizcatmodel_catquiz: commit SHA or branch (empty = branch head)'
+        required: false
+        default: ''
   push:
     branches:
       - main
@@ -41,7 +53,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: mirror.gcr.io/library/postgres:13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -49,7 +61,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10.8
+        image: mirror.gcr.io/library/mariadb:10.8
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -61,8 +73,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { php: '8.1', moodle-branch: MOODLE_405_STABLE, database: pgsql }
-          - { php: '8.1', moodle-branch: MOODLE_405_STABLE, database: mariadb }
+          # Issue #156: no cell runs PHP 8.1 or older; the functional tests run on 8.2 and 8.3.
           - { php: '8.2', moodle-branch: MOODLE_405_STABLE, database: pgsql }
           - { php: '8.2', moodle-branch: MOODLE_405_STABLE, database: mariadb }
           - { php: '8.3', moodle-branch: MOODLE_405_STABLE, database: pgsql }
@@ -102,9 +113,17 @@ jobs:
       - name: Install Moodle, dependencies and plugin
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          # Which commits are tested together - pinned on a manual run, reported always.
+          pin() { [ -z "$2" ] && return 0; git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" checkout -q FETCH_HEAD; }
+          pin ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz "${{ github.event.inputs.host_ref }}"
+          pin ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz "${{ github.event.inputs.adapter_ref }}"
+          for d in ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz; do
+            [ -d "$d/.git" ] && echo "::notice::$(basename "$d") @ $(git -C "$d" rev-parse HEAD)" || echo "::warning::$d not found"
+          done
+          echo "::notice::${{ github.repository }} @ ${{ github.sha }}"
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
 
@@ -121,6 +140,7 @@ jobs:
             rmdir "$placeholder"
           done
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
@@ -167,6 +187,12 @@ jobs:
           key: npm-${{ runner.os }}-${{ github.sha }}
           restore-keys: npm-${{ runner.os }}-
 
+      - name: AMD build belongs to its sources
+        if: ${{ always() }}
+        # Issue #31: a hard check. The source embedded in each source map has to be today's source -
+        # independent of how the runner's toolchain transpiles, which is why the rebuild below can only warn.
+        run: python3 plugin/.github/ci/check_amd_build.py plugin
+
       - name: Verify committed AMD build
         if: ${{ always() }}
         shell: bash
@@ -181,7 +207,13 @@ jobs:
         run: |
           set -euo pipefail
           MOODLE="${MOODLE_DIR:-$(pwd)/moodle}"
+          # Since Moodle 5.1 the code lives under public/. Looking only at local/catquiz
+          # skipped this rebuild on main, and moodle-plugin-ci grunt then reported the
+          # committed files as stale.
           PLUGIN="$MOODLE/local/catquiz"
+          if [ -d "$MOODLE/public/local/catquiz" ]; then
+            PLUGIN="$MOODLE/public/local/catquiz"
+          fi
 
           if [ ! -d "$PLUGIN/amd/build" ]; then
             echo "No amd/build directory - nothing to verify."
@@ -192,7 +224,9 @@ jobs:
           mkdir -p /tmp/amd-before
           cp -a "$PLUGIN/amd/build/." /tmp/amd-before/
 
-          ( cd "$MOODLE" && npx grunt amd --root=local/catquiz )
+          # Run from the component directory: the Gruntfile picks the component from there,
+          # with or without public/.
+          ( cd "$PLUGIN" && npx grunt amd )
 
           if ! diff -ruN /tmp/amd-before "$PLUGIN/amd/build" > /tmp/amd-diff.txt; then
             echo "::warning::The rebuilt amd/build differs from the committed one."
@@ -232,6 +266,23 @@ jobs:
         if: ${{ always() }}
         run: set -o pipefail; moodle-plugin-ci phpunit --fail-on-warning --testdox 2>&1 | tee ci-logs/phpunit.log
 
+      # Docker Hub begrenzt anonyme Pulls (toomanyrequests). moodle-plugin-ci startet Selenium
+      # per docker run und holt das Image sonst von Docker Hub; liegt es lokal vor, wird nicht
+      # gezogen. Deshalb zuerst ueber den Google-Mirror, erst danach Docker Hub, mit Wiederholung.
+      - name: Selenium-Image vorladen (Docker-Hub-Ratenlimit)
+        if: ${{ always() }}
+        run: |
+          for src in mirror.gcr.io/selenium/standalone-chrome:4 selenium/standalone-chrome:4; do
+            for attempt in 1 2 3; do
+              if docker pull "$src"; then
+                docker tag "$src" selenium/standalone-chrome:4
+                exit 0
+              fi
+              sleep $((attempt * 15))
+            done
+          done
+          echo "::warning::Selenium-Image konnte nicht vorab geladen werden."
+
       - name: Behat features
         id: behat
         if: ${{ always() }}
@@ -260,7 +311,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: error-summary-main-${{ matrix.php }}-${{ matrix.database }}
+          name: error-summary-main-${{ matrix.moodle-branch }}-${{ matrix.php }}-${{ matrix.database }}
           path: ci-logs
           retention-days: 7
           if-no-files-found: ignore
@@ -269,7 +320,7 @@ jobs:
         if: ${{ failure() && steps.behat.outcome == 'failure' }}
         uses: actions/upload-artifact@v7
         with:
-          name: behat-screenshots-main-${{ matrix.php }}-${{ matrix.database }}
+          name: behat-screenshots-main-${{ matrix.moodle-branch }}-${{ matrix.php }}-${{ matrix.database }}
           path: ${{ github.workspace }}/moodledata/behat_dump
           retention-days: 7
           if-no-files-found: warn

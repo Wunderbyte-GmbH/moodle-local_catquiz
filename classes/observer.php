@@ -86,6 +86,36 @@ class local_catquiz_observer {
     }
 
     /**
+     * A change in the question bank that the runtime pool reads (issue #146).
+     *
+     * The pool takes a question whose newest version is ready (issue #82: the status of the newest version
+     * of the bank entry decides; the item plays the version it refers to). A question hidden or set to draft,
+     * a new version saved or a question moved changes it, without any CATquiz event - so far the pool took that in
+     * only after its lifetime of ten minutes. When the question - in any of its versions - is a CAT item,
+     * the pool is invalidated now; any other question of the site leaves it alone.
+     *
+     * @param base $event question_updated, question_created or question_moved.
+     */
+    public static function question_bank_changed(base $event) {
+        global $DB;
+        $questionid = (int) $event->objectid;
+        if ($questionid <= 0) {
+            return;
+        }
+        $isitem = $DB->record_exists_sql(
+            "SELECT 1
+               FROM {question_versions} qv
+               JOIN {question_versions} qvall ON qvall.questionbankentryid = qv.questionbankentryid
+               JOIN {local_catquiz_items} i ON i.componentid = qvall.questionid AND i.componentname = 'question'
+              WHERE qv.questionid = :questionid",
+            ['questionid' => $questionid]
+        ) || $DB->record_exists('local_catquiz_items', ['componentid' => $questionid, 'componentname' => 'question']);
+        if ($isitem) {
+            cache_helper::purge_by_event('changesintestitems');
+        }
+    }
+
+    /**
      * Observer for the testitem_imported event.
      *
      * @param testitem_imported $event

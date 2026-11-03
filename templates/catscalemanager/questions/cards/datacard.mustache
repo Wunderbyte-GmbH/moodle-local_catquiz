@@ -41,7 +41,11 @@
                 "statuscircle": "success",
                 "statustitle": "Manually confirmed",
                 "model": "Adaptive",
-                "attempts": "Unlimited"
+                "attempts": "Unlimited",
+                "availability": "Active",
+                "availabilitykey": "active",
+                "globallyout": false,
+                "globallocked": ""
             }
         ]
     }
@@ -55,8 +59,16 @@
         {{#body}}
         <div>{{#str}}id, local_catquiz{{/str}}: {{id}}</div>
         <div>{{#str}}type, local_catquiz{{/str}}: {{type}}</div>
+        {{! Issue #82: both levels that hide a question, in words. }}
+        <div class="catquiz-itemavailability" data-availability="{{availabilitykey}}">
+            {{#str}}itemavailability, local_catquiz{{/str}}: {{availability}}
+            {{#globallyout}}<div class="small text-muted">{{globallocked}}</div>{{/globallyout}}
+        </div>
         <div class="testitem-togglestatus">
             {{#str}}status, core{{/str}}:
+            {{! A question the bank hides cannot be activated in a scale: no toggle then. }}
+            {{#globallyout}}<i class='fa fa-eye{{closedeye}} text-muted' title='{{globallocked}}' aria-hidden="true"></i>{{/globallyout}}
+            {{^globallyout}}
             <a href='#'>
             <i class='fa fa-eye{{closedeye}}'
             title='{{#str}}togglestatus, local_catquiz{{/str}}'
@@ -74,9 +86,9 @@
             data-adparams="{{scaleid}},{{testitemid}},{{closedeye}},{{component}}"
             data-admethodname="local_catquiz_toggle_testitemstatus">
             </i></a>
-            <a><i class='fa fa-circle {{statuscircle}}'
-                id="testitem-status-circle"
-                title='{{statustitle}}'></i></a>
+            {{/globallyout}}
+            {{! Issue #30: no id - nothing points to it, and a card per item would repeat it. }}
+            <i class='fa fa-circle {{statuscircle}}' title='{{statustitle}}' aria-hidden="true"></i>
                 {{status}}
         </div>
         <div>{{#str}}model, local_catquiz{{/str}}: {{model}}</div>

@@ -319,7 +319,8 @@ class firstquestionselector extends preselect_task {
     private function get_items() {
         // Create item list.
         $catscaleids = [$this->context['catscaleid'], ...catscale::get_subscale_ids($this->context['catscaleid'])];
-        $catscalecontext = catscale::get_context_id($this->context['catscaleid']);
+        // Issue #157: the CAT context of the attempt.
+        $catscalecontext = (int) ($this->context['contextid'] ?? 0) ?: catscale::get_context_id($this->context['catscaleid']);
         $items = model_item_param_list::get(
             $catscalecontext,
             null,

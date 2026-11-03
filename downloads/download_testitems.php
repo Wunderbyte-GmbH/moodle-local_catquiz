@@ -23,7 +23,8 @@
 
 use local_wunderbyte_table\wunderbyte_table;
 
-require_once("../../../config.php");
+// Issue #32: relative to this file, not to the working directory of the web server.
+require_once(__DIR__ . '/../../../config.php');
 
 global $CFG, $PAGE;
 
@@ -36,7 +37,7 @@ $encodedtable = optional_param('encodedtable', '', PARAM_RAW);
 
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url('/downloads/download.php');
+$PAGE->set_url(new moodle_url('/local/catquiz/downloads/download_testitems.php'));
 
 $table = wunderbyte_table::instantiate_from_tablecache_hash($encodedtable);
 

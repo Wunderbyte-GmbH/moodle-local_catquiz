@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use html_table;
 use html_table_cell;
+use html_table_row;
 use html_writer;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedback_helper;
@@ -53,24 +54,27 @@ class graphicalsummary extends feedbackgenerator {
         global $OUTPUT;
 
         if (isset($feedbackdata['graphicalsummary_data'])) {
+            $rows = array_values($feedbackdata['graphicalsummary_data']);
+            $pilots = $this->pilot_flags($rows);
+            [$chartrows, $otherscales] = self::without_pilots(
+                $rows,
+                $pilots,
+                $feedbackdata['graphicalsummary_otherscales'] ?? []
+            );
             $primaryscaleid = null;
             if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
                 $primaryscaleid = array_key_first($feedbackdata['graphicalsummary_primaryscale']);
             }
-            $chart = $this->render_chart(
-                $feedbackdata['graphicalsummary_data'],
-                $primaryscaleid,
-                $feedbackdata['graphicalsummary_otherscales'] ?? []
-            );
-        }
-        if (isset($feedbackdata['graphicalsummary_data'])) {
+            if ($chartrows) {
+                $chart = $this->render_chart($chartrows, $primaryscaleid, $otherscales);
+            }
             $showquestions = boolval(
                 $this
                     ->get_progress()
                     ->get_quiz_settings()
                     ->catquiz_showquestion ?? false
             );
-            $table = $this->render_table($feedbackdata['graphicalsummary_data'], $showquestions);
+            $table = $this->render_table($rows, $showquestions, $pilots, $this->has_teacherfeedbackpermission());
         }
         $globalscale = catscale::return_catscale_object($this->get_progress()->get_quiz_settings()->catquiz_catscales);
         $globalscalename = $globalscale->name;
@@ -150,6 +154,15 @@ class graphicalsummary extends feedbackgenerator {
     }
 
     /**
+     * The quiz history: the questions of the attempt one by one; no result needed. (issue #120)
+     *
+     * @return string
+     */
+    public function get_result_dependency(): string {
+        return self::DEPENDS_ON_ATTEMPT;
+    }
+
+    /**
      * Get generatorname.
      *
      * @return string
@@ -176,14 +189,14 @@ class graphicalsummary extends feedbackgenerator {
     /**
      * Load data.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+    public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
         $progress = $this->get_progress();
 
         // If we already have all the data, just return them instead of adding
@@ -225,6 +238,8 @@ class graphicalsummary extends feedbackgenerator {
         // the table can show the title as primary and the label as secondary.
         $new['questiontitle'] = $this->get_question_title((int) $lastquestion->id, (string) $lastquestion->label);
         $new['lastresponse'] = round($lastresponse['fraction'], self::PRECISION);
+        // A pilot item is shown to teachers only and kept out of the chart (decision of 2026-10-14).
+        $new['pilot'] = !empty($lastquestion->is_pilot);
         // Store the real QUBA slot and question attempt id so the
         // "show question" modal fetches exactly this question attempt instead of
         // reconstructing the slot from the table row index (which is wrong after
@@ -275,6 +290,62 @@ class graphicalsummary extends feedbackgenerator {
     }
 
     /**
+     * Whether each row of the quiz history is a pilot item.
+     *
+     * Rows stored since 2026-10-14 carry the flag; for older rows the played pilot items of the
+     * progress tell.
+     *
+     * @param array $rows
+     * @return bool[] By row index.
+     */
+    private function pilot_flags(array $rows): array {
+        $pilotids = null;
+        $flags = [];
+        foreach ($rows as $index => $row) {
+            if (array_key_exists('pilot', $row)) {
+                $flags[$index] = (bool) $row['pilot'];
+                continue;
+            }
+            if ($pilotids === null) {
+                $pilotids = array_map('intval', array_keys($this->get_progress()->get_played_pilot_questions()));
+            }
+            $flags[$index] = isset($row['id']) && in_array((int) $row['id'], $pilotids, true);
+        }
+        return $flags;
+    }
+
+    /**
+     * The rows and the series of the other scales without the pilot items, for the chart.
+     *
+     * A series of another scale has one value per row from the row where the scale first appeared:
+     * it is aligned with the end of the rows.
+     *
+     * @param array $rows
+     * @param bool[] $pilots By row index.
+     * @param array $otherscales Values by scale id.
+     * @return array [rows, otherscales]
+     */
+    public static function without_pilots(array $rows, array $pilots, array $otherscales): array {
+        $keep = [];
+        foreach (array_values($rows) as $index => $row) {
+            if (empty($pilots[$index])) {
+                $keep[] = $index;
+            }
+        }
+        $chartrows = array_map(fn($index) => $rows[$index], $keep);
+        $series = [];
+        foreach ($otherscales as $scaleid => $values) {
+            $values = array_values($values);
+            $offset = count($rows) - count($values);
+            $series[$scaleid] = array_values(array_filter(
+                array_map(fn($index) => $index - $offset >= 0 ? ($values[$index - $offset] ?? null) : false, $keep),
+                fn($value) => $value !== false
+            ));
+        }
+        return [$chartrows, $series];
+    }
+
+    /**
      * Render the moodle charts.
      *
      * @param array $data
@@ -289,21 +360,24 @@ class graphicalsummary extends feedbackgenerator {
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $hasnewabilities = array_key_exists('personability_after', $data[0]);
-        if ($hasnewabilities) {
-            $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
-            $abilitiesafterchart = new \core\chart_series(
-                get_string('abilityinglobalscale', 'local_catquiz'),
-                $abilitiesafter
-            );
-            $chart->add_series($abilitiesafterchart);
-        } else {
-            $abilities = array_map(fn($round) => $round['personability'] ?? null, $data);
-            $abilitieschart = new \core\chart_series(
-                get_string('abilityintestedscale', 'local_catquiz'),
-                $abilities
-            );
-            $chart->add_series($abilitieschart);
+        /* Issue #152: rows stored since personability_after existed carry the ability in the global scale, older rows
+           the ability in the tested scale as personability. They are different values: each has its own series, and a
+           row without it is a gap - nothing is carried over from the other. Before, the format of the first row
+           decided for all, and the branch of the older format ended in a TypeError. */
+        $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
+        $abilities = array_map(
+            fn($round) => array_key_exists('personability_after', $round) ? null : ($round['personability'] ?? null),
+            $data
+        );
+        $hasvalue = fn(array $values): bool => (bool) array_filter($values, fn($value) => $value !== null);
+        $series = 0;
+        if ($hasvalue($abilitiesafter)) {
+            $chart->add_series(new \core\chart_series(get_string('abilityinglobalscale', 'local_catquiz'), $abilitiesafter));
+            $series++;
+        }
+        if ($hasvalue($abilities)) {
+            $chart->add_series(new \core\chart_series(get_string('abilityintestedscale', 'local_catquiz'), $abilities));
+            $series++;
         }
 
         $globalscaleid = $this->get_progress()->get_quiz_settings()->catquiz_catscales;
@@ -318,9 +392,15 @@ class graphicalsummary extends feedbackgenerator {
                 $primaryvalues
             );
             $chart->add_series($primarychart);
+            $series++;
+        }
+        if (!$series) {
+            // No ability in any row: no chart, the table says what was asked.
+            return '';
         }
 
-        $chart->set_labels(range(1, count($abilitiesafter)));
+        // One label per row (issue #152: the labels counted $abilitiesafter, which the older format never set).
+        $chart->set_labels(range(1, count($data)));
 
         return html_writer::tag('div', $OUTPUT->render_chart($chart, false), ['dir' => 'ltr']);
     }
@@ -328,12 +408,17 @@ class graphicalsummary extends feedbackgenerator {
     /**
      * Render a table with data that do not fit in the chart
      *
+     * Pilot items are shown to teachers only: without a number - the numbers follow the chart, which
+     * leaves them out -, with a grey verdict and without an ability, since they do not change it.
+     *
      * @param array $data The feedback data
      * @param bool $viewquestion Adds links and modal to display questions.
+     * @param bool[] $pilots Whether each row is a pilot item, by row index.
+     * @param bool $showpilots Whether pilot items are shown (teachers).
      * @return ?string If all required data are present, the rendered HTML table.
      */
-    private function render_table($data, $viewquestion = true): ?string {
-        if (! array_key_exists('id', $data[0])) {
+    private function render_table($data, $viewquestion = true, array $pilots = [], bool $showpilots = false): ?string {
+        if (!$data || ! array_key_exists('id', $data[0])) {
             return null;
         }
 
@@ -386,7 +471,12 @@ class graphicalsummary extends feedbackgenerator {
         // the slot from the row index. Built once for the whole table.
         $slotmap = $this->build_slot_map_from_quba();
         $occurrences = [];
+        $number = 0;
         foreach ($data as $index => $values) {
+            $ispilot = !empty($pilots[$index]);
+            if ($ispilot && !$showpilots) {
+                continue;
+            }
             $slot = $values['slot'] ?? null;
             $questionattemptid = $values['questionattemptid'] ?? null;
             $resolvedtitle = $values['questiontitle'] ?? null;
@@ -420,6 +510,11 @@ class graphicalsummary extends feedbackgenerator {
             } else if ($values['lastresponse'] > 0) {
                 $responsestring = get_string('feedback_table_answerpartlycorrect', 'local_catquiz');
                 $iconclass = 'fa-solid fa-triangle-exclamation text-warning';
+            }
+            if ($ispilot) {
+                // Grey: the verdict is shown, but it does not count.
+                $iconclass = preg_replace('/\btext-(success|danger|warning)\b/', 'text-secondary', $iconclass);
+                $responsestring .= ' (' . get_string('feedback_table_pilot', 'local_catquiz') . ')';
             }
 
             $correctnesscell = null;
@@ -476,8 +571,13 @@ class graphicalsummary extends feedbackgenerator {
             $questioncell = $viewquestion
                 ? html_writer::tag('span', $questionhtml, ['class' => 'clickable'] + $dataattributes)
                 : $questionhtml;
+            $numbercell = new html_table_cell($ispilot
+                ? html_writer::tag('span', get_string('feedback_table_pilot', 'local_catquiz'), ['class' => 'sr-only'])
+                : (string) ++$number);
+            // Rows of the older format carry the ability as personability (issue #152).
+            $ability = $values['personability_after'] ?? $values['personability'] ?? null;
             $newrow = [
-                $index + 1,
+                $numbercell,
             ];
             if ($correctnesscell !== null) {
                 $newrow[] = $correctnesscell;
@@ -485,7 +585,7 @@ class graphicalsummary extends feedbackgenerator {
             $newrow = array_merge($newrow, [
                 $questioncell,
                 $values['questionscale_name'],
-                sprintf('%.2f', $values['personability_after']),
+                $ispilot || $ability === null ? '' : sprintf('%.2f', $ability),
             ]);
 
             if ($viewquestion) {
@@ -505,7 +605,11 @@ class graphicalsummary extends feedbackgenerator {
                 $searchcol->attributes = ['class' => 'questionbutton catquiz-col-action'];
                 $newrow[] = $searchcol;
             }
-            $tabledata[] = $newrow;
+            $row = new html_table_row($newrow);
+            if ($ispilot) {
+                $row->attributes['class'] = 'catquiz-pilot-row text-muted';
+            }
+            $tabledata[] = $row;
         }
         $table->data = $tabledata;
         return html_writer::div(

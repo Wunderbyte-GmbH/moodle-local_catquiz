@@ -92,11 +92,16 @@ $functions = [
                 'ajax' => true,
                 'loginrequired' => true,
         ],
+        // Issue #85: "write" because it writes an event to the log - not the session. Without
+        // readonlysession every click on a tab held the session lock for the whole request, and the
+        // tab's own content (render_feedback_tab, sent at the same moment) and any other request of the
+        // user waited for it. The function reads the session (login, capabilities) and changes nothing in it.
         'local_catquiz_feedback_tab_clicked' => [
                 'classname' => 'local_catquiz\external\feedback_tab_clicked',
                 'description' => 'Sends an event about a clicked feedback tab',
                 'type' => 'write',
                 'ajax' => 1,
+                'readonlysession' => true,
         ],
         'local_catquiz_get_question_preview' => [
                 'classname' => 'local_catquiz\\external\\get_question_preview',
@@ -109,5 +114,23 @@ $functions = [
                 'description' => 'Renders a question with a response',
                 'type' => 'read',
                 'ajax' => 1,
+        ],
+        // Issue #85: one feedback tab, when it is opened. Read only, so it does not hold the session
+        // lock while a chart is built - other tabs and requests of the same user stay responsive.
+        'local_catquiz_render_feedback_tab' => [
+                'classname' => 'local_catquiz\external\render_feedback_tab',
+                'description' => 'Renders one feedback tab of an attempt on demand',
+                'type' => 'read',
+                'ajax' => 1,
+                'readonlysession' => true,
+        ],
+        // Issue #85: one chart of the statistics shortcode, when its tab is shown. Read only and without
+        // the session lock, like the feedback tabs: the charts of one page load side by side.
+        'local_catquiz_render_statistics_chart' => [
+                'classname' => 'local_catquiz\external\render_statistics_chart',
+                'description' => 'Renders one chart of the statistics shortcode on demand',
+                'type' => 'read',
+                'ajax' => 1,
+                'readonlysession' => true,
         ],
 ];

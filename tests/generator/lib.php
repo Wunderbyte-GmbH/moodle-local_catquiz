@@ -172,6 +172,50 @@ class local_catquiz_generator extends testing_module_generator {
             }
         }
         unset($target);
+        // Pilot items (issue #141): a ratio switches them on.
+        if (property_exists($adaptivequiz, 'catquiz_pilotratio')) {
+            $jsondata->catquiz_includepilotquestions = '1';
+            $jsondata->catquiz_pilotratio = $adaptivequiz->catquiz_pilotratio;
+        }
+        // Feedback per scale (issues #117, #118) and routing (#129, #130): one range over the whole scale
+        // for every scale of the test, with a written feedback text naming the scale - and, for routing,
+        // into the given course and into a group named after the scale: "<prefix> <scale name>".
+        if (
+            property_exists($adaptivequiz, 'routingcourse')
+            || property_exists($adaptivequiz, 'routinggroupprefix')
+            || property_exists($adaptivequiz, 'scalefeedbacktexts')
+            || property_exists($adaptivequiz, 'scalefeedbackprefix')
+        ) {
+            $targetid = property_exists($adaptivequiz, 'routingcourse')
+                ? (int) $DB->get_field('course', 'id', ['shortname' => $adaptivequiz->routingcourse], MUST_EXIST)
+                : 0;
+            $jsondata->numberoffeedbackoptionsselect = '1';
+            foreach ([$catscale->id, ...catscale::get_subscale_ids($catscale->id)] as $scaleid) {
+                $jsondata->{'feedback_scaleid_limit_lower_' . $scaleid . '_1'} = '-100';
+                $jsondata->{'feedback_scaleid_limit_upper_' . $scaleid . '_1'} = '100';
+                $jsondata->{'enrolment_message_checkbox_' . $scaleid . '_1'} = '1';
+                $scalename = $DB->get_field('local_catquiz_catscales', 'name', ['id' => $scaleid]);
+                // A prefix of its own tells the feedback of one activity from another's (mod_adaptivequiz #22).
+                $prefix = property_exists($adaptivequiz, 'scalefeedbackprefix')
+                    ? $adaptivequiz->scalefeedbackprefix
+                    : 'Written feedback for';
+                $jsondata->{'feedbackeditor_scaleid_' . $scaleid . '_1_editor'} = (object) [
+                    'text' => $prefix . ' ' . $scalename, 'format' => FORMAT_HTML,
+                ];
+                // A scale routes only when it is reported (issue #117).
+                $jsondata->{'catquiz_scalereportcheckbox_' . $scaleid} = '1';
+                // The colour the form offers for a single range.
+                $jsondata->{'wb_colourpicker_' . $scaleid . '_1'} = '3';
+                if ($targetid) {
+                    // Element 0 is the "please choose" entry of the form.
+                    $jsondata->{'catquiz_courses_' . $scaleid . '_1'} = [0, $targetid];
+                }
+                if (property_exists($adaptivequiz, 'routinggroupprefix')) {
+                    $name = $DB->get_field('local_catquiz_catscales', 'name', ['id' => $scaleid]);
+                    $jsondata->{'catquiz_group_' . $scaleid . '_1'} = $adaptivequiz->routinggroupprefix . ' ' . $name;
+                }
+            }
+        }
         $jsondata->json = json_encode($jsondata);
 
         // Setup testenv finally.

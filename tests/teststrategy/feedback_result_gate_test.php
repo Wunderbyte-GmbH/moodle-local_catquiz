@@ -49,6 +49,16 @@ use local_catquiz\teststrategy\feedbacksettings;
  */
 final class feedback_result_gate_test extends advanced_testcase {
     /**
+     * Counts for every scale: the fixtures stand for scales measured in the attempt (issue #128).
+     *
+     * @param array $personabilities
+     * @return array
+     */
+    private function measured(array $personabilities): array {
+        return ['nbyscale' => array_fill_keys(array_keys($personabilities), 1)];
+    }
+
+    /**
      * The historical filter: reported, not excluded, not hidden.
      *
      * @param array $entry
@@ -91,7 +101,7 @@ final class feedback_result_gate_test extends advanced_testcase {
         foreach ($cases as $label => $entry) {
             $entry['value'] = 0.5;
             $personabilities = [7 => $entry];
-            $result = feedback_helper::build_attempt_result($personabilities);
+            $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
             $this->assertSame(
                 $this->legacy_displayable($entry),
@@ -119,7 +129,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['checkbox' => ['scalereportcheckboxinquizsettings' => false]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
         $scale = $result->get_scale_result(7);
 
         $this->assertFalse($scale->reportable, 'Reporting is off, so nothing is displayed.');
@@ -144,7 +154,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['se' => ['semindefined' => 0.35, 'securrent' => 0.1]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
         $this->assertSame(
             get_string('error:semin', 'local_catquiz', ['semindefined' => 0.35, 'securrent' => 0.1]),
@@ -169,7 +179,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['checkbox' => ['scalereportcheckboxinquizsettings' => false]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
         $this->assertSame(
             get_string('noscalesfound', 'local_catquiz'),
@@ -190,7 +200,7 @@ final class feedback_result_gate_test extends advanced_testcase {
             7 => ['value' => 0.5, 'toreport' => true],
             9 => ['value' => -0.5, 'toreport' => true, 'primary' => true],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
         $this->assertSame(9, $result->get_primary_scale()->scaleid);
         $this->assertFalse($result->get_scale_result(7)->primary);
@@ -226,7 +236,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['se' => ['semindefined' => 0.35, 'securrent' => 0.1]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
         $this->assertSame(
             get_string('error:semin', 'local_catquiz', ['semindefined' => 0.35, 'securrent' => 0.1]),
@@ -259,7 +269,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['checkbox' => ['scalereportcheckboxinquizsettings' => false]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
         $scale = $result->get_scale_result(7);
 
         $this->assertFalse($scale->reportable, 'Reporting is switched off.');
@@ -284,7 +294,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['se' => ['semindefined' => 0.35, 'securrent' => 0.1]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
         $scale = $result->get_scale_result(7);
 
         $this->assertFalse($scale->statisticallyvalid);
@@ -308,7 +318,7 @@ final class feedback_result_gate_test extends advanced_testcase {
                 'error' => ['checkbox' => ['scalereportcheckboxinquizsettings' => false]],
             ],
         ];
-        $result = feedback_helper::build_attempt_result($personabilities);
+        $result = feedback_helper::build_attempt_result($personabilities, $this->measured($personabilities));
 
         $this->assertTrue($result->get_scale_result(7)->statisticallyvalid);
         $this->assertFalse($result->get_scale_result(7)->reportable);

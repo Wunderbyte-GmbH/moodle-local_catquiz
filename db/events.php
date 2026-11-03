@@ -38,6 +38,19 @@
         'eventname' => '\core\event\question_deleted',
         'callback' => 'local_catquiz_observer::question_deleted',
         ],
+    // Issue #146: changes in the question bank that the runtime pool reads.
+    [
+        'eventname' => '\core\event\question_updated',
+        'callback' => 'local_catquiz_observer::question_bank_changed',
+    ],
+    [
+        'eventname' => '\core\event\question_created',
+        'callback' => 'local_catquiz_observer::question_bank_changed',
+    ],
+    [
+        'eventname' => '\core\event\question_moved',
+        'callback' => 'local_catquiz_observer::question_bank_changed',
+    ],
     [
         'eventname' => '\local_catquiz\event\testitem_imported',
         'callback' => 'local_catquiz_observer::testitem_imported',

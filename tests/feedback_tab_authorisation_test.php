@@ -210,4 +210,37 @@ final class feedback_tab_authorisation_test extends advanced_testcase {
         $this->assertSame('student', $last->other['role'] ?? null);
         $this->assertSame('personabilities', $last->other['feedback'] ?? null);
     }
+
+    /**
+     * A teacher of another course may not act on an attempt in this one (issue #68, re-audit 27.10.2026): the
+     * capability counts in the context of the attempt's activity, not in any course where the person teaches.
+     *
+     * @return void
+     */
+    public function test_teacher_of_another_course_is_denied(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $coursea = $this->getDataGenerator()->create_course();
+        $courseb = $this->getDataGenerator()->create_course();
+        $module = $this->getDataGenerator()->create_module('adaptivequiz', ['course' => $coursea->id]);
+        $student = $this->getDataGenerator()->create_and_enrol($coursea, 'student');
+        $teachera = $this->getDataGenerator()->create_and_enrol($coursea, 'editingteacher');
+        $teacherb = $this->getDataGenerator()->create_and_enrol($courseb, 'editingteacher');
+        $now = time();
+        $DB->insert_record('local_catquiz_attempts', (object) [
+            'userid' => $student->id, 'scaleid' => 1, 'contextid' => 1, 'courseid' => $coursea->id, 'attemptid' => 9201,
+            'component' => 'mod_adaptivequiz', 'instanceid' => $module->id, 'teststrategy' => 4, 'status' => 1,
+            'json' => '{}', 'debug_info' => '', 'timecreated' => $now, 'timemodified' => $now, 'endtime' => $now,
+        ]);
+
+        $this->setUser($teacherb);
+        $this->assert_refused_without_event(9201);
+
+        // The teacher of the attempt's course may - the denial is about the course, not about teachers.
+        $this->setUser($teachera);
+        $sink = $this->redirectEvents();
+        feedback_tab_clicked::execute(9201, 'personabilities', 'Person abilities');
+        $this->assertNotEmpty($sink->get_events());
+    }
 }

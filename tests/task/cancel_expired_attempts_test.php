@@ -29,14 +29,15 @@ use basic_testcase;
 use local_catquiz\task\cancel_expired_attempts;
 
 /**
- * Tests the mathcat functionality.
+ * The clean-up of attempts out of time, and the reading of the time limits it shares (mod_adaptivequiz #5).
  *
  * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\mathcat
+ * @covers \local_catquiz\task\cancel_expired_attempts
+ * @covers \local_catquiz\catquiz_handler::time_limits
  *
  */
 final class cancel_expired_attempts_test extends basic_testcase {
@@ -115,6 +116,14 @@ final class cancel_expired_attempts_test extends basic_testcase {
                 $now,
                 false,
             ],
+            // Mod_adaptivequiz #5: the test's own limit counts, also when the default is longer.
+            'quiz setting shorter than the default and expired' => [
+                $starttime,
+                60,
+                24 * 3600,
+                $now,
+                true,
+            ],
             'no quiz setting and default and expired' => [
                 $starttime,
                 null,
@@ -137,5 +146,25 @@ final class cancel_expired_attempts_test extends basic_testcase {
                 false,
             ],
         ];
+    }
+
+    /**
+     * One reading of the limits: a unit, an empty value as none, and a limit switched off as none.
+     */
+    public function test_time_limits_are_read_the_same_everywhere(): void {
+        $settings = fn(array $group, $include = null) => (object) (['catquiz_timelimitgroup' => (object) $group]
+            + ($include === null ? [] : ['catquiz_includetimelimit' => $include]));
+        $group = ['catquiz_maxtimeperattempt' => 30, 'catquiz_timeselect_attempt' => 'min',
+            'catquiz_maxtimeperitem' => 45, 'catquiz_timeselect_item' => 'sec'];
+
+        $this->assertSame(['attempt' => 1800, 'item' => 45], \local_catquiz\catquiz_handler::time_limits($settings($group)));
+        $this->assertSame(['attempt' => 1800, 'item' => 45], \local_catquiz\catquiz_handler::time_limits($settings($group, '1')));
+        $this->assertSame(['attempt' => null, 'item' => null], \local_catquiz\catquiz_handler::time_limits($settings($group, '0')));
+        $this->assertSame(
+            ['attempt' => null, 'item' => 45],
+            \local_catquiz\catquiz_handler::time_limits($settings(['catquiz_maxtimeperattempt' => ''] + $group)),
+            'An empty limit is none - it used to become an hour.'
+        );
+        $this->assertSame(['attempt' => null, 'item' => null], \local_catquiz\catquiz_handler::time_limits(null));
     }
 }

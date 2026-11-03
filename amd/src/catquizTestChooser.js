@@ -21,6 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Notification from 'core/notification';
+import {copyScaleSettings, PANELLOADED} from 'local_catquiz/feedbackpanel';
+
 const SELECTORS = {
     CATTESTCHOOSER: '[data-on-change-action]',
     CATTESTSUBMIT: '[data-action="submitCatTest"]',
@@ -66,12 +69,15 @@ export const init = () => {
                 submitbutton.classList.remove('hidden');
                 return;
             }
+            // The field carries the reason for the reload, and it is set here - the one place where
+            // that reason is known. The technical no-submit button travels separately under its own
+            // name (see prepareNoSubmitButton()); the two must not share this field.
             let triggeredButtonField = document.getElementsByName('triggered_button')[0];
-            triggeredButtonField.value = '';
+            const action = e.target.dataset.onChangeAction;
+            triggeredButtonField.value = action || '';
 
-            switch (e.target.dataset.onChangeAction) {
+            switch (action) {
                 case 'reloadTestForm':
-                    document.getElementsByName('triggered_button')[0].value = 'reloadTestForm';
                     clickNoSubmitButton(e.target, SELECTORS.CATTESTSUBMIT);
                     break;
                 case 'reloadFormFromScaleSelect':
@@ -96,16 +102,21 @@ export const init = () => {
         });
     });
 
-    if (!checkboxelements || checkboxelements.length == 0) {
-        return;
+    // On the first run when the page is loaded set the status according to saved fields. The fields of
+    // a scale come and go as it is opened (issue #51): the listeners are on the document, and the
+    // status is set for the fields loaded.
+    checkboxelements.forEach(selector => setCardDisabledStatus(selector));
+    if (!document.body.dataset.catquizReportListeners) {
+        document.body.dataset.catquizReportListeners = '1';
+        document.addEventListener('change', e => {
+            if (e.target.matches && e.target.matches(SELECTORS.REPORTSCALECHECKBOXES)) {
+                setCardDisabledStatus(e.target);
+            }
+        });
+        document.addEventListener(PANELLOADED, e => {
+            e.target.querySelectorAll(SELECTORS.REPORTSCALECHECKBOXES).forEach(checkbox => setCardDisabledStatus(checkbox));
+        });
     }
-
-    // On the first run when the page is loaded set the status according to
-    // saved fields and add event listeners.
-    checkboxelements.forEach(selector => {
-        setCardDisabledStatus(selector);
-        selector.addEventListener('change', e => setCardDisabledStatus(e.target));
-    });
 };
 
 /**
@@ -160,9 +171,6 @@ function clickNoSubmitButton(element, buttonselector) {
     const submitCatTest = form.querySelector(buttonselector);
     const fieldset = submitCatTest.closest('fieldset');
 
-    // eslint-disable-next-line no-console
-    console.log(submitCatTest, 'submitCatTest');
-
     const url = new URL(form.action);
     url.hash = fieldset.id;
 
@@ -173,17 +181,16 @@ function clickNoSubmitButton(element, buttonselector) {
 
 /**
  * Ensures no-submit buttons are consistently present in the submitted payload.
+ * Exported for the unit tests (issue #123).
  *
  * @param {HTMLElement} button
  */
-function prepareNoSubmitButton(button) {
+export function prepareNoSubmitButton(button) {
     const form = button.closest('form');
-    const triggeredButtonField = form.querySelector('[name="triggered_button"]');
 
-    if (triggeredButtonField) {
-        triggeredButtonField.value = button.name;
-    }
-
+    // Only the technical no-submit button is put into the request here. This used to write the
+    // button's name into triggered_button as well, which overwrote the reason for the reload that
+    // had just been set - 'reloadTestForm' arrived as 'submitcattestoption' (issue #123).
     let hiddenButtonField = form.querySelector('[data-nosubmit-proxy-for="' + button.name + '"]');
     if (!hiddenButtonField) {
         hiddenButtonField = document.createElement('input');
@@ -197,336 +204,33 @@ function prepareNoSubmitButton(button) {
 }
 
 /**
- * Copies all feedback settings from one scale to the selected subscales.
+ * Copies all feedback settings from one scale to the selected subscales (issue #51: also into the
+ * carriers of the scales not being edited).
  *
  * @param {HTMLElement} button
  */
-function copySettingsToSubscales(button) {
+async function copySettingsToSubscales(button) {
     setCopyButtonStatus(button, button.dataset.copyingText);
 
-    const form = button.closest('form');
-    const sourceScaleId = button.dataset.sourceScaleId;
     const subscaleIds = (button.dataset.subscaleIds || '')
         .split(',')
         .map(id => id.trim())
         .filter(id => id.length > 0);
-    const numberOfFeedbackOptions = parseInt(getElementValue(form, 'numberoffeedbackoptionsselect'), 10) || 0;
-    const rangePrefixes = [
-        'feedback_scaleid_limit_lower_',
-        'feedback_scaleid_limit_upper_',
-        'wb_colourpicker_',
-        'feedbackeditor_scaleid_',
-        'catquiz_group_',
-        'catquiz_courses_',
-        'enrolment_message_checkbox_',
-        'feedbacklegend_scaleid_'
-    ];
-    const scalePrefixes = [
-        'catquiz_scalereportcheckbox_'
-    ];
-    const selectedSubscaleIds = subscaleIds
-        .filter(subscaleId => hasCopyTarget(form, subscaleId));
+    let copied = 0;
+    try {
+        copied = await copyScaleSettings(button.closest('form'), button.dataset.sourceScaleId, subscaleIds);
+    } catch (error) {
+        setCopyButtonStatus(button, '');
+        Notification.exception(error);
+        return;
+    }
 
-    selectedSubscaleIds.forEach(subscaleId => {
-            setSubscaleSelected(form, subscaleId);
-            scalePrefixes.forEach(prefix => {
-                copyFieldGroup(form, prefix + sourceScaleId, prefix + subscaleId);
-            });
-
-            for (let index = 1; index <= numberOfFeedbackOptions; index++) {
-                rangePrefixes.forEach(prefix => {
-                    copyFieldGroup(
-                        form,
-                        prefix + sourceScaleId + '_' + index,
-                        prefix + subscaleId + '_' + index
-                    );
-                });
-            }
-        });
-
-    if (selectedSubscaleIds.length === 0) {
+    if (copied === 0) {
         setCopyButtonStatus(button, button.dataset.nothingCopiedText);
         return;
     }
 
-    setCopyButtonStatus(button, button.dataset.copiedText.replace('{$a}', selectedSubscaleIds.length));
-}
-
-/**
- * Checks whether a subscale has copy targets in the current form.
- *
- * @param {HTMLFormElement} form
- * @param {string} subscaleId
- * @returns {boolean}
- */
-function hasCopyTarget(form, subscaleId) {
-    return getNamedElements(form, 'catquiz_scalereportcheckbox_' + subscaleId).length > 0;
-}
-
-/**
- * Marks a subscale checkbox as selected when present.
- *
- * @param {HTMLFormElement} form
- * @param {string} subscaleId
- */
-function setSubscaleSelected(form, subscaleId) {
-    const checkbox = getNamedElements(form, 'catquiz_subscalecheckbox_' + subscaleId)[0];
-
-    if (!checkbox) {
-        return;
-    }
-
-    checkbox.checked = true;
-    checkbox.value = '1';
-}
-
-/**
- * Copies one field group, including editor subfields such as [text], [format], [itemid].
- *
- * @param {HTMLFormElement} form
- * @param {string} sourceBaseName
- * @param {string} targetBaseName
- */
-function copyFieldGroup(form, sourceBaseName, targetBaseName) {
-    const sourceElements = getNamedElements(form, sourceBaseName);
-
-    sourceElements.forEach(sourceElement => {
-        const targetName = sourceElement.name.replace(sourceBaseName, targetBaseName);
-        const targetElement = getNamedElements(form, targetName)[0];
-
-        if (!targetElement) {
-            return;
-        }
-
-        copyElementValue(sourceElement, targetElement);
-
-        if (targetName === targetBaseName || targetName === targetBaseName + '[text]') {
-            updateEditorDisplay(targetElement);
-        }
-    });
-}
-
-/**
- * Returns all form controls matching the given name or editor subfield prefix.
- *
- * @param {HTMLFormElement} form
- * @param {string} baseName
- * @returns {HTMLElement[]}
- */
-function getNamedElements(form, baseName) {
-    return Array.from(form.elements).filter(element =>
-        element.name === baseName || element.name.startsWith(baseName + '[')
-    );
-}
-
-/**
- * Returns the scalar value of a form element by name.
- *
- * @param {HTMLFormElement} form
- * @param {string} name
- * @returns {string}
- */
-function getElementValue(form, name) {
-    const element = getNamedElements(form, name)[0];
-
-    return element ? element.value : '';
-}
-
-/**
- * Copies the value from one control to another.
- *
- * @param {HTMLElement} sourceElement
- * @param {HTMLElement} targetElement
- */
-function copyElementValue(sourceElement, targetElement) {
-    if (targetElement.type === 'checkbox' || targetElement.type === 'radio') {
-        targetElement.checked = sourceElement.checked;
-    } else if (targetElement.tagName === 'SELECT' && targetElement.multiple) {
-        const selectedValues = getAutocompleteValues(sourceElement);
-
-        Array.from(targetElement.options).forEach(option => {
-            option.selected = selectedValues.includes(option.value);
-        });
-
-        updateAutocompleteDisplay(targetElement, sourceElement);
-    } else if (targetElement.tagName === 'SELECT') {
-        targetElement.value = sourceElement.value;
-        updateColourPickerDisplay(targetElement);
-    } else if (targetElement.tagName === 'TEXTAREA') {
-        targetElement.value = getEditorValue(sourceElement);
-    } else {
-        targetElement.value = sourceElement.value;
-    }
-
-    notifyFieldChanged(targetElement);
-}
-
-/**
- * Mirrors copied editor values into the visible Atto content area.
- *
- * @param {HTMLElement} targetElement
- */
-function updateEditorDisplay(targetElement) {
-    const editorContainer = targetElement.closest('.editor');
-
-    if (typeof window.tinymce !== 'undefined' && targetElement.id) {
-        const editor = window.tinymce.get(targetElement.id);
-
-        if (editor) {
-            editor.setContent(targetElement.value || '');
-            editor.save();
-        }
-    }
-
-    if (!editorContainer) {
-        return;
-    }
-
-    const editable = editorContainer.querySelector('.editor_atto_content');
-    if (!editable) {
-        return;
-    }
-
-    editable.innerHTML = targetElement.value;
-}
-
-/**
- * Returns the current editor value, including TinyMCE content.
- *
- * @param {HTMLElement} sourceElement
- * @returns {string}
- */
-function getEditorValue(sourceElement) {
-    if (typeof window.tinymce !== 'undefined' && sourceElement.id) {
-        const editor = window.tinymce.get(sourceElement.id);
-
-        if (editor) {
-            return editor.getContent();
-        }
-    }
-
-    return sourceElement.value;
-}
-
-/**
- * Returns the selected values of a Moodle autocomplete/select field.
- *
- * @param {HTMLSelectElement} sourceElement
- * @returns {string[]}
- */
-function getAutocompleteValues(sourceElement) {
-    const selectedValues = Array.from(sourceElement.options)
-        .filter(option => option.selected)
-        .map(option => option.value);
-
-    if (selectedValues.length > 0) {
-        return selectedValues;
-    }
-
-    const autocompleteContainer = sourceElement.closest('.form-autocomplete-original-select') || sourceElement.parentElement;
-    const selectionContainer = autocompleteContainer
-        ? autocompleteContainer.parentElement.querySelector('.form-autocomplete-selection')
-        : null;
-
-    if (!selectionContainer) {
-        return [];
-    }
-
-    return Array.from(selectionContainer.querySelectorAll('[data-value]'))
-        .map(item => item.getAttribute('data-value'))
-        .filter(value => value !== null && value !== '');
-}
-
-/**
- * Mirrors selected values into the visible Moodle autocomplete badges.
- *
- * @param {HTMLSelectElement} targetElement
- * @param {HTMLSelectElement} sourceElement
- */
-function updateAutocompleteDisplay(targetElement, sourceElement) {
-    const selectionContainer = findAutocompleteSelectionContainer(targetElement);
-    const sourceSelectionContainer = findAutocompleteSelectionContainer(sourceElement);
-
-    if (!selectionContainer) {
-        return;
-    }
-
-    if (sourceSelectionContainer) {
-        selectionContainer.innerHTML = sourceSelectionContainer.innerHTML;
-        selectionContainer.removeAttribute('aria-activedescendant');
-        selectionContainer.removeAttribute('data-active-value');
-        Array.from(selectionContainer.querySelectorAll('[id]')).forEach(node => node.removeAttribute('id'));
-        Array.from(selectionContainer.querySelectorAll('[data-active-selection]'))
-            .forEach(node => node.removeAttribute('data-active-selection'));
-        return;
-    }
-
-    const selectedOptions = Array.from(targetElement.options)
-        .filter(option => option.selected && option.value !== '0' && option.value !== '');
-
-    if (selectedOptions.length === 0) {
-        selectionContainer.innerHTML = '<span class="m-1 h-5">Select course</span>';
-    }
-}
-
-/**
- * Updates the visible colour picker circles to match the copied select value.
- *
- * @param {HTMLSelectElement} targetElement
- */
-function updateColourPickerDisplay(targetElement) {
-    const picker = document.querySelector('span[data-id="wb_colourpick_id_' + targetElement.name + '"]');
-
-    if (!picker) {
-        return;
-    }
-
-    const circles = Array.from(picker.querySelectorAll('.colourpickercircle'));
-    const selectedCircle = circles.find(circle => circle.dataset.colour === targetElement.value);
-    const selectedOption = Array.from(targetElement.options)
-        .find(option => option.value === targetElement.value);
-    const notify = picker.querySelector('.colourselectnotify');
-
-    circles.forEach(circle => circle.classList.remove('selected'));
-
-    if (selectedCircle) {
-        selectedCircle.classList.add('selected');
-    }
-
-    if (notify && selectedOption) {
-        notify.textContent = selectedOption.textContent.trim();
-    }
-}
-
-/**
- * Finds the visible selection container for a Moodle autocomplete field.
- *
- * @param {HTMLSelectElement} element
- * @returns {HTMLElement|null}
- */
-function findAutocompleteSelectionContainer(element) {
-    const container = element.parentElement;
-
-    if (!container) {
-        return null;
-    }
-
-    return container.querySelector('.form-autocomplete-selection');
-}
-
-
-/**
- * Notifies both native listeners and jQuery-based Moodle widgets.
- *
- * @param {HTMLElement} targetElement
- */
-function notifyFieldChanged(targetElement) {
-    targetElement.dispatchEvent(new Event('input', {bubbles: true}));
-    targetElement.dispatchEvent(new Event('change', {bubbles: true}));
-
-    if (typeof window.jQuery !== 'undefined') {
-        window.jQuery(targetElement).trigger('change');
-    }
+    setCopyButtonStatus(button, button.dataset.copiedText.replace('{$a}', copied));
 }
 
 /**

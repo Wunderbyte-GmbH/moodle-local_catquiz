@@ -33,13 +33,16 @@
     {{>local_catquiz/catscalemanager/scaleandcontextselector}}
     <div>
         {{^notable}}
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-xl">{{#str}}addtestitemtitle, local_catquiz{{/str}}</button>
-            <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-label="myLargeModalLabel" aria-hidden="true">
+            {{! Issue #30: the dialog is found by an id of this render, not by a class every copy shares,
+                and named by its title. Bootstrap 4 markup on purpose - this line runs on Moodle 4.5. }}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#local-catquiz-addtestitems-{{uniqid}}">{{#str}}addtestitemtitle, local_catquiz{{/str}}</button>
+            <div class="modal fade bd-example-modal-xl" id="local-catquiz-addtestitems-{{uniqid}}" tabindex="-1" role="dialog"
+                 aria-labelledby="local-catquiz-addtestitems-{{uniqid}}-title" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">{{#str}}addtestitemtitle, local_catquiz{{/str}}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <h5 class="modal-title" id="local-catquiz-addtestitems-{{uniqid}}-title">{{#str}}addtestitemtitle, local_catquiz{{/str}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}}closebuttontitle, core{{/str}}">
                             <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -54,12 +57,12 @@
             </div>
         {{/notable}}
         {{^notable}}
-            <form method="get" class="form-inline my-2" id="catquiz-questiontext-search">
+            <form method="get" class="form-inline my-2" id="local-catquiz-questiontext-search">
                 {{#hiddenparams}}
                     <input type="hidden" name="{{name}}" value="{{value}}">
                 {{/hiddenparams}}
-                <label class="mr-2" for="catquiz-qtsearch">{{#str}}questiontextsearch, local_catquiz{{/str}}</label>
-                <input type="text" class="form-control mr-2" id="catquiz-qtsearch" name="qtsearch"
+                <label class="mr-2" for="local-catquiz-qtsearch">{{#str}}questiontextsearch, local_catquiz{{/str}}</label>
+                <input type="text" class="form-control mr-2" id="local-catquiz-qtsearch" name="qtsearch"
                        value="{{qtsearch}}">
                 <button type="submit" class="btn btn-secondary">{{#str}}search, core{{/str}}</button>
             </form>
@@ -72,7 +75,7 @@
                 {{{table}}}
             </div>
         {{/table}}
-        <div id="testitemdashboard">
+        <div id="local-catquiz-testitemdashboard">
             {{>local_catquiz/catscalemanager/questions/testitemdashboard}}
         </div>
     </div>

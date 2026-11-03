@@ -31,14 +31,20 @@ use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
-use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 use local_catquiz\teststrategy\strategy;
 
 /**
- * Will select questions with the highest fisher information first
+ * Selects globally the question with the highest information score (issue #135).
+ *
+ * The score is the Fisher information of the item on the root scale, weighted by the penalty for
+ * a recent use (last time played). The whole remaining pool is a candidate: FASTEST drops no
+ * scale and applies no per-scale limit, so a subscale that is measured well enough neither ends
+ * the test nor takes its items out of the selection. The test ends at the maximum number of
+ * questions, when no eligible item is left, or - past the minimum - when the standard error of
+ * the root scale is at or below the target and its ability is stable.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
@@ -92,7 +98,6 @@ class teststrategy_fastest extends strategy {
         return [
             new customscalefeedback($this->feedbacksettings, $feedbackhelper),
             new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
-            new questionssummary($this->feedbacksettings, $feedbackhelper),
             new learningprogress($this->feedbacksettings, $feedbackhelper),
             new graphicalsummary($this->feedbacksettings, $feedbackhelper),
             new debuginfo($this->feedbacksettings, $feedbackhelper),
@@ -153,28 +158,44 @@ class teststrategy_fastest extends strategy {
         // Minimum of questions per test applied.
         $newabilities = $feedbacksettings->filter_nmintest($newabilities, $feedbackdata);
 
-        // Fraction can not be 1 (all answers correct) or 0 (all answers incorrect).
-        if ($feedbacksettings->fraction >= 1 || $feedbacksettings->fraction <= 0) {
-            foreach ($personabilities as $scaleid => $abilityvalue) {
-                $newabilities[$scaleid] = [
-                    'value' => $abilityvalue['value'],
-                    'excluded' => true,
-                    ];
-                $newabilities[$scaleid]['error']['fraction'] = [
-                        'fraction' => $feedbacksettings->fraction,
-                        'expected' => '0 < f < 1',
-                ];
-            }
-        }
+        // Neither all productive items of the root scale wrong nor all right (issue #140).
+        $newabilities = $feedbacksettings->filter_fraction($newabilities, $feedbackdata);
         return $newabilities;
     }
 
     /**
-     * In this strategy, we do not need to calculate this.
+     * FASTEST chooses globally: no scale is dropped (issue #135).
      *
-     * @return result
+     * @return bool
      */
-    protected function filterbytestinfo(): result {
-        return result::ok($this->context);
+    public function uses_scale_dropping(): bool {
+        return false;
+    }
+
+    /**
+     * No per-scale maximum cuts down the global pool (issue #135).
+     *
+     * @return bool
+     */
+    public function uses_per_scale_selection_limits(): bool {
+        return false;
+    }
+
+    /**
+     * The test information of a scale deactivates nothing (issue #135).
+     *
+     * @return bool
+     */
+    public function uses_testinfo_filter(): bool {
+        return false;
+    }
+
+    /**
+     * Ends on the precision of the root scale past the minimum, and only on that (issue #135).
+     *
+     * @return bool
+     */
+    public function stops_on_global_precision(): bool {
+        return true;
     }
 }

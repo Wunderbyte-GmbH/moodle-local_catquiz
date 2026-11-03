@@ -50,6 +50,14 @@ class modal_manage_catscale extends dynamic_form {
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('required'), 'required', PARAM_ALPHAEXT, 'client');
+        // Issue #81: the column holds 255 characters.
+        $mform->addRule(
+            'name',
+            get_string('maximumchars', '', dataapi::CONTEXT_NAME_MAXLENGTH),
+            'maxlength',
+            dataapi::CONTEXT_NAME_MAXLENGTH,
+            'client'
+        );
 
         // Add a textarea field for the catscale description.
         $mform->addElement('textarea', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
@@ -222,6 +230,16 @@ class modal_manage_catscale extends dynamic_form {
         }
         if ((float)$data["catquiz_minscalevalue"] > (float) $data["catquiz_maxscalevalue"]) {
             $errors['catquiz_minscalevalue'] = get_string('errorminscalevalue', 'local_catquiz');
+        }
+
+        // Issue #52: not below itself or one of its own subscales.
+        $id = (int) ($data['id'] ?? 0);
+        $parentid = (int) ($data['parentid'] ?? 0);
+        if ($id > 0 && $parentid > 0) {
+            $descendants = array_map('intval', \local_catquiz\catscale::get_subscale_ids($id));
+            if ($parentid === $id || in_array($parentid, $descendants, true)) {
+                $errors['parentid'] = get_string('cannotmovescaleintoitself', 'local_catquiz');
+            }
         }
 
         return $errors;

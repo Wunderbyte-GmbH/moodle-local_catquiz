@@ -21,7 +21,10 @@
  */
 
 import Ajax from 'core/ajax';
-import ModalFactory from 'core/modal_factory';
+import Fragment from 'core/fragment';
+// The modal itself, not core/modal_factory: the factory was deprecated in Moodle 4.3 and is gone in 5.2,
+// where the question modal no longer opened at all.
+import Modal from 'core/modal';
 import {addIconToContainerWithPromise} from 'core/loadingicon';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
@@ -46,13 +49,13 @@ export const init = async() => {
             this.setAttribute('aria-busy', 'true');
             // Show loader icon until we have the question.
             const iconPromise = addIconToContainerWithPromise(row);
+            const name = this.getAttribute('data-name');
             try {
                 const attemptid = this.getAttribute('data-attemptid');
                 const slot = this.getAttribute('data-slot');
                 const questionattemptid = this.getAttribute('data-questionattemptid') || 0;
-                const name = this.getAttribute('data-name');
                 const questiondata = await fetchQuestionData(slot, attemptid, questionattemptid);
-                const modal = await ModalFactory.create({
+                const modal = await Modal.create({
                     title: name,
                     body: '',
                 });
@@ -67,9 +70,15 @@ export const init = async() => {
                 const bodyElement = modal.getBody()[0];
                 await Templates.appendNodeContents(bodyElement, questiondata.questionhtml, questiondata.javascript);
             } catch (error) {
-                // Surface the real backend error to the user instead of leaving a
-                // spinner running forever.
-                Notification.exception(error);
+                // Never leave a spinner running. A refusal or a question that no longer
+                // exists comes from the server with a message for the user: it is shown in
+                // the dialogue the user asked for (issue #139). Anything else - a broken
+                // script, a failed request without a message - is reported as an exception.
+                if (error && error.errorcode && error.message) {
+                    await showMessage(name, error.message).catch(Notification.exception);
+                } else {
+                    Notification.exception(error);
+                }
             } finally {
                 // Always clear the loader and busy state, even on error.
                 iconPromise.resolve();
@@ -78,6 +87,27 @@ export const init = async() => {
             }
         });
     });
+};
+
+/**
+ * Shows a message from the server in a dialogue titled like the question.
+ *
+ * @param {string} title Name of the question
+ * @param {string} message Message for the user
+ * @return {Promise<void>}
+ */
+const showMessage = async(title, message) => {
+    const modal = await Modal.create({
+        title: title,
+        body: '',
+    });
+    modal.setRemoveOnClose(true);
+    await modal.show();
+    const note = document.createElement('p');
+    note.className = 'alert alert-warning catquiz-question-unavailable';
+    note.setAttribute('role', 'alert');
+    note.textContent = message;
+    modal.getBody()[0].appendChild(note);
 };
 
 /**
@@ -97,6 +127,8 @@ const fetchQuestionData = async(slot, attemptid, questionattemptid) => {
     }])[0];
     return {
         questionhtml: data.questionhtml,
-        javascript: data.javascript,
+        // Collected page JavaScript arrives inside <script> tags; unwrapped it runs once, not twice
+        // (the question's own scripts - STACK, MathJax - were bound twice in the modal).
+        javascript: Fragment.processCollectedJavascript(data.javascript),
     };
 };

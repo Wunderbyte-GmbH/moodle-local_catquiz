@@ -33,6 +33,64 @@ final class progress_preattempt_test extends advanced_testcase {
      * overwrite an already-captured scale), and survives a save/reload round
      * trip.
      */
+
+    /**
+     * Returns the internal CAT attempt id for an attempt of mod_adaptivequiz.
+     *
+     * Progress is filed under local_catquiz_attempts.id since issue #95; the tests work with the
+     * external id of the component and resolve it the same way production does.
+     *
+     * @param int $attemptid Id of the attempt of the component.
+     * @return int
+     */
+    private static function catattemptid(int $attemptid): int {
+        global $DB;
+
+        return (int) $DB->get_field('local_catquiz_attempts', 'id', [
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+        ]);
+    }
+
+    /**
+     * Files the CAT attempt the progress belongs to.
+     *
+     * Since issue #95 progress references local_catquiz_attempts.id, so that row has to exist
+     * before the first progress access - which is what the CAT model does in production.
+     *
+     * @param int $attemptid Id of the attempt of the component.
+     * @param int $contextid The CAT context.
+     * @return int The internal CAT attempt id.
+     */
+    private static function make_cat_attempt(int $attemptid, int $contextid): int {
+        global $DB, $USER;
+
+        // The fixture may already have filed one; local_catquiz_attempts.attemptid is unique.
+        $existing = $DB->get_field('local_catquiz_attempts', 'id', [
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+        ]);
+        if ($existing) {
+            return (int) $existing;
+        }
+
+        $now = time();
+
+        return (int) $DB->insert_record('local_catquiz_attempts', (object) [
+            'userid' => $USER->id ?? 2,
+            'scaleid' => 1,
+            'contextid' => $contextid,
+            'courseid' => 1,
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+            'instanceid' => 1,
+            'status' => 1,
+            'json' => '{}',
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
+    }
+
     public function test_capture_is_idempotent_and_persists(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
@@ -40,6 +98,8 @@ final class progress_preattempt_test extends advanced_testcase {
 
         $attemptid = 4711;
         $contextid = 9;
+
+        self::make_cat_attempt($attemptid, $contextid);
 
         $progress = progress::load($attemptid, 'mod_adaptivequiz', $contextid, (object) []);
         $progress->capture_preattempt_abilities([5 => 0.4, 6 => -0.2]);
@@ -55,6 +115,7 @@ final class progress_preattempt_test extends advanced_testcase {
         $progress->save();
 
         // Reload from the DB and confirm the values round-trip.
+        self::make_cat_attempt($attemptid, $contextid);
         $reloaded = progress::load($attemptid, 'mod_adaptivequiz', $contextid);
         $this->assertEquals([5 => 0.4, 6 => -0.2, 7 => 1.1], $reloaded->get_preattempt_abilities());
     }
@@ -73,13 +134,19 @@ final class progress_preattempt_test extends advanced_testcase {
         $contextid = 9;
 
         // A minimal legacy progress JSON without 'preattemptabilities'.
+        self::make_cat_attempt($attemptid, $contextid);
         $legacy = progress::load($attemptid, 'mod_adaptivequiz', $contextid, (object) []);
         $legacy->save();
-        $json = json_decode($DB->get_field('local_catquiz_progress', 'json', ['attemptid' => $attemptid]), true);
+        $json = json_decode(
+            $DB->get_field('local_catquiz_progress', 'json', ['attemptid' => self::catattemptid($attemptid)]),
+            true
+        );
         unset($json['preattemptabilities']);
-        $DB->set_field('local_catquiz_progress', 'json', json_encode($json), ['attemptid' => $attemptid]);
+        $DB->set_field('local_catquiz_progress', 'json', json_encode($json), ['attemptid' => self::catattemptid($attemptid)]);
         // Force a reload from the DB rather than the cached object.
         \cache::make('local_catquiz', 'adaptivequizattempt')->purge();
+
+        self::make_cat_attempt($attemptid, $contextid);
 
         $reloaded = progress::load($attemptid, 'mod_adaptivequiz', $contextid);
         $this->assertSame([], $reloaded->get_preattempt_abilities());

@@ -25,6 +25,7 @@
 use local_catquiz\task\cancel_expired_attempts;
 use local_catquiz\task\recalculate_cat_model_params;
 use local_catquiz\task\cleanup_attempt_progress;
+use local_catquiz\task\purge_attempt_traces;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,6 +58,15 @@ $tasks = [
         'classname' => cleanup_attempt_progress::class,
         'blocking' => 0,
         'minute' => '30',
+        'hour' => '3',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
+    [
+        'classname' => purge_attempt_traces::class,
+        'blocking' => 0,
+        'minute' => '40',
         'hour' => '3',
         'day' => '*',
         'dayofweek' => '*',

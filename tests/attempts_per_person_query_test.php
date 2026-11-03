@@ -88,6 +88,30 @@ final class attempts_per_person_query_test extends advanced_testcase {
     }
 
     /**
+     * A CATquiz test of scale 501 in the course: the people who could take it form "no attempt" (issue #132).
+     *
+     * @return int adaptivequiz.id
+     */
+    private function add_test_instance(): int {
+        global $DB;
+
+        $quiz = $this->getDataGenerator()->get_plugin_generator('mod_adaptivequiz')->create_instance([
+            'course' => $this->courseid,
+            'highestlevel' => 10,
+            'lowestlevel' => 1,
+            'standarderror' => 14,
+            'attemptfeedbackeditor' => ['text' => '', 'format' => FORMAT_MOODLE],
+        ]);
+        $DB->insert_record('local_catquiz_tests', (object) [
+            'componentid' => $quiz->id, 'component' => 'mod_adaptivequiz', 'catscaleid' => 501,
+            'courseid' => $this->courseid, 'name' => 'test', 'status' => 1, 'json' => '{}',
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        \local_catquiz\local\statistics\eligible_population::reset();
+        return (int) $quiz->id;
+    }
+
+    /**
      * Runs the query and returns attempts keyed by user id.
      *
      * @param array|null $alloweduserids
@@ -290,6 +314,7 @@ final class attempts_per_person_query_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $this->courseid = (int) $course->id;
+        $this->add_test_instance();
 
         $expectedattempts = 0;
         $withattempts = 0;
@@ -416,6 +441,7 @@ final class attempts_per_person_query_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course(['groupmode' => SEPARATEGROUPS]);
         $this->courseid = (int) $course->id;
+        $this->add_test_instance();
 
         $smallgroup = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
         $biggroup = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
@@ -473,10 +499,10 @@ final class attempts_per_person_query_test extends advanced_testcase {
         $counts = $this->attempts_per_user(null);
 
         $this->assertCount(
-            16,
+            15,
             $counts,
-            'Fifteen participants and the teacher belong to the course aggregate, '
-                . 'whatever group the viewer is in.'
+            'The fifteen participants belong to the course aggregate, whatever group the viewer is in. '
+                . 'The teacher may not attempt the test and is no "no attempt" (issue #132).'
         );
         $this->assertSame(
             $expected['one'] + ($expected['two'] * 2),

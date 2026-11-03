@@ -34,6 +34,7 @@ use local_catquiz\local\model\model_person_param;
  * @copyright  2026 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_catquiz\catquiz::get_peer_comparison_stats
+ * @covers     \local_catquiz\local\statistics\peer_population
  */
 final class peer_comparison_stats_test extends advanced_testcase {
     /** @var int Scale id. */
@@ -49,15 +50,17 @@ final class peer_comparison_stats_test extends advanced_testcase {
      * @param int $userid
      * @param float $ability
      * @param int $contextid
+     * @param bool $valid The verdict stored with the estimate (isvalid); the finalisation stores both.
      * @return void
      */
-    private function pp(int $userid, float $ability, int $contextid): void {
+    private function pp(int $userid, float $ability, int $contextid, bool $valid = true): void {
         global $DB;
         $DB->insert_record('local_catquiz_personparams', (object) [
             'userid' => $userid,
             'catscaleid' => $this->scaleid,
             'contextid' => $contextid,
             'ability' => $ability,
+            'isvalid' => $valid ? 1 : 0,
             'status' => 1,
             'timecreated' => time(),
             'timemodified' => time(),
@@ -159,6 +162,38 @@ final class peer_comparison_stats_test extends advanced_testcase {
         // Peers with |ability| == MODEL_POS_INF (users 7, 8) must be ignored.
         $stats = catquiz::get_peer_comparison_stats($this->contextid, $this->scaleid, 1.0, 10);
         $this->assertSame(4, $stats->n, 'Saturated results must not be counted as peers.');
+    }
+
+    /**
+     * Only the stored verdict decides: an invalid estimate inside the bound is no peer, and a newer
+     * invalid estimate does not replace the valid one before it (issue #88).
+     *
+     * The histogram of the same feedback counted valid estimates only; the percentile counted every
+     * newest estimate that was not saturated. The two described different groups.
+     *
+     * @return void
+     */
+    public function test_only_valid_results_are_peers(): void {
+        $this->resetAfterTest();
+        $this->seed();
+        // User u9: a single invalid result that is not saturated - not a peer.
+        $this->pp(9, 0.5, $this->contextid, false);
+        // User u2: a later invalid result on top of the valid 1.0 - the valid one stays.
+        $this->pp(2, 3.0, $this->contextid, false);
+
+        $stats = catquiz::get_peer_comparison_stats($this->contextid, $this->scaleid, 1.0, 10);
+
+        $this->assertSame(4, $stats->n, 'Peers u1..u4, each with their newest valid result.');
+        $this->assertEqualsWithDelta(1.0, $stats->meanvalue, 0.0001);
+        $this->assertSame(2, $stats->equalcount, 'u2 counts with its valid 1.0, not the invalid 3.0.');
+
+        // The histogram of "Your result" reads the same population, the person compared included.
+        [$sql, $params] = \local_catquiz\local\statistics\peer_population::sql($this->contextid, $this->scaleid);
+        $histogram = $GLOBALS['DB']->get_records_sql_menu($sql, $params);
+        ksort($histogram);
+        $this->assertSame([1, 2, 3, 4, 10], array_keys($histogram));
+        $source = file_get_contents(__DIR__ . '/../classes/teststrategy/feedbackgenerator/comparetotestaverage.php');
+        $this->assertStringContainsString('peer_population::sql(', $source, 'The histogram uses the shared population.');
     }
 
     /**

@@ -1,0 +1,191 @@
+##############################################################################
+# Install and upgrade matrix (local_catquiz issue #31)
+#
+# Moodle refuses a plugin only for "requires" and "incompatible" - "supported" is information. This workflow
+# shows that the two lines keep apart, and that the upgrade from one to the other runs:
+#
+#   negative-13-on-45   line 1.3 on Moodle 4.5          -> the installation must fail ("requires")
+#   negative-12-on-51   line 1.2 on Moodle 5.1          -> the installation must fail ("incompatible")
+#   negative-old-host   line 1.3 with a too old host    -> the installation must fail (dependency)
+#   negative-no-adapter line 1.3 without the adapter    -> the installation must fail (dependency)
+#   upgrade-12-to-13    Moodle 4.5 + line 1.2, then Moodle 5.1 + line 1.3 -> upgrade.php must succeed
+#
+# Plain Moodle CLI (admin/cli/install.php, admin/cli/upgrade.php), no moodle-plugin-ci: the point is what an
+# administrator sees. Manual runs can pin the refs of all three plugins.
+##############################################################################
+
+name: Install and upgrade matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      catquiz13_ref:
+        description: 'local_catquiz line 1.3 (commit SHA or branch)'
+        required: false
+        default: 'migration-zu-moodle-5.x'
+      catquiz12_ref:
+        description: 'local_catquiz line 1.2 (commit SHA or branch)'
+        required: false
+        default: 'ALiSe-v-1.2.0-legacy'
+      host_v3_ref:
+        description: 'mod_adaptivequiz for 5.x (commit SHA or branch)'
+        required: false
+        default: 'v-3.0'
+      host_legacy_ref:
+        description: 'mod_adaptivequiz for 4.5 (commit SHA or branch)'
+        required: false
+        default: 'ALiSe-v-1.2.0-legacy'
+      adapter_v3_ref:
+        description: 'adaptivequizcatmodel_catquiz for 5.x (commit SHA or branch)'
+        required: false
+        default: 'v-3.0'
+      adapter_legacy_ref:
+        description: 'adaptivequizcatmodel_catquiz for 4.5 (commit SHA or branch)'
+        required: false
+        default: 'ALiSe-v-1.2.0-legacy'
+      too_old_host_ref:
+        description: 'A mod_adaptivequiz below the version line 1.3 depends on'
+        required: false
+        default: 'v-3.0~20'
+  push:
+    branches:
+      - main
+      - ALiSe-v-1.2.0-legacy
+    paths:
+      - 'version.php'
+      - 'catmodel/*/version.php'
+      - '.github/workflows/install-matrix.yml'
+
+jobs:
+  install:
+    name: "${{ matrix.case }}"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: mirror.gcr.io/library/postgres:16
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { case: negative-13-on-45, moodle: MOODLE_405_STABLE, line: '13', expect: fail }
+          - { case: negative-12-on-51, moodle: MOODLE_501_STABLE, line: '12', expect: fail }
+          - { case: negative-old-host, moodle: MOODLE_501_STABLE, line: '13', host: old, expect: fail }
+          - { case: negative-no-adapter, moodle: MOODLE_501_STABLE, line: '13', adapter: none, expect: fail }
+          - { case: upgrade-12-to-13, moodle: MOODLE_405_STABLE, line: '12', upgrade: MOODLE_501_STABLE, expect: ok }
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, zip, gd, xmlrpc, soap, intl, sodium
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Fetch the plugins
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch() { # fetch <dir> <repo> <ref>
+            git init -q "$1"
+            git -C "$1" remote add origin "https://github.com/$2"
+            git -C "$1" fetch -q --depth 50 origin "$3" || git -C "$1" fetch -q origin "$3"
+            git -C "$1" checkout -q FETCH_HEAD
+            echo "::notice::$2 $(git -C "$1" rev-parse HEAD)"
+          }
+          fetch plugins/catquiz13 ralferlebach/moodle-local_catquiz "${{ inputs.catquiz13_ref || 'migration-zu-moodle-5.x' }}"
+          fetch plugins/catquiz12 ralferlebach/moodle-local_catquiz "${{ inputs.catquiz12_ref || 'ALiSe-v-1.2.0-legacy' }}"
+          fetch plugins/host3 ralferlebach/moodle-mod_adaptivequiz "${{ inputs.host_v3_ref || 'v-3.0' }}"
+          fetch plugins/host12 ralferlebach/moodle-mod_adaptivequiz "${{ inputs.host_legacy_ref || 'ALiSe-v-1.2.0-legacy' }}"
+          fetch plugins/adapter3 ralferlebach/moodle-adaptivequizcatmodel_catquiz "${{ inputs.adapter_v3_ref || 'v-3.0' }}"
+          fetch plugins/adapter12 ralferlebach/moodle-adaptivequizcatmodel_catquiz "${{ inputs.adapter_legacy_ref || 'ALiSe-v-1.2.0-legacy' }}"
+          fetch plugins/wbt Wunderbyte-GmbH/moodle-local_wunderbyte_table main
+          if [ "${{ matrix.host }}" = old ]; then
+            # A host below the version line 1.3 depends on.
+            git -C plugins/host3 fetch -q --unshallow origin || true
+            git -C plugins/host3 checkout -q "${{ inputs.too_old_host_ref || 'v-3.0~20' }}" \
+              || git -C plugins/host3 checkout -q "$(git -C plugins/host3 rev-list --max-count=1 --skip=20 HEAD)"
+            echo "::notice::too old host $(grep -o 'version = [0-9]*' plugins/host3/version.php)"
+          fi
+
+      - name: Install Moodle ${{ matrix.moodle }} with line ${{ matrix.line }}
+        id: install
+        shell: bash
+        run: |
+          # GitHub runs "shell: bash" with -e: without +e an installation that is refused - the expected result of
+          # the negative cases - would end this step before its exit code is recorded.
+          set +e -uo pipefail
+          setup() { # setup <branch> <line>
+            rm -rf moodle && git clone -q --depth 1 --branch "$1" https://github.com/moodle/moodle.git moodle
+            root=moodle; [ -d moodle/public ] && root=moodle/public
+            if [ "$2" = 13 ]; then cq=catquiz13; host=host3; adapter=adapter3; else cq=catquiz12; host=host12; adapter=adapter12; fi
+            cp -a "plugins/$cq" "$root/local/catquiz"
+            cp -a "plugins/$host" "$root/mod/adaptivequiz"
+            if [ "${{ matrix.adapter }}" != none ]; then
+              cp -a "plugins/$adapter" "$root/mod/adaptivequiz/catmodel/catquiz"
+            fi
+            cp -a plugins/wbt "$root/local/wunderbyte_table"
+          }
+          setup "${{ matrix.moodle }}" "${{ matrix.line }}"
+          mkdir -p "$HOME/moodledata"
+          createdb -E UTF8 moodle
+          # Moodle 5.1 and later keep the plugins below public/, the CLI scripts (admin/cli) and config.php stay
+          # in the root.
+          php moodle/admin/cli/install.php --non-interactive --agree-license --allow-unstable \
+            --wwwroot=http://localhost/moodle --dataroot="$HOME/moodledata" \
+            --dbtype=pgsql --dbhost=localhost --dbname=moodle --dbuser=postgres --dbpass= \
+            --fullname=Matrix --shortname=matrix --adminpass='Test123!' 2>&1 | tee install.log
+          code=${PIPESTATUS[0]}
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "::notice::install.php exit $code"
+
+      - name: Check the result of the installation
+        shell: bash
+        run: |
+          code="${{ steps.install.outputs.code }}"
+          if [ "${{ matrix.expect }}" = fail ]; then
+            if [ "$code" = 0 ]; then
+              echo "::error::The installation succeeded, but it must be refused (${{ matrix.case }})."
+              exit 1
+            fi
+            grep -Ei 'requires|incompatible|dependenc|missing|cannot be installed|plugins check' install.log \
+              || { echo "::error::Refused, but not for a plugin check - see install.log."; exit 1; }
+            echo "Refused as expected."
+          elif [ "$code" != 0 ]; then
+            echo "::error::The installation failed."; exit 1
+          fi
+
+      - name: Upgrade to ${{ matrix.upgrade }} with line 1.3
+        if: ${{ matrix.upgrade }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mv moodle/config.php config.php.saved
+          rm -rf moodle && git clone -q --depth 1 --branch "${{ matrix.upgrade }}" https://github.com/moodle/moodle.git moodle
+          root=moodle; [ -d moodle/public ] && root=moodle/public
+          cp config.php.saved moodle/config.php
+          cp -a plugins/catquiz13 "$root/local/catquiz"
+          cp -a plugins/host3 "$root/mod/adaptivequiz"
+          cp -a plugins/adapter3 "$root/mod/adaptivequiz/catmodel/catquiz"
+          cp -a plugins/wbt "$root/local/wunderbyte_table"
+          php moodle/admin/cli/upgrade.php --non-interactive --allow-unstable 2>&1 | tee upgrade.log
+          php -r 'define("CLI_SCRIPT", true); require "moodle/config.php"; echo get_config("local_catquiz", "version"), PHP_EOL;' \
+            | tee installed-version.txt
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: install-matrix-${{ matrix.case }}
+          path: |
+            install.log
+            upgrade.log
+            installed-version.txt
+          if-no-files-found: ignore

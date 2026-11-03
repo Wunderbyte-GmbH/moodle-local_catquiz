@@ -30,17 +30,19 @@
     }
 }}
 
+{{! Issue #30: the selector sits on the questions and on the tests tab; the script finds its parts by
+    data-region, the checkbox and its label are paired through an id of this render. }}
 <div class="catscales-dashboard grid">
-    <div id="catmanagerquestions-scaleselectors">
+    <div data-region="local_catquiz-scaleselectors">
             {{{scaleselectors}}}
     </div>
     {{#checkbox}}
         <div class="form-check">
-            <input type="checkbox" class="integrate-subscales-checkbox" id="integrateSubscaleQuestionsCheckbox" {{checked}}>
-            <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{label}}</label>
+            <input type="checkbox" class="integrate-subscales-checkbox" id="local-catquiz-integratesubscales-{{uniqid}}" {{checked}}>
+            <label class="integrate-subscales-checkbox" for="local-catquiz-integratesubscales-{{uniqid}}">{{label}}</label>
         </div>
     {{/checkbox}}
-    <div id="catmanagerquestions-contextselector" class="float-right" >
+    <div data-region="local_catquiz-contextselector" class="float-right">
         {{{contextselector}}}
     </div>
 </div>

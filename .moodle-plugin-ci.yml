@@ -1,0 +1,29 @@
+# Konfiguration fuer moodle-plugin-ci.
+#
+# tests/fixtures ist rund 86 MB gross: aufgezeichnete Simulationslaeufe als CSV
+# und die daraus erzeugten PHP-Datensaetze; strategy_test.php haelt dieselben
+# Daten als PHP-Arrays. Fuer phpcpd sind das Millionen nahezu gleicher Zeilen -
+# der Lauf meldete 88 % Duplikate bei 2,6 Mio Zeilen und eine groesste
+# Klonlaenge von 422.000 Zeilen, und phpcs lief ueber fuenf Minuten. Das sind
+# Aussagen ueber die Messdaten, nicht ueber den Code.
+filter:
+  notPaths:
+    - tests/fixtures
+    - tests/behat/fixtures
+  notNames:
+    - "*.csv"
+    - "strategy_test.php"
+
+# Mustache: diese Vorlagen sind Teilvorlagen, die nur eingebettet gueltig sind.
+# Die HTML-Pruefung sieht jede Datei einzeln und meldet deshalb Fehler, die im
+# gerenderten Ganzen nicht existieren. moodle-plugin-ci liest dafuer keine
+# Umgebungsvariable mehr (MUSTACHE_IGNORE_NAMES in den Workflows ist
+# wirkungslos), sondern nur diesen befehlsspezifischen Filter.
+# Issue #32: der Akkordeon-Block des Feedback-Formulars ist eine einzige Vorlage
+# (feedback/feedbackform_collapsible.mustache), deren Beispielkontext Oeffnen und
+# Schliessen zusammen rendert - sie wird wieder geprueft und steht nicht mehr hier.
+filter-mustache:
+  notNames:
+    - catscaleshortcodetablechildren.mustache
+    - colour_pick_circle.mustache
+    - colour_picker.mustache

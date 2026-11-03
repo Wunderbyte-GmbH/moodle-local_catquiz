@@ -29,7 +29,7 @@
         "viewlink":"http://localhost:8000/local/catquiz/manage_catscales.php?id=3#lcq_questions"
     }
 }}
-<table class="table" id="local-catscales-container-shortcodes-table-{{id}}">
+<table class="table" id="local-catscales-container-shortcodes-table-{{uniqid}}">
     <thead class="thead-dark">
         <tr>
             <th scope="col">{{#str}}catscale, local_catquiz{{/str}}</th>
@@ -41,7 +41,7 @@
         {{#itemtree}}
             <tr>
                 {{^ischild}}
-                    <th scope="row">{{name}}</td>
+                    <th scope="row">{{name}}</th>
                 {{/ischild}}
                 {{#ischild}}
                     <td style="padding-left: {{padding}}px">{{name}}</td>

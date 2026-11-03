@@ -101,6 +101,15 @@ final class maximumquestionscheck_test extends advanced_testcase {
             }
 
             /**
+             * All answered questions, pilot items included.
+             *
+             * @return int
+             */
+            public function get_num_answered_questions(): int {
+                return count($this->responses);
+            }
+
+            /**
              * Simulates a resume: progress::load() drops the pending item.
              *
              * @return void
@@ -185,22 +194,24 @@ final class maximumquestionscheck_test extends advanced_testcase {
     }
 
     /**
-     * Answered pilot items do not count towards the productive test length.
+     * Answered pilot items count towards the maximum: it limits every question asked (issue #141).
      *
      * @return void
      */
-    public function test_pilot_answers_do_not_count(): void {
+    public function test_pilot_answers_count_towards_the_maximum(): void {
         $this->resetAfterTest(true);
 
         $task = new maximumquestionscheck();
+        // Four answers, one of them a pilot item: the maximum of four is reached.
         $context = [
             'maximumquestions' => 4,
-            'questionsattempted' => 5,
-            'progress' => $this->progress_stub(5, 5, 1),
+            'questionsattempted' => 4,
+            'progress' => $this->progress_stub(4, 4, 1),
         ];
-        $this->assertTrue($task->run($context)->iserr());
+        $this->assertTrue($task->run($context)->iserr(), 'A pilot answer is a question asked.');
 
-        $context['progress'] = $this->progress_stub(4, 4, 1);
+        // Three answers, one of them a pilot item: one more question may follow.
+        $context['progress'] = $this->progress_stub(4, 3, 1);
         $this->assertFalse($task->run($context)->iserr());
     }
 

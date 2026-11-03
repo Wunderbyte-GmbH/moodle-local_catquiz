@@ -334,7 +334,9 @@ class questionsdisplay {
 
         $table->stickyheader = false;
         $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
+        // A list to choose from, opened over the list of test items, which offers the download. Its own download
+        // selector would repeat the fixed id downloadtype_download of local_wunderbyte_table on the page.
+        $table->showdownloadbutton = false;
         $table->showreloadbutton = true;
         $table->showrowcountselect = true;
 

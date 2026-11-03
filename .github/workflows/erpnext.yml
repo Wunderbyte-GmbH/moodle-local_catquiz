@@ -7,6 +7,9 @@ on:
 
 jobs:
   create-task:
+    # Only in the Wunderbyte repository: issues labelled in ralferlebach's repository
+    # do not create ERPNext tasks (no access to the token, nothing to track there).
+    if: github.repository_owner != 'ralferlebach'
     runs-on: ubuntu-latest
 
     steps:

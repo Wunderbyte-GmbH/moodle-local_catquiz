@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\local\attempt\administration_history;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -51,11 +52,25 @@ final class removeplayedquestions extends preselect_task {
      */
     public function run(array &$context): result {
         $this->progress = $context['progress'];
-        $playedquestions = $this->progress->get_playedquestions();
-        if (! $playedquestions) {
-            return result::ok($context);
+
+        /* Two sources, not one (issue #126). The played questions of the progress are the CAT's
+           own record, but a question handed out on a path that did not register it was missing
+           there and could be drawn again. The question usage is the host's record of what was
+           actually administered, whatever the path; everything in it is excluded as well. */
+        $excluded = array_keys($this->progress->get_playedquestions());
+        try {
+            $usageid = $this->progress->get_usage_id();
+        } catch (\dml_missing_record_exception $e) {
+            // No attempt of the host behind this progress: nothing administered to add.
+            $usageid = null;
         }
-        foreach (array_keys($playedquestions) as $qid) {
+        if ($usageid) {
+            foreach (administration_history::for_usage((int) $usageid) as $entry) {
+                $excluded[] = $entry->questionid;
+            }
+        }
+
+        foreach (array_unique($excluded) as $qid) {
             if (array_key_exists($qid, $context['questions'])) {
                 unset($context['questions'][$qid]);
             }

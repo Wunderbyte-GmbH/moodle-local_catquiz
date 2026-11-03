@@ -26,6 +26,8 @@
 namespace local_catquiz;
 
 use Closure;
+use local_catquiz\event\numeric_fallback_applied;
+use local_catquiz\local\monitoring\numeric_notice;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
@@ -44,6 +46,9 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcalc {
+    /** @var int Points whose ability derivatives each response keeps (issue #145): the current one and one before. */
+    public const ABILITY_DERIVATIVE_MEMO_SIZE = 2;
+
     /**
      * Residual gradient (max abs) above which a Newton item-parameter result is
      * treated as not converged and a BFGS rescue is tried (issue: experiment K1).
@@ -102,6 +107,13 @@ class catcalc {
      * method's own scope, giving every response an independent cache (a shared cache
      * across responses would return one response's derivatives for another).
      *
+     * The cache is bounded (issue #145). Newton-Raphson asks for the jacobian and then the
+     * hessian at the same point and never returns to an earlier one, so only the latest
+     * points are ever hit again. Keeping every point instead let the cache grow with the
+     * iterations - up to 500 entries per answered question and fit - for no reuse at all.
+     * The values are the same either way: a point is computed once while it is cached and
+     * computed again, identically, if it should ever be asked for after being dropped.
+     *
      * @param string $model model class name
      * @param array $itemparams item parameters for this response
      * @param float $response response fraction
@@ -113,6 +125,10 @@ class catcalc {
             // Format %.17g round-trips a double exactly, so distinct Newton iterates never collide.
             $key = sprintf('%.17g', $pp['ability']);
             if (!array_key_exists($key, $memo)) {
+                if (count($memo) >= self::ABILITY_DERIVATIVE_MEMO_SIZE) {
+                    // Oldest point first: arrays keep insertion order.
+                    unset($memo[array_key_first($memo)]);
+                }
                 $memo[$key] = $model::get_ability_derivatives($pp, $itemparams, $response);
             }
             return $memo[$key];
@@ -149,6 +165,7 @@ class catcalc {
 
         $jfuns = [];
         $hfuns = [];
+        $modelnames = [];
         foreach ($personresponses as $qid => $qresponse) {
             $item = $items[$qid];
             // The item parameter for this response was filtered out.
@@ -156,6 +173,7 @@ class catcalc {
                 continue;
             }
             $itemparams = $item->get_params_array();
+            $modelnames[$item->get_model_name()] = true;
 
             /** @var catcalc_ability_estimator $model */
             $model = $allmodels[$item->get_model_name()];
@@ -185,15 +203,28 @@ class catcalc {
         $hessian = self::build_callable_array($hfuns);
         $hessian = fn ($pp) => matrixcat::multi_sum($hessian($pp));
 
-        $trfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
-        $trderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
+        /* Issue #116: the prior's spread is forced away from zero - max(sd, 10^-PRECISION) - in
+           model_raschmodel::sanitize_trusted_region_sd(), for every model. A spread raised to that
+           minimum is reported, not corrected silently - as an event, issue #106. */
+        $effectivesd = model_raschmodel::sanitize_trusted_region_sd($sd);
+        if (is_nan($sd) || $effectivesd > $sd) {
+            numeric_notice::report(numeric_fallback_applied::SPREAD_RAISED, [
+                'n' => count($jfuns),
+                'mean' => (float) $mean,
+                'sd' => (float) $sd,
+                'effectivesd' => (float) $effectivesd,
+                'models' => implode(',', array_keys($modelnames)),
+            ]);
+        }
+        $trfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $effectivesd);
+        $trderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $effectivesd);
         $trustedregionfilter = fn($ability) => model_raschmodel::restrict_to_trusted_region_pp(
             $ability,
             $trlowerlimit,
             $trupperlimit,
             $tr,
             $mean,
-            $sd,
+            $effectivesd,
             $usetrfactor
         );
 

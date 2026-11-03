@@ -31,7 +31,7 @@ use local_catquiz\teststrategy\progress;
  * The fraction column stayed null on every row although the data was there.
  *
  * validate() passed an empty array for the fraction map, so nothing ever reached
- * local_catquiz_attemptscale.fraction - while the per-item fractions sat in the
+ * the fraction of the scale result - while the per-item fractions sat in the
  * recorded responses the whole time.
  *
  * @package    local_catquiz

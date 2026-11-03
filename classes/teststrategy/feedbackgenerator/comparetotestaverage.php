@@ -29,9 +29,7 @@ use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_model;
-use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\statistics\chart_output;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -198,8 +196,9 @@ class comparetotestaverage extends feedbackgenerator {
         $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
         $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
 
-        $rangestart = (float) $quizsettings->$lowestlimitkey;
-        $rangeend = (float) $quizsettings->$highestlimitkey;
+        // A scale without feedback ranges has neither key; that is the error below, not a warning.
+        $rangestart = (float) ($quizsettings->$lowestlimitkey ?? 0);
+        $rangeend = (float) ($quizsettings->$highestlimitkey ?? 0);
 
         if (!($rangeend > $rangestart)) {
             throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
@@ -209,15 +208,17 @@ class comparetotestaverage extends feedbackgenerator {
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
 
-            $lowerlimit = (float) $quizsettings->$lowerlimitkey;
-            $upperlimit = (float) $quizsettings->$upperlimitkey;
+            $lowerlimit = (float) ($quizsettings->$lowerlimitkey ?? $rangestart);
+            $upperlimit = (float) ($quizsettings->$upperlimitkey ?? $rangeend);
 
             $lowerpercentage = (($lowerlimit - $rangestart) / ($rangeend - $rangestart)) * 100 + $gradient;
             $upperpercentage = (($upperlimit - $rangestart) / ($rangeend - $rangestart)) * 100 - $gradient;
 
+            // A range without a chosen colour gets the colour the form offers for its position, not a
+            // warning: this runs with every answer, inside the selection of the next question.
             $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
-            $colorname = $quizsettings->$colorkey;
-            $colorvalue = $colorarray[$colorname];
+            $colorname = $quizsettings->$colorkey ?? (array_keys($colorarray)[$i - 1] ?? null);
+            $colorvalue = $colorarray[$colorname] ?? reset($colorarray);
 
             $output .= "{$colorvalue} {$lowerpercentage}%, ";
             $output .= "{$colorvalue} {$upperpercentage}%, ";
@@ -231,14 +232,14 @@ class comparetotestaverage extends feedbackgenerator {
     /**
      * Load data.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+    public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
         global $DB;
         $progress = $this->get_progress();
         $quizsettings = $progress->get_quiz_settings();
@@ -259,7 +260,7 @@ class comparetotestaverage extends feedbackgenerator {
         // person, the compared user excluded. This replaces loading every
         // personparam into PHP, computing a mean that included the user, and a
         // percentile that ignored ties.
-        $attemptuserid = (int) $DB->get_field('adaptivequiz_attempt', 'userid', ['id' => $attemptid]);
+        $attemptuserid = (int) $DB->get_field('adaptivequiz_attempt', 'userid', ['id' => $adaptiveattemptid]);
         $stats = catquiz::get_peer_comparison_stats(
             (int) $existingdata['contextid'],
             (int) $catscaleid,
@@ -355,7 +356,7 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     private function render_abilityprofile_chart(array $initialcontext, array $primarycatscale) {
-        global $OUTPUT, $DB;
+        global $DB;
 
         $abilitysteps = [];
         $abilitystep = 0.25;
@@ -371,90 +372,91 @@ class comparetotestaverage extends feedbackgenerator {
         for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
-        $items = $this->feedbackhelper->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
-        // Prepare data for test information line.
+        // The test information line, from the items with parameters. Issue #150: it may be missing - an empty
+        // pool, only pilot items, parameters not calculated yet - and then it is left out, not invented; the bars
+        // do not depend on it. Re-audit 27.10.2026: why it is missing, for the scale and CAT context of the attempt.
+        $testinfodata = $this->feedbackhelper->testinfo_for_scale(
+            (int) $primarycatscale['id'],
+            (int) $initialcontext['contextid'],
+            $abilitysteps
+        );
+        $testinfo = $testinfodata['values'];
 
-        $models = model_strategy::get_installed_models();
-        $fisherinfos = [];
-        foreach ($items as $item) {
-            // We can not calculate the fisher information for items without a model.
-            if (!$item->model) {
-                continue;
-            }
-            $itemparam = model_item_param::from_record($item);
-            $model = model_model::get_instance($item->model);
-            $params = $itemparam->get_params_array();
-            foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model->fisher_info(
-                    ['ability' => $ability],
-                    $params
-                );
-                $stringkey = strval($ability);
-
-                if (!isset($fisherinfos[$stringkey])) {
-                    $fisherinfos[$stringkey] = $fisherinformation;
-                } else {
-                    $fisherinfos[$stringkey] += $fisherinformation;
-                }
-            }
-        }
-
-        $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
         // Prepare data for scorecounter bars.
         // Scope the histogram to the current CAT context so it does
         // not mix person parameters from other contexts.
-        $abilityrecords = $DB->get_records('local_catquiz_personparams', [
-            'catscaleid' => $primarycatscale['id'],
-            'contextid' => $initialcontext['contextid'],
-        ]);
-        $abilityseries = [];
+        /* One row per person, not one per estimate: local_catquiz_personparams keeps the history,
+           so counting every row would count a person as often as they have been measured.
+           Issue #88: the same population as the percentile of the text above the chart (peer_population);
+           the histogram shows everybody, the person compared included. */
+        [$peersql, $peerparams] = \local_catquiz\local\statistics\peer_population::sql(
+            (int) $initialcontext['contextid'],
+            (int) $primarycatscale['id']
+        );
+        $abilityrecords = $DB->get_records_sql($peersql, $peerparams);
+        // Issue #150: the bars of the statistics, (step - 0.25, step + 0.25]. Rounding to a grid of 0.25 left
+        // out every value next to an integer.
+        $counts = chart_output::counts_per_step(
+            $abilitysteps,
+            array_map(fn($record) => (float) $record->ability, $abilityrecords),
+            $abilitystep
+        );
+        $colors = [];
         foreach ($abilitysteps as $as) {
-            $counter = 0;
-            foreach ($abilityrecords as $record) {
-                $a = floatval($record->ability);
-                $ability = $this->feedbackhelper->round_to_customsteps($a, $abilitystep, $interval);
-                if ($ability != $as) {
-                    continue;
-                } else {
-                    $counter++;
-                }
-            }
-            $colorvalue = $this->feedbackhelper->get_color_for_personability(
+            $colors[] = $this->feedbackhelper->get_color_for_personability(
                 (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
             );
-            $abilitystring = strval($as);
-            $abilityseries['counter'][$abilitystring] = $counter;
-            $abilityseries['colors'][$abilitystring] = $colorvalue;
         }
-        // Scale the values of $fisherinfos before creating chart series.
-        $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
         $aserieslabel = "";
         if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'])) {
             $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
             $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
         }
-        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
-        $aseries->set_colors(array_values($abilityseries['colors']));
+        $aseries = new chart_series($aserieslabel, $counts);
+        $aseries->set_colors($colors);
         $chart = new chart_bar();
         $chart->add_series($aseries);
 
-        if ($this->has_extended_view_permissions()) {
+        $extended = $this->has_extended_view_permissions();
+        $notes = '';
+        if ($extended && $testinfo !== null) {
             $testinfolabel = get_string('testinfolabel', 'local_catquiz');
-            $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+            $tiseries = new chart_series($testinfolabel, $this->feedbackhelper->scalevalues($testinfo, $counts));
             $tiseries->set_type(chart_series::TYPE_LINE);
             $tiseries->set_smooth(true);
             $chart->add_series($tiseries);
         }
+        if ($extended) {
+            $notename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name']
+                ?? catscale::return_catscale_object((int) $primarycatscale['id'])->name;
+            $notes = feedback_helper::testinfo_note($testinfodata, (string) $notename);
+        }
 
-        $chart->set_labels(array_keys($fisherinfos));
+        // Issue #150: the bars are the ability steps - not the keys of the test information, which may be empty.
+        $chart->set_labels(chart_output::step_labels($abilitysteps));
+        // Re-audit 27.10.2026: the axes, as in the statistics.
+        $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
+        $chart->get_yaxis(0, true)->set_label(get_string('abilityprofilepersons', 'local_catquiz'));
 
-        $out = $OUTPUT->render_chart($chart, $this->has_extended_view_permissions());
+        $nodata = get_string('abilityprofilenodata', 'local_catquiz');
+        // With the data table for everybody (issue #150): the bars without it are not readable for a screen reader,
+        // and the table shows nothing the bars do not.
+        $out = array_sum($counts) > 0 ? chart_output::render($chart, true, $nodata) . $notes : chart_output::notice($nodata);
         return [
             'chart' => $out,
             'charttitle' => get_string('abilityprofile_title', 'local_catquiz'),
         ];
+    }
+
+    /**
+     * Shows the result of the global scale: needs it valid, not a reported scale (2026-10-14).
+     *
+     * @return string
+     */
+    public function get_result_dependency(): string {
+        return self::DEPENDS_ON_GLOBAL;
     }
 }

@@ -25,13 +25,13 @@ test.describe('CAT manager item parameter validity', () => {
 
         // The column exists and is filled - not an empty header.
         const states = page.locator(
-            '#lcq_questions [class*="catquiz-itemparams-"]'
+            '#local-catquiz-manager-questions [class*="catquiz-itemparams-"]'
         );
         expect(await states.count()).toBeGreaterThan(0);
     });
 
     test('marks an item whose parameters cannot be used', async({page}) => {
-        const row = page.locator('#lcq_questions table tbody tr', {
+        const row = page.locator('#local-catquiz-manager-questions table tbody tr', {
             hasText: unusableQuestion(),
         });
         await expect(row).toHaveCount(1);
@@ -49,7 +49,7 @@ test.describe('CAT manager item parameter validity', () => {
     });
 
     test('keeps a pilot item distinguishable from a broken one', async({page}) => {
-        const pilotrow = page.locator('#lcq_questions table tbody tr', {
+        const pilotrow = page.locator('#local-catquiz-manager-questions table tbody tr', {
             hasText: pilotQuestion(),
         });
         await expect(pilotrow).toHaveCount(1);

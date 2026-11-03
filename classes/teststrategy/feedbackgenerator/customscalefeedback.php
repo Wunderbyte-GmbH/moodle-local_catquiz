@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use context_module;
+use core_collator;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -97,7 +98,9 @@ class customscalefeedback extends feedbackgenerator {
             $data['customscalefeedback_abilities'],
             (array) $progress->get_quiz_settings(),
             $data['catscales'],
-            ['se' => $data['se'] ?? []]
+            // With the progress, so the per-scale N is known and a scale not measured in this attempt
+            // is not taken as measured (issue #128).
+            ['se' => $data['se'] ?? [], 'progress' => $progress]
         );
 
         if (empty($customscalefeedback)) {
@@ -157,14 +160,14 @@ class customscalefeedback extends feedbackgenerator {
     /**
      * Load data.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      *
      * @return array
      *
      */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+    public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
         $progress = $this->get_progress();
         $personabilities = $progress->get_abilities(true);
 
@@ -213,7 +216,6 @@ class customscalefeedback extends feedbackgenerator {
         array $feedbackdata = []
     ): string {
         $scalefeedback = [];
-        $relevantscalesfound = false;
 
         /* Issue #7 DoD 2/3: the gate and the rejection message both come from the
            central result object. Previously this filtered on `toreport` and then
@@ -230,7 +232,6 @@ class customscalefeedback extends feedbackgenerator {
             return feedback_helper::get_rejection_reason_string($attemptresult, $personabilities);
         }
         foreach ($displayable as $catscaleid => $personability) {
-            $relevantscalesfound = true;
             // A score is assigned to exactly one range (half-open
             // intervals), instead of matching every range whose inclusive bounds
             // contain the value and letting the last match overwrite the earlier.
@@ -281,26 +282,11 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         if (!$scalefeedback) {
-            if (!$relevantscalesfound) {
-                return $this->get_exclusion_reason_string($personabilitiestoreport);
-            }
+            // Shown scales exist (the empty case returned above), but none has a range text.
             return get_string('nofeedback', 'local_catquiz');
         }
 
-        // Sort in the following way:
-        // 1. Main scale always comes first.
-        // 2. Other scales are sorted by name.
-        $mainscale = $scalefeedback[$this->mainscale] ?? null;
-        unset($scalefeedback[$this->mainscale]);
-        uksort($scalefeedback, function ($a, $b) use ($catscales) {
-            $a = (object) $catscales[$a];
-            $b = (object) $catscales[$b];
-            return $catscales[$a->id]->name <=> $catscales[$b->id]->name;
-        });
-        $sorted = $scalefeedback;
-        if ($mainscale) {
-            $sorted = [$mainscale, ...$scalefeedback];
-        }
+        $sorted = self::sort_scalefeedback($scalefeedback, $catscales, $this->mainscale);
 
         $text = "";
         foreach ($sorted as $value) {
@@ -341,7 +327,8 @@ class customscalefeedback extends feedbackgenerator {
         if (!array_key_exists($quizsettingskey, $quizsettings)) {
              $quizsettingskey .= '_editor';
         }
-        $content = $quizsettings[$quizsettingskey];
+        // A range without a text has nothing to say - and does not take the result page down.
+        $content = $quizsettings[$quizsettingskey] ?? '';
         if (is_object($content) && property_exists($content, 'text')) {
             $content = $content->text;
         }
@@ -358,5 +345,67 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         return $content;
+    }
+
+    /**
+     * Orders the feedback: main scale first, the rest by the name of their scale.
+     *
+     * Extracted so the ordering can be tested on its own - it used to sit inside a private method
+     * that is only reachable through feedback ranges, an uncertainty factor and the result gate.
+     *
+     * Three assumptions used to be made here without a check: that an entry for the key exists,
+     * that the array key equals catscale.id, and that the entry is an object. A missing scale
+     * threw, and a list-keyed array sorted by whatever happened to sit at that offset (issue
+     * #102). The name is looked up directly now, and a scale that is not there sorts to the end
+     * instead of taking the page down.
+     *
+     * @param array $scalefeedback Feedback texts keyed by catscale id.
+     * @param array $catscales Scale records, keyed by catscale id; entries may be arrays or objects.
+     * @param int|null $mainscaleid The scale to put first, if it has feedback.
+     * @return array The feedback texts in display order.
+     */
+    public static function sort_scalefeedback(array $scalefeedback, array $catscales, ?int $mainscaleid): array {
+        $mainscale = $mainscaleid !== null ? ($scalefeedback[$mainscaleid] ?? null) : null;
+
+        if ($mainscaleid !== null) {
+            unset($scalefeedback[$mainscaleid]);
+        }
+
+        /* The scale records are keyed by catscale id here, whatever they arrived as. Only refusing
+           to crash on a list-keyed array would not be enough: no scale would find its name, every
+           entry would sort equal, and the order would silently be the insertion order. */
+        $byid = [];
+        foreach ($catscales as $key => $scale) {
+            $id = is_object($scale) ? ($scale->id ?? null) : ($scale['id'] ?? null);
+            $byid[$id === null ? $key : (int) $id] = $scale;
+        }
+
+        // Issue #77: by name as people read it - locale aware, umlauts with their letter, case does not
+        // decide, "Scale 2" before "Scale 10". A scale without a name, or one we know nothing about, comes
+        // last, in the order of its id.
+        $named = [];
+        $unnamed = [];
+        foreach (array_keys($scalefeedback) as $scaleid) {
+            $scale = $byid[$scaleid] ?? null;
+            $name = $scale === null ? null : (is_object($scale) ? ($scale->name ?? null) : ($scale['name'] ?? null));
+            if ($name === null || trim((string) $name) === '') {
+                $unnamed[] = $scaleid;
+            } else {
+                $named[$scaleid] = (string) $name;
+            }
+        }
+        core_collator::asort($named, core_collator::SORT_NATURAL);
+        sort($unnamed);
+        $ordered = [];
+        foreach ([...array_keys($named), ...$unnamed] as $scaleid) {
+            $ordered[$scaleid] = $scalefeedback[$scaleid];
+        }
+        $scalefeedback = $ordered;
+
+        if ($mainscale === null) {
+            return $scalefeedback;
+        }
+
+        return [$mainscale, ...$scalefeedback];
     }
 }

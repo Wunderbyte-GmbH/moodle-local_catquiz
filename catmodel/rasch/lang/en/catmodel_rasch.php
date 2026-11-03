@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = '1PL Rasch model';
+$string['privacy:metadata'] = 'The model stores no personal data; it computes with the data local_catquiz holds.';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
 $string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
 $string['trusted_region_max_a'] = 'Trusted Region Maximum';

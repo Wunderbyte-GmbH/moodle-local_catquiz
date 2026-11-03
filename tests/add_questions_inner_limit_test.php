@@ -250,17 +250,20 @@ final class add_questions_inner_limit_test extends advanced_testcase {
 
         [$scaleid, $contextid] = $this->make_scale();
 
+        // A question of its own, made before the first count: a fresh test database has none, and the case used to be
+        // skipped then - in every CI run (re-audit 02.11.2026).
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $questionid = (int) $generator->create_question('truefalse', null, [
+            'category' => $generator->create_question_category()->id,
+        ])->id;
+
         $before = $DB->count_records_sql(
             $this->count_sql($scaleid, $contextid),
             $this->count_params($scaleid, $contextid)
         );
 
-        // Assign one question to the scale; it has to disappear from the dialog, and
+        // Assign the question to the scale; it has to disappear from the dialog, and
         // the total has to fall by exactly one.
-        $questionid = $DB->get_field_sql('SELECT MIN(id) FROM {question}');
-        if ($questionid === false || $questionid === null) {
-            $this->markTestSkipped('No question in the test database.');
-        }
 
         $DB->insert_record('local_catquiz_items', (object) [
             'componentid' => $questionid,

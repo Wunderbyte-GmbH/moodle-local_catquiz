@@ -33,7 +33,7 @@ Feature: Question texts stay searchable although the list no longer carries them
     And I set the field "Scale" to "Simulation"
     And I should see "28 of 28 records found"
     When I set the field "Search in question texts" to "zzzznotfoundzzzz"
-    And I click on "#catquiz-questiontext-search button[type='submit']" "css_element"
+    And I click on "#local-catquiz-questiontext-search button[type='submit']" "css_element"
     And I wait until the page is ready
     Then I should not see "28 of 28 records found"
 
@@ -46,7 +46,7 @@ Feature: Question texts stay searchable although the list no longer carries them
     And I set the field "Scale" to "Simulation"
     And I should see "28 of 28 records found"
     When I set the field "Search in question texts" to "Antwort"
-    And I click on "#catquiz-questiontext-search button[type='submit']" "css_element"
+    And I click on "#local-catquiz-questiontext-search button[type='submit']" "css_element"
     And I wait until the page is ready
     ## Submitting a GET form must not drop the scale and context, otherwise the user
     ## silently ends up looking at a different list than before.

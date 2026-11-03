@@ -30,10 +30,12 @@ use Exception;
 use local_catquiz\catcalc;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\event\numeric_fallback_applied;
+use local_catquiz\local\monitoring\numeric_notice;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use moodle_exception;
@@ -197,20 +199,16 @@ class updatepersonability extends preselect_task {
         $this->scalestoupdate = array_reverse(
             [$catscaleid, ...catscale::get_ancestors($catscaleid)]
         );
-        try {
-            $index = 0;
-            foreach ($this->scalestoupdate as $scale) {
-                $isancestor = $scale != $catscaleid;
-                $parentscale = $index == 0 ? null : $this->scalestoupdate[$index - 1];
-                $index++;
-                $context = $this->updateability($context, $scale, $isancestor, $parentscale);
-            }
-        } catch (\Exception $e) {
-            if ($e->getMessage() === status::ABORT_PERSONABILITY_NOT_CHANGED) {
-                return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
-            } else {
-                throw $e;
-            }
+        // Issue #64: an unchanged ability does not end the test. The handler that turned an exception
+        // with the message ABORT_PERSONABILITY_NOT_CHANGED into that status was removed: nothing throws it,
+        // and a stable estimate is a matter of the precision checks (filterbystandarderror). The status
+        // itself stays defined for attempts stored with it and for the adapter's mapping.
+        $index = 0;
+        foreach ($this->scalestoupdate as $scale) {
+            $isancestor = $scale != $catscaleid;
+            $parentscale = $index == 0 ? null : $this->scalestoupdate[$index - 1];
+            $index++;
+            $context = $this->updateability($context, $scale, $isancestor, $parentscale);
         }
 
         return result::ok($context);
@@ -228,8 +226,6 @@ class updatepersonability extends preselect_task {
      *
      */
     private function updateability(array $context, int $catscaleid, $isancestor = false, $parentscale = null) {
-        global $CFG;
-
         $startvalue = $context['person_ability'][$catscaleid] ?? $this->parentability;
         if ($parentscale && $this->ability_was_calculated($parentscale)) {
             $startvalue = $this->parentability;
@@ -258,27 +254,27 @@ class updatepersonability extends preselect_task {
             $message = sprintf(
                 'Can not update ability for scale %d in context %d: %s',
                 $catscaleid,
-                catscale::get_context_id($catscaleid),
+                (int) ($this->context['contextid'] ?? 0) ?: catscale::get_context_id($catscaleid),
                 $e->getMessage()
             );
             throw new Exception($message);
         }
 
-        if (is_nan($updatedability)) {
-            // In a production environment, we can use fallback values. However,
-            // during development we want to see when we get unexpected values.
-            if ($CFG->debug > 0) {
-                throw new moodle_exception('error', 'local_catquiz');
-            }
-            // If we already have an ability, just continue with that one and do not update it.
-            // Otherwise, use 0 as default value.
+        if (!is_finite($updatedability)) {
+            // Issue #106: NaN and INF alike. The previous ability is kept - or 0, when there is none - and
+            // the fallback is reported as an event, in development as in production, instead of silently
+            // or by an exception that only development saw.
+            $previous = $context['person_ability'][$catscaleid] ?? null;
+            $keep = is_numeric($previous) && is_finite((float) $previous);
             $context['skip_reason'] = 'abilityisnan';
-            if (!is_nan($context['person_ability'][$catscaleid])) {
-                return $context;
-            } else {
-                $context['person_ability'][$catscaleid] = 0;
-                return $context;
-            }
+            $context['person_ability'][$catscaleid] = $keep ? (float) $previous : 0;
+            numeric_notice::report(numeric_fallback_applied::ABILITY_NOT_FINITE, [
+                'catscaleid' => $catscaleid,
+                'n' => is_countable($this->arrayresponses) ? count($this->arrayresponses) : 0,
+                'value' => (float) $updatedability,
+                'kept' => $keep ? 'previous' : 'zero',
+            ]);
+            return $context;
         }
 
         if ($this->ability_was_calculated($catscaleid)) {
@@ -383,7 +379,9 @@ class updatepersonability extends preselect_task {
             return $this->itemparamlists[$catscaleid];
         }
 
-        $catscalecontext = catscale::get_context_id($catscaleid);
+        // Issue #157: the parameters of the CAT context the attempt plays in - the context of the pool its questions
+        // came from -, not the context the scale has now. They differ after the scale moved to another context.
+        $catscalecontext = (int) ($this->context['contextid'] ?? 0) ?: catscale::get_context_id($catscaleid);
         $catscaleids = [
             $catscaleid,
             ...catscale::get_subscale_ids($catscaleid),
@@ -404,9 +402,10 @@ class updatepersonability extends preselect_task {
      *
      */
     protected function update_person_param(int $catscaleid, float $updatedability): void {
+        // Issue #157 (T10): the estimate belongs to the CAT context of the attempt, where it is read again.
         catquiz::update_person_param(
             $this->context['userid'],
-            catscale::get_context_id($catscaleid),
+            (int) ($this->context['contextid'] ?? 0) ?: catscale::get_context_id($catscaleid),
             $catscaleid,
             $updatedability
         );
@@ -424,7 +423,8 @@ class updatepersonability extends preselect_task {
         }
 
         // If we already have more than 50 abilities for this test, get the mean from there.
-        if ($mean = $this->calculate_mean_from_past_attempts()) {
+        // A mean of exactly 0.0 is a mean too.
+        if (($mean = $this->calculate_mean_from_past_attempts()) !== null) {
             $this->meanability = $mean;
             return $mean;
         }
@@ -494,18 +494,29 @@ class updatepersonability extends preselect_task {
      * @return ?float
      */
     private function calculate_mean_from_past_attempts() {
-        $existingabilities = $this->get_existing_personparams();
+        $existingabilities = $this->get_finite_past_abilities();
         if (count($existingabilities) < self::NUM_ESTIMATION_THRESHOLD) {
             return null;
         }
 
-        $sum = 0.0;
-        foreach ($existingabilities as $pp) {
-            $sum += floatval($pp->ability);
-        }
-        $mean = $sum / count($existingabilities);
+        $mean = array_sum($existingabilities) / count($existingabilities);
         $this->meanability = $mean;
         return $mean;
+    }
+
+    /**
+     * The abilities of past attempts that are numbers, NaN and infinities left out (issue #116).
+     *
+     * @return float[]
+     */
+    private function get_finite_past_abilities(): array {
+        $abilities = [];
+        foreach ($this->get_existing_personparams() as $pp) {
+            if (isset($pp->ability) && is_numeric($pp->ability) && is_finite((float) $pp->ability)) {
+                $abilities[] = (float) $pp->ability;
+            }
+        }
+        return $abilities;
     }
 
     /**
@@ -513,19 +524,31 @@ class updatepersonability extends preselect_task {
      * @return ?float
      */
     private function calculate_sd_from_past_attempts() {
-        $existingabilities = $this->get_existing_personparams();
+        $existingabilities = $this->get_finite_past_abilities();
 
+        // Too few - or, after leaving out what is not a number, none at all: the default spread.
         if (count($existingabilities) < self::NUM_ESTIMATION_THRESHOLD) {
             return 1.0;
         }
 
-        $mean = $this->meanability ?? calculate_mean_from_past_attempts() ?? 0.0;
+        // This called a global function of the same name, which does not exist.
+        $mean = $this->meanability ?? $this->calculate_mean_from_past_attempts() ?? 0.0;
 
         $sum = 0.0;
-        foreach ($existingabilities as $pp) {
-            $sum += floatval(($pp->ability - $mean) ** 2);
+        foreach ($existingabilities as $ability) {
+            $sum += ($ability - $mean) ** 2;
         }
         $sd = sqrt($sum / count($existingabilities));
+        if (model_raschmodel::sanitize_trusted_region_sd($sd) > $sd) {
+            // Issue #116: e.g. every past ability the same. Kept as it is - the estimator raises the
+            // spread to its minimum - but made visible, without any person's value: an event, issue #106.
+            numeric_notice::report(numeric_fallback_applied::NO_SPREAD, [
+                'catscaleid' => (int) ($this->context['catscaleid'] ?? 0),
+                'n' => count($existingabilities),
+                'mean' => (float) $mean,
+                'sd' => (float) $sd,
+            ]);
+        }
         $this->sdability = $sd;
         return $sd;
     }

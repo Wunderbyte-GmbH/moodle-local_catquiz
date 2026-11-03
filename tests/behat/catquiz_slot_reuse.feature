@@ -71,7 +71,7 @@ Feature: Reloading an unanswered item does not create a duplicate slot.
     ## out-of-sequence resubmission by design. Resuming re-renders Question 2.
     And I am on the "adaptivecatquiz1" Activity page
     And I wait until the page is ready
-    And I click on "Start attempt" "link"
+    And I click on "Continue attempt" "button"
     And I wait until the page is ready
     And I should see "Question 2"
     And I reload the page
@@ -108,7 +108,7 @@ Feature: Reloading an unanswered item does not create a duplicate slot.
     ## Re-enter through the activity so no answer is re-posted out of sequence.
     And I am on the "adaptivecatquiz1" Activity page
     And I wait until the page is ready
-    And I click on "Start attempt" "link"
+    And I click on "Continue attempt" "button"
     And I wait until the page is ready
     And I should see "Question 2"
     And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
@@ -137,12 +137,12 @@ Feature: Reloading an unanswered item does not create a duplicate slot.
     And I should see "Question 2"
     And I am on the "adaptivecatquiz1" Activity page
     And I wait until the page is ready
-    And I click on "Start attempt" "link"
+    And I click on "Continue attempt" "button"
     And I wait until the page is ready
     And I should see "Question 2"
     And I am on the "adaptivecatquiz1" Activity page
     And I wait until the page is ready
-    And I click on "Start attempt" "link"
+    And I click on "Continue attempt" "button"
     And I wait until the page is ready
     And I should see "Question 2"
     And I should not see "Question 3"

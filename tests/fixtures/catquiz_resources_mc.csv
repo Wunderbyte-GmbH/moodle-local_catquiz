@@ -1,0 +1,3 @@
+componentid;status;qtype;model;difficulty;discrimination;guessing;label;catscalename;parentscalenames;componentname
+0;4;Multiple-Choice;raschbirnbaum;-0.50;1.20;0.0000;RES-MC-one;Ressourcen A;Ressourcen;question
+0;4;Multiple-Choice;raschbirnbaum;0.50;1.20;0.0000;RES-MC-two;Ressourcen A;Ressourcen;question

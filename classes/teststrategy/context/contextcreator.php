@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\context;
 
+use local_catquiz\local\monitoring\timeline;
 use moodle_exception;
 
 /**
@@ -107,7 +108,8 @@ class contextcreator {
             }
         }
 
-        return $loader->load($context);
+        // One span per loader (issue #136): progress, ability, questions, pilot items, SE, scales.
+        return timeline::span('context:' . $paramname, fn() => $loader->load($context));
     }
 
 

@@ -24,7 +24,7 @@
 
 use local_catquiz\output\catcontextdashboard;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 $context = \context_system::instance();
 $PAGE->set_context($context);

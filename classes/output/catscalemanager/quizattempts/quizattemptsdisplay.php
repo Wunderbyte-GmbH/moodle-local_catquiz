@@ -40,6 +40,9 @@ class quizattemptsdisplay {
      */
     public function render_table() {
         $table = new quizattempts_table('quizattemptstable');
+        // Loading and downloading the rows through the table's web services asks the same as the CAT manager.
+        $table->context = \context_system::instance();
+        $table->requirecapability = 'local/catquiz:manage_catscales';
 
         [$select, $from, $where, $filter, $params] = catquiz::return_sql_for_quizattempts();
         $table->set_filter_sql($select, $from, $where, $filter, $params);
@@ -147,13 +150,13 @@ class quizattemptsdisplay {
     /**
      * Renders attempt details.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      *
      * @return mixed
      *
      */
-    public function render_attempt_details(int $attemptid) {
-        $attemptfeedback = new attemptfeedback($attemptid);
+    public function render_attempt_details(int $adaptiveattemptid) {
+        $attemptfeedback = new attemptfeedback($adaptiveattemptid);
         $feedback = $attemptfeedback->get_feedback_for_attempt();
         return $feedback;
     }

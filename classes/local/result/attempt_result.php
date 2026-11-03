@@ -101,7 +101,9 @@ final class attempt_result {
     public function get_reportable_scale_ids(): array {
         $ids = [];
         foreach ($this->scaleresults as $scaleid => $scaleresult) {
-            if ($scaleresult->reportable && $scaleresult->statisticallyvalid) {
+            // The same three conditions as feedback_helper::is_displayable() (issues #117, #128):
+            // a valid value carried over from an earlier attempt is not a result of this one.
+            if ($scaleresult->reportable && $scaleresult->statisticallyvalid && $scaleresult->measuredincurrentattempt) {
                 $ids[] = (int) $scaleid;
             }
         }

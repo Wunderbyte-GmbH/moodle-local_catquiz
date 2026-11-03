@@ -33,28 +33,6 @@ use templatable;
  */
 class renderer extends plugin_renderer_base {
     /**
-     * Render the catscaledashboard
-     *
-     * @param templatable $data
-     * @return string|boolean
-     */
-    public function render_catscaledashboard(templatable $data) {
-        $data = $data->export_for_template($this);
-        return $this->render_from_template('local_catquiz/catscaledashboard', $data);
-    }
-
-    /**
-     * Render the catscaledashboard
-     *
-     * @param templatable $data
-     * @return string|boolean
-     */
-    public function render_testitemdashboard(templatable $data) {
-        $data = $data->export_for_template($this);
-        return $this->render_from_template('local_catquiz/testitemdashboard', $data);
-    }
-
-    /**
      * Render the studentdetails
      *
      * @param templatable $data

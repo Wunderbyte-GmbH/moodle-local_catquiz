@@ -328,3 +328,255 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "-1"
     And I should see "5" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@id='fitem_id_highestvalue']" "xpath_element"
     And I log out
+
+  @javascript
+  Scenario: CATquiz settings: a disabled subscale can be switched on again and saved
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              |       |
+    And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
+    When I wait until the page is ready
+    ## Verify all root catscales active by default
+    Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimA02" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB03" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC02']" matches value "checked"
+    ## Disable scale and sub-scale
+    And I set the field with xpath "//input[@data-name='SimB03']" to ""
+    And I set the field with xpath "//input[@data-name='SimC']" to ""
+    ## Verify disabled scale and sub-scale
+    And I wait until the page is ready
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And I click on "Save and display" "button"
+    And I follow "Settings"
+    ## Verify disabled scale and sub-scale after save
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value ""
+    And the field with xpath "//input[@data-name='SimC']" matches value ""
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    ## Issue #124: switch the stored, disabled scale on again. The reload that builds its
+    ## subtree used to restore the stored "off", so the choice could not be saved.
+    And I expand all fieldsets
+    And I set the field with xpath "//input[@data-name='SimC']" to "1"
+    And I wait until the page is ready
+    And the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And I should see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And I click on "Save and display" "button"
+    And I follow "Settings"
+    Then the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And I should see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+
+  @javascript
+  Scenario: CATquiz settings: changing the number of feedback options keeps the scale choice
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              |       |
+    And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
+    When I wait until the page is ready
+    ## Verify all root catscales active by default
+    Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimA02" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB03" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC02']" matches value "checked"
+    ## Disable scale and sub-scale
+    And I set the field with xpath "//input[@data-name='SimB03']" to ""
+    And I set the field with xpath "//input[@data-name='SimC']" to ""
+    ## Verify disabled scale and sub-scale
+    And I wait until the page is ready
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And I click on "Save and display" "button"
+    And I follow "Settings"
+    ## Verify disabled scale and sub-scale after save
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value ""
+    And the field with xpath "//input[@data-name='SimC']" matches value ""
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    ## Issue #123: the reload for the number of feedback options is a reload of its own kind.
+    ## It must neither be taken for another reload nor lose the scale choice made before.
+    And I expand all fieldsets
+    And I set the field "numberoffeedbackoptionsselect" to "3"
+    And I wait until the page is ready
+    And I expand all fieldsets
+    And "//div[@data-name='feedback_scale_Simulation_range_3']" "xpath_element" should exist
+    And the field with xpath "//input[@data-name='SimC']" matches value ""
+    And the field with xpath "//input[@data-name='SimB03']" matches value ""
+    And I click on "Save and display" "button"
+    And I follow "Settings"
+    Then "//div[@data-name='feedback_scale_Simulation_range_3']" "xpath_element" should exist
+    And the field with xpath "//input[@data-name='SimC']" matches value ""
+    And the field with xpath "//input[@data-name='SimB03']" matches value ""
+
+  @javascript
+  Scenario: CATquiz settings: the strategy decides which thresholds per scale apply (issue #135)
+    ## CLASSIC keeps the reporting thresholds - minimum per scale, maximum standard error - and
+    ## says that they do not change the fixed form; FASTEST has no thresholds per scale at all.
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    And I set the following fields to these values:
+      | catmodel |  |
+    And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
+    And I wait until the page is ready
+    When I set the field "catquiz_selectteststrategy" to "7"
+    Then I should see "Classic test: the questions are asked in a fixed order"
+    And "maxquestionsscalegroup[catquiz_minquestionspersubscale]" "field" should be visible
+    And "catquiz_standarderrorgroup[catquiz_standarderror_max]" "field" should be visible
+    When I set the field "catquiz_selectteststrategy" to "1"
+    Then I should not see "Classic test: the questions are asked in a fixed order"
+    And "maxquestionsscalegroup[catquiz_minquestionspersubscale]" "field" should not be visible
+    And "catquiz_standarderrorgroup[catquiz_standarderror_min]" "field" should be visible
+
+  @javascript
+  Scenario: CATquiz settings: a switched-on subscale gets all its fields, takes feedback and is saved (issue #124)
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              |       |
+    And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
+    When I wait until the page is ready
+    And I set the field with xpath "//input[@data-name='SimC']" to ""
+    And I wait until the page is ready
+    And I should not see "Feedback for “SimC”" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I click on "Save and display" "button"
+    And "Save and display" "button" should not exist
+    And I follow "Settings"
+    And I expand all fieldsets
+    ## Switched on again after the reload: the subtree and every field of the scale come back.
+    When I set the field with xpath "//input[@data-name='SimC']" to "1"
+    And I wait until the page is ready
+    And I expand all fieldsets
+    Then I should see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='SimC01']" matches value "checked"
+    And I click on "Feedback for “Simulation”" "text"
+    And I should see "Feedback for “SimC”" in the "//div[@data-name='catquiz_feedback_header_Simulation']" "xpath_element"
+    And "//div[@data-name='catquiz_feedback_header_SimC01']" "xpath_element" should exist
+    ## Feedback for the scale just switched on, then saved. Its fields come when it is opened (issue #51).
+    And I click on "Feedback for “SimC”" "text"
+    And I wait until the page is ready
+    And "//div[@data-name='feedback_scale_SimC_range_1']" "xpath_element" should exist
+    And "//div[@data-name='feedback_scale_SimC_range_2']" "xpath_element" should exist
+    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_SimC_range_1']" "xpath_element" to "Feedback-SimC_range_1"
+    And I click on "Save and display" "button"
+    And "Save and display" "button" should not exist
+    And I follow "Settings"
+    And I expand all fieldsets
+    Then the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And I click on "Feedback for “Simulation”" "text"
+    And I click on "Feedback for “SimC”" "text"
+    And I wait until the page is ready
+    And the field "Feedback" in the "//div[@data-name='feedback_scale_SimC_range_1']" "xpath_element" matches value "Feedback-SimC_range_1"
+
+  @javascript
+  Scenario: CATquiz settings: another root scale brings its own subtree and saves without the old fields (issue #124)
+    Given the following "local_catquiz > questions" exist:
+      | filepath                                              | filename                 | course |
+      | local/catquiz/tests/fixtures/catquiz_resources_mc.xml | catquiz_resources_mc.xml | C1     |
+    And the following "local_catquiz > importedcatscales" exist:
+      | filepath                                              | filename                 |
+      | local/catquiz/tests/fixtures/catquiz_resources_mc.csv | catquiz_resources_mc.csv |
+    And the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              |       |
+    And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
+    When I wait until the page is ready
+    And I click on "Save and display" "button"
+    And "Save and display" "button" should not exist
+    And I follow "Settings"
+    And I expand all fieldsets
+    ## Another root scale after the reload: its complete subtree, nothing of the old one.
+    When I set the field "Select CAT scale" to "Ressourcen"
+    And I wait until the page is ready
+    And I expand all fieldsets
+    Then I should see "Ressourcen A" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='Ressourcen A']" matches value "checked"
+    And I should not see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And "//div[@data-name='catquiz_feedback_header_Ressourcen']" "xpath_element" should exist
+    And "//div[@data-name='catquiz_feedback_header_Ressourcen A']" "xpath_element" should exist
+    And "//div[starts-with(@data-name, 'catquiz_feedback_header_Sim')]" "xpath_element" should not exist
+    And "//div[@data-name='feedback_scale_Ressourcen_range_1']" "xpath_element" should exist
+    And "//div[starts-with(@data-name, 'feedback_scale_Sim')]" "xpath_element" should not exist
+    ## Saved without validation errors for fields of the old scale. The new scale has two questions: a
+    ## minimum above that is refused (issue #60), so it is set to what the pool allows.
+    And I set the field "maxquestionsgroup[catquiz_minquestions]" to "1"
+    And I click on "Save and display" "button"
+    And "Save and display" "button" should not exist
+    And I follow "Settings"
+    And I expand all fieldsets
+    Then the field "Select CAT scale" matches value "Ressourcen"
+    And the field with xpath "//input[@data-name='Ressourcen A']" matches value "checked"
+    And I should not see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And "//div[starts-with(@data-name, 'feedback_scale_Sim')]" "xpath_element" should not exist

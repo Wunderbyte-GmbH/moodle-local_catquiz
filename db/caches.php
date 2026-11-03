@@ -110,6 +110,22 @@ $definitions = [
             'changesintestitems',
             ],
     ],
+    // Issue #146: the runtime item pool of a CAT test - the same for everybody, without the statistics of a
+    // person. Invalidated with the items, their parameters and the scales. The usage numbers in it
+    // (answers in the CAT context, for piloting and balancing) are at most ten minutes old; changes in
+    // the question bank (a question hidden or made a draft) are taken in after the same time.
+    'runtimepool' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 2,
+        'ttl' => 600,
+        'invalidationevents' => [
+            'changesincatscales',
+            'changesintestitems',
+            'changesinitemparams',
+        ],
+    ],
     'catquiz_item_params' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,

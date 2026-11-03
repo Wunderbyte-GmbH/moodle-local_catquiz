@@ -21,7 +21,9 @@
     Context variables required for this template:
     Example context (json):
     {
-        "chart": "<div>...chart...</div>"
+        "heading": {"title": "Statistics", "description": "Course 1"},
+        "abilityprofilechart": {"chartname": "abilityprofile", "charttitle": "Profile", "chart": "<div>...chart...</div>"},
+        "learningprogress": {"chartname": "learningprogress", "lazy": true, "scope": "{}"}
     }
 }}
 {{#error}}
@@ -30,85 +32,75 @@
 {{^error}}
 
 
+    {{! Issue #30: tabs and panels are paired by ids of this render, so the same shortcode twice on one
+        page keeps its tabs apart; role, aria-controls, aria-selected and aria-labelledby per the ARIA
+        tabs pattern. Bootstrap 4 markup on purpose - this line runs on Moodle 4.5. }}
     {{#heading}}
         <h4>{{{title}}}</h4>
         <p style="margin-bottom: 1em">{{{description}}}</p>
         <!-- Nav tabs -->
         <ul style="list-style: outside none none; margin-bottom: 1em;" class="nav nav-tabs" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#overview-{{shortcodeid}}" role="tab" aria-expanded="true">{{#str}}catquizstatistics_overview, local_catquiz{{/str}}</a>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="local-catquiz-statistics-{{uniqid}}-overview-tab" data-toggle="tab" href="#local-catquiz-statistics-{{uniqid}}-overview"
+               role="tab" aria-controls="local-catquiz-statistics-{{uniqid}}-overview" aria-selected="true">{{#str}}catquizstatistics_overview, local_catquiz{{/str}}</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#testusage-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}catquizstatistics_testusage, local_catquiz{{/str}}</a>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="local-catquiz-statistics-{{uniqid}}-testusage-tab" data-toggle="tab" href="#local-catquiz-statistics-{{uniqid}}-testusage"
+               role="tab" aria-controls="local-catquiz-statistics-{{uniqid}}-testusage" aria-selected="false">{{#str}}catquizstatistics_testusage, local_catquiz{{/str}}</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#learningprogress-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="local-catquiz-statistics-{{uniqid}}-learningprogress-tab" data-toggle="tab" href="#local-catquiz-statistics-{{uniqid}}-learningprogress"
+               role="tab" aria-controls="local-catquiz-statistics-{{uniqid}}-learningprogress" aria-selected="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
           </li>
           {{#exportbutton}}
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#export-{{shortcodeid}}" role="tab" aria-expanded="false">Export</a>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="local-catquiz-statistics-{{uniqid}}-export-tab" data-toggle="tab" href="#local-catquiz-statistics-{{uniqid}}-export"
+               role="tab" aria-controls="local-catquiz-statistics-{{uniqid}}-export" aria-selected="false">Export</a>
           </li>
           {{/exportbutton}}
         </ul>
     {{/heading}}
         <!-- Tab panes -->
-        <div class="tab-content">
-          <div class="tab-pane active" id="overview-{{shortcodeid}}" role="tabpanel" aria-expanded="true">
+        {{! Issue #85: each chart is its own region; with lazy loading it is built when its tab is shown. }}
+        <div class="tab-content local-catquiz-statistics" data-region="local_catquiz-statistics">
+          <div class="tab-pane active" id="local-catquiz-statistics-{{uniqid}}-overview" role="tabpanel"
+               {{#heading}}aria-labelledby="local-catquiz-statistics-{{uniqid}}-overview-tab"{{/heading}} tabindex="0">
             {{#abilityprofilechart}}
-                <h5>{{{charttitle}}}</h5>
-                {{{chart}}}
+                {{> local_catquiz/catscaleshortcodes/statisticschart }}
             {{/abilityprofilechart}}
             {{#detectedscales}}
-                <h5>{{charttitle}}</h5>
-                {{{chart}}}
-                {{#colorbarlegend}}
-                    <div class="catquiz-legend">
-                        <h5>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h5>
-                        {{#feedbackbarlegend}}
-                            <div>
-                                <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
-                                <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
-                                <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
-                            </div>
-                        {{/feedbackbarlegend}}
-                    </div>
-                {{/colorbarlegend}}
+                {{> local_catquiz/catscaleshortcodes/statisticschart }}
             {{/detectedscales}}
           </div>
-          <div class="tab-pane" id="testusage-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+          <div class="tab-pane" id="local-catquiz-statistics-{{uniqid}}-testusage" role="tabpanel"
+               {{#heading}}aria-labelledby="local-catquiz-statistics-{{uniqid}}-testusage-tab"{{/heading}} tabindex="0">
             {{#attemptspertimerangechart}}
-                <h5>{{charttitle}}</h5>
-                <div style="display: flex; align-items: center; flex-direction: column;">{{{chart}}}</div>
+                {{> local_catquiz/catscaleshortcodes/statisticschart }}
             {{/attemptspertimerangechart}}
             {{#attemptsperpersonchart}}
-                <h5>{{charttitle}}</h5>
-                <div>{{{chart}}}</div>
-                {{#colorbarlegend}}
-                    <div class="catquiz-legend">
-                        <h5>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h5>
-                        {{#feedbackbarlegend}}
-                            <div>
-                                <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
-                                <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
-                                <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
-                            </div>
-                        {{/feedbackbarlegend}}
-                    </div>
-                {{/colorbarlegend}}
+                {{> local_catquiz/catscaleshortcodes/statisticschart }}
             {{/attemptsperpersonchart}}
           </div>
-          <div class="tab-pane" id="learningprogress-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+          <div class="tab-pane" id="local-catquiz-statistics-{{uniqid}}-learningprogress" role="tabpanel"
+               {{#heading}}aria-labelledby="local-catquiz-statistics-{{uniqid}}-learningprogress-tab"{{/heading}} tabindex="0">
             {{#learningprogress}}
-               <h5>{{{charttitle}}}</h5>
-              {{{chart}}}
+                {{> local_catquiz/catscaleshortcodes/statisticschart }}
             {{/learningprogress}}
           </div>
-          <div class="tab-pane" id="export-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+          {{#exportbutton}}
+          <div class="tab-pane" id="local-catquiz-statistics-{{uniqid}}-export" role="tabpanel"
+               {{#heading}}aria-labelledby="local-catquiz-statistics-{{uniqid}}-export-tab"{{/heading}} tabindex="0">
             <h5 style="margin-top: 1em; margin-bottom: 0;">{{#str}}catquizstatistics_exportcsv_heading, local_catquiz{{/str}}</h5>
             <div>{{#str}}catquizstatistics_exportcsv_description, local_catquiz{{/str}}</div>
             <div style="display: flex; align-items: center; flex-direction: column;" class="flex-wrapper">
                 {{{ exportbutton }}}
             </div>
           </div>
+          {{/exportbutton}}
         </div>
 {{/error}}
+{{#js}}
+    require(['local_catquiz/statistics'], function(statistics) {
+        statistics.init();
+    });
+{{/js}}

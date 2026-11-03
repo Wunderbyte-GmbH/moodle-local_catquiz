@@ -45,6 +45,64 @@ final class ability_trace_roundtrip_test extends advanced_testcase {
      *
      * @return void
      */
+
+    /**
+     * Returns the internal CAT attempt id for an attempt of mod_adaptivequiz.
+     *
+     * Progress is filed under local_catquiz_attempts.id since issue #95; the tests work with the
+     * external id of the component and resolve it the same way production does.
+     *
+     * @param int $attemptid Id of the attempt of the component.
+     * @return int
+     */
+    private static function catattemptid(int $attemptid): int {
+        global $DB;
+
+        return (int) $DB->get_field('local_catquiz_attempts', 'id', [
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+        ]);
+    }
+
+    /**
+     * Files the CAT attempt the progress belongs to.
+     *
+     * Since issue #95 progress references local_catquiz_attempts.id, so that row has to exist
+     * before the first progress access - which is what the CAT model does in production.
+     *
+     * @param int $attemptid Id of the attempt of the component.
+     * @param int $contextid The CAT context.
+     * @return int The internal CAT attempt id.
+     */
+    private static function make_cat_attempt(int $attemptid, int $contextid): int {
+        global $DB, $USER;
+
+        // The fixture may already have filed one; local_catquiz_attempts.attemptid is unique.
+        $existing = $DB->get_field('local_catquiz_attempts', 'id', [
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+        ]);
+        if ($existing) {
+            return (int) $existing;
+        }
+
+        $now = time();
+
+        return (int) $DB->insert_record('local_catquiz_attempts', (object) [
+            'userid' => $USER->id ?? 2,
+            'scaleid' => 1,
+            'contextid' => $contextid,
+            'courseid' => 1,
+            'attemptid' => $attemptid,
+            'component' => 'mod_adaptivequiz',
+            'instanceid' => 1,
+            'status' => 1,
+            'json' => '{}',
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
+    }
+
     public function test_serialisation_contains_the_trace(): void {
         global $CFG;
 
@@ -161,6 +219,8 @@ final class ability_trace_roundtrip_test extends advanced_testcase {
         // would report a persistence defect where there is simply nothing to persist.
         set_config('progressretention', 'trace', 'local_catquiz');
 
+        self::make_cat_attempt($attemptid, $contextid);
+
         $progress = progress::load($attemptid, 'mod_adaptivequiz', $contextid, $quizsettings);
         $progress->set_ability(1.25, 3);
 
@@ -173,13 +233,16 @@ final class ability_trace_roundtrip_test extends advanced_testcase {
         $progress->save();
 
         $this->assertTrue(
-            $DB->record_exists('local_catquiz_progress', ['attemptid' => $attemptid]),
+            $DB->record_exists('local_catquiz_progress', ['attemptid' => self::catattemptid($attemptid)]),
             'Nothing was written, so the reload below would prove nothing.'
         );
 
         // Everything in-process is dropped, so the reload has to come from storage.
 
         \cache::make("local_catquiz", "adaptivequizattempt")->purge();
+        \cache::make("local_catquiz", "runtimepool")->purge();
+
+        self::make_cat_attempt($attemptid, $contextid);
 
         $reloaded = progress::load($attemptid, 'mod_adaptivequiz', $contextid, $quizsettings);
         $trace = $reloaded->get_ability_trace();

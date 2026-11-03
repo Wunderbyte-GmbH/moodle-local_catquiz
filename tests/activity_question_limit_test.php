@@ -181,4 +181,78 @@ final class activity_question_limit_test extends advanced_testcase {
                 . 'counting against the placeholder.'
         );
     }
+
+    /**
+     * Inserts the CAT settings of an activity.
+     *
+     * @param int $activityid
+     * @param string|null $json
+     * @param string $component
+     * @return void
+     */
+    private function make_test(int $activityid, ?string $json, string $component = 'mod_adaptivequiz'): void {
+        global $DB;
+        $DB->insert_record('local_catquiz_tests', (object) [
+            'componentid' => $activityid,
+            'component' => $component,
+            'json' => $json,
+            'status' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+    }
+
+    /**
+     * The upgrade brings every stale activity maximum in line - and nothing else (issue #141).
+     *
+     * The activity now refuses any question beyond its own maximum. A limit changed without
+     * the activity being saved again must not cut tests short after the update.
+     *
+     * @return void
+     */
+    public function test_upgrade_sync_aligns_stale_maxima_only(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $DB->delete_records('local_catquiz_tests');
+
+        $stale = $this->make_activity(1000);
+        $this->make_test($stale, json_encode(['maxquestionsgroup' => ['catquiz_maxquestions' => 25]]));
+        $inline = $this->make_activity(30);
+        $this->make_test($inline, json_encode(['maxquestionsgroup' => ['catquiz_maxquestions' => 30]]));
+        $unset = $this->make_activity(50);
+        $this->make_test($unset, json_encode(['maxquestionsgroup' => ['catquiz_maxquestions' => 0]]));
+        $nojson = $this->make_activity(60);
+        $this->make_test($nojson, null);
+        $other = $this->make_activity(70);
+        $this->make_test($other, json_encode(['maxquestionsgroup' => ['catquiz_maxquestions' => 5]]), 'mod_other');
+        // Settings of an activity deleted since.
+        $this->make_test($other + 1000, json_encode(['maxquestionsgroup' => ['catquiz_maxquestions' => 5]]));
+
+        $this->assertSame(1, catquiz_handler::sync_all_activity_question_limits(), 'Only the stale maximum changes.');
+
+        $expected = [$stale => 25, $inline => 30, $unset => 50, $nojson => 60, $other => 70];
+        foreach ($expected as $id => $maximum) {
+            $this->assertSame($maximum, (int) $DB->get_field('adaptivequiz', 'maximumquestions', ['id' => $id]));
+        }
+        $this->assertFalse($DB->record_exists('adaptivequiz', ['id' => $other + 1000]), 'No activity is created.');
+
+        $this->assertSame(0, catquiz_handler::sync_all_activity_question_limits(), 'A second run changes nothing.');
+    }
+
+    /**
+     * The upgrade step actually runs the sync.
+     *
+     * @return void
+     */
+    public function test_upgrade_step_runs_the_sync(): void {
+        global $CFG;
+
+        $source = file_get_contents($CFG->dirroot . '/local/catquiz/db/upgrade.php');
+        $start = strpos($source, 'if ($oldversion < 2026100909)');
+        $this->assertNotFalse($start);
+        $body = substr($source, $start, strpos($source, 'upgrade_plugin_savepoint', $start) - $start);
+
+        $this->assertStringContainsString('catquiz_handler::sync_all_activity_question_limits()', $body);
+    }
 }

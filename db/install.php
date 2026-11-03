@@ -97,5 +97,9 @@ function xmldb_local_catquiz_install() {
     $defaultcontext = new catcontext();
     $defaultcontext->create_default_context();
 
+    // Issue #150: a new installation stores the results of its attempts from the start (result_provenance).
+    set_config(\local_catquiz\local\result\result_provenance::CONFIG, time(), 'local_catquiz');
+    set_config(\local_catquiz\local\result\result_provenance::CONFIG_SOURCE, 'installation', 'local_catquiz');
+
     return true;
 }

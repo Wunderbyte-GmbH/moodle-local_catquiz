@@ -115,6 +115,7 @@ if ($options['reset']) {
         $DB->delete_records_select('local_catquiz_attempts', "scaleid $insql", $inparams);
         $DB->delete_records_select('local_catquiz_catscales', "id $insql", $inparams);
     }
+    \local_catquiz\data\dataapi::invalidate_catscale_caches();
     $DB->delete_records_select('question', 'name LIKE :p', ['p' => 'Loadtest %']);
     $DB->delete_records_select('user', 'username LIKE :p', ['p' => 'loadtest%']);
     cli_writeln('Removed.');
@@ -388,3 +389,6 @@ for ($offset = 0; $offset < $attempts; $offset += $batch) {
 
 cli_writeln(sprintf('Done in %.0f seconds.', microtime(true) - $start));
 cli_writeln('scaleid=' . $scaleid . ' contextid=' . $contextid);
+
+// Issue #52: scales written here bypass dataapi; the caches must not keep the old tree.
+\local_catquiz\data\dataapi::invalidate_catscale_caches();

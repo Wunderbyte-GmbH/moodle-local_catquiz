@@ -20,6 +20,18 @@
 name: Moodle Plugin CI Dev
 
 on:
+  # Cross-repo pinning (re-audit G3): the other plugins are taken from their branch heads, which may
+  # not yet carry the commits this one was made for. A manual run can pin them to known SHAs.
+  workflow_dispatch:
+    inputs:
+      host_ref:
+        description: 'mod_adaptivequiz: commit SHA or branch (empty = branch head)'
+        required: false
+        default: ''
+      adapter_ref:
+        description: 'adaptivequizcatmodel_catquiz: commit SHA or branch (empty = branch head)'
+        required: false
+        default: ''
   push:
     branches-ignore:
       - main
@@ -161,7 +173,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: mirror.gcr.io/library/postgres:13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -201,9 +213,17 @@ jobs:
       - name: Install Moodle, dependencies and plugin (no test init)
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          # Which commits are tested together - pinned on a manual run, reported always.
+          pin() { [ -z "$2" ] && return 0; git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" checkout -q FETCH_HEAD; }
+          pin ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz "${{ github.event.inputs.host_ref }}"
+          pin ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz "${{ github.event.inputs.adapter_ref }}"
+          for d in ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz; do
+            [ -d "$d/.git" ] && echo "::notice::$(basename "$d") @ $(git -C "$d" rev-parse HEAD)" || echo "::warning::$d not found"
+          done
+          echo "::notice::${{ github.repository }} @ ${{ github.sha }}"
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
 
@@ -231,6 +251,12 @@ jobs:
           key: npm-${{ runner.os }}-${{ github.sha }}
           restore-keys: npm-${{ runner.os }}-
 
+      - name: AMD build belongs to its sources
+        if: ${{ always() }}
+        # Issue #31: a hard check. The source embedded in each source map has to be today's source -
+        # independent of how the runner's toolchain transpiles, which is why the rebuild below can only warn.
+        run: python3 plugin/.github/ci/check_amd_build.py plugin
+
       - name: Verify committed AMD build
         if: ${{ always() }}
         shell: bash
@@ -245,7 +271,13 @@ jobs:
         run: |
           set -euo pipefail
           MOODLE="${MOODLE_DIR:-$(pwd)/moodle}"
+          # Since Moodle 5.1 the code lives under public/. Looking only at local/catquiz
+          # skipped this rebuild on main, and moodle-plugin-ci grunt then reported the
+          # committed files as stale.
           PLUGIN="$MOODLE/local/catquiz"
+          if [ -d "$MOODLE/public/local/catquiz" ]; then
+            PLUGIN="$MOODLE/public/local/catquiz"
+          fi
 
           if [ ! -d "$PLUGIN/amd/build" ]; then
             echo "No amd/build directory - nothing to verify."
@@ -256,7 +288,9 @@ jobs:
           mkdir -p /tmp/amd-before
           cp -a "$PLUGIN/amd/build/." /tmp/amd-before/
 
-          ( cd "$MOODLE" && npx grunt amd --root=local/catquiz )
+          # Run from the component directory: the Gruntfile picks the component from there,
+          # with or without public/.
+          ( cd "$PLUGIN" && npx grunt amd )
 
           if ! diff -ruN /tmp/amd-before "$PLUGIN/amd/build" > /tmp/amd-diff.txt; then
             echo "::warning::The rebuilt amd/build differs from the committed one."
@@ -318,7 +352,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: mirror.gcr.io/library/postgres:13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -357,9 +391,17 @@ jobs:
       - name: Install Moodle, dependencies and plugin (no test init)
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          # Which commits are tested together - pinned on a manual run, reported always.
+          pin() { [ -z "$2" ] && return 0; git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" checkout -q FETCH_HEAD; }
+          pin ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz "${{ github.event.inputs.host_ref }}"
+          pin ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz "${{ github.event.inputs.adapter_ref }}"
+          for d in ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz; do
+            [ -d "$d/.git" ] && echo "::notice::$(basename "$d") @ $(git -C "$d" rev-parse HEAD)" || echo "::warning::$d not found"
+          done
+          echo "::notice::${{ github.repository }} @ ${{ github.sha }}"
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
 
@@ -424,7 +466,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: mirror.gcr.io/library/postgres:13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -432,7 +474,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10.8
+        image: mirror.gcr.io/library/mariadb:10.8
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -444,7 +486,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { php: '8.1', database: pgsql }
+          # Issue #156: no cell runs PHP 8.1 or older. 8.2 takes PostgreSQL over from 8.1.
+          - { php: '8.2', database: pgsql }
           - { php: '8.2', database: mariadb }
           - { php: '8.3', database: pgsql }
 
@@ -459,6 +502,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          # pcntl: the concurrency tests fork real processes (CATQUIZ_REQUIRE_CONCURRENCY).
+          extensions: pcntl
           ini-values: max_input_vars=5000
           coverage: none
 
@@ -480,9 +525,17 @@ jobs:
       - name: Install Moodle, dependencies and plugin
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          # Which commits are tested together - pinned on a manual run, reported always.
+          pin() { [ -z "$2" ] && return 0; git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" checkout -q FETCH_HEAD; }
+          pin ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz "${{ github.event.inputs.host_ref }}"
+          pin ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz "${{ github.event.inputs.adapter_ref }}"
+          for d in ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz; do
+            [ -d "$d/.git" ] && echo "::notice::$(basename "$d") @ $(git -C "$d" rev-parse HEAD)" || echo "::warning::$d not found"
+          done
+          echo "::notice::${{ github.repository }} @ ${{ github.sha }}"
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
 
@@ -505,6 +558,9 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
+        env:
+          # The concurrency tests (pcntl) fail instead of being skipped: a skip is no green (audit 18.10.).
+          CATQUIZ_REQUIRE_CONCURRENCY: '1'
         run: set -o pipefail; moodle-plugin-ci phpunit --fail-on-warning --testdox 2>&1 | tee ci-logs/phpunit.log
 
 
@@ -522,10 +578,13 @@ jobs:
         timeout-minutes: 20
         env:
           CATQUIZ_RUN_SLOW: 1
+        # From inside the Moodle tree: phpunit.xml lives there, and without it the
+        # bootstrap is never loaded ("Class basic_testcase not found").
+        working-directory: moodle
         run: >-
-          moodle/vendor/bin/phpunit
+          vendor/bin/phpunit
           --filter 3PL
-          moodle/local/catquiz/tests/local/model/model_person_ability_estimator_catcalc_test.php
+          local/catquiz/tests/local/model/model_person_ability_estimator_catcalc_test.php
       - name: Collect error summary
         if: ${{ always() }}
         run: |
@@ -557,7 +616,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:10.8
+        image: mirror.gcr.io/library/mariadb:10.8
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -597,9 +656,17 @@ jobs:
       - name: Install Moodle, dependencies and plugin
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
-          moodle-plugin-ci add-plugin --branch v-3.0 ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+          # Which commits are tested together - pinned on a manual run, reported always.
+          pin() { [ -z "$2" ] && return 0; git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" checkout -q FETCH_HEAD; }
+          pin ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz "${{ github.event.inputs.host_ref }}"
+          pin ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz "${{ github.event.inputs.adapter_ref }}"
+          for d in ./moodle-plugin-ci-plugins/moodle-mod_adaptivequiz ./moodle-plugin-ci-plugins/moodle-adaptivequizcatmodel_catquiz; do
+            [ -d "$d/.git" ] && echo "::notice::$(basename "$d") @ $(git -C "$d" rev-parse HEAD)" || echo "::warning::$d not found"
+          done
+          echo "::notice::${{ github.repository }} @ ${{ github.sha }}"
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_host
           moodle-plugin-ci add-plugin ralferlebach/moodle-catquizcentralhub_client
 
@@ -616,9 +683,27 @@ jobs:
             rmdir "$placeholder"
           done
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+
         env:
           DB: mariadb
           MOODLE_BRANCH: MOODLE_405_STABLE
+
+      # Docker Hub begrenzt anonyme Pulls (toomanyrequests). moodle-plugin-ci startet Selenium
+      # per docker run und holt das Image sonst von Docker Hub; liegt es lokal vor, wird nicht
+      # gezogen. Deshalb zuerst ueber den Google-Mirror, erst danach Docker Hub, mit Wiederholung.
+      - name: Selenium-Image vorladen (Docker-Hub-Ratenlimit)
+        if: ${{ always() }}
+        run: |
+          for src in mirror.gcr.io/selenium/standalone-chrome:4 selenium/standalone-chrome:4; do
+            for attempt in 1 2 3; do
+              if docker pull "$src"; then
+                docker tag "$src" selenium/standalone-chrome:4
+                exit 0
+              fi
+              sleep $((attempt * 15))
+            done
+          done
+          echo "::warning::Selenium-Image konnte nicht vorab geladen werden."
 
       - name: Behat features
         id: behat
@@ -670,7 +755,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: mirror.gcr.io/library/postgres:16
         env:
           POSTGRES_USER: moodle
           POSTGRES_PASSWORD: moodle
@@ -710,7 +795,9 @@ jobs:
         run: |
           # local_catquiz declares hard dependencies in version.php, so the site
           # cannot install with the plugin alone. DEP_REF pins the adaptivequiz side.
-          DEP_REF="${DEP_REF:-v-3.0}"
+          # The 4.5 line needs the 4.5 line of host and adapter; v-3.0 requires Moodle 5.1 and
+          # failed the dependency check of the site install.
+          DEP_REF="${DEP_REF:-ALiSe-v-1.2.0-legacy}"
 
           # The plugin under test comes from this checkout, never from a clone.
           rm -rf moodle/local/catquiz
@@ -730,6 +817,47 @@ jobs:
             https://github.com/branchup/moodle-filter_shortcodes.git moodle/filter/shortcodes
 
           find moodle -mindepth 2 -type d -name .git -prune -exec rm -rf {} + || true
+
+      # The installer reports a failed dependency check without the plugin and the version behind it. This
+      # step names both, before the installation: an older state of mod_adaptivequiz or of the adapter on the
+      # branch this run takes is the usual cause.
+      - name: Check the versions of the dependencies
+        run: |
+          root=moodle; [ -d moodle/public ] && root=moodle/public
+          php -- "$root" <<'PHP'
+          <?php
+          // Read version.php files without Moodle: the constants they may use, and $plugin in its own scope.
+          define('MOODLE_INTERNAL', true);
+          foreach (['MATURITY_ALPHA' => 50, 'MATURITY_BETA' => 100, 'MATURITY_RC' => 150, 'MATURITY_STABLE' => 200,
+              'ANY_VERSION' => 'any'] as $name => $value) {
+              defined($name) || define($name, $value);
+          }
+          $root = $argv[1];
+          $read = static function (string $file): stdClass {
+              $plugin = new stdClass();
+              include($file);
+              return $plugin;
+          };
+          $dirs = [
+              'local_wunderbyte_table' => 'local/wunderbyte_table',
+              'mod_adaptivequiz' => 'mod/adaptivequiz',
+              'adaptivequizcatmodel_catquiz' => 'mod/adaptivequiz/catmodel/catquiz',
+              'filter_shortcodes' => 'filter/shortcodes',
+          ];
+          $rc = 0;
+          foreach ($read("$root/local/catquiz/version.php")->dependencies ?? [] as $component => $required) {
+              $file = isset($dirs[$component]) ? "$root/{$dirs[$component]}/version.php" : '';
+              $found = $file !== '' && is_file($file) ? $read($file)->version : null;
+              $ok = $found !== null && ($required === ANY_VERSION || $found >= $required);
+              printf("%-30s requires %-12s found %s\n", $component, $required, $found ?? 'nothing');
+              if (!$ok) {
+                  echo "::error::local_catquiz requires $component $required, the checkout has " . ($found ?? 'nothing')
+                      . ": push that state to the branch of $component this run takes, or pin its ref.\n";
+                  $rc = 1;
+              }
+          }
+          exit($rc);
+          PHP
 
       # install.php writes config.php itself and aborts when one exists, and it needs
       # an existing dataroot OUTSIDE the Moodle tree.

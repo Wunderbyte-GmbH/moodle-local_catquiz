@@ -344,7 +344,7 @@ final class catcalc_test extends basic_testcase {
         $inpersonrange = false;
         $steps = [];
         $person = '';
-        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
             $row++;
             if ($row <= 5) {
                 // The first two row contains no relevant data.
@@ -453,7 +453,7 @@ final class catcalc_test extends basic_testcase {
         $itemparams = new model_item_param_list();
 
         $row = 0;
-        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
             $row++;
             if ($row == 1) {
                 // The first row contains the header.
@@ -486,7 +486,7 @@ final class catcalc_test extends basic_testcase {
 
         $header = [];
         $row = 0;
-        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        while (($data = fgetcsv($handle, 0, ";", '"', "\\")) !== false) {
             $row++;
             if ($row == 1) {
                 // The first row contains the header.

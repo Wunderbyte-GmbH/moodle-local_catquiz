@@ -40,18 +40,19 @@
 }}
 
 {{#testitemdashboard}}
+    {{! Issue #30: once per page (the detail of the selected question), ids with the plugin prefix. }}
     {{#backtotablelink}}
-        <button id="backtotablelink" class='btn {{class}}' type={{type}}>{{label}}</button>
+        <button id="local-catquiz-testitem-backtotable" class='btn {{class}}' type={{type}}>{{label}}</button>
     {{/backtotablelink}}
-    <div id="questiondetailview">
+    <div id="local-catquiz-testitem-detailview">
         {{>local_catquiz/catscalemanager/questions/questiondetailview}}
     </div>
     <div>
-        <div id="models">
+        <div id="local-catquiz-testitem-models">
         {{>local_catquiz/tabs/tab_models}}
         </div>
     </div>
-    <div id="statistics">
+    <div id="local-catquiz-testitem-statistics">
         {{>local_catquiz/tabs/tab_testitemstats}}
     </div>
 {{/testitemdashboard}}

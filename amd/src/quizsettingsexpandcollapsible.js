@@ -24,7 +24,12 @@
 
 export const init = () => {
 
-    let invalidElements = document.querySelectorAll(".is-invalid");
+    // Also the summary of a scale not being edited, which shows the errors of its fields (issue #51).
+    let invalidElements = [
+        ...document.querySelectorAll(".is-invalid"),
+        ...[...document.querySelectorAll('[id^="id_error_catquiz_feedbacksummary_"]')]
+            .filter((element) => element.textContent.trim() !== ''),
+    ];
     invalidElements.forEach((element) => {
         let parent = element.closest('[data-name^="catquiz_feedback_header"]');
         while (parent) {

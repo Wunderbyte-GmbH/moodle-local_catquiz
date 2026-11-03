@@ -32,6 +32,8 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\statistics\chart_output;
+use local_catquiz\local\statistics\learning_progress_series;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
@@ -167,14 +169,14 @@ class learningprogress extends feedbackgenerator {
     /**
      * Loads data personability, number of items played per subscale and standarderrorpersubscale.
      *
-     * @param int $attemptid
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id - not local_catquiz_attempts.id.
      * @param array $existingdata
      * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+    public function load_data(int $adaptiveattemptid, array $existingdata, array $newdata): ?array {
         return $this->generate_feedback($existingdata, $newdata, true);
     }
 
@@ -319,7 +321,10 @@ class learningprogress extends feedbackgenerator {
                 $initialcontext['testid'],
                 $initialcontext['contextid'],
                 null,
-                $end
+                $end,
+                // The cohort of a past day is who took part then, not who is enrolled today - as in the
+                // statistics, so both show the same curve for the same scope (issue #119).
+                false
             ) as $record
         ) {
             $json = json_decode($record->json);
@@ -338,16 +343,16 @@ class learningprogress extends feedbackgenerator {
                 'comparison' => '',
             ];
         }
-        $startingrecord = reset($records);
-        if (empty($startingrecord->endtime)) {
-            foreach ($records as $record) {
-                if (isset($record->endtime) && !empty($record->endtime)) {
-                    $startingrecord = $record;
-                    break;
-                }
-            }
+        // The periods begin with the earliest finished attempt - the records are not sorted by it,
+        // and an attempt before the first period would be left out of the series (issue #119).
+        $endtimes = array_filter(array_map(fn($r) => (int) ($r->endtime ?? 0), $records));
+        if (!$endtimes) {
+            return [
+                'individual' => '',
+                'comparison' => '',
+            ];
         }
-        $beginningoftimerange = intval($startingrecord->endtime);
+        $beginningoftimerange = min($endtimes);
         $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
@@ -361,8 +366,8 @@ class learningprogress extends feedbackgenerator {
             ];
         }
         $progresscomparison = $this->render_chart_for_comparison(
-            $attemptsofuser,
-            $attemptsofpeers,
+            $records,
+            (int) $userid,
             (array) $primarycatscale,
             $timerange,
             [$beginningoftimerange, $endtime]
@@ -376,10 +381,13 @@ class learningprogress extends feedbackgenerator {
     /**
      * Render chart for individual progress.
      *
+     * The valid results of the person, attempt by attempt (issue #119): an invalid result is not a
+     * point of the trajectory.
+     *
      * @param array $attemptsofuser
      * @param array $primarycatscale
      *
-     * @return array
+     * @return array|string
      *
      */
     private function render_chart_for_individual_user(array $attemptsofuser, array $primarycatscale) {
@@ -391,26 +399,25 @@ class learningprogress extends feedbackgenerator {
         $scalename = $primarycatscale['name'];
         $scaleid = $primarycatscale['id'];
 
-        $chart = new chart_line();
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-
-        $personabilities = $this->extract_scale_progress_values($attemptsofuser, $scaleid);
+        $personabilities = learning_progress_series::individual($attemptsofuser, (int) $scaleid);
         // At least two real data points are required to draw a trajectory.
-        $realvalues = array_filter($personabilities, fn($v) => $v !== null);
-        if (count($realvalues) < 2) {
+        if (count($personabilities) < 2) {
             return '';
         }
 
+        $chart = new chart_line();
+        // Straight lines between the measured points: a smoothed curve bulges between them and shows
+        // values that were never measured (issue #119).
+        $chart->set_smooth(false);
         $chartserie = new \core\chart_series(
             get_string('personabilityinscale', 'local_catquiz', $scalename),
             $personabilities
         );
 
-        $labels = range(1, count($personabilities));
-
         $chart->add_series($chartserie);
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render_chart($chart, false);
+        $chart->set_labels(range(1, count($personabilities)));
+        // With the table of values: the chart can be read without seeing it.
+        $out = $OUTPUT->render_chart($chart, true);
 
         return [
             'chart' => $out,
@@ -419,37 +426,13 @@ class learningprogress extends feedbackgenerator {
     }
 
     /**
-     * Extracts one scale's ability value per attempt, in attempt order.
-     *
-     * The learning-progress trajectory follows the given (global)
-     * scale strictly. An attempt without a value for the scale yields null (a
-     * gap in the chart) rather than being skipped or substituted with another
-     * scale, and an ability of exactly 0.0 is kept (explicit null check, not
-     * empty()).
-     *
-     * @param array $attemptsofuser Attempt records, each with a ->json field.
-     * @param int|string $scaleid   The scale whose ability is extracted.
-     *
-     * @return array List of float|null, one entry per attempt.
-     */
-    protected function extract_scale_progress_values(array $attemptsofuser, $scaleid): array {
-        $values = [];
-        foreach ($attemptsofuser as $attempt) {
-            $data = json_decode($attempt->json);
-            if (isset($data->personabilities->$scaleid) && $data->personabilities->$scaleid !== null) {
-                $values[] = (float) $data->personabilities->$scaleid;
-            } else {
-                $values[] = null;
-            }
-        }
-        return $values;
-    }
-
-    /**
      * Render chart for progress compared to peers and grouped by date.
      *
-     * @param array $attemptsofuser
-     * @param array $attemptsofpeers
+     * Both series are cumulative: for each period the latest valid result of every person up to
+     * then (issue #119, learning_progress_series).
+     *
+     * @param array $records Attempts of the scope, the viewer's and the others'.
+     * @param int $userid The viewer.
      * @param array $primarycatscale
      * @param int $timerange
      * @param array $beginningandendofrange
@@ -458,188 +441,45 @@ class learningprogress extends feedbackgenerator {
      *
      */
     private function render_chart_for_comparison(
-        array $attemptsofuser,
-        array $attemptsofpeers,
+        array $records,
+        int $userid,
         array $primarycatscale,
         int $timerange,
         array $beginningandendofrange
     ) {
-        global $OUTPUT;
-
         if (!isset($primarycatscale['name']) || !isset($primarycatscale['id'])) {
             return [];
         }
         $scalename = $primarycatscale['name'];
-        $scaleid = $primarycatscale['id'];
-
-        $chart = new chart_line();
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-
-        // Peers are weighted once per person and period so a peer with
-        // several attempts does not dominate the comparison.
-        $orderedattemptspeers = feedback_helper::order_attempts_by_timerange(
-            $attemptsofpeers,
-            $scaleid,
+        $series = learning_progress_series::comparison(
+            $records,
+            (int) $primarycatscale['id'],
+            $userid,
             $timerange,
-            false,
-            true
+            $beginningandendofrange
         );
-        $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
-        $orderedattemptsuser = feedback_helper::order_attempts_by_timerange(
-            $attemptsofuser,
-            $scaleid,
-            $timerange,
-            false,
-            true
-        );
-        $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
-
-        $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
-        $peerattemptsbydate = [];
-        $userattemptsbydate = [];
-        $firstvalue = true;
-        foreach ($alldates as $index => $key) {
-            if (!isset($pa[$key]) && !isset($ua[$key]) && $firstvalue) {
-                unset($alldates[$index]);
-                continue;
-            }
-            $firstvalue = false;
-            if (isset($pa[$key])) {
-                $peerattemptsbydate[$key] = $pa[$key];
-            } else {
-                $peerattemptsbydate[$key] = null;
-            }
-
-            if (isset($ua[$key])) {
-                $userattemptsbydate[$key] = $ua[$key];
-            } else {
-                $userattemptsbydate[$key] = null;
-            }
+        // Issue #150 (re-audit 23.10.2026): the attempts were counted, not their valid results. With none, every
+        // period is empty and so are the labels: two series without values, which core/chart_series refuses
+        // ("Invalid values received for series."). As in the statistics (catquizstatistics::render_learning_progress()).
+        $hasvalue = fn(array $values) => (bool) array_filter($values, fn($value) => $value !== null);
+        if (!$series['labels'] || (!$hasvalue($series['user']) && !$hasvalue($series['peers']))) {
+            return [];
         }
 
-        // To display the chartserie lines connected, we fill empty keys with average.
-        $peerattempts = $this->fill_empty_values_with_average($peerattemptsbydate);
-        $userattempts = $this->fill_empty_values_with_average($userattemptsbydate);
-
-        $peerattempts = new chart_series(
-            get_string('scoreofpeers', 'local_catquiz'),
-            array_values($peerattempts)
-        );
-        $peerattempts->set_labels(array_values($peerattemptsbydate));
-
-        $userattempts = new chart_series(
-            get_string('yourscorein', 'local_catquiz', $scalename),
-            array_values($userattempts)
-        );
-        $userattempts->set_labels(array_values($userattemptsbydate));
-
-        $labels = array_values($alldates);
-
-        $chart->add_series($userattempts);
-        $chart->add_series($peerattempts);
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
+        $chart = new chart_line();
+        // Straight lines: a smoothed curve between periods suggests values in between (issue #119).
+        $chart->set_smooth(false);
+        $chart->add_series(new chart_series(get_string('yourscorein', 'local_catquiz', $scalename), $series['user']));
+        $chart->add_series(new chart_series(get_string('scoreofpeers', 'local_catquiz'), $series['peers']));
+        $chart->set_labels($series['labels']);
+        // With the table of values: the chart can be read without seeing it. Drawn as the ability profile is: what
+        // the browser cannot draw says so (issue #150).
+        $out = chart_output::render($chart, true, get_string('catquizstatisticsnodata', 'local_catquiz'));
 
         return [
             'chart' => $out,
             'charttitle' => get_string('progress', 'local_catquiz', $scalename),
         ];
-    }
-
-    /**
-     * In order to make the chartvalues connected, we need to calculate averages between entries, if there are no values set.
-     *
-     * @param array $attemptswithnulls
-     *
-     * @return array
-     *
-     */
-    private function fill_empty_values_with_average(array $attemptswithnulls) {
-        $result = [];
-
-        $keys = array_keys($attemptswithnulls);
-
-        foreach ($keys as $key) {
-            // If the current value is null.
-            if ($attemptswithnulls[$key] === null) {
-                $neighborvalues = $this->find_non_nullable_value($keys, $attemptswithnulls, $key);
-                $prevvalue = $neighborvalues['prevvalue'];
-                $nextvalue = $neighborvalues['nextvalue'];
-
-                $average = null;
-                if ($prevvalue !== null && $nextvalue !== null) {
-                    $average = ($prevvalue + $nextvalue) / 2;
-                } else if ($prevvalue !== null) {
-                    $average = $prevvalue;
-                } else if ($nextvalue !== null) {
-                    $average = $nextvalue;
-                }
-
-                // Replace the null value with the calculated average.
-                $result[$key] = $average;
-            } else {
-                // If the current value is not null, keep it unchanged.
-                $result[$key] = $attemptswithnulls[$key];
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Return average of personabilities ordered by date of quizattempt.
-     *
-     * @param array $keys
-     * @param array $attemptswithnulls
-     * @param string $key
-     *
-     * @return array
-     *
-     */
-    private function find_non_nullable_value(array $keys, array $attemptswithnulls, string $key) {
-
-        // Treat only genuine nulls as missing. empty() would discard a
-        // valid ability of exactly 0.0 and pull neighbouring averages towards it.
-        if (($attemptswithnulls[$key] ?? null) !== null) {
-            return $attemptswithnulls[$key];
-        }
-        $prevkey = null;
-        $nextkey = null;
-        $stop = false;
-        foreach ($keys as $k) {
-            if (($attemptswithnulls[$k] ?? null) !== null) {
-                $pk = $k;
-            }
-            if ($key == $k) {
-                $prevkey = $pk ?? null;
-                $stop = true;
-                continue;
-            }
-            if ($stop) {
-                $nextkey = $k;
-                break;
-            }
-        }
-
-        return [
-            'prevvalue' => $attemptswithnulls[$prevkey] ?? null,
-            'nextvalue' => $attemptswithnulls[$nextkey] ?? null,
-        ];
-    }
-
-    /**
-     * Assign average of result for each period.
-     * @param array $attemptsbytimerange
-     *
-     * @return array
-     */
-    private function assign_average_result_to_timerange(array $attemptsbytimerange) {
-        // Calculate average personability of this period.
-        foreach ($attemptsbytimerange as $date => $attempt) {
-            $floats = array_map('floatval', $attempt);
-            $average = count($floats) > 0 ? array_sum($floats) / count($floats) : $attempt;
-            $attemptsbytimerange[$date] = $average;
-        }
-        return $attemptsbytimerange;
     }
 
     /**
@@ -720,5 +560,14 @@ class learningprogress extends feedbackgenerator {
     private function render_questionpreview(object $record) {
         $questionpreview = new questionpreview($record);
         return $questionpreview->render_questionpreview();
+    }
+
+    /**
+     * Shows the valid results over time; an invalid attempt adds no point but keeps the history (2026-10-14).
+     *
+     * @return string
+     */
+    public function get_result_dependency(): string {
+        return self::DEPENDS_ON_ATTEMPT;
     }
 }

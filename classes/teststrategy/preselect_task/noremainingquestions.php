@@ -49,7 +49,13 @@ final class noremainingquestions extends preselect_task {
             count($context['questions']) === 0
             && empty($context['pilot_questions'])
         ) {
-                return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+            // Issue #134: running out before the minimum is not a regular end; it has its own status.
+            $progress = $context['progress'] ?? null;
+            $minimum = (int) ($context['minimumquestions'] ?? 0);
+            if ($progress && $minimum > 0 && $progress->get_num_answered_productive_questions() < $minimum) {
+                return result::err(status::ERROR_NO_REMAINING_QUESTIONS_BEFORE_MINIMUM);
+            }
+            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
         return result::ok($context);

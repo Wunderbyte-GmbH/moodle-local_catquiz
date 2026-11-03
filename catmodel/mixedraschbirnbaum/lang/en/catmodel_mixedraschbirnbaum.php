@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = '3PL mixed Rasch-Birnbaum model';
+$string['privacy:metadata'] = 'The model stores no personal data; it computes with the data local_catquiz holds.';
 $string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';

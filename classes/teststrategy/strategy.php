@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy;
 
+use local_catquiz\local\attempt_cache;
 use cache;
 use coding_exception;
 use Exception;
@@ -31,12 +32,13 @@ use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\monitoring\timeline;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbyquestionsperscale;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
 use local_catquiz\teststrategy\context\loader\questions_loader;
@@ -115,6 +117,13 @@ abstract class strategy {
     private array $stagecounts = [];
 
     /**
+     * The status with which the selection ends the test, null while it goes on (issue #64).
+     *
+     * @var string|null
+     */
+    private ?string $endstatus = null;
+
+    /**
      * Milliseconds per stage, for the profiling issues #26 and #27 ask for.
      * @var array
      */
@@ -155,6 +164,73 @@ abstract class strategy {
     abstract public function get_selector(): preselect_task;
 
     /**
+     * Whether the strategy drops and deactivates scales on their own measurement (issue #135).
+     *
+     * The shared pipeline runs scale-related steps before the selector. They belong to strategies
+     * that measure subscales; a strategy that chooses globally (FASTEST) or in a fixed order
+     * (CLASSIC) declares here that it does not use them, and the pipeline skips them for it.
+     *
+     * @return bool
+     */
+    public function uses_scale_dropping(): bool {
+        return true;
+    }
+
+    /**
+     * Whether the maximum number of questions per scale removes items from the pool (issue #135).
+     *
+     * @return bool
+     */
+    public function uses_per_scale_selection_limits(): bool {
+        return true;
+    }
+
+    /**
+     * Whether scales are deactivated by their test information - the remaining potential (issue #135).
+     *
+     * @return bool
+     */
+    public function uses_testinfo_filter(): bool {
+        return true;
+    }
+
+    /**
+     * Whether every scale is played up to its minimum number of questions first (issue #135).
+     *
+     * @return bool
+     */
+    public function requires_scale_coverage(): bool {
+        return false;
+    }
+
+    /**
+     * Whether the test ends on the precision of the measured (root) scale alone (issue #135).
+     *
+     * Past the minimum number of questions, with the standard error of that scale at or below the
+     * target and its ability stable. Local conditions of subscales never end such a test.
+     *
+     * @return bool
+     */
+    public function stops_on_global_precision(): bool {
+        return false;
+    }
+
+    /**
+     * The mechanisms of the shared pipeline the strategy uses, by name (issue #135).
+     *
+     * @return array<string, bool>
+     */
+    public function get_capabilities(): array {
+        return [
+            'scale_dropping' => $this->uses_scale_dropping(),
+            'per_scale_selection_limits' => $this->uses_per_scale_selection_limits(),
+            'testinfo_filter' => $this->uses_testinfo_filter(),
+            'scale_coverage' => $this->requires_scale_coverage(),
+            'global_precision_stop' => $this->stops_on_global_precision(),
+        ];
+    }
+
+    /**
      * Returns the actual question or an error.
      *
      * @return result
@@ -187,6 +263,8 @@ abstract class strategy {
      */
     public function return_next_testitem(array $context): result {
         $this->context = $context;
+        // Issue #64: the instance may serve several selections in one request; an end belongs to one.
+        $this->endstatus = null;
         $maxtime = $context['progress']->get_starttime() + $context['max_attempttime_in_sec'];
         if (time() > $maxtime) {
             // The 'endtime' holds the last timepoint that is relevant for the
@@ -195,7 +273,12 @@ abstract class strategy {
             // attempt time).
             $this->cache->set('endtime', $maxtime);
             $this->cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
-            $this->persist_stage_counts();
+            // Mod_adaptivequiz #22: the error belongs to this attempt, not to whatever page reads it next.
+            $this->cache->set('catquizerrorattempt', (int) ($context['attemptid'] ?? 0));
+            // Issue #146: also under the attempt's own keys - another attempt of the session does not overwrite them.
+            attempt_cache::set('endtime', (int) ($context['attemptid'] ?? 0), $maxtime);
+            attempt_cache::set('catquizerror', (int) ($context['attemptid'] ?? 0), status::EXCEEDED_MAX_ATTEMPT_TIME);
+            $this->persist_stage_counts(status::EXCEEDED_MAX_ATTEMPT_TIME);
 
             return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
         }
@@ -203,7 +286,7 @@ abstract class strategy {
         try {
             $this->check_item_params();
         } catch (Exception $e) {
-            $this->persist_stage_counts();
+            $this->persist_stage_counts(status::ERROR_GENERAL);
 
             return result::err(status::ERROR_GENERAL, $e->getMessage());
         }
@@ -236,18 +319,22 @@ abstract class strategy {
            Loading it here means the chain always has the pool, whichever path the
            selector takes. The loader has existed all along and was called nowhere. */
         if (!isset($this->context['questions'])) {
-            $this->context = (new questions_loader())->load($this->context);
+            $this->context = timeline::span('strategy:questions_loader', fn() => (new questions_loader())->load($this->context));
         }
 
-        $res = $this->update_personability()
-            ->and_then(fn () => $this->first_question_selector())
+        $res = $this->traced('update_personability', fn() => $this->update_personability())
+            ->and_then(fn () => $this->traced('first_question_selector', fn() => $this->first_question_selector()))
             ->or_else(fn ($res) => $this->after_error($res));
 
         $val = $res->unwrap();
         // If the result contains a single object, this is the question to be returned.
         // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
         // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
-        if (is_object($val)) {
+        if (is_object($val) && $this->is_deliverable($val)) {
+            // The first question counts as administered like any other (issue #126). Returning it
+            // without registering it left it out of the played questions, so it was never
+            // excluded and could be drawn again later in the same attempt.
+            $this->register_administered_question($val, $context);
             $this->persist_stage_counts();
 
             return $res;
@@ -265,47 +352,62 @@ abstract class strategy {
             // for: it would have named add_scale_standarderror as the step that
             // emptied the pool while maximumquestionscheck did it.
             $this->record_stage('start');
-            $this->add_scale_standarderror()
+            $this->traced('add_scale_standarderror', fn() => $this->add_scale_standarderror())
                 ->and_then(fn () => $this->record_stage('add_scale_standarderror'))
-                ->and_then(fn () => $this->maximumquestionscheck())
+                ->and_then(fn () => $this->traced('maximumquestionscheck', fn() => $this->maximumquestionscheck()))
                 ->and_then(fn () => $this->record_stage('maximumquestionscheck'))
-                ->and_then(fn () => $this->removeplayedquestions())
+                ->and_then(fn () => $this->traced('removeplayedquestions', fn() => $this->removeplayedquestions()))
                 ->and_then(fn () => $this->record_stage('removeplayedquestions'))
-                ->and_then(fn () => $this->noremainingquestions())
+                ->and_then(fn () => $this->traced('noremainingquestions', fn() => $this->noremainingquestions()))
                 ->and_then(fn () => $this->record_stage('noremainingquestions'))
-                ->and_then(fn () => $this->fisherinformation())
+                ->and_then(fn () => $this->traced('fisherinformation', fn() => $this->fisherinformation()))
                 ->or_else(fn($res) => $this->after_error($res))
                 ->expect();
             $this->record_stage('fisherinformation');
         } catch (Exception $e) {
-            $this->persist_stage_counts();
+            $this->persist_stage_counts($this->result ? null : status::ERROR_GENERAL);
 
             return $this->result ?? result::err(status::ERROR_GENERAL, $e->getMessage());
         }
 
-        $res = $this->maybereturnpilot();
+        $res = $this->traced('maybereturnpilot', fn() => $this->maybereturnpilot());
         $val = $res->unwrap();
         // If the value is an object, it is the pilot question that should be returned.
-        if (is_object($val)) {
+        if (is_object($val) && $this->is_deliverable($val)) {
+            // Registered like any other administered question (issue #126): unregistered, a pilot
+            // item was never excluded and could be drawn again, and its answer - missing from the
+            // played questions - was counted as a productive item.
+            $this->register_administered_question($val, $context);
             $this->persist_stage_counts();
 
             return $res;
         }
 
         try {
-            $selectedquestion = $this->remove_uncalculated()
-                ->and_then(fn() => $this->mayberemovescale())
-                ->and_then(fn() => $this->last_time_played_penalty())
-                ->and_then(fn() => $this->filterbystandarderror())
+            // Issue #64: the stages after the pilot check are counted as well - a filter here that empties the
+            // pool used to leave no trace.
+            $selectedquestion = $this->traced('remove_uncalculated', fn() => $this->remove_uncalculated())
+                ->and_then(fn () => $this->record_stage('remove_uncalculated'))
+                ->and_then(fn() => $this->traced('mayberemovescale', fn() => $this->mayberemovescale()))
+                ->and_then(fn () => $this->record_stage('mayberemovescale'))
+                ->and_then(fn() => $this->traced('last_time_played_penalty', fn() => $this->last_time_played_penalty()))
+                ->and_then(fn () => $this->record_stage('last_time_played_penalty'))
+                ->and_then(fn() => $this->traced('filterbystandarderror', fn() => $this->filterbystandarderror()))
+                ->and_then(fn () => $this->record_stage('filterbystandarderror'))
                 ->or_else(fn($res) => $this->after_error($res))
                 ->expect()
-                ->and_then(fn() => $this->filterbytestinfo())
-                ->and_then(fn() => $this->filterbyquestionsperscale())
-                ->and_then(fn() => $this->select_question())
+                ->and_then(fn() => $this->traced('filterbytestinfo', fn() => $this->filterbytestinfo()))
+                ->and_then(fn () => $this->record_stage('filterbytestinfo'))
+                ->and_then(fn() => $this->traced('filterbyquestionsperscale', fn() => $this->filterbyquestionsperscale()))
+                ->and_then(fn () => $this->record_stage('filterbyquestionsperscale'))
+                ->and_then(fn() => $this->traced('select_question', fn() => $this->select_question()))
                 ->and_then(
                     function ($res) {
-                        $this->progress->save();
-                        $this->update_attemptfeedback($this->context);
+                        timeline::span('strategy:progress_save', fn() => $this->progress->save());
+                        timeline::span(
+                            'strategy:update_attemptfeedback',
+                            fn() => $this->update_attemptfeedback($this->context)
+                        );
                         $this->persist_stage_counts();
                         return $res;
                     }
@@ -314,31 +416,61 @@ abstract class strategy {
                 ->expect()
                 ->unwrap();
         } catch (Exception $e) {
-            $this->persist_stage_counts();
+            $this->persist_stage_counts($this->result ? null : status::ERROR_GENERAL);
 
             return $this->result ?? result::err(status::ERROR_GENERAL, $e->getMessage());
         }
 
-        if (!$selectedquestion) {
-            $this->persist_stage_counts();
-
-            return result::err();
+        // Issue #82: the question bank may have hidden the question since the pool was cached.
+        // Every round drops all unavailable candidates at once, so a second round is the exception; the bound
+        // only guards against a selector that does not take its candidates from the context.
+        for ($round = 0; is_object($selectedquestion) && !$this->is_deliverable($selectedquestion); $round++) {
+            $reselected = $round < 3 ? $this->select_question() : null;
+            $selectedquestion = $reselected && $reselected->isOk() ? $reselected->unwrap() : null;
         }
 
-        $this->progress
-            ->add_playedquestion($selectedquestion)
-            ->save();
+        if (!$selectedquestion) {
+            /* Issue #64: a filter after noremainingquestions emptied the pool. That ended the test with a
+               general error, stored as "undefined", and without saving the progress or the feedback. It is
+               the same end as an empty pool - before the minimum, a status of its own - and goes the same way. */
+            $minimum = (int) ($this->context['minimumquestions'] ?? 0);
+            $answered = $this->progress->get_num_answered_productive_questions();
+            $status = $minimum > 0 && $answered < $minimum
+                ? status::ERROR_NO_REMAINING_QUESTIONS_BEFORE_MINIMUM
+                : status::ERROR_NO_REMAINING_QUESTIONS;
+            $this->persist_stage_counts();
+            return $this->after_error(result::err($status));
+        }
 
-        catscale::update_testitem(
-            $context['contextid'],
-            $selectedquestion,
-            $context['catscaleid'],
-            $context['includesubscales'],
-            $context['progress']->get_selected_subscales()
-        );
+        $this->register_administered_question($selectedquestion, $context);
         $this->persist_stage_counts();
 
         return result::ok($selectedquestion);
+    }
+
+    /**
+     * Whether a question may be handed out now (issue #82); if not, it leaves the candidates and the pool.
+     *
+     * The runtime pool is cached and leaves out what the question bank hides - but the bank can hide a
+     * question without any event (question_delete_question() on a question in use only sets the status), so
+     * a cached pool may still hold it. One query for the question at hand closes that gap. When it is out,
+     * every candidate is checked in one go and the unavailable ones are dropped, and the pool is invalidated,
+     * so the next request reads it anew.
+     *
+     * @param \stdClass $question
+     * @return bool
+     */
+    private function is_deliverable(\stdClass $question): bool {
+        if (!isset($question->id) || !catscale::unavailable_question_ids([(int) $question->id])) {
+            return true;
+        }
+        $candidates = array_keys($this->context['questions'] ?? []);
+        $candidates[] = (int) $question->id;
+        foreach (catscale::unavailable_question_ids($candidates) as $questionid) {
+            unset($this->context['questions'][$questionid]);
+        }
+        \cache_helper::purge_by_event('changesintestitems');
+        return false;
     }
 
     /**
@@ -350,9 +482,15 @@ abstract class strategy {
      */
     private function after_error(result $result) {
         $this->progress->save();
+        // Issue #64: the end of the selection travels with the feedback data of the attempt as well.
+        $this->endstatus = (string) $result->get_status();
+        $this->context['selectiondiagnosis'] = $this->diagnosis();
         $this->update_attemptfeedback($this->context);
         $this->cache->set('endtime', time());
         $this->cache->set('catquizerror', $result->get_status());
+        $this->cache->set('catquizerrorattempt', (int) ($this->context['attemptid'] ?? 0));
+        attempt_cache::set('endtime', (int) ($this->context['attemptid'] ?? 0), time());
+        attempt_cache::set('catquizerror', (int) ($this->context['attemptid'] ?? 0), $result->get_status());
 
         // The counts are written by persist_stage_counts(), which runs on
         // every completed selection - not only here. The reported abort never reaches
@@ -360,6 +498,7 @@ abstract class strategy {
         // not run, and a diagnosis that only wrote here stayed empty for exactly the
         // case it was built for.
         $this->result = $result;
+        $this->persist_stage_counts($this->endstatus);
         return $result;
     }
 
@@ -487,20 +626,15 @@ abstract class strategy {
     protected function check_item_params() {
         $selectedscales = [$this->context['catscaleid'], ...$this->context['progress']->get_selected_subscales()];
         foreach ($selectedscales as $catscaleid) {
-            $catscalecontext = catscale::get_context_id($catscaleid);
+            // Issue #157: the CAT context of the attempt.
+            $catscalecontext = (int) ($this->context['contextid'] ?? 0) ?: catscale::get_context_id($catscaleid);
             $catscaleids = [
                 $catscaleid,
                 ...catscale::get_subscale_ids($catscaleid),
             ];
-            $itemparamlists = [];
-            foreach (array_keys(model_strategy::get_installed_models()) as $model) {
-                $itemparamlists[$model] = model_item_param_list::get(
-                    $catscalecontext,
-                    $model,
-                    $catscaleids
-                )->count();
-            }
-            if (array_sum($itemparamlists) === 0) {
+            // Re-audit 02.11.2026 (#157): the active parameters, as the pool has them; parameters behind a reference
+            // that does not resolve count as none.
+            if (model_item_param_list::get($catscalecontext, null, $catscaleids)->count() === 0) {
                 $this->context['progress']->drop_scale($catscaleid);
                 unset($selectedscales[array_search($catscaleid, $selectedscales)]);
             }
@@ -656,6 +790,10 @@ abstract class strategy {
      * @return result
      */
     protected function mayberemovescale(): result {
+        // Issue #135: a global or fixed-order selection is not cut down by a per-scale maximum.
+        if (!$this->uses_per_scale_selection_limits()) {
+            return result::ok($this->context);
+        }
         $mayberemovescale = new mayberemovescale();
         return $mayberemovescale->run($this->context);
     }
@@ -670,6 +808,30 @@ abstract class strategy {
     protected function fisherinformation(): result {
         $fisherinformation = new fisherinformation();
         return $fisherinformation->run($this->context);
+    }
+
+    /**
+     * Records a question as administered: in the played questions and in the item's last use.
+     *
+     * Every path that hands out a question goes through here - the regular selection, the first
+     * question and a pilot item. The played questions are the exclusion set for every later
+     * selection; a question missing from them can be administered a second time (issue #126).
+     *
+     * @param \stdClass $question The question being administered.
+     * @param array $context The selection context.
+     */
+    private function register_administered_question(\stdClass $question, array $context): void {
+        $this->progress
+            ->add_playedquestion($question)
+            ->save();
+
+        catscale::update_testitem(
+            $context['contextid'],
+            $question,
+            $context['catscaleid'],
+            $context['includesubscales'],
+            $context['progress']->get_selected_subscales()
+        );
     }
 
     /**
@@ -738,6 +900,11 @@ abstract class strategy {
      * Now, this is just a wrapper to call the respective pre-select task.
      */
     protected function filterbystandarderror(): result {
+        // Issue #135: without scale dropping, only a global precision stop - or nothing at all.
+        if (!$this->uses_scale_dropping() && !$this->stops_on_global_precision()) {
+            return result::ok($this->context);
+        }
+        $this->context['global_precision_only'] = !$this->uses_scale_dropping();
         $filterbystandarderror = new filterbystandarderror();
         return $filterbystandarderror->run($this->context);
     }
@@ -748,6 +915,9 @@ abstract class strategy {
      * Now, this is just a wrapper to call the respective pre-select task.
      */
     protected function filterbytestinfo(): result {
+        if (!$this->uses_testinfo_filter()) {
+            return result::ok($this->context);
+        }
         $filterbytestinfo = new filterbytestinfo();
         return $filterbytestinfo->run($this->context);
     }
@@ -760,19 +930,32 @@ abstract class strategy {
      * @return result
      */
     protected function filterbyquestionsperscale(): result {
-        return result::ok($this->context);
+        if (!$this->requires_scale_coverage()) {
+            return result::ok($this->context);
+        }
+        return (new filterbyquestionsperscale())->run($this->context);
     }
+
     /**
-     * Notes how many candidates remain after a stage, and passes the result through.
+     * Runs one step of the selection inside a trace span (issue #136) and notes the candidates left.
      *
-     * The count is taken before the next stage runs, so a stage that
-     * empties the pool can be named. Without this the only observable fact was that
-     * the pool ended up empty.
+     * Without the trace switched on this only calls the step.
      *
-     * @param string $stage Name of the stage that has just finished.
-     * @param result|null $result Result of the following stage, passed through.
-     * @return result
+     * @param string $step Name of the step.
+     * @param callable $fn The step.
+     * @return mixed What the step returns.
      */
+    private function traced(string $step, callable $fn) {
+        if (!timeline::enabled()) {
+            return $fn();
+        }
+        return timeline::span('strategy:' . $step, function () use ($fn) {
+            $res = $fn();
+            timeline::note('candidates', isset($this->context['questions']) ? count($this->context['questions']) : null);
+            return $res;
+        });
+    }
+
     /**
      * Writes the recorded counts to the attempt cache.
      *
@@ -781,15 +964,95 @@ abstract class strategy {
      * simply empty - so writing only in the error path left no trace of the one thing
      * worth knowing.
      *
+     * Issue #64: the session-wide keys are kept for readers of the earlier layout; the diagnosis also goes
+     * under the attempt's own key, so a second attempt of the session does not overwrite it, and - when the
+     * selection ends the test - into the CAT attempt in the database, where it outlives the session. All of
+     * it without store_debug_info.
+     *
+     * @param string|null $endstatus The status that ends the test; null while it goes on.
      * @return void
      */
-    private function persist_stage_counts(): void {
-        if (empty($this->stagecounts) || !isset($this->cache)) {
+    private function persist_stage_counts(?string $endstatus = null): void {
+        if ($endstatus !== null) {
+            $this->endstatus = $endstatus;
+        }
+        if (!isset($this->cache)) {
             return;
         }
+        if (!empty($this->stagecounts)) {
+            $this->cache->set('catquizstagecounts', $this->stagecounts);
+            $this->cache->set('catquizstagetimings', $this->stagetimings);
+        }
+        $adaptiveattemptid = (int) ($this->context['attemptid'] ?? 0);
+        if ($adaptiveattemptid <= 0) {
+            return;
+        }
+        $diagnosis = $this->diagnosis();
+        attempt_cache::set('catquizstagecounts', $adaptiveattemptid, $diagnosis);
+        if ($this->endstatus !== null) {
+            $this->store_diagnosis_with_attempt($adaptiveattemptid, $diagnosis);
+        }
+    }
 
-        $this->cache->set('catquizstagecounts', $this->stagecounts);
-        $this->cache->set('catquizstagetimings', $this->stagetimings);
+    /**
+     * What the selection saw when it ended or handed out a question (issue #64).
+     *
+     * The status, the candidate count after every stage, the limits that apply and the counters they are
+     * compared with, and the abilities before and after the last answer - enough to tell which of the
+     * reported causes ended a test: no item left, the maximum, a filter that emptied the pool, the
+     * estimator.
+     *
+     * @return array
+     */
+    private function diagnosis(): array {
+        $progress = isset($this->progress) ? $this->progress : ($this->context['progress'] ?? null);
+        $finite = fn($values) => array_map(
+            fn($v) => is_numeric($v) && is_finite((float) $v) ? round((float) $v, 4) : null,
+            is_array($values) ? $values : []
+        );
+        return [
+            'status' => $this->endstatus ?? status::OK,
+            'time' => time(),
+            'counts' => $this->stagecounts,
+            'timings' => $this->stagetimings,
+            'minimumquestions' => (int) ($this->context['minimumquestions'] ?? 0),
+            'maximumquestions' => (int) ($this->context['maximumquestions'] ?? 0),
+            'maxperscale' => (int) ($this->context['max_attempts_per_scale'] ?? -1),
+            'answered' => $progress ? (int) $progress->get_num_answered_productive_questions() : null,
+            'played' => $progress ? count($progress->get_playedquestions()) : null,
+            'skipreason' => $this->context['skip_reason'] ?? null,
+            'previousabilities' => $finite($this->context['prev_ability'] ?? []),
+            'abilities' => $finite($this->context['person_ability'] ?? []),
+        ];
+    }
+
+    /**
+     * Keeps the diagnosis with the CAT attempt (issue #64), in its JSON next to the feedback data.
+     *
+     * Written directly, so it is there also when the feedback data are not updated in this request.
+     *
+     * @param int $adaptiveattemptid Id of the attempt of the component (adaptivequiz_attempt.id).
+     * @param array $diagnosis
+     * @return void
+     */
+    private function store_diagnosis_with_attempt(int $adaptiveattemptid, array $diagnosis): void {
+        global $DB;
+        $catattemptid = isset($this->progress) ? $this->progress->get_catattemptid() : null;
+        if (!$catattemptid) {
+            // The number of an attempt of the component is unique only together with the component (issue #5).
+            $component = isset($this->progress) ? (string) $this->progress->get_component() : '';
+            $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component ?: 'mod_adaptivequiz');
+        }
+        $record = $catattemptid ? $DB->get_record('local_catquiz_attempts', ['id' => $catattemptid], 'id, json') : false;
+        if (!$record) {
+            return;
+        }
+        $json = json_decode((string) $record->json, true);
+        if (!is_array($json)) {
+            $json = [];
+        }
+        $json['selectiondiagnosis'] = $diagnosis;
+        $DB->set_field('local_catquiz_attempts', 'json', json_encode($json), ['id' => $record->id]);
     }
 
     /**

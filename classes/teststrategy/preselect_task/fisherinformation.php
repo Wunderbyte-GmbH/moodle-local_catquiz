@@ -47,25 +47,39 @@ final class fisherinformation extends preselect_task {
      */
     public function run(array &$context): result {
         foreach ($context['questions'] as $item) {
-            // Just skip questions where we can not calculate the fisher information.
-            if (!array_key_exists($item->model, $context['installed_models'])) {
-                continue;
-            }
-
-            $model = $context['installed_models'][$item->model];
-
-            $item->fisherinformation = [];
-            foreach ($context['progress']->get_abilities() as $catscaleid => $ability) {
-                $fisherinformation = $this->get_fisherinformation($item, $ability, $model);
-                $item->fisherinformation[$catscaleid] = $fisherinformation;
-                // In order to calculate the standarderror per scale, we need the
-                // fisher information for all questions there.
-                $context['original_questions'][$item->id]->fisherinformation[$catscaleid] = $fisherinformation;
-            }
+            $this->annotate($item, $context);
         }
 
         $context['has_fisherinformation'] = true;
         return result::ok($context);
+    }
+
+    /**
+     * Sets the fisher information of one item, for every scale with an ability.
+     *
+     * The same values run() gives each item of the pool. A strategy that does not choose by
+     * information - CLASSIC - needs them only for the item it hands out (issue #144).
+     *
+     * @param \stdClass $item The question.
+     * @param array $context The selection context.
+     * @return void
+     */
+    public function annotate(\stdClass $item, array &$context): void {
+        // Just skip questions where we can not calculate the fisher information.
+        if (!array_key_exists($item->model, $context['installed_models'])) {
+            return;
+        }
+
+        $item->fisherinformation = [];
+        foreach ($context['progress']->get_abilities() as $catscaleid => $ability) {
+            $fisherinformation = $this->get_fisherinformation($item, $ability);
+            $item->fisherinformation[$catscaleid] = $fisherinformation;
+            // In order to calculate the standarderror per scale, we need the
+            // fisher information for all questions there.
+            if (isset($context['original_questions'][$item->id])) {
+                $context['original_questions'][$item->id]->fisherinformation[$catscaleid] = $fisherinformation;
+            }
+        }
     }
 
     /**

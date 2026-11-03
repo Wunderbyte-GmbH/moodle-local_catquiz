@@ -63,11 +63,22 @@ final class customscalefeedback_test extends basic_testcase {
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([
                 'get_quiz_settings',
+                'get_num_answered_productive_questions',
+                'get_fraction_for_scale',
             ])
             ->getMock();
         $progressmock
             ->method('get_quiz_settings')
             ->willReturn((object) $feedbackdata['quizsettings']);
+        // The range path now reads the per-scale N from the progress (issue #128); the scales of these
+        // data sets stand for scales measured in the attempt.
+        $progressmock
+            ->method('get_num_answered_productive_questions')
+            ->willReturn(3);
+        // Answered partly right (issue #140): all right or all wrong would make the scales invalid.
+        $progressmock
+            ->method('get_fraction_for_scale')
+            ->willReturn(0.5);
 
         $customscalefeedback = $this->getMockBuilder(customscalefeedback::class)
             ->onlyMethods([
@@ -83,6 +94,56 @@ final class customscalefeedback_test extends basic_testcase {
 
         $output = $customscalefeedback->get_feedback($feedbackdata)['studentfeedback'];
         $this->assertEquals($expected, $output);
+    }
+
+    /**
+     * The rendered feedback shows the main scale first, then its subscales by name (issue #102).
+     *
+     * Ids and names run in opposite directions on purpose: 101 is "Zeta", 102 is "Alpha". Sorting
+     * by id, or relying on array keys, would put Zeta before Alpha.
+     */
+    public function test_main_scale_and_subscales_are_rendered_in_order(): void {
+        $quizsettings = ['numberoffeedbackoptionsselect' => '1'];
+        $abilities = [];
+        foreach ([100 => 'MAINTEXT', 101 => 'ZETATEXT', 102 => 'ALPHATEXT'] as $scaleid => $text) {
+            $quizsettings["feedback_scaleid_limit_lower_{$scaleid}_1"] = '-5';
+            $quizsettings["feedback_scaleid_limit_upper_{$scaleid}_1"] = '5';
+            $quizsettings["feedbackeditor_scaleid_{$scaleid}_1"] = (object) ['text' => "<p>$text</p>", 'format' => '1'];
+            $abilities[$scaleid] = ['value' => '0.5', 'toreport' => true];
+        }
+        $feedbackdata = [
+            'testid' => 1,
+            'catscaleid' => 100,
+            'attemptid' => '1',
+            'contextid' => '2',
+            'catscales' => [
+                101 => (object) ['id' => 101, 'name' => 'Zeta'],
+                100 => (object) ['id' => 100, 'name' => 'Gesamt'],
+                102 => (object) ['id' => 102, 'name' => 'Alpha'],
+            ],
+            'customscalefeedback_abilities' => $abilities,
+            'quizsettings' => $quizsettings,
+        ];
+
+        $progressmock = $this->getMockBuilder(progress::class)
+            ->onlyMethods(['get_quiz_settings', 'get_num_answered_productive_questions', 'get_fraction_for_scale'])
+            ->getMock();
+        $progressmock->method('get_quiz_settings')->willReturn((object) $quizsettings);
+        $progressmock->method('get_num_answered_productive_questions')->willReturn(3);
+        $progressmock->method('get_fraction_for_scale')->willReturn(0.5);
+        $generator = $this->getMockBuilder(customscalefeedback::class)
+            ->onlyMethods(['get_progress'])
+            ->setConstructorArgs([new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_RELSUBS), new feedback_helper()])
+            ->getMock();
+        $generator->method('get_progress')->willReturn($progressmock);
+
+        $content = $generator->get_feedback($feedbackdata)['studentfeedback']['content'] ?? '';
+
+        $positions = array_map(fn($text) => strpos($content, $text), ['MAINTEXT', 'ALPHATEXT', 'ZETATEXT']);
+        $this->assertNotContains(false, $positions, 'A scale is missing from the feedback: ' . $content);
+        $sorted = $positions;
+        sort($sorted);
+        $this->assertSame($sorted, $positions, 'Not main scale first, then subscales by name.');
     }
 
     /**

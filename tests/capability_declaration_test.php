@@ -44,6 +44,13 @@ use advanced_testcase;
  */
 final class capability_declaration_test extends advanced_testcase {
     /**
+     * A capability check in the source of an endpoint: require_capability()/has_capability(), or the access
+     * rule of the feedback that wraps them (feedback_access: local/catquiz:canmanage on the site, or
+     * local/catquiz:view_users_feedback in the context), which the lazy statistics endpoint uses.
+     */
+    private const CAPABILITY_CHECK = '/(require_capability|has_capability|feedback_access::can_view_(other_users|user))\s*\(/';
+
+    /**
      * Returns the capabilities the plugin code checks.
      *
      * @return string[]
@@ -154,7 +161,7 @@ final class capability_declaration_test extends advanced_testcase {
             if (!preg_match('/function execute\s*\(/', $source)) {
                 continue;
             }
-            if (!preg_match('/(require_capability|has_capability)\s*\(/', $source)) {
+            if (!preg_match(self::CAPABILITY_CHECK, $source)) {
                 $unguarded[] = basename($file);
             }
         }
@@ -288,7 +295,7 @@ final class capability_declaration_test extends advanced_testcase {
             if (!str_contains($source, 'validate_context')) {
                 $missing[] = $name . ' (no validate_context)';
             }
-            if (!preg_match('/(require|has)_capability/', $source)) {
+            if (!preg_match(self::CAPABILITY_CHECK, $source)) {
                 $missing[] = $name . ' (no capability check)';
             }
         }
@@ -299,5 +306,21 @@ final class capability_declaration_test extends advanced_testcase {
             'These endpoints are reachable over the web service layer without both '
                 . 'guards in place.'
         );
+    }
+
+    /**
+     * The legacy attempt web services are gone and stay gone (issue #67, re-audit 27.10.2026): not declared, not
+     * registered on the site, no class behind the name - nothing that could be called without the activity's context,
+     * capability and ownership checks.
+     */
+    public function test_the_legacy_attempt_services_do_not_exist(): void {
+        global $CFG, $DB;
+        $functions = [];
+        require($CFG->dirroot . '/local/catquiz/db/services.php');
+        foreach (['start_new_attempt', 'get_next_question', 'submit_result'] as $name) {
+            $this->assertArrayNotHasKey('local_catquiz_' . $name, $functions);
+            $this->assertFalse($DB->record_exists('external_functions', ['name' => 'local_catquiz_' . $name]));
+            $this->assertFalse(class_exists('\\local_catquiz\\external\\' . $name));
+        }
     }
 }

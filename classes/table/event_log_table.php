@@ -56,9 +56,16 @@ class event_log_table extends wunderbyte_table {
         unset($values->uniqueid);
         unset($values->username);
 
-        $event = $values->eventname::restore((array)$values, []);
-
-        return $event->get_name();
+        // Issue #79: a log row outlives its event class - moved to a subplugin or removed.
+        $event = self::restore_event($values);
+        if ($event) {
+            try {
+                return $event->get_name();
+            } catch (\Throwable $e) {
+                debugging('Event name failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return get_string('historicevent', 'local_catquiz', s((string) ($values->eventname ?? '')));
     }
 
     /**
@@ -75,9 +82,37 @@ class event_log_table extends wunderbyte_table {
         unset($values->uniqueid);
         unset($values->username);
 
-        $event = $values->eventname::restore((array)$values, []);
+        $event = self::restore_event($values);
+        if ($event) {
+            try {
+                return $event->get_description();
+            } catch (\Throwable $e) {
+                debugging('Event description failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return get_string('historiceventdescription', 'local_catquiz', (object) [
+            'component' => s((string) ($values->component ?? '')),
+            'action' => s((string) ($values->action ?? '')),
+            'target' => s((string) ($values->target ?? '')),
+        ]);
+    }
 
-        return $event->get_description();
+    /**
+     * The event of a log row, or null when its class no longer exists or cannot rebuild it (issue #79).
+     *
+     * @param object $values The row.
+     * @return \core\event\base|null
+     */
+    private static function restore_event($values): ?\core\event\base {
+        $class = $values->eventname ?? '';
+        if (!is_string($class) || !class_exists($class) || !is_subclass_of($class, \core\event\base::class)) {
+            return null;
+        }
+        try {
+            return $class::restore((array) $values, []) ?: null;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

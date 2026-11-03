@@ -24,17 +24,37 @@ Finally, the plugin allows to pursuit different test strategies:
 * semi-classical diagnose for all given (sub-)scales
 * classical testing (ask all questions), but evaluation with IRT
 
-### Dependencies
+### Versions and dependencies
 
-For using this plugin, you are required to install the following plugins:
+local_catquiz comes in two lines (issue #31). Install the line of your Moodle; each one refuses the other
+Moodle (`requires`, `incompatible`).
 
-* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/tree/alise_adaptivequiz) until our changes are integrated into the [upstream plugin](https://moodle.org/plugins/mod_adaptivequiz) (in progress). This branch already includes the subplugin [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.2), which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
-* [local_wunderbyte_table](https://moodle.org/plugins/local_wunderbyte_table) - database and tables handling
+| Line | Moodle | mod_adaptivequiz | adaptivequizcatmodel_catquiz |
+|---|---|---|---|
+| 1.2.x | 4.5 (`supported` 405, refused on 5.0 and later) | branch `ALiSe-v-1.2.0-legacy`, at least 2026101800 | branch `ALiSe-v-1.2.0-legacy`, at least 2026101800 |
+| 1.3.x | 5.1 to 5.3 (`requires` 5.1) | branch `v-3.0`, at least 2026101801 | branch `v-3.0`, at least 2026101801 |
 
-It is also recommended to install the following plugins as well:
+You are reading the README of line 1.2 (this branch, `ALiSe-v-1.2.0-legacy`). The seven model subplugins under `catmodel/` ask for the same Moodle
+as the plugin.
 
-* [local_shortcodes](https://moodle.org/plugins/filter_shortcodes) - helps to render results at any point in your courses
-* local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
+Required plugins:
+
+* [mod_adaptivequiz](https://github.com/ralferlebach/moodle-mod_adaptivequiz) - the activity a CAT test is started
+  from, in the branch of the line (see above).
+* [adaptivequizcatmodel_catquiz](https://github.com/ralferlebach/moodle-adaptivequizcatmodel_catquiz) - the CAT model
+  subplugin of mod_adaptivequiz that connects it to local_catquiz, in the branch of the line. It is installed into
+  `mod/adaptivequiz/catmodel/catquiz`.
+* [local_wunderbyte_table](https://moodle.org/plugins/local_wunderbyte_table) - database and tables handling. Note:
+  its version.php names Moodle 4.5 to 5.2 as supported; on Moodle 5.3 it is used beyond that.
+
+Optional:
+
+* [filter_shortcodes](https://moodle.org/plugins/filter_shortcodes) - renders feedback and statistics anywhere in
+  your courses (see "Shortcodes" below). Without it, the shortcodes are not available; nothing else depends on it.
+* The CATquiz central hub subplugins (`catquizcentralhub/host`, `catquizcentralhub/client`) - separate repositories.
+
+On Moodle 5.1 and later the code of a plugin lives below the `public/` directory: install this plugin into
+`public/local/catquiz` (Moodle 4.5: `local/catquiz`).
 
 ## Core concepts & Terminology ##
 The plugin tries to present questions matching the ability of the student. To assign parameters like difficulty to each question, questions and params are grouped as items.

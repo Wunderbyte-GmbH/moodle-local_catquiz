@@ -40,8 +40,8 @@ amd/package-lock.json
 amd/node_modules
 
 # moodle-plugin-ci working directories
-ci/
-moodle/
+/ci/
+/moodle/
 
 # PHPUnit / coverage
 .phpunit.result.cache

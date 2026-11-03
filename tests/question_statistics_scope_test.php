@@ -39,6 +39,7 @@ use advanced_testcase;
  * @copyright  2026 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_catquiz\catquiz::return_sql_for_catscalequestions
+ * @covers     \local_catquiz\catquiz::get_pool_statistics
  */
 final class question_statistics_scope_test extends advanced_testcase {
     /**
@@ -100,24 +101,26 @@ final class question_statistics_scope_test extends advanced_testcase {
     }
 
     /**
-     * Attempt counts are distinct, so steps cannot inflate them.
+     * The pilot number is counted on question attempts, without the steps.
+     *
+     * Issue #136: "answered" is read off question_attempts.responsesummary. Without the
+     * join to question_attempt_steps there is nothing that could multiply the rows, so
+     * a plain COUNT(qa.id) counts question attempts.
      *
      * @return void
      */
-    public function test_attempt_count_is_distinct(): void {
+    public function test_attempt_count_needs_no_steps(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         [$scaleid, $contextid] = $this->make_scale();
 
         [, $from] = catquiz::return_sql_for_catscalequestions([$scaleid], $contextid, []);
+        $astat = substr($from, 0, strpos($from, ') astat'));
 
-        $this->assertStringNotContainsString(
-            'COUNT(qa.id)',
-            $from,
-            'A plain COUNT over the steps join counts steps, not question attempts.'
-        );
-        $this->assertStringContainsString('COUNT(DISTINCT qa.id)', $from);
+        $this->assertStringNotContainsString('question_attempt_steps', $astat);
+        $this->assertStringContainsString('qa.responsesummary IS NOT NULL', $astat);
+        $this->assertStringContainsString('COUNT(qa.id)', $astat);
     }
 
     /**
@@ -233,6 +236,7 @@ final class question_statistics_scope_test extends advanced_testcase {
             'maxfraction' => 1.0,
             'flagged' => 0,
             'questionsummary' => '',
+            'responsesummary' => 'True',
             'timemodified' => $now,
         ]);
 
@@ -248,18 +252,10 @@ final class question_statistics_scope_test extends advanced_testcase {
             ]);
         }
 
-        $sql = "SELECT COUNT(DISTINCT qa.id) AS attempts, COUNT(qa.id) AS steps
-                  FROM {local_catquiz_attempts} lca
-                  JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
-                  JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
-                  JOIN {question_attempt_steps} qas
-                    ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
-                 WHERE lca.contextid = :contextid AND lca.scaleid = :scaleid";
-        $row = $DB->get_record_sql($sql, ['contextid' => $contextid, 'scaleid' => $scaleid]);
-
-        $this->assertEquals(1, $row->attempts, 'One answered question is one attempt.');
-        // Proves the fixture actually exercises the defect: without DISTINCT the same
-        // question attempt is reported three times.
-        $this->assertEquals(3, $row->steps);
+        // Issue #136: counted by the same function the runtime pool uses.
+        $stats = catquiz::get_pool_statistics([$scaleid], $contextid);
+        $this->assertSame(1, $stats[$questionid]->attempts, 'One answered question is one attempt.');
+        // Proves the fixture actually has several steps for the one answer.
+        $this->assertSame(3, $DB->count_records('question_attempt_steps', ['questionattemptid' => $qaid]));
     }
 }

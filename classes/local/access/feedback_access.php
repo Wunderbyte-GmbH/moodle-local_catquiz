@@ -74,6 +74,30 @@ class feedback_access {
     }
 
     /**
+     * Whether the current user may see the results of one person, the group mode included (issue #85).
+     *
+     * can_view_user() with the groups: in separate groups, a teacher without moodle/site:accessallgroups
+     * sees the members of their own groups only. Used by every view of one person's attempt - the result
+     * page, the tabs and attempts loaded later - so they cannot disagree.
+     *
+     * @param context $context The context the viewed data belongs to.
+     * @param int $userid The owner of the data.
+     * @return bool
+     */
+    public static function can_view_user_in_groups(context $context, int $userid): bool {
+        global $USER;
+
+        if ((int) $userid === (int) $USER->id) {
+            return true;
+        }
+        if (!self::can_view_other_users($context)) {
+            return false;
+        }
+        $allowed = self::get_allowed_userids($context);
+        return $allowed === null || in_array((int) $userid, $allowed, true);
+    }
+
+    /**
      * Returns the ids of the users whose results may be shown in this context.
      *
      * Honours the Moodle group mode: in separate groups mode a teacher without

@@ -43,6 +43,15 @@
     }
 }}
 <h5>{{#str}}attemptscollapsableheading, local_catquiz {{/str}}</h5>
+{{! The accordion around the attempts - once per render, not once per attempt (issue #30). }}
+<div id="local-catquiz-attempts-{{uniqid}}">
 {{#attempt}}
     {{>local_catquiz/feedback/feedbacklist}}
 {{/attempt}}
+</div>
+{{! Collapsed attempts load their feedback when opened (issue #85); the open one brings its own call. }}
+{{#js}}
+    require(['local_catquiz/feedback'], function(feedback) {
+        feedback.init();
+    });
+{{/js}}

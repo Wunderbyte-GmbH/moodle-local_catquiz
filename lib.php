@@ -65,6 +65,12 @@ define('LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY_COLOR_CLASS', 'text-success');
 // Attempt Status.
 define('LOCAL_CATQUIZ_ATTEMPT_OK', 0);
 define('LOCAL_CATQUIZ_ATTEMPT_ABORTED', 1);
+/*
+ * A CAT attempt that has started but not been saved by the result page yet. Issue #101 requires the
+ * CAT attempt to exist before the first progress access, so it is filed as soon as a test starts -
+ * without scale, context or course, which the result page fills in. Statistics must not count it.
+ */
+define('LOCAL_CATQUIZ_ATTEMPT_RUNNING', 2);
 
 define('LOCAL_CATQUIZ_PERSONABILITY_MAX', 50);
 
@@ -110,8 +116,6 @@ define('LOCAL_CATQUIZ_MAX_SCALERANGE', 8);
  * @return string The HTML
  */
 function local_catquiz_render_navbar_output(\renderer_base $renderer) {
-    global $CFG;
-
     // Early bail out conditions.
     if (
         !isloggedin() || isguestuser()
@@ -120,14 +124,15 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
         return;
     }
 
-    $output = '<div class="popover-region nav-link icon-no-margin dropdown">
-        <a class="btn btn-secondary"
-        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
-            . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"
-        role="button">
-        ' . get_string('catquiz', 'local_catquiz') . '
-        </a>
-    </div>';
+    // Issue #30: no generic id - it is on every page - and no popup it does not open; issue #32: a moodle_url.
+    $output = html_writer::div(
+        html_writer::link(
+            new moodle_url('/local/catquiz/manage_catscales.php'),
+            get_string('catquiz', 'local_catquiz'),
+            ['class' => 'btn btn-secondary', 'role' => 'button']
+        ),
+        'popover-region nav-link icon-no-margin'
+    );
 
     return $output;
 }
@@ -140,6 +145,19 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
  * @return void
  */
 function local_catquiz_coursemodule_standard_elements($fromform, $fields) {
+}
+
+/**
+ * The feedback fields of one scale for the activity settings (issue #51).
+ *
+ * Only the scale being edited has its fields in the form; the others are loaded with this fragment when
+ * they are opened.
+ *
+ * @param array $args context, scaleid, rootscaleid, nranges, cmid, instanceid, values
+ * @return string
+ */
+function local_catquiz_output_fragment_feedbackpanel($args) {
+    return \local_catquiz\feedback\feedbackclass::panel_fragment($args);
 }
 
 /**
@@ -158,6 +176,8 @@ function local_catquiz_pluginfile($course, $birecordorcm, $context, $filearea, $
     if (!$isfeedbackfile) {
         send_file_not_found();
     }
+    // Images of the feedback texts: only for people who may enter the course of the test.
+    \local_catquiz\local\access\feedback_file_access::require_access($context, $course);
 
     $fs = get_file_storage();
     $filename = array_pop($args);

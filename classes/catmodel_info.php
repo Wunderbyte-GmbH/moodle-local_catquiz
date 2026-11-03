@@ -164,7 +164,12 @@ class catmodel_info {
             foreach ($itemdifficulties as $modelname => $itemparamlist) {
                 $itemcounter = 0;
                 /** @var model_item_param_list $itemparamlist */
-                $itemparamlist->save_to_db($targetcontextid);
+                // Issue #104, H2: the estimate of a question goes to each of its items in the calibrated scales.
+                $itemparamlist->save_to_db(
+                    $targetcontextid,
+                    [$catscaleid, ...catscale::get_subscale_ids($catscaleid)],
+                    (int) $contextid
+                );
                 if (!$inplace) {
                     $personabilities->save_to_db($targetcontextid, $catscaleid);
                 }

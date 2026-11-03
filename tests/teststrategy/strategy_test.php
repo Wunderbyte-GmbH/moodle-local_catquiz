@@ -403,19 +403,31 @@ final class strategy_test extends advanced_testcase {
             $adaptivequiz = $DB->get_record('adaptivequiz', ['id' => $attemptrec->instance], '*', MUST_EXIST);
             $attempt = new attempt($adaptivequiz, $attemptrec->userid);
             $attemptdata = $attempt->get_attempt();
-            $abilityrecord = $DB->get_record(
+            /* The newest valid row, not the first one the database happens to return: since the
+               per-attempt results were merged in, local_catquiz_personparams keeps one row per
+               estimate. get_record() would return the oldest and the trajectory would stand still. */
+            $abilityrecord = current($DB->get_records(
                 'local_catquiz_personparams',
-                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
-                'ability'
-            );
+                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid, 'isvalid' => 1],
+                'id DESC',
+                'id, ability',
+                0,
+                1
+            )) ?: null;
             $ability = $abilityrecord ? $abilityrecord->ability : ($initialability ?: 0);
 
             [$nextquestionid, $message] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attemptdata);
-            $abilityrecord = $DB->get_record(
+            /* The newest valid row, not the first one the database happens to return: since the
+               per-attempt results were merged in, local_catquiz_personparams keeps one row per
+               estimate. get_record() would return the oldest and the trajectory would stand still. */
+            $abilityrecord = current($DB->get_records(
                 'local_catquiz_personparams',
-                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
-                'ability'
-            );
+                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid, 'isvalid' => 1],
+                'id DESC',
+                'id, ability',
+                0,
+                1
+            )) ?: null;
             $ability = $abilityrecord ? $abilityrecord->ability : ($initialability ?: 0);
             $abilities[] = (float) $ability;
             if ($expectedquestion['label'] === 'FINISH' || $nextquestionid == 0) {
@@ -515,11 +527,17 @@ final class strategy_test extends advanced_testcase {
 
             [$nextquestionid, $message] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attemptdata);
 
-            $abilityrecord = $DB->get_record(
+            /* The newest valid row, not the first one the database happens to return: since the
+               per-attempt results were merged in, local_catquiz_personparams keeps one row per
+               estimate. get_record() would return the oldest and the trajectory would stand still. */
+            $abilityrecord = current($DB->get_records(
                 'local_catquiz_personparams',
-                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
-                'ability'
-            );
+                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid, 'isvalid' => 1],
+                'id DESC',
+                'id, ability',
+                0,
+                1
+            )) ?: null;
             $abilities[] = $abilityrecord ? (float) $abilityrecord->ability : 0.0;
 
             if ($nextquestionid == 0) {
@@ -2883,6 +2901,62 @@ final class strategy_test extends advanced_testcase {
         return $filename;
     }
     /**
+     * The first question enters the exclusion set the moment it is handed out (issue #126).
+     *
+     * Every path that hands out a question now registers it through the same helper. Two early
+     * returns did not: the first-question selector when only one question has a difficulty, and a
+     * pilot item. Unregistered, a question was missing from the played questions - the exclusion
+     * set for every later selection - and could be drawn again in the same attempt.
+     *
+     * What this fixture reaches is the regular selection; removing the registration there turns it
+     * red. The two early returns go through the same helper but are not reached here - the pilot
+     * path needs a pool with pilot items, which only the large simulation data set provides.
+     *
+     * @dataProvider stopping_strategies_provider
+     * @param int $strategy
+     * @param string $label
+     * @return void
+     */
+    public function test_the_first_question_is_excluded_from_then_on(int $strategy, string $label): void {
+        global $DB, $USER;
+
+        putenv(
+            sprintf(
+                'USE_TESTING_CLASS_FOR=%s',
+                implode(',', [
+                    'local_catquiz\\teststrategy\\preselect_task\\updatepersonability',
+                    'local_catquiz\\teststrategy\\preselect_task\\maybe_return_pilot',
+                ])
+            )
+        );
+        putenv('CATQUIZ_TESTING_ABILITY=0.0');
+        putenv('CATQUIZ_TESTING_STANDARDERROR=1.0');
+        putenv('CATQUIZ_TESTING_SKIP_FEEDBACK=true');
+        $settings = [
+            'maxquestions' => 250,
+            'maxquestionspersubscale' => 25,
+            'standarderror_min' => 0.25,
+            'standarderror_max' => 0.5,
+        ];
+        $this->createtestenvironment($strategy, $settings)->save_or_update();
+        catquiz_handler::prepare_attempt_caches();
+        $this->preventResetByRollback();
+        $attempt = new attempt($this->adaptivequiz, $USER->id);
+
+        [$firstid] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attempt->get_attempt());
+        $this->assertNotEquals(0, $firstid, "$label: no first question was selected at all.");
+
+        // Read back what was saved: the exclusion set of the next request comes from there.
+        $catattemptid = \local_catquiz\catquiz::get_cat_attempt_id((int) $attempt->get_attempt()->id, 'mod_adaptivequiz');
+        $saved = json_decode((string) $DB->get_field('local_catquiz_progress', 'json', ['attemptid' => $catattemptid]), true);
+        $this->assertArrayHasKey(
+            (int) $firstid,
+            $saved['playedquestions'] ?? [],
+            "$label: the first question was handed out without entering the exclusion set."
+        );
+    }
+
+    /**
      * Issue #64: after answering the first question, a second one is selected.
      *
      * The reported symptom is an attempt that stops after Q1. The stage
@@ -2983,6 +3057,97 @@ final class strategy_test extends advanced_testcase {
             $secondid,
             "$label: the same question was selected twice."
         );
+    }
+
+    /**
+     * After a pilot item the next question is a new one - not the question before the pilot (issue #141).
+     *
+     * The production attempt behind issues #141/#125/#126: 33 slots at a maximum of 25, and each of
+     * its four repetitions came right after a pilot item and repeated the question before it. The
+     * pilot item was not registered as the last question, so its answer did not match the last
+     * question, the request looked like a reload and the previous question was handed out again.
+     *
+     * Driven through the real selection with pilot items (the testing class makes the third, fifth,
+     * ninth ... question a pilot), answering every question in its own slot as the activity does.
+     *
+     * @dataProvider pilot_strategies_provider
+     * @param int $strategy
+     * @param string $label
+     * @return void
+     */
+    public function test_no_question_is_repeated_after_a_pilot(int $strategy, string $label): void {
+        global $DB, $USER;
+
+        putenv(
+            sprintf(
+                'USE_TESTING_CLASS_FOR=%s',
+                implode(',', [
+                    'local_catquiz\\teststrategy\\preselect_task\\updatepersonability',
+                    'local_catquiz\\teststrategy\\preselect_task\\maybe_return_pilot',
+                ])
+            )
+        );
+        putenv('CATQUIZ_TESTING_ABILITY=0.0');
+        putenv('CATQUIZ_TESTING_STANDARDERROR=1.0');
+        putenv('CATQUIZ_TESTING_SKIP_FEEDBACK=true');
+        $settings = [
+            'maxquestions' => 250,
+            'maxquestionspersubscale' => 25,
+            'pilot_ratio' => 50,
+            'standarderror_min' => 0.25,
+            'standarderror_max' => 0.5,
+        ];
+        $this->createtestenvironment($strategy, $settings)->save_or_update();
+        catquiz_handler::prepare_attempt_caches();
+        $this->preventResetByRollback();
+
+        $attemptid = (new attempt($this->adaptivequiz, $USER->id))->get_attempt()->id;
+        $administered = [];
+        $pilots = 0;
+        $hasqubaid = false;
+        for ($i = 0; $i < 12; $i++) {
+            $attemptrec = $DB->get_record('adaptivequiz_attempt', ['id' => $attemptid], '*', MUST_EXIST);
+            $adaptivequiz = $DB->get_record('adaptivequiz', ['id' => $attemptrec->instance], '*', MUST_EXIST);
+            $attempt = new attempt($adaptivequiz, $attemptrec->userid);
+            [$questionid] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attempt->get_attempt());
+            if (!$questionid) {
+                break;
+            }
+            $this->assertNotContains(
+                (int) $questionid,
+                $administered,
+                "$label: question $questionid handed out again after " . implode(', ', $administered) . '.'
+            );
+            $administered[] = (int) $questionid;
+            $catattemptid = \local_catquiz\catquiz::get_cat_attempt_id((int) $attemptid, 'mod_adaptivequiz');
+            $saved = json_decode((string) $DB->get_field('local_catquiz_progress', 'json', ['attemptid' => $catattemptid]), true);
+            $pilots += empty($saved['playedquestions'][$questionid]['is_pilot']) ? 0 : 1;
+
+            $this->createresponse(question_bank::load_question($questionid), $i % 2 === 0);
+            $attemptrec = $attempt->get_attempt();
+            $attemptrec->timemodified = time();
+            $attemptrec->questionsattempted = ($attemptrec->questionsattempted ?? 0) + 1;
+            $DB->update_record('adaptivequiz_attempt', $attemptrec);
+            if (!$hasqubaid) {
+                $attempt->set_quba_id($this->quba->get_id());
+                $hasqubaid = true;
+            }
+        }
+
+        $this->assertGreaterThan(0, $pilots, "$label: no pilot item was handed out - the test proves nothing.");
+        $this->assertGreaterThan(5, count($administered), "$label: the attempt ended too early to tell.");
+    }
+
+    /**
+     * Strategies that hand out pilot items from the simulation pool.
+     *
+     * @return array
+     */
+    public static function pilot_strategies_provider(): array {
+        return [
+            'fastest' => [LOCAL_CATQUIZ_STRATEGY_FASTEST, 'fastest'],
+            'balanced' => [LOCAL_CATQUIZ_STRATEGY_BALANCED, 'balanced'],
+        ];
     }
 
     /**

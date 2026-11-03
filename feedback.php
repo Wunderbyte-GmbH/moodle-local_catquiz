@@ -24,7 +24,7 @@
 
 use local_catquiz\output\feedback_page;
 
-require_once('../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 // Get URL parameters.

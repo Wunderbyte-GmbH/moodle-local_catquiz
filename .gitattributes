@@ -8,7 +8,24 @@
 /.github/                 export-ignore
 /doc/                     export-ignore
 /erpnext.yml              export-ignore
-/cli/	                  export-ignore
+# Werkzeuge fuer Betrieb und Support werden ausgeliefert (u. a. cli/revalidate_attempts.php,
+# cli/export_trace.php, cli/diagnose_*.php). Nur Entwicklungs-, Last- und Experimentskripte nicht.
+/cli/compare_runs.php              export-ignore
+/cli/compare_versions.php          export-ignore
+/cli/edgecase_emit_fixtures.php    export-ignore
+/cli/edgecase_experiment.php       export-ignore
+/cli/edgecase_lib.php              export-ignore
+/cli/explain_hotqueries.php        export-ignore
+/cli/explain_seed.php              export-ignore
+/cli/loadtest_seed.php             export-ignore
+/cli/measure_ability_fit.php       export-ignore
+/cli/measure_attempt.php           export-ignore
+/cli/measure_feedback_cache.php    export-ignore
+/cli/measure_runtime_pool.php      export-ignore
+/cli/measure_screens.php           export-ignore
+/cli/measure_session_pool.php      export-ignore
+/cli/reproduce_issue_64.php        export-ignore
+/cli/verify_recalculation_lock.php export-ignore
 package.json              export-ignore
 babel.config.js           export-ignore
 
@@ -20,3 +37,4 @@ catquizcentralhub/client/ export-ignore
 .gitmodules               export-ignore
 .gitignore                export-ignore
 .gitattributes            export-ignore
+/Makefile export-ignore

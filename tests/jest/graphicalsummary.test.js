@@ -27,10 +27,11 @@
 
 import {init} from '../../amd/src/graphicalsummary';
 import Ajax from 'core/ajax';
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import {addIconToContainerWithPromise} from 'core/loadingicon';
 import Templates from 'core/templates';
 import Notification from 'core/notification';
+import Fragment from 'core/fragment';
 
 /**
  * Let the pending promise chain of the async click handler settle.
@@ -81,14 +82,14 @@ test('successful AJAX opens the modal and clears the spinner', async() => {
     addIconToContainerWithPromise.mockReturnValue(iconPromise);
     Ajax.call.mockReturnValue([Promise.resolve({questionhtml: '<p>Q</p>', javascript: ''})]);
     const modal = fakeModal();
-    ModalFactory.create.mockResolvedValue(modal);
+    Modal.create.mockResolvedValue(modal);
 
     await init();
     element.click();
     await flush();
 
     expect(Ajax.call).toHaveBeenCalledTimes(1);
-    expect(ModalFactory.create).toHaveBeenCalledTimes(1);
+    expect(Modal.create).toHaveBeenCalledTimes(1);
     expect(modal.show).toHaveBeenCalledTimes(1);
     expect(iconPromise.resolve).toHaveBeenCalledTimes(1);
     expect(Notification.exception).not.toHaveBeenCalled();
@@ -108,8 +109,52 @@ test('AJAX rejection clears the spinner, shows a notification and opens no modal
 
     expect(iconPromise.resolve).toHaveBeenCalledTimes(1);
     expect(Notification.exception).toHaveBeenCalledWith(error);
-    expect(ModalFactory.create).not.toHaveBeenCalled();
+    expect(Modal.create).not.toHaveBeenCalled();
     expect(element.hasAttribute('aria-busy')).toBe(false);
+});
+
+test('a message from the server is shown in the dialogue, not as an exception (issue #139)', async() => {
+    const element = setupDom();
+    const iconPromise = {resolve: jest.fn()};
+    addIconToContainerWithPromise.mockReturnValue(iconPromise);
+    const body = document.createElement('div');
+    const modal = {...fakeModal(), getBody: jest.fn(() => [body])};
+    Modal.create.mockResolvedValue(modal);
+    Ajax.call.mockReturnValue([Promise.reject({
+        errorcode: 'reviewquestionunavailable',
+        message: 'This question of the attempt is no longer available.',
+    })]);
+
+    await init();
+    element.click();
+    await flush();
+
+    expect(Notification.exception).not.toHaveBeenCalled();
+    expect(Modal.create).toHaveBeenCalledWith({title: 'Q1', body: ''});
+    expect(modal.show).toHaveBeenCalledTimes(1);
+    expect(body.querySelector('[role="alert"]').textContent)
+        .toBe('This question of the attempt is no longer available.');
+    expect(iconPromise.resolve).toHaveBeenCalledTimes(1);
+    expect(element.hasAttribute('aria-busy')).toBe(false);
+    expect(element.dataset.loading).toBeUndefined();
+});
+
+test('the collected JavaScript is unwrapped before it runs, so it runs once (issue #139)', async() => {
+    const element = setupDom();
+    addIconToContainerWithPromise.mockReturnValue({resolve: jest.fn()});
+    Ajax.call.mockReturnValue([Promise.resolve({
+        questionhtml: '<p>Q</p>',
+        javascript: '<script>\n//<![CDATA[\nrun();\n//]]>\n</script>',
+    })]);
+    Fragment.processCollectedJavascript.mockReturnValueOnce(' run();');
+    Modal.create.mockResolvedValue(fakeModal());
+
+    await init();
+    element.click();
+    await flush();
+
+    expect(Fragment.processCollectedJavascript).toHaveBeenCalledWith('<script>\n//<![CDATA[\nrun();\n//]]>\n</script>');
+    expect(Templates.appendNodeContents).toHaveBeenCalledWith(expect.anything(), '<p>Q</p>', ' run();');
 });
 
 test('a double click does not start parallel requests', async() => {
@@ -118,7 +163,7 @@ test('a double click does not start parallel requests', async() => {
     Ajax.call.mockReturnValue([new Promise(resolve => {
         resolveAjax = resolve;
     })]);
-    ModalFactory.create.mockResolvedValue(fakeModal());
+    Modal.create.mockResolvedValue(fakeModal());
 
     await init();
     element.click();

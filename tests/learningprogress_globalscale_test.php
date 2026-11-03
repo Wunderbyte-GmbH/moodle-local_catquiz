@@ -25,40 +25,31 @@
 namespace local_catquiz;
 
 use advanced_testcase;
-use local_catquiz\teststrategy\feedback_helper;
-use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
-use local_catquiz\teststrategy\feedbacksettings;
-use ReflectionMethod;
+use local_catquiz\local\statistics\learning_progress_series;
 
 /**
  * The learning-progress series is bound to a chosen scale (issue #11).
  *
  * The chart must follow the global scale, so its series must not change when the
  * primary scale of individual attempts changes. A value of exactly 0.0 is a
- * valid ability and must be kept; an attempt without a value for the scale must
- * become a gap (null), never a substituted value.
+ * valid ability and must be kept. An attempt without a value for the scale gives no point
+ * of the trajectory - never a substituted value (issue #119: one point per valid result).
  *
  * @package    local_catquiz
  * @copyright  2026 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_catquiz\teststrategy\feedbackgenerator\learningprogress::extract_scale_progress_values
+ * @covers     \local_catquiz\local\statistics\learning_progress_series
  */
 final class learningprogress_globalscale_test extends advanced_testcase {
     /**
-     * Extracts the per-attempt values for a scale via the generator.
+     * The person's trajectory on a scale, as the learning-progress chart draws it.
      *
      * @param array $attempts
      * @param int   $scaleid
      * @return array
      */
     private function values_for_scale(array $attempts, int $scaleid): array {
-        $generator = new learningprogress(
-            new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB),
-            new feedback_helper()
-        );
-        $method = new ReflectionMethod(learningprogress::class, 'extract_scale_progress_values');
-        $method->setAccessible(true);
-        return $method->invoke($generator, $attempts, $scaleid);
+        return learning_progress_series::individual($attempts, $scaleid);
     }
 
     /**
@@ -69,12 +60,15 @@ final class learningprogress_globalscale_test extends advanced_testcase {
      */
     private function attempts(): array {
         return [
-            // Global 0.5, primary 1.5.
-            (object) ['json' => json_encode(['personabilities' => [1 => 0.5, 2 => 1.5]])],
+            // Global 0.5, primary 1.5. Attempts without stored results: their JSON is read.
+            (object) ['id' => 91, 'userid' => 5, 'endtime' => 1000,
+                'json' => json_encode(['personabilities' => [1 => 0.5, 2 => 1.5]])],
             // Global exactly 0.0 (must be kept), primary 2.0.
-            (object) ['json' => json_encode(['personabilities' => [1 => 0.0, 2 => 2.0]])],
-            // No global value (must become a gap), primary 3.0.
-            (object) ['json' => json_encode(['personabilities' => [2 => 3.0]])],
+            (object) ['id' => 92, 'userid' => 5, 'endtime' => 2000,
+                'json' => json_encode(['personabilities' => [1 => 0.0, 2 => 2.0]])],
+            // No global value (no point), primary 3.0.
+            (object) ['id' => 93, 'userid' => 5, 'endtime' => 3000,
+                'json' => json_encode(['personabilities' => [2 => 3.0]])],
         ];
     }
 
@@ -85,7 +79,7 @@ final class learningprogress_globalscale_test extends advanced_testcase {
      */
     public function test_global_series_keeps_zero_and_gaps(): void {
         $global = $this->values_for_scale($this->attempts(), 1);
-        $this->assertSame([0.5, 0.0, null], $global);
+        $this->assertSame([0.5, 0.0], $global);
     }
 
     /**
@@ -106,13 +100,13 @@ final class learningprogress_globalscale_test extends advanced_testcase {
     }
 
     /**
-     * An attempt missing the scale value yields null, not a shifted series.
+     * An attempt missing the scale value gives no point, and no other scale's value takes its place.
      *
      * @return void
      */
     public function test_missing_value_is_a_gap(): void {
         $global = $this->values_for_scale($this->attempts(), 1);
-        $this->assertCount(3, $global, 'Every attempt must map to one entry.');
-        $this->assertNull($global[2], 'A missing global value must be a gap.');
+        $this->assertCount(2, $global, 'Only attempts with a value for the scale are points.');
+        $this->assertNotContains(3.0, $global, 'The primary value must not stand in for the global one.');
     }
 }

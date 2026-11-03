@@ -251,12 +251,16 @@ final class light_count_test extends advanced_testcase {
         $source = file_get_contents(
             $CFG->dirroot . '/local/catquiz/classes/output/catquizstatistics.php'
         );
+        // Issue #88: the rows are loaded by the population every chart shares.
+        $populationsource = file_get_contents(
+            $CFG->dirroot . '/local/catquiz/classes/local/statistics/attempt_population.php'
+        );
 
-        $start = strpos($source, 'private function get_attempts');
+        $start = strpos($populationsource, 'public function attempts(');
         $this->assertNotFalse($start, 'The statistics rows are loaded here.');
 
-        $end = strpos($source, "\n    }", $start);
-        $loader = substr($source, $start, $end - $start);
+        $end = strpos($populationsource, "\n    }\n", $start);
+        $loader = substr($populationsource, $start, $end - $start);
 
         preg_match_all('/a\.([a-z_]+)/', $loader, $columns);
         $loaded = array_unique($columns[1]);
@@ -267,7 +271,7 @@ final class light_count_test extends advanced_testcase {
         // lives in catquiz.php and reads personability_after_attempt off these rows -
         // scanning only catquizstatistics.php made an earlier version of this test pass
         // with the column removed, which is the failure it was written to catch.
-        $consumers = $source . file_get_contents(
+        $consumers = $source . $populationsource . file_get_contents(
             $CFG->dirroot . '/local/catquiz/classes/catquiz.php'
         );
 
@@ -275,9 +279,14 @@ final class light_count_test extends advanced_testcase {
 
         // The key 'value' is built in the reducer, not selected; 'component'
         // and 'instanceid' are read on rows from other queries in catquiz.php.
+        // 'primaryvalid' and 'legacy' are set by the population from the stored results (issue #88),
+        // 'provenance' and 'valuesource' likewise, from the time the attempt ended (issue #150).
         $needed = array_diff(
             array_unique($reads[1]),
-            ['value', 'component', 'instanceid', 'attemptid', 'uniqueid']
+            [
+                'value', 'component', 'instanceid', 'attemptid', 'uniqueid',
+                'primaryvalid', 'legacy', 'provenance', 'valuesource',
+            ]
         );
 
         $this->assertSame(

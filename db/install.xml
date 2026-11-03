@@ -165,10 +165,19 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT = "0" SEQUENCE="false" COMMENT="User id"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cat context"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the attempt"/>   <!-- TODO: To be decided and to be implemented -->
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The CAT attempt this ability came from: local_catquiz_attempts.id. Null means the value does not come from a single attempt - a recalibration of the scale estimates every person from the whole response set."/>
         <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="person ability in given catscale"/>
         <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/> <!-- TODO: To be implemented -->
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Status"/>
+        <FIELD NAME="n" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="number of graded, non-pilot items behind this estimate"/>
+        <FIELD NAME="fraction" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="fraction of correct answers"/>
+        <FIELD NAME="isprimary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if this is the reported scale of the attempt this row came from"/>
+        <FIELD NAME="isvalid" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if the estimate is valid. Reads take the newest valid row per user, context and scale."/>
+        <FIELD NAME="resultsource" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="origin of the value: current | prior | legacy | recalibration"/>
+        <FIELD NAME="validationstatus" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="comma-separated machine-readable rejection reason codes"/>
+        <FIELD NAME="rangelower" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Lower bound of the scale's ability range when the attempt was finalised; null when not recorded."/>
+        <FIELD NAME="rangeupper" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Upper bound of the scale's ability range when the attempt was finalised; null when not recorded."/>
+        <FIELD NAME="rangebackfilled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when the range was not recorded at finalisation but taken from the scale later (upgrade or revalidation of an older attempt)."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -180,7 +189,9 @@
         <KEY NAME="attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid_contextid_catscaleid" UNIQUE="true" FIELDS="userid,contextid,catscaleid" COMMENT="Issue #25: one person parameter per user, context and scale. The saving code keyed existing rows by userid and therefore already assumed this."/>
+        <INDEX NAME="userid_contextid_catscaleid" UNIQUE="false" FIELDS="userid,contextid,catscaleid" COMMENT="Not unique any more: the table is appended to, one row per estimate. Reads take the newest valid row per user, context and scale - see issue #25 for the previous one-row rule."/>
+        <INDEX NAME="isvalid" UNIQUE="false" FIELDS="isvalid"/>
+        <INDEX NAME="attemptid_catscaleid" UNIQUE="false" FIELDS="attemptid,catscaleid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_attempts" COMMENT="Table to save all relevant data about attempts of adaptive quiz instances.">
@@ -226,9 +237,10 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the attempt"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The CAT attempt this progress belongs to: local_catquiz_attempts.id. The external id of the component's attempt is kept in local_catquiz_attempts.attemptid and never here."/>
         <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="all data needed to continue the attempt"/>
         <FIELD NAME="quizsettings" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The quiz settings used for this attempt"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="When this progress was last saved on the server. Not when the person was last active in the browser; for that, the start time of the current question counts. 0 for rows saved before this field existed."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -291,35 +303,25 @@
             <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
         </INDEXES>
     </TABLE>
-    <TABLE NAME="local_catquiz_attemptscale" COMMENT="Per-attempt, per-scale CAT result history (issue #9). One row per finalised attempt and successfully tested scale.">
+    <TABLE NAME="local_catquiz_trace" COMMENT="Timeline of attempt requests: where the time to a question goes (issue #136). Written only while the setting attempttrace is on; holds no question or answer content.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="catattemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to local_catquiz_attempts.id (the CATquiz attempt, not the adaptivequiz attempt)"/>
+        <FIELD NAME="adaptiveattemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The attempt of the activity: adaptivequiz_attempt.id."/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catcontext"/>
-        <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="score" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="ability estimate for the scale in this attempt"/>
-        <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/>
-        <FIELD NAME="n" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="number of graded, non-pilot items in this attempt for the scale"/>
-        <FIELD NAME="fraction" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="fraction of correct answers"/>
-        <FIELD NAME="isprimary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if this is the primary/reported scale of the attempt"/>
-        <FIELD NAME="isvalid" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if the scale result is valid (primary, statistically valid, measured in this attempt)"/>
-        <FIELD NAME="resultsource" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="origin of the value: current | prior | legacy"/>
-        <FIELD NAME="validationstatus" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="comma-separated machine-readable rejection reason codes, empty when valid"/>
+        <FIELD NAME="kind" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="first_item, next_item or reload."/>
+        <FIELD NAME="questionnumber" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of the item administered in the request, 1 for the first."/>
+        <FIELD NAME="requestms" TYPE="number" LENGTH="12" NOTNULL="false" SEQUENCE="false" DECIMALS="3" COMMENT="Milliseconds from the start of the request to the end of the trace."/>
+        <FIELD NAME="dbqueries" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Database queries of the request."/>
+        <FIELD NAME="spans" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON list of spans: name, depth, offsetms, ms, queries, meta."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="catattemptid" TYPE="foreign" FIELDS="catattemptid" REFTABLE="local_catquiz_attempts" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="catscaleid" TYPE="foreign" FIELDS="catscaleid" REFTABLE="local_catquiz_catscales" REFFIELDS="id"/>
-        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="local_catquiz_catcontext" REFFIELDS="id"/>
-        <KEY NAME="catattemptid_catscaleid" TYPE="unique" FIELDS="catattemptid, catscaleid"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid_contextid_catscaleid" UNIQUE="false" FIELDS="userid, contextid, catscaleid"/>
-        <INDEX NAME="isvalid" UNIQUE="false" FIELDS="isvalid"/>
-        <INDEX NAME="isprimary" UNIQUE="false" FIELDS="isprimary"/>
+        <INDEX NAME="adaptiveattemptid" UNIQUE="false" FIELDS="adaptiveattemptid"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
       </INDEXES>
     </TABLE>
   </TABLES>

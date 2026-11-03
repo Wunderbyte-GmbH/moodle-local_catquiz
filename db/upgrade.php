@@ -507,22 +507,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Make sure the database has updated the itemid in the catquiz_itemparams table.
-        $sql = <<<SQL
-            SELECT lcip.id itemparamid, lci.id itemid
-              FROM {local_catquiz_itemparams} lcip
-              JOIN {local_catquiz_items} lci ON lci.componentid = lcip.componentid
-                  AND lci.componentname = lcip.componentname
-        SQL;
-
-        $sqlresult = $DB->get_records_sql($sql);
-
-        foreach ($sqlresult as $row) {
-            $updaterecord = new stdclass();
-            $updaterecord->id = $row->itemparamid;
-            $updaterecord->itemid = $row->itemid;
-            $DB->update_record('local_catquiz_itemparams', $updaterecord);
-        }
+        // Each parameter gets the item of its question - one item, chosen by a named rule (issue #104, K6).
+        require_once(__DIR__ . '/upgradelib.php');
+        local_catquiz_upgrade_assign_itemparam_items();
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
@@ -1460,6 +1447,153 @@ ENDSQL;
         }
 
         upgrade_plugin_savepoint(true, 2026090207, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026092601) {
+        /* Issue #95: local_catquiz_progress.attemptid held the id of the component's attempt
+           although the schema declared a foreign key to local_catquiz_attempts.id. The column keeps
+           its name; what changes is what it holds. See local_catquiz_rekey_progress_attempts() -
+           the work is done there so it can be tested against existing data. */
+        $table = new xmldb_table('local_catquiz_progress');
+
+        // A first version of this step used a temporary column and stopped half way on MySQL and
+        // MariaDB. An installation that ran it is left with that column; it goes before anything else.
+        $temp = new xmldb_field('catattemptidtmp');
+        if ($dbman->field_exists($table, $temp)) {
+            $dbman->drop_field($table, $temp);
+        }
+
+        $result = local_catquiz_rekey_progress_attempts();
+        mtrace("local_catquiz: progress re-keyed to CAT attempts - {$result['rekeyed']} rows, "
+            . "{$result['started']} running tests given a CAT attempt, "
+            . "{$result['orphans']} without an attempt (left unassigned), "
+            . "{$result['duplicates']} duplicates removed, "
+            . "{$result['mismatched']} of another person (left unassigned).");
+
+        upgrade_plugin_savepoint(true, 2026092601, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026092607) {
+        /* local_catquiz_attemptscale and local_catquiz_personparams held the same thing at
+           different grain. The person table takes over, appended to rather than overwritten; see
+           local_catquiz_merge_attemptscale_into_personparams() - the work is done there so it can
+           be tested against existing data. */
+        $result = local_catquiz_merge_attemptscale_into_personparams();
+        mtrace("local_catquiz: {$result['legacy']} person parameters marked as legacy, "
+            . "{$result['carried']} scale results carried over from local_catquiz_attemptscale.");
+
+        upgrade_plugin_savepoint(true, 2026092607, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026092902) {
+        // Issue #122: when a progress was last saved, for live monitoring. Existing rows get 0 - a
+        // time of last activity is not invented for them; the column says 'never recorded'.
+        $table = new xmldb_table('local_catquiz_progress');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'quizsettings');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026092902, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026100900) {
+        // Issue #136: timeline of attempt requests, written only while the trace is switched on.
+        $table = new xmldb_table('local_catquiz_trace');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('adaptiveattemptid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('kind', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('questionnumber', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('requestms', XMLDB_TYPE_NUMBER, '12, 3', null, null, null, null);
+        $table->add_field('dbqueries', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('spans', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_index('adaptiveattemptid', XMLDB_INDEX_NOTUNIQUE, ['adaptiveattemptid']);
+        $table->add_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100900, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026100909) {
+        // Issue #141: the activity's maximum now caps every question asked; it has to match the
+        // CAT limit of every activity, also of those not saved again since the limit changed.
+        $changed = \local_catquiz\catquiz_handler::sync_all_activity_question_limits();
+        if ($changed) {
+            mtrace("local_catquiz: maximum number of questions brought in line with the CAT settings in $changed activities.");
+        }
+
+        upgrade_plugin_savepoint(true, 2026100909, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026100913) {
+        // Issue #137: the ability range of each scale, frozen when the attempt is finalised. Older
+        // rows stay without one - a range nobody recorded is not reconstructed from today's scale.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $fields = [
+            new xmldb_field('rangelower', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'validationstatus'),
+            new xmldb_field('rangeupper', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'rangelower'),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026100913, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026100916) {
+        // Issue #137: marks a range that was not recorded at finalisation but taken from the scale
+        // later - by the recovery of older results (adaptivequizcatmodel_catquiz,
+        // cli/recover_legacy_results.php) or a revalidation. Nothing is filled here: older results
+        // keep no range until a recovery run, within its time window, judges them again.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('rangebackfilled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'rangeupper');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100916, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026101801) {
+        // Issue #86: the outer limits of the feedback ranges of every test are those of its global scale.
+        $aligned = \local_catquiz\local\feedback_limits::align_all_tests();
+        if ($aligned > 0) {
+            mtrace("local_catquiz: aligned the feedback ranges of $aligned test environment(s) to their global scale.");
+        }
+        upgrade_plugin_savepoint(true, 2026101801, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026102406) {
+        /* Issue #150 (re-audit 28.10.2026): from when on the results of attempts are stored, as the records of the
+           site give it - the upgrade log of local_catquiz at 2026082104 or later, or the first stored result. An
+           attempt finalised before counts with its own value (legacy); one finalised after without a stored row has
+           no result. Nothing in the attempts or results is changed. See result_provenance. */
+        $found = \local_catquiz\local\result\result_provenance::record(time());
+        /* Issue #157: the runtime pools and item parameter lists were built from the items of every context. They
+           are rebuilt from the items of their context only; these two application caches are emptied - not the
+           sessions, the progress of running attempts or any result. */
+        \cache::make('local_catquiz', 'runtimepool')->purge();
+        \cache::make('local_catquiz', 'catquiz_item_params')->purge();
+        mtrace('local_catquiz: results of attempts are stored since ' . userdate($found['since'])
+            . " (source: {$found['source']}).");
+        upgrade_plugin_savepoint(true, 2026102406, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2026102407) {
+        /* Issue #157 (CI 02.11.2026): a parameter row without a question (componentid 0 or null) belongs to its item by
+           itemid, and an item with activeparamid 0 is a pilot like one with null. The first version of the rule took
+           both for broken references and left such items out of the pool; the pools are built again. No data change. */
+        \cache::make('local_catquiz', 'runtimepool')->purge();
+        \cache::make('local_catquiz', 'catquiz_item_params')->purge();
+        upgrade_plugin_savepoint(true, 2026102407, 'local', 'catquiz');
     }
 
     return true;

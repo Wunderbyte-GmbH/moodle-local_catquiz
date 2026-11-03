@@ -39,11 +39,11 @@
                 {{! Local calculation section }}
                 <div class="card-header">
                     <h5>
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#localCalc">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#local-catquiz-localcalc-{{uniqid}}" aria-expanded="true" aria-controls="local-catquiz-localcalc-{{uniqid}}">
                             {{#str}}localcalculations, local_catquiz{{/str}}
                         </button>
-                    </h2>
-                    <div id="localCalc" class="accordion-collapse collapse show">
+                    </h5>
+                    <div id="local-catquiz-localcalc-{{uniqid}}" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <p class="mb-2">{{#str}}localcalculationshelp, local_catquiz{{/str}}</p>
                             {{{modelbutton}}}
@@ -57,11 +57,11 @@
                     {{! Local calculation section }}
                     <div class="card-header">
                         <h5 class="accordion-header">
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#syncActions">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#local-catquiz-syncactions-{{uniqid}}" aria-expanded="true" aria-controls="local-catquiz-syncactions-{{uniqid}}">
                                 {{#str}}syncactions, local_catquiz{{/str}}
                             </button>
                         </h5>
-                        <div id="syncActions" class="accordion-collapse collapse show">
+                        <div id="local-catquiz-syncactions-{{uniqid}}" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <p class="mb-2">{{#str}}syncactionshelp, local_catquiz{{/str}}</p>
                                 {{{syncbutton}}}
@@ -77,11 +77,11 @@
                     {{! Local calculation section }}
                     <div class="card-header">
                         <h5 class="accordion-header">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="#hubActions">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#local-catquiz-hubactions-{{uniqid}}" aria-expanded="true" aria-controls="local-catquiz-hubactions-{{uniqid}}">
                                 {{#str}}hubactions, local_catquiz{{/str}}
                             </button>
                         </h5>
-                        <div id="hubActions" class="accordion-collapse collapse show">
+                        <div id="local-catquiz-hubactions-{{uniqid}}" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <p class="mb-2">{{#str}}hubactionshelp, local_catquiz{{/str}}</p>
                                 {{{remotecalcbutton}}}
@@ -100,17 +100,22 @@
             require(['local_catquiz/calculatescales'], function(init) {
                 init.init();
             });
+            {{! Issue #31: the hub plugins are no dependency - their modules only where they are switched on. }}
+            {{#sync_as_node_enabled}}
             require(['catquizcentralhub_client/syncscale'], function(init) {
                 init.init({
                     centralHost: '{{centralhost}}'
                 });
             });
-            require(['catquizcentralhub_host/recalculateremote'], function(init) {
-                init.init();
-            });
             require(['catquizcentralhub_client/submit_responses'], function(init) {
                 init.init();
             });
+            {{/sync_as_node_enabled}}
+            {{#sync_as_hub_enabled}}
+            require(['catquizcentralhub_host/recalculateremote'], function(init) {
+                init.init();
+            });
+            {{/sync_as_hub_enabled}}
         {{/js}}
     {{/scaledetailview}}
     {{^scaledetailview}}
