@@ -167,7 +167,15 @@ class attemptfeedback implements renderable, templatable {
      */
     public function get_progress(): progress {
         if (!$this->progress) {
-            $this->progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+            try {
+                $this->progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+            } catch (\local_catquiz\teststrategy\progress_missing_exception $e) {
+                // Issue #159: a finished attempt after the retention task - read from what was stored with it.
+                $this->progress = progress::load_historical((int) $this->attemptid, 'mod_adaptivequiz');
+                if ($this->progress === null) {
+                    throw $e;
+                }
+            }
         }
         return $this->progress;
     }
@@ -784,6 +792,10 @@ class attemptfeedback implements renderable, templatable {
         $adaptiveattemptid = (int) ($feedbackdata['attemptid'] ?? $this->attemptid ?? 0);
         $catattemptid = $adaptiveattemptid ? catquiz::get_cat_attempt_id($adaptiveattemptid, 'mod_adaptivequiz') : null;
         $progress = $catattemptid === null ? null : progress::load_for_reading($catattemptid);
+        // Issue #159: after the retention task the finished attempt is read from what was stored with it.
+        if ($progress === null && $catattemptid !== null) {
+            $progress = progress::load_historical($adaptiveattemptid, 'mod_adaptivequiz');
+        }
         $result = feedback_helper::build_attempt_result(
             $abilities,
             ['se' => $feedbackdata['se'] ?? [], 'nbyscale' => $feedbackdata['nbyscale'] ?? []]

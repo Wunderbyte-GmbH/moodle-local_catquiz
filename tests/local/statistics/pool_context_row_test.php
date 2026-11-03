@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \local_catquiz\catscale::one_row_per_question
  */
-#[\PHPUnit\Framework\Attributes\CoversMethod(catscale::class, 'one_row_per_question')]
 final class pool_context_row_test extends advanced_testcase {
     /**
      * The calibrated row of the context wins over a row without parameters of an earlier context; between rows

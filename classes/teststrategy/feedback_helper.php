@@ -1232,10 +1232,17 @@ class feedback_helper {
      * @param string|int $catscaleid
      * @param bool $customlabels Use the labels defined in the settings instead of default labels
      * @param bool $withuncalculated Include the color and description for the "not yet calculated" range
+     * @param string|null $uncalculatedlabel The text of that range; null for the general "no ability was calculated".
      * @return array
      *
      */
-    public static function get_colorbarlegend($quizsettings, $catscaleid, $customlabels = true, $withuncalculated = false): array {
+    public static function get_colorbarlegend(
+        $quizsettings,
+        $catscaleid,
+        $customlabels = true,
+        $withuncalculated = false,
+        ?string $uncalculatedlabel = null
+    ): array {
         if (!$quizsettings) {
             return [];
         }
@@ -1289,7 +1296,9 @@ class feedback_helper {
         if ($withuncalculated) {
             $feedbacks[] = [
                 'subcolorcode' => LOCAL_CATQUIZ_DEFAULT_GREY,
-                'subfeedbacktext' => get_string('noresult', 'local_catquiz'),
+                // Issue #160: what grey means is the chart's to say ("no valid reported result", "no valid
+                // measurement of this scale"); the general text only where nothing else is given.
+                'subfeedbacktext' => $uncalculatedlabel ?? get_string('noresult', 'local_catquiz'),
                 'subfeedbackrange' => '',
             ];
         }

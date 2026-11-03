@@ -1,8 +1,9 @@
 name: Playwright (CAT manager UI)
 
 # Browser tests for the CAT manager UI. These need a live Moodle site, so they run
-# separately from the moodle-plugin-ci static pipeline. Manual and scheduled by
-# default to keep PR runs fast.
+# separately from the moodle-plugin-ci static pipeline. Manual, and on push to the
+# development branches; no scheduled runs (decided 02.11.2026: CI only on request,
+# push or merge).
 #
 # Why Playwright next to Behat: the UI areas of the performance work (pagination,
 # sorting, the "add question" dialog, the item parameter validity column) repeatedly
@@ -14,8 +15,8 @@ name: Playwright (CAT manager UI)
 # the repository's DEFAULT branch.
 on:
   # Manual on any branch, so a development branch can be tried before it is merged:
-  # pick the branch in the "Run workflow" dialog. Scheduled runs stay on the default
-  # branch. Pushes to the development branch run it automatically, because that is
+  # pick the branch in the "Run workflow" dialog. Pushes to the development branch
+  # run it automatically, because that is
   # where the UI work happens and a browser regression should surface there rather
   # than after a merge.
   workflow_dispatch:
@@ -24,8 +25,6 @@ on:
       - dev
       - develop
       - development
-  schedule:
-    - cron: '0 4 * * 1'
 
 jobs:
   playwright:

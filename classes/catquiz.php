@@ -3559,19 +3559,23 @@ class catquiz {
                 -- 'student' - silently removes everyone enrolled that way, which on
                 -- an LTI course is nearly the entire population.
                 LEFT JOIN (
-                    SELECT s1.userid, COUNT(*) as answercount
+                    SELECT s1.userid, COUNT(DISTINCT s1.id) as answercount
                     FROM (
                         SELECT qas.id, qas.userid, qa.questionid, qa.questionusageid
                         FROM $from
                         WHERE $where
                     ) s1
-                    JOIN {local_catquiz_items} lci ON lci.componentname = 'question' AND s1.questionid = lci.componentid
-                    -- Only select questions that have item params.
-                    JOIN {local_catquiz_itemparams} lcip ON lci.id = lcip.componentid
                     -- Make sure we only get responses from the quizzes in the given course.
                     JOIN {adaptivequiz_attempt} aa ON aa.uniqueid = s1.questionusageid
                     JOIN {adaptivequiz} a ON a.id = aa.instance
                     JOIN {local_catquiz_attempts} ca ON ca.attemptid = aa.id
+                    -- Re-audit 02.11.2026 (#157): the items of the question in the CAT context of the attempt, with
+                    -- their active params. The joins before compared an item id with a question id
+                    -- (lci.id = lcip.componentid); an answer is counted once, whatever number of items it has.
+                    JOIN {local_catquiz_items} lci
+                      ON lci.componentname = 'question' AND s1.questionid = lci.componentid AND lci.contextid = ca.contextid
+                    JOIN {local_catquiz_itemparams} lcip
+                      ON lcip.id = lci.activeparamid AND lcip.itemid = lci.id AND lcip.contextid = lci.contextid
                     WHERE $where3 AND $populationwhere
                     GROUP BY s1.userid
                 ) s2 ON ue.userid = s2.userid

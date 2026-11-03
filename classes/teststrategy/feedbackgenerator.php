@@ -134,7 +134,15 @@ abstract class feedbackgenerator {
             return $this->progress;
         }
 
-        $this->progress = progress::load($this->attemptid, $this->component, $this->contextid);
+        try {
+            $this->progress = progress::load($this->attemptid, $this->component, $this->contextid);
+        } catch (progress_missing_exception $e) {
+            // Issue #159: a finished attempt after the retention task - read from what was stored with it.
+            $this->progress = progress::load_historical((int) $this->attemptid, (string) $this->component);
+            if ($this->progress === null) {
+                throw $e;
+            }
+        }
         return $this->progress;
     }
 

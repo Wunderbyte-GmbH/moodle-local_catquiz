@@ -51,12 +51,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @covers \local_catquiz\output\catquizstatistics::render_abilityprofilechart
  * @covers \local_catquiz\output\catquizstatistics::get_chart_data
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(attempt_population::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(result_provenance::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(learning_progress_series::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(statistics_diagnosis::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(catquizstatistics::class, 'render_abilityprofilechart')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(catquizstatistics::class, 'get_chart_data')]
 final class root_result_contract_test extends advanced_testcase {
     /** @var int[] CAT contexts by name: 1601, 1603 (earlier calibrations), 1605 (now). */
     private array $contexts = [];

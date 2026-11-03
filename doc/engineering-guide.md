@@ -367,6 +367,9 @@ bis der Marker verschwunden und die neue Seite fertig ist; ohne Seitenwechsel fe
 6. phpcs plugin-weit Exit 0: ganzer Baum mit `make phpcs` (Ausschlüsse und Warnschwelle wie die CI,
    `--max-warnings 0`), nie nur die Dateien, die man für geändert hält. Am 28.10.2026 rutschten so neun
    Fehler in `tests/behat/behat_catquiz.php` bis in die CI.
+   Und **im Moodle-Baum** (`make phpcs` tut das seit 02.11.2026): Nur dort kennt moodle-cs die Moodle-Version
+   (auf 4.5 verstecken Attribute zwischen Docblock und Klasse die `@covers`-Angaben) und prüft die Sortierung der
+   Sprachstrings. Aus dem Arbeitsbaum gemessen war beides unsichtbar; die Main-CI von 1.2 wurde rot.
 7. Interne Version erhöht; CHANGELOG + Session-Doku aktualisiert.
 8. Beide ZIPs gebaut, Datei-/Ausschlusszahlen geprüft, präsentiert. Dabei
    sichergestellt, dass **kein** `.git`-Verzeichnis (auch kein verschachteltes)

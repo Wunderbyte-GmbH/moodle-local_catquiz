@@ -162,6 +162,13 @@ class catquizstatistics {
     private int $rootscaleid;
 
     /**
+     * Attempts a usage chart classified by the reported result of a subscale, attempt id => scale (issue #160).
+     *
+     * @var array
+     */
+    private array $usageclassbyprimary = [];
+
+    /**
      * @var int $endtime
      */
     private int $endtime;
@@ -425,50 +432,101 @@ class catquizstatistics {
      * @return array
      */
     private function get_attempts_per_timerange_data(): array {
-        $attemptsbytimerange = $this->get_attempts_by_timerange(true);
-        if (!$attemptsbytimerange) {
+        // Sets the periods of the page (timerangekeys); the attempts themselves are classified below.
+        if (!$this->get_attempts_by_timerange(true)) {
             return [];
         }
+        $qs = $this->get_quizsettings();
+        // Without usable settings: range 1 for "a result", as before.
+        $maxrange = $qs ? (int) $qs->numberoffeedbackoptionsselect : 1;
         $countsbyrange = [];
-        $total = 0;
-        if (!$qs = $this->get_quizsettings()) {
-            // We use only one range '1' if the quizsettings do not match between different quizzes.
+        for ($i = 0; $i <= $maxrange; $i++) {
             foreach ($this->timerangekeys as $timepoint) {
-                $countsbyrange[0][$timepoint] = 0;
-                $countsbyrange[1][$timepoint] = 0;
+                $countsbyrange[$i][$timepoint] = 0;
             }
-            foreach ($attemptsbytimerange as $timestamp => $attempts) {
-                foreach ($attempts as $attempt) {
-                    $total++;
-                    // Not "if ($attempt)": a result of 0.0 is a result.
-                    $countsbyrange[$attempt === null ? 0 : 1][$timestamp]++;
-                }
+        }
+        $total = 0;
+        $records = $this->get_attempts();
+        $timerange = feedback_helper::get_timerange_for_attempts((int) reset($records)->endtime, $this->endtime);
+        foreach ($records as $record) {
+            $bucket = feedback_helper::return_datestring_label($timerange, (int) $record->endtime);
+            if (!isset($countsbyrange[0][$bucket])) {
+                continue;
             }
-        } else {
-            for ($i = 0; $i <= $qs->numberoffeedbackoptionsselect; $i++) {
-                foreach ($this->timerangekeys as $timepoint) {
-                    $countsbyrange[$i][$timepoint] = 0;
-                }
+            $total++;
+            // Issue #160: by the reported result of the attempt, not only by a measurement of the requested scale.
+            $range = $this->usage_class($record, $qs);
+            if ($range === null) {
+                // A value outside every configured range: left out, as before.
+                continue;
             }
-            foreach ($attemptsbytimerange as $timestamp => $attempts) {
-                foreach ($attempts as $attempt) {
-                    $total++;
-                    if (is_null($attempt)) {
-                        $countsbyrange[0][$timestamp]++;
-                        continue;
-                    }
-                    if (!$range = feedback_helper::get_range_of_value($qs, $this->scaleid, $attempt)) {
-                        continue;
-                    }
-                    $countsbyrange[$range][$timestamp]++;
-                }
-            }
+            $countsbyrange[$range][$bucket]++;
         }
         return [
             'labels' => array_values($this->timerangekeys),
             'series' => array_map('array_values', $countsbyrange),
-            'population' => ['attempts' => $total],
+            'population' => ['attempts' => $total, 'byprimary' => $this->usageclassbyprimary],
         ];
+    }
+
+    /**
+     * The class an attempt has in the usage charts ("Anzahl an Testversuchen", "Testversuche pro Person";
+     * issue #160).
+     *
+     * Two modes, chosen by the scale asked for:
+     *  - the root scale: the reported primary result of the attempt. Its valid measurement of the root scale when
+     *    there is one; otherwise its valid primary result on a subscale (LOWESTSUB, RELSUBS ...), classified by
+     *    the feedback ranges of THAT scale - abilities of different scales are never put on one axis;
+     *  - a subscale: the valid measurement of this very scale, nothing else.
+     * 0 is "no valid result" in the sense of the mode (see usage_noresult_label()); null a value outside every
+     * configured range. The ranges are those of the current test settings: no earlier state of them is stored.
+     *
+     * @param \stdClass $record A record of attempt_population::attempts().
+     * @param \stdClass|null $qs The settings of the tests of the page, null when they do not agree.
+     * @return int|null
+     */
+    private function usage_class(\stdClass $record, ?\stdClass $qs): ?int {
+        $scaleid = $this->scaleid;
+        $value = $record->value;
+        if ($value === null && $this->scaleid === $this->rootscaleid && ($record->primaryvalue ?? null) !== null) {
+            $scaleid = (int) $record->primaryscaleid;
+            $value = (float) $record->primaryvalue;
+        }
+        if ($value === null) {
+            return 0;
+        }
+        if (!$qs) {
+            return 1;
+        }
+        $range = feedback_helper::get_range_of_value($qs, $scaleid, $value);
+        if ($range && $scaleid !== $this->scaleid) {
+            $this->usageclassbyprimary[(int) $record->id] = $scaleid;
+        }
+        return $range ?: null;
+    }
+
+    /**
+     * The label of class 0 in the usage charts: what "grey" means in the mode of the page (issue #160).
+     *
+     * @return string
+     */
+    private function usage_noresult_label(): string {
+        return $this->scaleid === $this->rootscaleid
+            ? get_string('noreportedresult', 'local_catquiz')
+            : get_string('novalidmeasurementofscale', 'local_catquiz');
+    }
+
+    /**
+     * The note under a usage chart: how it classifies, and that the ranges are today's (issue #160).
+     *
+     * @param int $byprimary Number of attempts classified by the reported result of a subscale.
+     * @return string HTML
+     */
+    private function usage_note(int $byprimary): string {
+        $text = $this->scaleid === $this->rootscaleid
+            ? get_string('usagechart_note_reported', 'local_catquiz', $byprimary)
+            : get_string('usagechart_note_scale', 'local_catquiz');
+        return \html_writer::tag('p', $text, ['class' => 'text-muted small catquiz-usagechart-note']);
     }
 
     /**
@@ -495,9 +553,9 @@ class catquizstatistics {
         $chart->set_labels($data['labels']);
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $serieslabels = is_null($qs)
-            ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
+            ? [$this->usage_noresult_label(), get_string('hasability', 'local_catquiz')]
             : array_map(fn ($r) => get_string('feedbackrange', 'local_catquiz', $r), array_keys($data['series']));
-        $serieslabels[0] = get_string('noresult', 'local_catquiz');
+        $serieslabels[0] = $this->usage_noresult_label();
         foreach ($data['series'] as $range => $counts) {
             $series = new chart_series($serieslabels[$range], $counts);
             $series->set_color($colors[$range - 1]);
@@ -508,6 +566,7 @@ class catquizstatistics {
         $chart->set_legend_options(['display' => false]);
         // With its data table (issue #151): the counts per day readable without the picture, as the histograms.
         $out = $OUTPUT->render_chart($chart, true);
+        $out .= $this->usage_note(count($data['population']['byprimary'] ?? []));
 
         return [
             'charttitle' => get_string('catquizstatistics_numattempts_title', 'local_catquiz'),
@@ -711,9 +770,10 @@ class catquizstatistics {
         );
 
         if ($data['population']['persons'] === 0 || array_sum($data['series']['counter']) === 0) {
-            // No bar: say why, and do not compute the information of a pool for a chart that is not drawn (issue
-            // #150, re-audit 28.10.2026). When the attempts report other scales - the subscales of a test under
-            // "lowest skill gap" -, say so: there are results, only none in this scale.
+            // No bar: say why (issue #150, re-audit 28.10.2026). When the attempts report other scales - the subscales
+            // of a test under "lowest skill gap" -, say so: there are results, only none in this scale. The test
+            // information of the pool does not depend on the persons: for those who may see it, it is shown on its
+            // own (re-audit 02.11.2026).
             $notice = $data['population']['persons'] === 0 && $data['population']['primarypersons'] > 0
                 ? get_string('abilityprofilenoreportedvalue', 'local_catquiz', (object) [
                     'scale' => $scalename,
@@ -726,7 +786,9 @@ class catquizstatistics {
                     chart_output::notice($notice),
                     '',
                     ['data-region' => 'local_catquiz-abilityprofile-novalue']
-                ) . $population,
+                ) . $population . ($canviewall
+                    ? $this->testinfo_without_bars($feedbackhelper, $abilitysteps, $data, $scalename)
+                    : ''),
                 'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
             ];
         }
@@ -794,6 +856,52 @@ class catquizstatistics {
             'chart' => chart_output::render($chart, true, $nodata) . $population . $notes,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
         ];
+    }
+
+    /**
+     * The test information of the pool when no person has a valid value of the scale (re-audit 02.11.2026, #150).
+     *
+     * The information of the items with their active parameters does not depend on who took the test: it is shown
+     * on its own, unscaled, as a line over the ability steps - not with the bars it would otherwise be scaled to.
+     * Without it, the reason (no items, no parameters, not computable), as with bars.
+     *
+     * @param feedback_helper $feedbackhelper
+     * @param array $abilitysteps
+     * @param array $data get_abilityprofile_data()
+     * @param string $scalename
+     * @return string HTML
+     */
+    private function testinfo_without_bars(
+        feedback_helper $feedbackhelper,
+        array $abilitysteps,
+        array $data,
+        string $scalename
+    ): string {
+        $testinfodata = $feedbackhelper->testinfo_for_scale(
+            (int) $this->scaleid,
+            $this->get_testinfo_contextid(),
+            $abilitysteps
+        );
+        $notes = feedback_helper::testinfo_note($testinfodata, $scalename);
+        $testinfo = $testinfodata['values'] ?? null;
+        if ($testinfo === null) {
+            return $notes;
+        }
+        $chart = new \core\chart_line();
+        $series = new chart_series(get_string('testinfolabel', 'local_catquiz'), array_values($testinfo));
+        $series->set_smooth(true);
+        $chart->add_series($series);
+        $chart->set_labels($data['labels']);
+        $chart->set_legend_options(['display' => true]);
+        $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
+        $chart->get_yaxis(0, true)->set_label(get_string('testinfolabel', 'local_catquiz'));
+        return \html_writer::div(
+            \html_writer::div(s(get_string('testinfowithoutbars', 'local_catquiz', $scalename)), 'small text-muted')
+                . chart_output::render($chart, true, get_string('abilityprofilenodata', 'local_catquiz'))
+                . $notes,
+            '',
+            ['data-region' => 'local_catquiz-testinfo-withoutbars']
+        );
     }
 
     /**
@@ -1349,18 +1457,35 @@ class catquizstatistics {
             $maxrange = $qs->numberoffeedbackoptionsselect;
         }
 
-        // The same scope as the rest of the page: test, period and selection included. Without
-        // them this chart answered a different question than the heading above it.
-        $maxattempts = catquiz::get_max_attempts_per_person(
-            $this->contextid,
+        // Issue #160: per person from the population of the page - the same scope, selection and groups as every
+        // other chart, without a query of its own. The class is that of the person's latest attempt with a valid
+        // result in the mode of the page (usage_class()); the number counts all their attempts in the scope.
+        $persons = [];
+        $this->usageclassbyprimary = [];
+        // This chart shows people: it keeps the group restriction it always had.
+        $allowed = $this->get_allowed_userids_for_charts();
+        foreach ($this->population->attempts('', $allowed === null ? null : array_map('intval', $allowed)) as $record) {
+            $userid = (int) $record->userid;
+            $persons[$userid] = $persons[$userid] ?? ['attempts' => 0, 'range' => 0];
+            $persons[$userid]['attempts']++;
+            $range = $this->usage_class($record, $qs);
+            if ($range) {
+                // Ordered by end time: the latest classified attempt wins.
+                $persons[$userid]['range'] = $range;
+            }
+        }
+        // Who could have taken a test of the scope and has no attempt in it (issue #132).
+        $eligible = \local_catquiz\local\statistics\eligible_population::userids(
             $this->scaleid,
-            $this->courseid,
-            $this->get_allowed_userids_for_charts(),
-            $this->testid,
-            $this->starttime,
-            $this->endtime,
-            $this->population->get_selection()
+            $this->courseid ?: null,
+            $this->testid ?: null
         );
+        if ($allowed !== null) {
+            $eligible = array_intersect($eligible, array_map('intval', $allowed));
+        }
+        $noattempt = count(array_diff(array_map('intval', $eligible), array_keys($persons)));
+
+        $maxattempts = $persons ? max(array_column($persons, 'attempts')) : 0;
         if ($maxattempts == 0) {
             $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
         }
@@ -1369,18 +1494,14 @@ class catquizstatistics {
         // means, that each bar covers a range of $classwidth attempts.
         $classwidth = (int) ceil($maxattempts / self::ATTEMPTS_PER_PERSON_CLASSES);
 
-        $counts = catquiz::get_attempts_per_person_histogram(
-            $this->contextid,
-            $this->scaleid,
-            $this->courseid,
-            $classwidth,
-            $qs ? feedback_helper::get_feedback_range_bounds($qs, $this->scaleid) : [],
-            $this->get_allowed_userids_for_charts(),
-            $this->testid,
-            $this->starttime,
-            $this->endtime,
-            $this->population->get_selection()
-        );
+        $counts = [];
+        if ($noattempt > 0) {
+            $counts[0][0] = $noattempt;
+        }
+        foreach ($persons as $person) {
+            $bin = (int) ceil($person['attempts'] / $classwidth);
+            $counts[$person['range']][$bin] = ($counts[$person['range']][$bin] ?? 0) + 1;
+        }
 
         if (empty($counts)) {
             return [];
@@ -1443,6 +1564,7 @@ class catquizstatistics {
                 'persons' => $persons,
                 'personswithvalue' => $withvalue,
                 'noattempt' => array_sum(array_map(fn($bins) => $bins[0], $chartdata)),
+                'byprimary' => count($this->usageclassbyprimary),
             ],
         ];
     }
@@ -1477,9 +1599,9 @@ class catquizstatistics {
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
 
         $serieslabels = is_null($qs)
-            ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
+            ? [$this->usage_noresult_label(), get_string('hasability', 'local_catquiz')]
             : array_map(fn ($r) => get_string('feedbackrange', 'local_catquiz', $r), array_keys($chartdata));
-        $serieslabels[0] = get_string('noresult', 'local_catquiz');
+        $serieslabels[0] = $this->usage_noresult_label();
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_labels($data['labels']);
@@ -1495,6 +1617,7 @@ class catquizstatistics {
         $chart->set_legend_options(['display' => false]);
         // With the table of values: the chart can be read without seeing it (issue #132).
         $out = $OUTPUT->render_chart($chart, true);
+        $out .= $this->usage_note((int) ($data['population']['byprimary'] ?? 0));
 
         if (
             optional_param('debug', false, PARAM_BOOL)
@@ -1529,7 +1652,8 @@ class catquizstatistics {
                     $qs,
                     $this->scaleid,
                     $this->check_quizsettings_are_compatible(self::COMPATIBILITY_LEVEL_DESCRIPTION),
-                    true
+                    true,
+                    $this->usage_noresult_label()
                 );
                 $colorbarlegend = ['feedbackbarlegend' => $legend];
             } catch (LogicException $e) {

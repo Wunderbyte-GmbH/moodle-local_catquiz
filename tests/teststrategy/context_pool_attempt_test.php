@@ -62,10 +62,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @covers \local_catquiz\catquiz::return_sql_for_catscalequestions
  * @covers \local_catquiz\teststrategy\progress::get_contextid
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_catquiz\catquiz_handler::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\local_catquiz\catquiz::class, 'return_sql_for_catscalequestions')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\local_catquiz\teststrategy\progress::class, 'get_contextid')]
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_catquiz\teststrategy\preselect_task\updatepersonability::class)]
 final class context_pool_attempt_test extends advanced_testcase {
     /** @var \stdClass The activity. */
     private \stdClass $adaptivequiz;

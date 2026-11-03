@@ -32,7 +32,6 @@ use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\monitoring\timeline;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
@@ -633,15 +632,9 @@ abstract class strategy {
                 $catscaleid,
                 ...catscale::get_subscale_ids($catscaleid),
             ];
-            $itemparamlists = [];
-            foreach (array_keys(model_strategy::get_installed_models()) as $model) {
-                $itemparamlists[$model] = model_item_param_list::get(
-                    $catscalecontext,
-                    $model,
-                    $catscaleids
-                )->count();
-            }
-            if (array_sum($itemparamlists) === 0) {
+            // Re-audit 02.11.2026 (#157): the active parameters, as the pool has them; parameters behind a reference
+            // that does not resolve count as none.
+            if (model_item_param_list::get($catscalecontext, null, $catscaleids)->count() === 0) {
                 $this->context['progress']->drop_scale($catscaleid);
                 unset($selectedscales[array_search($catscaleid, $selectedscales)]);
             }

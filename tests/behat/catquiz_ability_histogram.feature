@@ -279,7 +279,37 @@ Feature: The ability profile is drawn without item parameters (issue #150).
     And I should see "n = 0 persons" in the "[data-chartname='abilityprofile']" "css_element"
     And I should see "Out of 3 completed attempts of 3 persons in the selection" in the "[data-chartname='abilityprofile']" "css_element"
     And I should see "every test of the scale in this course (1)" in the "[data-chartname='abilityprofile']" "css_element"
-    And "[data-chartname='abilityprofile'] canvas" "css_element" should not exist
-    And I should not see "Test information" in the "[data-chartname='abilityprofile']" "css_element"
+    ## No bar - but the test information of the pool does not depend on the persons (re-audit 02.11.2026): its own
+    ## line, unscaled, for the teacher.
+    And "[data-chartname='abilityprofile'] [data-region='local_catquiz-abilityprofile-novalue'] canvas" "css_element" should not exist
+    And I wait until "[data-chartname='abilityprofile'] [data-region='local_catquiz-testinfo-withoutbars'] .chart-image canvas" "css_element" exists
+    And I should see "Test information of the current item pool of “Simulation”" in the "[data-chartname='abilityprofile']" "css_element"
     And "[data-chartname='detectedscales'] .chart-image canvas" "css_element" should be visible
+    And the recorded charts were drawn without an error
+
+  @javascript @accessibility
+  Scenario: Lowest skill gap in the usage charts: a valid reported subscale is not "no ability" (issue #160)
+    ## Test 20: the root scale is nowhere measured validly, but the reported subscale is valid for two of three.
+    Given results of CAT attempts are stored since 30 days ago
+    And the following CAT results of "adaptivecatquizA" exist under the lowest skill gap:
+      | user     | days ago | root ability | reported scale | reported ability | root reasons                          |
+      | student1 | 3        | 0.7          | SimA           | -1.0             | se_max,reporting_disabled,not_primary |
+      | student2 | 2        | 0.7          | SimB           | -0.5             | se_max,reporting_disabled,not_primary |
+    And the following CAT attempts of "adaptivecatquizA" ended without a stored result:
+      | user     | days ago | root ability |
+      | student3 | 1        | -1.3505      |
+    When I am on the "page1" "page activity" page logged in as teacher
+    And I click on "Testusage" "link" in the "#region-main" "css_element"
+    And I wait until "[data-chartname='attemptsperperson'] .chart-image canvas" "css_element" exists
+    And I wait until "[data-chartname='attemptspertimerange'] .chart-image canvas" "css_element" exists
+    Then I should see "this applies to 2 attempt(s) here" in the "[data-chartname='attemptsperperson']" "css_element"
+    And I should see "this applies to 2 attempt(s) here" in the "[data-chartname='attemptspertimerange']" "css_element"
+    ## The legend of the data table: grey means "no valid reported result", and it holds one person, not three.
+    When I click on "Show chart data" "link" in the "[data-chartname='attemptsperperson']" "css_element"
+    Then I should see "No valid reported result" in the "[data-chartname='attemptsperperson'] .chart-table-data" "css_element"
+    And I should not see "No ability was calculated" in the "[data-chartname='attemptsperperson']" "css_element"
+    When I click on "Show chart data" "link" in the "[data-chartname='attemptspertimerange']" "css_element"
+    Then I should see "No valid reported result" in the "[data-chartname='attemptspertimerange'] .chart-table-data" "css_element"
+    And the "[data-chartname='attemptsperperson']" "css_element" should meet accessibility standards with "wcag131, wcag141, wcag412" extra tests
+    And the "[data-chartname='attemptspertimerange']" "css_element" should meet accessibility standards with "wcag131, wcag141, wcag412" extra tests
     And the recorded charts were drawn without an error

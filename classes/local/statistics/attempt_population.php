@@ -302,7 +302,9 @@ final class attempt_population {
      * Every record carries `value` (the valid result for the requested scale or null), `primaryvalid`
      * (whether the reported scale of the attempt has a valid result), `provenance` (result_provenance::STORED,
      * LEGACY or NORESULT), `legacy` (provenance LEGACY) and `valuesource`: 'reported' (the valid result of the
-     * attempt), 'measured' (a valid measurement of a scale the attempt did not report), 'legacy', or null.
+     * attempt), 'measured' (a valid measurement of a scale the attempt did not report), 'legacy', or null;
+     * `primaryscaleid` and `primaryvalue`: the valid reported primary result of the attempt, whatever scale it is
+     * on (issue #160) - for LOWESTSUB often a subscale while the requested root scale has no valid measurement.
      *
      * @param string $fields Columns of local_catquiz_attempts, alias a; id, userid, scaleid, endtime and json
      *                       are always read.
@@ -355,17 +357,25 @@ final class attempt_population {
                     $record->valuesource = (int) $row->isvalid === 1 ? 'reported' : 'measured';
                 }
                 $record->primaryvalid = $stored[$id]['primaryvalid'];
+                $primary = $stored[$id]['primary'];
+                $record->primaryscaleid = $primary && $primary->ability !== null ? (int) $primary->catscaleid : null;
+                $record->primaryvalue = $record->primaryscaleid !== null ? (float) $primary->ability : null;
                 $record->provenance = result_provenance::STORED;
             } else if (result_provenance::without_stored_results((int) $record->endtime) === result_provenance::LEGACY) {
                 $record->value = self::legacy_value($record, $json, $this->scaleid, $this->rootscaleid);
                 $record->valuesource = $record->value !== null ? 'legacy' : null;
-                // Never judged: valid, like its value.
+                // Never judged: valid, like its value. Its reported result is the one of the root scale.
                 $record->primaryvalid = true;
+                $rootvalue = self::legacy_value($record, $json, $this->rootscaleid, $this->rootscaleid);
+                $record->primaryscaleid = $rootvalue !== null ? $this->rootscaleid : null;
+                $record->primaryvalue = $rootvalue;
                 $record->provenance = result_provenance::LEGACY;
             } else {
                 // Judged at finalisation, nothing stored: no result, whatever the attempt carries (issue #150).
                 $record->value = null;
                 $record->primaryvalid = false;
+                $record->primaryscaleid = null;
+                $record->primaryvalue = null;
                 $record->provenance = result_provenance::NORESULT;
             }
             $record->legacy = $record->provenance === result_provenance::LEGACY;
@@ -414,10 +424,12 @@ final class attempt_population {
             );
             foreach ($rows as $row) {
                 $id = (int) $row->attemptid;
-                $stored[$id] = $stored[$id] ?? ['scales' => [], 'primaryvalid' => false];
+                $stored[$id] = $stored[$id] ?? ['scales' => [], 'primaryvalid' => false, 'primary' => null];
                 $stored[$id]['scales'][(int) $row->catscaleid] = $row;
                 if ((int) $row->isprimary === 1 && (int) $row->isvalid === 1) {
                     $stored[$id]['primaryvalid'] = true;
+                    // Issue #160: the reported primary result itself - its scale may be a subscale.
+                    $stored[$id]['primary'] = $row;
                 }
             }
             $rows->close();

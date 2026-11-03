@@ -239,6 +239,13 @@ class progress implements JsonSerializable {
     private stdClass $quizsettings;
 
     /**
+     * Issue #159: rebuilt from what was stored with a finished attempt after its progress was removed - read only.
+     *
+     * @var bool
+     */
+    private bool $historical = false;
+
+    /**
      * Files the CAT attempt for a test that is starting.
      *
      * Only what is known at the start is written: the person, the attempt of the component and a
@@ -387,6 +394,106 @@ class progress implements JsonSerializable {
            (Issue #6). Keeping it also prevents the pending item from being selected
            again as if it were a new question. */
         return $instance;
+    }
+
+    /**
+     * The progress of a finished attempt whose progress was removed by the retention task, rebuilt read-only from
+     * what was stored with the attempt when it was finalised (issue #159).
+     *
+     * Nothing is played again, nothing is estimated again with today's item parameters, nothing is written: the
+     * questions in their order with the answer, scale and Fisher information they had, the abilities of the result,
+     * the context and the start of the attempt. The settings come as for any progress stored without them (the
+     * test's). What the stored data do not hold (the per-step trace, the state of the selection) stays empty; the
+     * sections that would need it say so.
+     *
+     * @param int $adaptiveattemptid Id of the attempt of the component: adaptivequiz_attempt.id.
+     * @param string $component
+     * @return self|null Null while the attempt is running, without stored data, or without a CAT attempt.
+     */
+    public static function load_historical(int $adaptiveattemptid, string $component): ?self {
+        global $DB;
+        $catattemptid = catquiz::get_cat_attempt_id($adaptiveattemptid, $component);
+        if ($catattemptid === null) {
+            return null;
+        }
+        $attempt = $DB->get_record('local_catquiz_attempts', ['id' => $catattemptid]);
+        if (!$attempt || empty($attempt->endtime)) {
+            return null;
+        }
+        $stored = json_decode((string) $attempt->json);
+        if (!is_object($stored) || empty($stored->personabilities)) {
+            return null;
+        }
+        $root = (int) ($stored->catscaleid ?? $attempt->scaleid);
+        $parents = $DB->get_records_menu('local_catquiz_catscales', null, '', 'id, parentid');
+        $played = [];
+        $byscale = [];
+        $responses = [];
+        foreach ((array) ($stored->graphicalsummary_data ?? []) as $row) {
+            $row = (object) $row;
+            if (empty($row->id)) {
+                continue;
+            }
+            $pilot = !empty($row->pilot);
+            $question = (object) [
+                'id' => (string) $row->id,
+                'componentid' => (string) $row->id,
+                'label' => (string) ($row->questionname ?? ''),
+                'idnumber' => (string) ($row->questionname ?? ''),
+                'name' => (string) ($row->questiontitle ?? ''),
+                'catscaleid' => (string) ($row->questionscale ?? ''),
+                'difficulty' => $row->difficulty ?? null,
+                'is_pilot' => $pilot,
+                'fisherinformation' => $pilot ? [] : [$root => (float) ($row->fisherinformation ?? 0)],
+            ];
+            $played[$question->id] = $question;
+            // As the progress files a question: under its scale and every ancestor.
+            for ($scaleid = (int) $question->catscaleid, $guard = 0; $scaleid > 0 && $guard < 50; $guard++) {
+                $byscale[$scaleid][] = $question->id;
+                $scaleid = (int) ($parents[$scaleid] ?? 0);
+            }
+            if (isset($row->lastresponse)) {
+                $responses[$question->id] = ['questionid' => $question->id, 'fraction' => (float) $row->lastresponse];
+            }
+        }
+        $abilities = [];
+        foreach ((array) ($stored->updated_personabilities ?? []) as $scaleid => $entry) {
+            if (is_object($entry) && isset($entry->value) && is_numeric($entry->value)) {
+                $abilities[$scaleid] = (float) $entry->value;
+            }
+        }
+        foreach ((array) $stored->personabilities as $scaleid => $value) {
+            if (is_numeric($value)) {
+                $abilities[$scaleid] = (float) $value;
+            }
+        }
+        $data = [
+            'progressformat' => self::FORMAT_COMPACT, 'playedquestions' => $played, 'playedquestionsbyscale' => $byscale,
+            'isfirstquestion' => false, 'lastquestion' => null, 'breakend' => null, 'activescales' => [],
+            'droppedscales' => [], 'contextid' => (int) $attempt->contextid, 'responses' => $responses,
+            'abilities' => $abilities, 'preattemptabilities' => [], 'forcedbreakend' => null, 'lockedscales' => [],
+            'usageid' => null, 'session' => null, 'excludedquestions' => [], 'gaveupquestions' => [],
+            'starttime' => (int) $attempt->starttime, 'abilitytrace' => [],
+        ];
+        $object = (object) [
+            'id' => null, 'userid' => (int) $attempt->userid, 'component' => $component, 'attemptid' => $catattemptid,
+            'json' => json_encode($data), 'quizsettings' => null,
+        ];
+        // Read only: populate_from_object() without the cache neither saves nor caches (issue #149).
+        $instance = self::populate_from_object($object, (int) $attempt->contextid, false);
+        $instance->historical = true;
+        $instance->hasnewresponse = false;
+        $instance->ignorelastresponse = false;
+        return $instance;
+    }
+
+    /**
+     * Whether this progress was rebuilt from a finished attempt after its own was removed (issue #159).
+     *
+     * @return bool
+     */
+    public function is_historical(): bool {
+        return $this->historical;
     }
 
     /**
@@ -775,6 +882,11 @@ class progress implements JsonSerializable {
      */
     public function save(): void {
         global $DB;
+
+        // Issue #159: a progress rebuilt from a finished attempt is never written - neither to the table nor the cache.
+        if ($this->historical) {
+            return;
+        }
 
         // Save to the DB.
         $record = (object) [

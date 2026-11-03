@@ -48,8 +48,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @covers \local_catquiz\local\statistics\statistics_diagnosis::testinfo_stages
  * @covers \local_catquiz\teststrategy\feedback_helper::testinfo_for_scale
  */
-#[\PHPUnit\Framework\Attributes\CoversMethod(statistics_diagnosis::class, 'testinfo_stages')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(feedback_helper::class, 'testinfo_for_scale')]
 final class testinfo_stages_test extends advanced_testcase {
     /** @var int[] */
     private array $contexts = [];

@@ -2,6 +2,48 @@
 
 ## 1.2.1 (in Arbeit)
 
+- Nacharbeitsauftrag nach Re-Audit vom 02.11.2026 (2026102408). Bericht: `doc/re-audit-2026-11-02.md`, Belege
+  `doc/evidence/re-audit-2026-11-02/`.
+  - CI (Main-CI 1.2 rot): Der Codechecker meldete Warnungen, die mein lokaler Lauf nicht sah, weil er im
+    Arbeitsbaum statt im Moodle-Baum lief.
+    - Unter Moodle 4.5 standen `#[CoversClass]`-Attribute zwischen Docblock und Klasse, und der Sniff fand dann die
+      `@covers`-Angaben nicht. In 1.2 sind die Attribute entfernt; PHPUnit 9 liest den Docblock.
+    - Zwei Sprachstrings waren falsch einsortiert.
+    - `make phpcs` läuft jetzt im Moodle-Baum, und `make check` synchronisiert vorher.
+  - Workflows: zeitgesteuerte Läufe entfernt (`playwright.yml`). CI läuft nur noch auf Anforderung, bei Push und bei
+    Pull Request bzw. Merge.
+  - #159: Die Ergebnisseite eines abgeschlossenen Versuchs bleibt nach dem Retention-Task gleich.
+    - Vorher stand dort „There is no result for this attempt: its progress was not found“ bzw. „No overall result“,
+      und Tabs „could not be shown“.
+    - Neu ist `progress::load_historical()`: Fehlt der Progress eines abgeschlossenen Versuchs, wird er
+      schreibgeschützt aus dem beim Abschluss gespeicherten Versuch aufgebaut (Fragenfolge, Antworten, Skalen,
+      Fähigkeiten). Kein `create_new`, kein Nachspielen, keine Neubewertung, kein Schreiben (auch nicht über
+      `save()`).
+    - Tests: `historical_feedback_cleanup_test` (echter Versuch, echter Retention-Task, Vergleich aller Abschnitte
+      für Teilnehmende und Lehrende) und Behat `catquiz_feedback_after_cleanup.feature`. RED→GREEN ausgeführt.
+  - #160: Die Nutzungsdiagramme „Anzahl an Testversuchen“ und „Testversuche pro Person“ ordnen nach dem
+    berichteten Ergebnis ein.
+    - Hat die Wurzelskala keine gültige Messung, aber eine gültige primäre Teilskala (LOWESTSUB), gilt der Versuch
+      nicht mehr als „kein Fähigkeits-Wert ermittelt“. Er wird nach den Rückmeldebereichen dieser Teilskala
+      eingeordnet.
+    - Grau heißt jetzt „kein gültiges berichtetes Ergebnis“, bei einer Teilskala „keine gültige Messung dieser
+      Skala“.
+    - Ein Hinweis unter dem Diagramm nennt die Zahl so eingeordneter Versuche und dass die Bereiche die aktuellen
+      sind.
+    - „Testversuche pro Person“ rechnet aus der Population der Seite, ohne zusätzliche Abfrage.
+    - Tests: `usage_chart_semantics_test` (Test 20: 17/13, Grenzwert 0.0, Teilskala mit eigenen Grenzen, CLASSIC,
+      keine Abfrage je Person) und Behat mit „Show chart data“ und axe. RED→GREEN ausgeführt.
+  - #150: Die Testinformation des Itempools erscheint für Berechtigte auch ohne Balken, als eigene, unskalierte
+    Linie.
+  - #157, aus dem Aufrufstellen-Inventar:
+    - SE und Startprüfung lesen die aktiven Parameter wie Pool und Schätzung. Vorher waren es alle Parameter je
+      Modell; die SE rechnete nachweislich mit einem nicht aktiven Parameter.
+    - „Beantwortete Fragen pro Person“: Der Join verglich eine Item-id mit einer Fragen-id und zählte 0 statt 15.
+    - Inventar: `doc/issue-157-call-sites.md`.
+  - Testhygiene: `add_questions_inner_limit_test` legte keine Frage an und wurde in jeder CI übersprungen. Ausgeführt
+    war er rot, weil die Frage erst nach der ersten Zählung entstand; das ist korrigiert. Katalog der übrigen Skips
+    im Bericht.
+
 - CI-Logs vom 02.11.2026 (2026102407): Playwright `itemparam-validity.spec.ts` („marks an item whose parameters cannot be
   used“) war in beiden Linien rot. Die anderen roten Markierungen der Logs (phpcpd) sind beratend; die Code-Analyse
   selbst war grün, phpcs ohne Befund (#158 erledigt).

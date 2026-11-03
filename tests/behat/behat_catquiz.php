@@ -3216,4 +3216,119 @@ JS;
             );
         }
     }
+
+    /** @var array Result pages remembered by name (issue #159). */
+    private static array $rememberedpages = [];
+
+    /**
+     * Opens the result page of the last attempt of a person in the browser, as from the report (issue #159).
+     *
+     * @When /^I open the CAT feedback page of the last attempt of "([^"]*)" at "([^"]*)"$/
+     *
+     * @param string $username
+     * @param string $idnumber
+     * @return void
+     */
+    public function i_open_the_cat_feedback_page_of_the_last_attempt(string $username, string $idnumber): void {
+        global $DB;
+        [$attempt] = $this->last_host_attempt_at($username, $idnumber);
+        [$insql, $inparams] = $DB->get_in_or_equal(\local_catquiz\catquiz::component_names('mod_adaptivequiz'));
+        $contextid = $DB->get_field_select(
+            'local_catquiz_attempts',
+            'contextid',
+            "attemptid = ? AND component $insql",
+            array_merge([$attempt->id], $inparams),
+            MUST_EXIST
+        );
+        $url = new \moodle_url(
+            '/local/catquiz/show_attemptfeedback.php',
+            ['attemptid' => $attempt->id, 'contextid' => $contextid]
+        );
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->getSession()->wait(behat_base::get_extended_timeout() * 1000, 'document.readyState === "complete"');
+    }
+
+    /**
+     * Remembers the text of the result page shown now, with its address (issue #159).
+     *
+     * @Given /^I remember the result page as "([^"]*)"$/
+     *
+     * @param string $name
+     * @return void
+     */
+    public function i_remember_the_result_page_as(string $name): void {
+        self::$rememberedpages[$name] = [
+            'url' => $this->getSession()->getCurrentUrl(),
+            'text' => $this->result_page_text(),
+        ];
+        if (self::$rememberedpages[$name]['text'] === '') {
+            throw new \Behat\Mink\Exception\ExpectationException('The result page is empty.', $this->getSession());
+        }
+    }
+
+    /**
+     * Runs the retention task the way the site does it: every finished attempt loses its progress (issue #159).
+     *
+     * @Given /^the retention task removes the progress of finished CAT attempts$/
+     *
+     * @return void
+     */
+    public function the_retention_task_removes_the_progress(): void {
+        global $DB;
+        set_config('progressretention', 'minimal', 'local_catquiz');
+        $before = $DB->count_records('local_catquiz_progress');
+        ob_start();
+        (new \local_catquiz\task\cleanup_attempt_progress())->execute();
+        ob_end_clean();
+        $finished = $DB->count_records_sql(
+            'SELECT COUNT(1) FROM {local_catquiz_progress} p JOIN {local_catquiz_attempts} a ON a.id = p.attemptid
+              WHERE a.endtime IS NOT NULL'
+        );
+        if ($before === 0 || $finished !== 0) {
+            throw new \Behat\Mink\Exception\ExpectationException(
+                "The retention task removed nothing ($before progress rows before, $finished of finished attempts left).",
+                $this->getSession()
+            );
+        }
+        \cache_helper::purge_all();
+    }
+
+    /**
+     * Opens the remembered result page again and compares what it shows (issue #159).
+     *
+     * @Then /^the result page "([^"]*)" shows the same values and labels again$/
+     *
+     * @param string $name
+     * @return void
+     */
+    public function the_result_page_shows_the_same_again(string $name): void {
+        $remembered = self::$rememberedpages[$name] ?? null;
+        if ($remembered === null) {
+            throw new \Behat\Mink\Exception\ExpectationException("No result page \"$name\" remembered.", $this->getSession());
+        }
+        $this->getSession()->visit($remembered['url']);
+        $this->getSession()->wait(behat_base::get_extended_timeout() * 1000, 'document.readyState === "complete"');
+        $text = $this->result_page_text();
+        if ($text !== $remembered['text']) {
+            $this->record_network_evidence("result page before: {$remembered['text']}");
+            $this->record_network_evidence("result page after: $text");
+            throw new \Behat\Mink\Exception\ExpectationException(
+                "The result page changed after the cleanup.\nBefore: " . \core_text::substr($remembered['text'], 0, 900)
+                    . "\nAfter:  " . \core_text::substr($text, 0, 900),
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * The visible text of the main region, without the ids generated per rendering.
+     *
+     * @return string
+     */
+    private function result_page_text(): string {
+        $region = $this->getSession()->getPage()->find('css', '#region-main');
+        $text = $region ? $region->getText() : $this->getSession()->getPage()->getText();
+        $text = preg_replace('~\b(?:[a-z_]*)?[0-9a-f]{13,}\b~i', '#', $text);
+        return trim(preg_replace('~\s+~u', ' ', $text));
+    }
 }

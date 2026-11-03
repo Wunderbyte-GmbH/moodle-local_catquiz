@@ -520,24 +520,16 @@ class model_responses {
      * @return model_item_param_list
      */
     public function get_items_for_scale(int $catscaleid, int $contextid): model_item_param_list {
-        $modelstrategy = new model_strategy($this);
         // Issue #157: the parameters of the context asked for - that of the attempt -, as the person parameters.
         $catscalecontext = $contextid ?: catscale::get_context_id($catscaleid);
         $catscaleids = [
             $catscaleid,
             ...catscale::get_subscale_ids($catscaleid),
         ];
-        $itemparamlists = [];
-        $personparams = $this->get_personparams($contextid, $catscaleids);
-        foreach (array_keys(model_strategy::get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::get(
-                $catscalecontext,
-                $model,
-                $catscaleids
-            );
-        }
-        $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
-        return $itemparamlist;
+        // Re-audit 02.11.2026 (#157): the ACTIVE parameters of the items - those the pool selects with and the
+        // ability is estimated with (catquiz::get_itemparams() without a model). Per model, the list held every
+        // parameter of the context: not active ones, and those of items whose reference does not resolve.
+        return model_item_param_list::get($catscalecontext, null, $catscaleids);
     }
 
     /**

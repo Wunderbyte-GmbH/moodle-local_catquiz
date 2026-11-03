@@ -26,7 +26,6 @@ use advanced_testcase;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \local_catquiz\local\integrity\attempt_pool_audit
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(attempt_pool_audit::class)]
 final class attempt_pool_audit_test extends advanced_testcase {
     /**
      * Three attempts: one with a calibrated question played as a pilot, one with a difficulty of another calibration,
